@@ -1,0 +1,155 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f8fafc 100%);
+}
+
+.appBg {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  box-sizing: border-box;
+  padding-top: 90px;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  background: #fff;
+  box-shadow: 0 2px 16px 0 rgba(50,60,90,0.04);
+  transition: transform 0.4s cubic-bezier(.4,2,.6,1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px;
+}
+
+.hideHeader {
+  transform: translateY(-120%);
+}
+
+.headerContent {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2vw;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2563eb;
+  letter-spacing: 1px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.centerNav {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+
+.searchBar {
+  flex: 1 1 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.searchInput {
+  width: 320px;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: 1.5px solid #e3e3e3;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border 0.2s;
+  box-shadow: 0 1px 8px #2563eb11;
+}
+.searchInput:focus {
+  border: 1.5px solid #2563eb;
+}
+
+nav {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+}
+nav button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #222;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+nav button:hover, nav .active {
+  background: #2563eb22;
+  color: #2563eb;
+}
+
+.main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 3vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.headerContent > button {
+  margin-left: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .headerContent {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: stretch;
+    padding: 0 1vw;
+  }
+  .centerNav {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .searchBar {
+    width: 100%;
+    margin-bottom: 0.7rem;
+  }
+  nav {
+    gap: 0.7rem;
+  }
+  .searchInput {
+    width: 100%;
+    min-width: 0;
+  }
+  .categories {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .heroContent h1 {
+    font-size: 2.1rem;
+  }
+  .heroSearch {
+    width: 180px;
+  }
+  .main {
+    padding: 1rem 1vw;
+  }
+} 
