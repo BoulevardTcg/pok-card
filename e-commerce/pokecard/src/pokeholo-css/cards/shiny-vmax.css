@@ -115,14 +115,7 @@
 
 .card[data-rarity="rare shiny vmax"] .card__glare {
 	
-	background-image: 
-		radial-gradient( 
-			farthest-corner circle at 
-			var(--pointer-x) var(--pointer-y), 
-			hsla(248, 5%, 90%, 0.45) 0%, 
-			hsla(206, 5%, 30%, 0.45) 45%, 
-			hsla(0, 0%, 0%, .33) 120% 
-		);
+
 
 	filter: brightness(1) contrast(1.25);
 
@@ -145,7 +138,7 @@
 			hsla(0, 0%, 0%, .75) 100% 
 		);
 
-  filter: brightness(1) contrast(1.25);
+  filter: brightness(0.2) contrast(1.25);
   mix-blend-mode: overlay;
 	opacity: 1;
 

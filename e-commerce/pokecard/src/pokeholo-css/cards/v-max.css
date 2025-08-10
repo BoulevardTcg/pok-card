@@ -128,8 +128,8 @@
 
 .card[data-rarity="rare holo vmax"] .card__glare {
 
-  mix-blend-mode: hard-light;
-  filter: brightness(1) contrast(1);
+ 
+  filter: brightness(0) contrast(0);
 
   /* Lumière de souris supprimée pour le test */
 
