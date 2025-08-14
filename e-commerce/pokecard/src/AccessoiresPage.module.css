@@ -1,0 +1,369 @@
+/* ===== PAGE ACCESSOIRES TCG ===== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Contrôles */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  color: #e2e8f0;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.filterSelect {
+  padding: 0.5rem 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.checkboxes {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.checkbox {
+  margin: 0;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
+.sorting {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.sorting label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.sortSelect {
+  padding: 0.5rem 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sortSelect:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+/* Grille d'accessoires */
+.accessoiresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.accessoireCard {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.accessoireCard:hover {
+  transform: translateY(-8px);
+  border-color: #10b981;
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+}
+
+.accessoireImage {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.accessoireImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.accessoireCard:hover .accessoireImage img {
+  transform: scale(1.1);
+}
+
+.newBadge, .saleBadge, .popularBadge {
+  position: absolute;
+  top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.newBadge {
+  left: 1rem;
+  background: #10b981;
+  color: white;
+}
+
+.saleBadge {
+  right: 1rem;
+  background: #ef4444;
+  color: white;
+}
+
+.popularBadge {
+  left: 1rem;
+  top: 3.5rem;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+}
+
+.accessoireInfo {
+  padding: 1.5rem;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.categoryIcon {
+  font-size: 1.2rem;
+}
+
+.categoryName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.accessoireName {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.accessoireDescription {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.subcategoryInfo {
+  margin-bottom: 1rem;
+}
+
+.subcategory {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tcgCompatible {
+  margin-bottom: 1rem;
+}
+
+.tcgLabel {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.tcgList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tcgTag {
+  background: rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.originalPrice {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.stockInfo {
+  margin-bottom: 1.5rem;
+}
+
+.stock {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.viewAccessoireButton {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.viewAccessoireButton:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Message aucun accessoire */
+.noAccessoires {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filters {
+    gap: 0.5rem;
+  }
+  
+  .filterGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterGroup label {
+    min-width: auto;
+  }
+  
+  .filterSelect {
+    min-width: auto;
+  }
+  
+  .checkboxes {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .accessoiresGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+}

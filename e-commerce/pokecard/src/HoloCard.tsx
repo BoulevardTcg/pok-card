@@ -311,6 +311,13 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
         style.setProperty('--foil', `url("${cardFoilUrl}")`)
         style.setProperty('--imgsize', 'cover')
         console.log(`🎨 Foil appliqué pour ${card.name}: ${cardFoilUrl}`)
+        
+        // Debug spécial pour les cartes TG
+        if (dataTrainerGallery === 'true') {
+          console.log(`🎭 CARTE TRAINER GALLERY DÉTECTÉE: ${card.name}`)
+          console.log(`🔑 Attributs: rarity="${dataRarity}", trainer-gallery="${dataTrainerGallery}"`)
+          console.log(`🎨 Variables CSS: --foil="${style.getPropertyValue('--foil')}", --imgsize="${style.getPropertyValue('--imgsize')}"`)
+        }
       } else {
         // Fallback selon la rareté de la carte
         let fallbackFoil = ''
@@ -327,9 +334,16 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
         style.setProperty('--foil', `url("${fallbackFoil}")`)
         style.setProperty('--imgsize', 'cover')
         console.log(`🎨 Fallback foil appliqué pour ${card.name}: ${fallbackFoil}`)
+        
+        // Debug spécial pour les cartes TG sans foil
+        if (dataTrainerGallery === 'true') {
+          console.log(`⚠️ CARTE TRAINER GALLERY SANS FOIL: ${card.name}`)
+          console.log(`🔑 Attributs: rarity="${dataRarity}", trainer-gallery="${dataTrainerGallery}"`)
+          console.log(`🎨 Fallback appliqué: ${fallbackFoil}`)
+        }
       }
     }
-  }, [cardFoilUrl, card.name, dataRarity])
+  }, [cardFoilUrl, card.name, dataRarity, dataTrainerGallery])
 
   useEffect(() => {
     if (!active) return
