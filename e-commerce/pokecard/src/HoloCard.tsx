@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react'
 import './pokeholo.css'
-import { loadFoilMap } from './foilMap'
+
 
 export type TradeCard = {
   id: string
@@ -116,7 +116,7 @@ function mapFrenchRarityToEffect(card: TradeCard): {
   }
 }
 
-export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<string, string> | null }) {
+export function HoloCard({ card, foilMap }: Props & { foilMap?: Map<string, string> | null }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const rotatorRef = useRef<HTMLButtonElement | null>(null)
   const [interacting, setInteracting] = useState(false)
@@ -235,6 +235,12 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
   const centerActive = useCallback(() => {
     const el = containerRef.current
     if (!el) return
+    
+    // Éviter les redimensionnements multiples
+    if (el.style.width && el.style.height) {
+      return
+    }
+    
     const rect = el.getBoundingClientRect()
     const viewW = window.innerWidth
     const viewH = window.innerHeight
@@ -292,6 +298,7 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
     const el = containerRef.current
     if (el) {
       const style = el.style as any
+      
       style.setProperty('--pointer-x', `50%`)
       style.setProperty('--pointer-y', `50%`)
       style.setProperty('--background-x', `50%`)
@@ -319,27 +326,13 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
           console.log(`🎨 Variables CSS: --foil="${style.getPropertyValue('--foil')}", --imgsize="${style.getPropertyValue('--imgsize')}"`)
         }
       } else {
-        // Fallback selon la rareté de la carte
-        let fallbackFoil = ''
-        if (dataRarity?.includes('vmax')) {
-          fallbackFoil = '/img/vmaxbg.jpg'
-        } else if (dataRarity?.includes('vstar')) {
-          fallbackFoil = '/img/vmaxbg.jpg' // Utiliser le même que VMAX pour l'instant
-        } else if (dataRarity?.includes('v')) {
-          fallbackFoil = '/img/vmaxbg.jpg' // Utiliser le même que VMAX pour l'instant
-        } else {
-          fallbackFoil = '/img/vmaxbg.jpg' // Fallback général
-        }
-        
-        style.setProperty('--foil', `url("${fallbackFoil}")`)
-        style.setProperty('--imgsize', 'cover')
-        console.log(`🎨 Fallback foil appliqué pour ${card.name}: ${fallbackFoil}`)
+        // Pas de foil disponible - ne pas appliquer d'effet foil par défaut
+        console.log(`🚫 Aucun foil disponible pour ${card.name} - pas d'effet foil appliqué`)
         
         // Debug spécial pour les cartes TG sans foil
         if (dataTrainerGallery === 'true') {
           console.log(`⚠️ CARTE TRAINER GALLERY SANS FOIL: ${card.name}`)
           console.log(`🔑 Attributs: rarity="${dataRarity}", trainer-gallery="${dataTrainerGallery}"`)
-          console.log(`🎨 Fallback appliqué: ${fallbackFoil}`)
         }
       }
     }
@@ -348,7 +341,25 @@ export function HoloCard({ card, onClick, foilMap }: Props & { foilMap?: Map<str
   useEffect(() => {
     if (!active) return
     const onResize = () => centerActive()
-    const onScroll = () => centerActive()
+    
+    // Empêcher le zoom infini lors du scroll avec la molette
+    const onScroll = () => {
+      // Ne recentrer que si la carte est vraiment active et visible
+      if (active && containerRef.current) {
+        // Vérifier que la carte n'a pas déjà la bonne taille
+        const el = containerRef.current
+        const currentWidth = el.style.width
+        const currentHeight = el.style.height
+        
+        // Si la carte a déjà la bonne taille (2x), ne pas la redimensionner
+        if (currentWidth && currentHeight) {
+          return
+        }
+        
+        centerActive()
+      }
+    }
+    
     window.addEventListener('resize', onResize)
     window.addEventListener('scroll', onScroll, { passive: true })
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') deactivate() }

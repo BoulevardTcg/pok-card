@@ -1,0 +1,223 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header h1 {
+  margin: 0 0 0.25rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+}
+
+.header p {
+  margin: 0;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filters button {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filters button:hover {
+  background: #f5f5f5;
+}
+
+.filters button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reviewCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.rating {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.productName {
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: #1a1a1a;
+}
+
+.userInfo {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+.verified {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  background: #10b981;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status {
+  flex-shrink: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+}
+
+.reviewTitle {
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #1a1a1a;
+}
+
+.reviewComment {
+  color: #666;
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+.reviewActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.approveButton,
+.rejectButton,
+.deleteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.approveButton {
+  background: #10b981;
+  color: white;
+}
+
+.approveButton:hover {
+  background: #059669;
+}
+
+.rejectButton {
+  background: #f59e0b;
+  color: white;
+}
+
+.rejectButton:hover {
+  background: #d97706;
+}
+
+.deleteButton {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.deleteButton:hover {
+  background: #fecaca;
+}
+
+/* Dark mode */
+:global(.dark) .header h1 {
+  color: #f2f2f2;
+}
+
+:global(.dark) .header p {
+  color: #9ca3af;
+}
+
+:global(.dark) .filters button {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #9ca3af;
+}
+
+:global(.dark) .filters button:hover {
+  background: #333;
+}
+
+:global(.dark) .loading,
+:global(.dark) .empty {
+  color: #666;
+}
+
+:global(.dark) .reviewCard {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+:global(.dark) .productName {
+  color: #f2f2f2;
+}
+
+:global(.dark) .userInfo {
+  color: #9ca3af;
+}
+
+:global(.dark) .reviewTitle {
+  color: #f2f2f2;
+}
+
+:global(.dark) .reviewComment {
+  color: #9ca3af;
+}
+

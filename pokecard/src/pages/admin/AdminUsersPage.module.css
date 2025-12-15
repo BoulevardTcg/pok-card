@@ -1,0 +1,162 @@
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0 0 0.25rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+}
+
+.header p {
+  margin: 0;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.searchBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.tableWrapper {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: #f9fafb;
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userName {
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: #1a1a1a;
+}
+
+.userUsername {
+  font-size: 0.875rem;
+  color: #999;
+  margin: 0;
+}
+
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+}
+
+/* Dark mode */
+:global(.dark) .header h1 {
+  color: #f2f2f2;
+}
+
+:global(.dark) .header p {
+  color: #9ca3af;
+}
+
+:global(.dark) .searchBox {
+  background: #2a2a2a;
+  border-color: #404040;
+}
+
+:global(.dark) .searchBox input {
+  color: #f2f2f2;
+}
+
+:global(.dark) .searchBox input::placeholder {
+  color: #666;
+}
+
+:global(.dark) .loading,
+:global(.dark) .empty {
+  color: #666;
+}
+
+:global(.dark) .tableWrapper {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+:global(.dark) .table thead {
+  background: #2a2a2a;
+}
+
+:global(.dark) .table th {
+  color: #9ca3af;
+}
+
+:global(.dark) .table td {
+  border-top-color: #333;
+  color: #f2f2f2;
+}
+
+:global(.dark) .userName {
+  color: #f2f2f2;
+}
+
+:global(.dark) .userUsername {
+  color: #666;
+}
+

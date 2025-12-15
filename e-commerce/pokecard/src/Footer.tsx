@@ -48,10 +48,14 @@ const Footer: React.FC = () => {
               <h3 className={styles.footerSectionTitle}>Navigation</h3>
               <ul className={styles.footerLinkList}>
                 <li><button onClick={() => navigate('/')} className={styles.footerLink}>Accueil</button></li>
-                <li><button onClick={() => navigate('/pokemon')} className={styles.footerLink}>Pokémon</button></li>
-                <li><button onClick={() => navigate('/onepiece')} className={styles.footerLink}>One Piece</button></li>
-                <li><button onClick={() => navigate('/concours')} className={styles.footerLink}>Concours</button></li>
-                <li><button onClick={() => navigate('/echanges')} className={styles.footerLink}>Échanges</button></li>
+                {/* Masqué temporairement - en développement */}
+                {/* <li><button onClick={() => navigate('/cartes')} className={styles.footerLink}>Cartes</button></li> */}
+                <li><button onClick={() => navigate('/produits')} className={styles.footerLink}>Produits TCG</button></li>
+                <li><button onClick={() => navigate('/protections')} className={styles.footerLink}>Protections</button></li>
+                {/* Masqué temporairement - en développement */}
+                {/* <li><button onClick={() => navigate('/concours')} className={styles.footerLink}>Concours</button></li> */}
+                {/* Masqué temporairement - en développement */}
+                {/* <li><button onClick={() => navigate('/trade')} className={styles.footerLink}>Échanges</button></li> */}
               </ul>
             </div>
 

@@ -1,0 +1,477 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: #1a1a1a;
+}
+
+.backButton:hover {
+  background: #e5e7eb;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #991b1b;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.form {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 1rem;
+}
+
+.section h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.formGroupFull {
+  grid-column: 1 / -1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.formGroup label svg {
+  color: #6b7280;
+}
+
+.formGroup input,
+.formGroup select {
+  padding: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: white;
+  color: #1a1a1a;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.codeInput {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.codeInput input {
+  flex: 1;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.generateButton {
+  padding: 0.75rem 1rem;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.generateButton:hover {
+  background: #d1d5db;
+}
+
+.typeSelector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.typeButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.typeButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.typeButton.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.typeButton svg {
+  flex-shrink: 0;
+}
+
+.valueInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.valueInput input {
+  width: 100%;
+  padding-right: 2.5rem;
+}
+
+.valueSuffix {
+  position: absolute;
+  right: 1rem;
+  color: #6b7280;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.toggleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toggleGroup > div {
+  flex: 1;
+}
+
+.toggleGroup strong {
+  display: block;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.toggleGroup p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e5e5;
+  transition: all 0.3s;
+  border-radius: 28px;
+}
+
+.toggleSlider::before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: all 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle input:checked + .toggleSlider {
+  background-color: #10b981;
+}
+
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(24px);
+}
+
+.summary {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.summary h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.summary p {
+  margin: 0;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
+
+.summary strong {
+  color: #3b82f6;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background: #e5e7eb;
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode */
+:global(.dark) .backButton {
+  background: #2a2a2a;
+  color: #f2f2f2;
+}
+
+:global(.dark) .backButton:hover {
+  background: #333;
+}
+
+:global(.dark) .header h1 {
+  color: #f2f2f2;
+}
+
+:global(.dark) .error {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+:global(.dark) .form {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+:global(.dark) .section {
+  border-bottom-color: #333;
+}
+
+:global(.dark) .section h2 {
+  color: #f2f2f2;
+}
+
+:global(.dark) .formGroup label {
+  color: #9ca3af;
+}
+
+:global(.dark) .formGroup input,
+:global(.dark) .formGroup select {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #f2f2f2;
+}
+
+:global(.dark) .generateButton {
+  background: #333;
+  color: #e5e7eb;
+}
+
+:global(.dark) .generateButton:hover {
+  background: #404040;
+}
+
+:global(.dark) .typeButton {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #9ca3af;
+}
+
+:global(.dark) .typeButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+:global(.dark) .typeButton.active {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+:global(.dark) .valueSuffix {
+  color: #9ca3af;
+}
+
+:global(.dark) .toggleGroup strong {
+  color: #f2f2f2;
+}
+
+:global(.dark) .toggleGroup p {
+  color: #9ca3af;
+}
+
+:global(.dark) .toggleSlider {
+  background-color: #404040;
+}
+
+:global(.dark) .summary {
+  background: #2a2a2a;
+}
+
+:global(.dark) .summary h3 {
+  color: #9ca3af;
+}
+
+:global(.dark) .summary p {
+  color: #e5e7eb;
+}
+
+:global(.dark) .actions {
+  border-top-color: #333;
+}
+
+:global(.dark) .cancelButton {
+  background: #2a2a2a;
+  color: #f2f2f2;
+}
+
+:global(.dark) .cancelButton:hover {
+  background: #333;
+}
+
+@media (max-width: 640px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .typeSelector {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

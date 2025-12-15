@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  avatar    String?
+  bio       String?
+  isAdmin   Boolean  @default(false)
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile     UserProfile?
+  favorites   Favorite[]
+  orders      Order[]
+  tradeOffers TradeOffer[] @relation("TradeOfferCreator")
+  tradeOffersReceived TradeOffer[] @relation("TradeOfferReceiver")
+  contestTickets ContestTicket[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  phone       String?
+  address     String?
+  city        String?
+  postalCode  String?
+  country     String?
+  birthDate   DateTime?
+  preferences Json?    // Préférences utilisateur (thème, notifications, etc.)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  cardId    String
+  cardName  String
+  cardImage String
+  cardSet   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId])
+  @@map("favorites")
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  userId        String?
+  orderNumber   String        @unique
+  status        OrderStatus   @default(PENDING)
+  totalCents    Int
+  currency      String        @default("EUR")
+  paymentMethod String?
+  shippingAddress Json?
+  billingAddress  Json?
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  productId       String
+  productVariantId String
+  productName     String
+  variantName     String?
+  imageUrl        String?
+  quantity Int
+  unitPriceCents Int
+  totalPriceCents Int
+  createdAt DateTime @default(now())
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String?
+  category    String
+  images      ProductImage[]
+  variants    ProductVariant[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("products")
+  @@index([category])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  altText   String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+  @@index([productId, position])
+}
+
+model ProductVariant {
+  id           String        @id @default(cuid())
+  productId    String
+  name         String
+  language     String?
+  edition      String?
+  priceCents   Int
+  stock        Int           @default(0)
+  sku          String?
+  stripePriceId String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  product Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@map("product_variants")
+  @@index([productId])
+}
+
+model TradeOffer {
+  id          String        @id @default(cuid())
+  creatorId   String
+  receiverId  String
+  status      TradeStatus   @default(PENDING)
+  creatorCards Json         // Cartes proposées par le créateur
+  receiverCards Json        // Cartes demandées au receveur
+  message     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  creator  User @relation("TradeOfferCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  receiver User @relation("TradeOfferReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("trade_offers")
+}
+
+model ContestTicket {
+  id        String   @id @default(cuid())
+  userId    String
+  contestId String
+  entry     String   // Réponse au concours
+  score     Int?
+  isWinner  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contestId])
+  @@map("contest_tickets")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}

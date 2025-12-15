@@ -1,0 +1,179 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0 0 0.25rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+}
+
+.header p {
+  margin: 0;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.addButton:hover {
+  background: #2563eb;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.tableWrapper {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: #f9fafb;
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.code {
+  font-family: monospace;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.dates {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editButton {
+  background: #f3f4f6;
+  color: #3b82f6;
+}
+
+.editButton:hover {
+  background: #e5e7eb;
+}
+
+.deleteButton {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.deleteButton:hover {
+  background: #fecaca;
+}
+
+/* Dark mode */
+:global(.dark) .header h1 {
+  color: #f2f2f2;
+}
+
+:global(.dark) .header p {
+  color: #9ca3af;
+}
+
+:global(.dark) .loading,
+:global(.dark) .empty {
+  color: #666;
+}
+
+:global(.dark) .tableWrapper {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+:global(.dark) .table thead {
+  background: #2a2a2a;
+}
+
+:global(.dark) .table th {
+  color: #9ca3af;
+}
+
+:global(.dark) .table td {
+  border-top-color: #333;
+  color: #f2f2f2;
+}
+
+:global(.dark) .editButton {
+  background: #2a2a2a;
+}
+
+:global(.dark) .editButton:hover {
+  background: #333;
+}
+
+:global(.dark) .deleteButton {
+  background: #7f1d1d;
+}
+
+:global(.dark) .deleteButton:hover {
+  background: #991b1b;
+}
+

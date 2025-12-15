@@ -1,0 +1,103 @@
+.banner {
+  background: linear-gradient(90deg, #fde047 0%, #fffbe6 100%);
+  color: #2563eb;
+  border-radius: 18px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 32px #fde04722;
+}
+.banner h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.banner p {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.steps {
+  margin-bottom: 2.5rem;
+}
+.steps h2 {
+  text-align: center;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #2563eb;
+}
+.stepsGrid {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+.step {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px #fde04711;
+  padding: 1.2rem 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+}
+.step span {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.formSection {
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 16px #fde04711;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.formSection h3 {
+  color: #2563eb;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.form input {
+  padding: 0.8rem 1rem;
+  border-radius: 7px;
+  border: 1px solid #e3e3e3;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.form input:focus {
+  border: 1.5px solid #2563eb;
+}
+.submitBtn {
+  background: #2563eb;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #2563eb33;
+  transition: background 0.2s, color 0.2s;
+}
+.submitBtn:hover {
+  background: #fde047;
+  color: #2563eb;
+}
+.success {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+} 

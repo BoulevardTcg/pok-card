@@ -1,0 +1,53 @@
+.section {
+  padding: 3rem 0;
+  background: white;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .section {
+  background: #0C1321;
+  border-top-color: #1A1D21;
+  border-bottom-color: #1A1D21;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.label {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+}
+
+.logosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem 3rem;
+  opacity: 0.6;
+}
+
+.logoItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  color: #E8DCC3;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+

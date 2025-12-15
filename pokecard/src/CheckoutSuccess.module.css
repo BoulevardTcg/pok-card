@@ -1,0 +1,240 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--blanc-lumiere-200);
+  transition: background-color 0.3s ease;
+}
+
+:global(.dark) .container {
+  background: var(--bleu-nuit);
+}
+
+.successCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 3rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(16, 42, 67, 0.1);
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .successCard {
+  background: #1A1D21;
+  border-color: #2E3542;
+}
+
+.iconContainer {
+  margin-bottom: 2rem;
+}
+
+.checkmark {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.checkmark svg circle {
+  stroke: #D7B56D;
+}
+
+.checkmark svg path {
+  stroke: #D7B56D;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.checkmark svg {
+  width: 100%;
+  height: 100%;
+  animation: drawCheckmark 0.8s ease-out 0.3s both;
+}
+
+@keyframes drawCheckmark {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.title {
+  font-size: 2.5rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: #0C1321;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .title {
+  color: white;
+}
+
+.message {
+  font-size: 1.125rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .message {
+  color: #9ca3af;
+}
+
+.sessionInfo {
+  background: rgba(215, 181, 109, 0.1);
+  border: 1px solid rgba(215, 181, 109, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+:global(.dark) .sessionInfo {
+  background: rgba(215, 181, 109, 0.15);
+  border-color: rgba(215, 181, 109, 0.3);
+}
+
+.sessionLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .sessionLabel {
+  color: #9ca3af;
+}
+
+.sessionId {
+  font-size: 0.875rem;
+  color: #D7B56D;
+  font-family: monospace;
+  word-break: break-all;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.primaryButton {
+  background: #D7B56D;
+  color: #0C1321;
+  box-shadow: 0 4px 15px rgba(215, 181, 109, 0.3);
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+.primaryButton:hover {
+  background: #C9A55A;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(215, 181, 109, 0.4);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: #0C1321;
+  border: 2px solid #e5e7eb;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .secondaryButton {
+  color: white;
+  border-color: #2E3542;
+}
+
+.secondaryButton:hover {
+  background: #f9fafb;
+  border-color: #D7B56D;
+}
+
+:global(.dark) .secondaryButton:hover {
+  background: #0C1321;
+  border-color: #D7B56D;
+}
+
+.infoBox {
+  background: rgba(215, 181, 109, 0.05);
+  border: 1px solid rgba(215, 181, 109, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .infoBox {
+  background: rgba(215, 181, 109, 0.1);
+  border-color: rgba(215, 181, 109, 0.25);
+}
+
+.infoText {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .infoText {
+  color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .successCard {
+    padding: 2rem 1.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+}
+
+
+
+

@@ -1,4 +1,19 @@
-/* ===== PAGE PRODUITS DÉRIVÉS ===== */
+/* ===== PAGE PRODUITS TCG ===== */
+
+/* Variables CSS pour la cohérence avec le site */
+:root {
+  --accent: #06b6d4;
+  --accent-light: #0891b2;
+  --accent-dark: #0e7490;
+  --primary-dark: #0f172a;
+  --primary: #1e293b;
+  --primary-light: #334155;
+  --white: #ffffff;
+  --gray-light: #e2e8f0;
+  --gray: #64748b;
+  --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.3);
+  --shadow-glow-strong: 0 0 40px rgba(6, 182, 212, 0.5);
+}
 
 .container {
   max-width: 1200px;
@@ -16,7 +31,7 @@
 .title {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 50%, var(--accent-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -72,7 +87,8 @@
 
 .filterSelect:focus {
   outline: none;
-  border-color: #f59e0b;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
 }
 
 .checkboxes {
@@ -92,7 +108,7 @@
 
 .checkbox {
   margin: 0;
-  accent-color: #f59e0b;
+  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -119,7 +135,8 @@
 
 .sortSelect:focus {
   outline: none;
-  border-color: #f59e0b;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
 }
 
 /* Grille de produits */
@@ -137,12 +154,37 @@
   overflow: hidden;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.productCard::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(8, 145, 178, 0.2) 40%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(15px);
 }
 
 .productCard:hover {
   transform: translateY(-8px);
-  border-color: #f59e0b;
-  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2);
+  border-color: var(--accent);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(6, 182, 212, 0.4),
+    0 0 60px rgba(6, 182, 212, 0.2);
+}
+
+.productCard:hover::before {
+  opacity: 1;
 }
 
 .productImage {
@@ -193,6 +235,13 @@
 
 .productInfo {
   padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.productImage {
+  position: relative;
+  z-index: 1;
 }
 
 .categoryHeader {
@@ -253,7 +302,7 @@
 .price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #10b981;
+  color: var(--accent);
 }
 
 .originalPrice {
@@ -274,19 +323,132 @@
 .viewProductButton {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.viewProductButton:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
+.viewProductButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.viewProductButton:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.viewProductButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-dark) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+  box-shadow: 
+    0 8px 25px rgba(6, 182, 212, 0.4),
+    var(--shadow-glow);
+}
+
+.viewProductButton:disabled {
+  background: #64748b;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.outOfStockBanner {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 
+    0 10px 30px rgba(239, 68, 68, 0.3),
+    0 5px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 100%;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  font-size: 1.2rem;
+}
+
+.searchInput {
+  padding: 0.5rem 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  border-radius: 8px;
+  min-width: 250px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pageButton {
+  padding: 0.75rem 1.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageButton:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #334155;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: #94a3b8;
+  font-size: 1rem;
 }
 
 /* Message aucun produit */
@@ -301,10 +463,15 @@
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+    min-height: calc(100vh - 200px);
   }
   
   .title {
     font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
   }
   
   .controls {
@@ -325,8 +492,10 @@
     min-width: auto;
   }
   
-  .filterSelect {
+  .filterSelect,
+  .searchInput {
     min-width: auto;
+    width: 100%;
   }
   
   .checkboxes {
@@ -335,7 +504,41 @@
   }
   
   .productsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
+  }
+  
+  .productCard {
+    margin: 0;
+  }
+  
+  .productImage {
+    height: 200px;
+  }
+  
+  .productName {
+    font-size: 1.1rem;
+  }
+  
+  .price {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .productImage {
+    height: 180px;
   }
 }

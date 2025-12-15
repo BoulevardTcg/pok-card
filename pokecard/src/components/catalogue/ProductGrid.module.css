@@ -1,0 +1,146 @@
+.gridContainer {
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .count {
+  color: #9ca3af;
+}
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sortLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .sortLabel {
+  color: #9ca3af;
+}
+
+.sortSelect {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #0C1321;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+:global(.dark) .sortSelect {
+  border-color: #2E3542;
+  background: #1A1D21;
+  color: white;
+}
+
+.sortSelect:focus {
+  border-color: #D7B56D;
+  box-shadow: 0 0 0 2px rgba(215, 181, 109, 0.2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-sans);
+}
+
+:global(.dark) .pageButton {
+  border-color: #2E3542;
+  background: #1A1D21;
+  color: #9ca3af;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: #0C1321;
+  color: white;
+  border-color: #0C1321;
+}
+
+:global(.dark) .pageButton:hover:not(:disabled) {
+  background: white;
+  color: #0C1321;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageButton.active {
+  background: #0C1321;
+  color: white;
+  border-color: #0C1321;
+}
+
+:global(.dark) .pageButton.active {
+  background: white;
+  color: #0C1321;
+}
+
+.ellipsis {
+  padding: 0.5rem;
+  color: #6b7280;
+  font-family: var(--font-sans);
+}
+
+:global(.dark) .ellipsis {
+  color: #9ca3af;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

@@ -1,0 +1,466 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.periodSelector {
+  display: flex;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 12px;
+}
+
+.periodSelector button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.periodSelector button:hover {
+  color: #1a1a1a;
+}
+
+.periodSelector button.active {
+  background: white;
+  color: #1a1a1a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statCard.revenue .statIcon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.statCard.orders .statIcon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.statCard.items .statIcon {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.statCard.trend .statIcon {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+}
+
+.statContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.statContent h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.textPositive {
+  color: #10b981 !important;
+}
+
+.textNegative {
+  color: #ef4444 !important;
+}
+
+.statBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statBadge.positive {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.statBadge.negative {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.statSubtext {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}
+
+/* Chart Card */
+.chartCard {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+}
+
+.chartHeader {
+  margin-bottom: 1.5rem;
+}
+
+.chartHeader h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.chartSubtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.chart {
+  min-height: 380px;
+}
+
+.chartWrapper {
+  position: relative;
+}
+
+.chartLegend {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding-left: 70px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.chartSvg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  color: #1a1a1a;
+}
+
+.axisLabel {
+  font-size: 11px;
+  fill: #94a3b8;
+  font-family: inherit;
+}
+
+.linePath {
+  animation: drawLine 1.5s ease-out forwards;
+}
+
+.areaPath {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes drawLine {
+  from {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dataPoint {
+  transition: all 0.2s ease;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: #1e293b;
+  color: white;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  pointer-events: none;
+  z-index: 100;
+  min-width: 160px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: tooltipFade 0.15s ease-out;
+}
+
+@keyframes tooltipFade {
+  from { 
+    opacity: 0; 
+    transform: translateY(5px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+.tooltipHeader {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  color: #cbd5e1;
+}
+
+.tooltipRow strong {
+  color: white;
+  margin-left: auto;
+}
+
+.tooltipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+/* Dark mode */
+:global(.dark) .header h1 {
+  color: #f8fafc;
+}
+
+:global(.dark) .header p {
+  color: #94a3b8;
+}
+
+:global(.dark) .periodSelector {
+  background: #1e293b;
+}
+
+:global(.dark) .periodSelector button {
+  color: #94a3b8;
+}
+
+:global(.dark) .periodSelector button:hover {
+  color: #f8fafc;
+}
+
+:global(.dark) .periodSelector button.active {
+  background: #334155;
+  color: #f8fafc;
+}
+
+:global(.dark) .statCard {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:global(.dark) .statContent h3 {
+  color: #94a3b8;
+}
+
+:global(.dark) .statValue {
+  color: #f8fafc;
+}
+
+:global(.dark) .statSubtext {
+  color: #64748b;
+}
+
+:global(.dark) .chartCard {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:global(.dark) .chartHeader h2 {
+  color: #f8fafc;
+}
+
+:global(.dark) .chartSubtitle {
+  color: #94a3b8;
+}
+
+:global(.dark) .chartSvg {
+  color: #f8fafc;
+}
+
+:global(.dark) .axisLabel {
+  fill: #64748b;
+}
+
+:global(.dark) .legendItem {
+  color: #94a3b8;
+}
+
+:global(.dark) .loading {
+  color: #64748b;
+}
+
+:global(.dark) .loadingSpinner {
+  border-color: #334155;
+  border-top-color: #3b82f6;
+}
+
+:global(.dark) .empty {
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .periodSelector {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .chartLegend {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .statCard {
+    padding: 1.25rem;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+}

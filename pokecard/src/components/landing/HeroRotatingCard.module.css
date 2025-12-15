@@ -1,0 +1,70 @@
+.cardWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  perspective: 1200px;
+}
+
+.card {
+  width: 280px;
+  height: 390px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(215, 181, 109, 0.2);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.card:hover {
+  transform: translateY(-12px) rotateX(5deg);
+  box-shadow: 
+    0 35px 60px -15px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(215, 181, 109, 0.4),
+    0 0 30px rgba(215, 181, 109, 0.2);
+}
+
+.card.flipping {
+  transform: rotateY(90deg) scale(0.95);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardShine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .cardShine {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 220px;
+    height: 310px;
+  }
+}
+

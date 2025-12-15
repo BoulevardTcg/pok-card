@@ -1,19 +1,65 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Home } from './Home'
 import { Concours } from './Concours'
 import { ProductDetail } from './ProductDetail'
 import { CartPage } from './CartPage'
-import { CategoryPage } from './CategoryPage'
-import { PokemonProductsPage } from './PokemonProductsPage'
-import { OnePieceProductsPage } from './OnePieceProductsPage'
 import { CardsPage } from './CardsPage'
 import { ProductsPage } from './ProductsPage'
 import { CategorySpecificPage } from './CategorySpecificPage'
 import { AccessoiresPage } from './AccessoiresPage'
+import { ProtectionsPage } from './ProtectionsPage'
+import { CheckoutSuccess } from './CheckoutSuccess'
 import styles from './App.module.css'
 import { TradePage } from './TradePage'
 import { TradeSetPage } from './TradeSetPage'
+import { ContactPage } from './ContactPage'
+import { AuthProvider, useAuth } from './authContext'
+import { CartContext } from './cartContext'
+import LoginPage from './LoginPage'
+import RegisterPage from './RegisterPage'
+import UserProfile from './UserProfile'
+
+// Composant pour les boutons d'authentification
+const AuthButtons: React.FC = () => {
+  const { user, isAuthenticated, logout } = useAuth()
+  const navigate = useNavigate()
+
+  if (isAuthenticated && user) {
+    return (
+      <div className={styles.authButtons}>
+        <button 
+          className={styles.profileButton}
+          onClick={() => navigate('/profile')}
+          title="Mon profil"
+        >
+          <span className={styles.profileIcon}>👤</span>
+          <span className={styles.profileText}>{user.firstName || user.username}</span>
+        </button>
+        <button 
+          className={styles.logoutButton}
+          onClick={logout}
+          title="Se déconnecter"
+        >
+          <span className={styles.logoutIcon}>🚪</span>
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.authButtons}>
+      <button 
+        className={styles.loginButton}
+        onClick={() => navigate('/login')}
+        title="Se connecter"
+      >
+        <span className={styles.loginIcon}>🔑</span>
+        <span className={styles.loginText}>Connexion</span>
+      </button>
+    </div>
+  )
+}
 
 const navLinks = [
   { 
@@ -21,43 +67,45 @@ const navLinks = [
     path: '/',
     icon: '🏠'
   },
-              { 
-              label: 'Cartes à Collectionner', 
-              path: '/cartes',
-              icon: '🃏'
-            },
-              { 
-              label: 'Accessoires TCG', 
-              path: '/accessoires',
-              icon: '🛡️',
-              submenu: [
-                { label: 'Étuis & Protections', path: '/accessoires/etuis' },
-                { label: 'Sleeves & Binders', path: '/accessoires/sleeves' },
-                { label: 'Displays & Présentoirs', path: '/accessoires/displays' },
-                { label: 'Accessoires de Jeu', path: '/accessoires/jeu' }
-              ]
-            },
-            { 
-              label: 'Produits Dérivés', 
-              path: '/produits',
-              icon: '🎁',
-              submenu: [
-                { label: 'Peluches & Figurines', path: '/produits/figurines' },
-                { label: 'Vêtements & Goodies', path: '/produits/goodies' },
-                { label: 'Posters & Décos', path: '/produits/decos' }
-              ]
-            },
-
+  // Masqué temporairement - en développement
+  // { 
+  //   label: 'Cartes à Collectionner', 
+  //   path: '/cartes',
+  //   icon: '🃏'
+  // },
   { 
-    label: 'Concours', 
-    path: '/concours',
-    icon: '🎯'
+    label: 'Produits TCG', 
+    path: '/produits',
+    icon: '🛒'
   },
   { 
-    label: 'Échanges', 
-    path: '/trade',
-    icon: '🔄'
+    label: 'Protections', 
+    path: '/protections',
+    icon: '🛡️'
   },
+  // Masqué temporairement - en développement
+  // { 
+  //   label: 'Produits Dérivés', 
+  //   path: '/produits',
+  //   icon: '🎁',
+  //   submenu: [
+  //     { label: 'Peluches & Figurines', path: '/produits/figurines' },
+  //     { label: 'Vêtements & Goodies', path: '/produits/goodies' },
+  //     { label: 'Posters & Décos', path: '/produits/decos' }
+  //   ]
+  // },
+  // Masqué temporairement - en développement
+  // { 
+  //   label: 'Concours', 
+  //   path: '/concours',
+  //   icon: '🎯'
+  // },
+  // Masqué temporairement - en développement
+  // { 
+  //   label: 'Échanges', 
+  //   path: '/trade',
+  //   icon: '🔄'
+  // },
   { 
     label: 'Contact', 
     path: '/contact',
@@ -65,7 +113,8 @@ const navLinks = [
   },
 ]
 
-export default function App() {
+// Composant principal de l'application
+function AppContent() {
   const [search] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
@@ -73,7 +122,8 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const lastScroll = useRef(window.scrollY)
-  const [cartCount] = useState(3)
+  const { cart } = useContext(CartContext)
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
   
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
@@ -101,19 +151,13 @@ export default function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-    setActiveDropdown(null)
-  }
+
 
   const toggleDropdown = (label: string) => {
     setActiveDropdown(activeDropdown === label ? null : label)
   }
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false)
-    setActiveDropdown(null)
-  }
+
 
   return (
     <div className={styles.appBg}>
@@ -134,7 +178,7 @@ export default function App() {
               <span className={styles.logoText}>PC</span>
               <div className={styles.logoGlow}></div>
             </div>
-            <span className={styles.logoTitle}>PokéCard</span>
+            <span className={styles.logoTitle}>BoulevardTCG</span>
           </div>
           
           {/* Navigation centrale */}
@@ -188,14 +232,29 @@ export default function App() {
 
           {/* Boutons d'action */}
           <div className={styles.actionButtons}>
-            <button 
-              className={styles.cartButton} 
-              onClick={() => navigate('/panier')}
-              title="Panier"
-            >
-              <span className={styles.cartIcon}>🛒</span>
-              <span className={styles.cartText}>Panier</span>
-            </button>
+            <div className={styles.cartButtonWrapper}>
+              <button 
+                className={styles.cartButton} 
+                onClick={() => navigate('/panier')}
+                title="Panier"
+              >
+                <span className={styles.cartIconWrapper}>
+                  <span className={styles.cartIcon}>🛒</span>
+                </span>
+                <span className={styles.cartText}>Panier</span>
+              </button>
+              {cartCount > 0 && (
+                <span 
+                  className={styles.cartBadge}
+                  data-count={cartCount > 99 ? '99' : String(cartCount).length}
+                >
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </div>
+            
+            {/* Boutons d'authentification */}
+            <AuthButtons />
           </div>
 
           {/* Bouton menu mobile */}
@@ -232,7 +291,8 @@ export default function App() {
                 </button>
               </div>
               
-              <div className={styles.mobileNavItem}>
+              {/* Masqué temporairement - en développement */}
+              {/* <div className={styles.mobileNavItem}>
                 <button 
                   className={`${styles.mobileNavButton} ${
                     activeDropdown === 'Cartes à Collectionner' ? styles.active : ''
@@ -261,70 +321,36 @@ export default function App() {
                       Voir toutes les cartes
                     </button>
                   </div>
-              </div>
+              </div> */}
               
-                              <div className={styles.mobileNavItem}>
-                  <button 
-                    className={`${styles.mobileNavButton} ${
-                      activeDropdown === 'Accessoires TCG' ? styles.active : ''
-                    }`}
-                    onClick={() => setActiveDropdown(activeDropdown === 'Accessoires TCG' ? null : 'Accessoires TCG')}
-                  >
-                    <span className={styles.mobileNavIcon}>🛡️</span>
-                    Accessoires TCG
-                    <span className={`${styles.mobileDropdownArrow} ${
-                      activeDropdown === 'Accessoires TCG' ? styles.open : ''
-                    }`}>
-                      ▼
-                    </span>
-                  </button>
-                  <div className={`${styles.mobileDropdownContent} ${
-                    activeDropdown === 'Accessoires TCG' ? styles.open : ''
-                  }`}>
-                    <button 
-                      className={styles.mobileDropdownItem}
-                      onClick={() => {
-                        navigate('/accessoires/etuis');
-                        setMobileMenuOpen(false);
-                        setActiveDropdown(null);
-                      }}
-                    >
-                      Étuis & Protections
-                    </button>
-                    <button 
-                      className={styles.mobileDropdownItem}
-                      onClick={() => {
-                        navigate('/accessoires/sleeves');
-                        setMobileMenuOpen(false);
-                        setActiveDropdown(null);
-                      }}
-                    >
-                      Sleeves & Binders
-                    </button>
-                    <button 
-                      className={styles.mobileDropdownItem}
-                      onClick={() => {
-                        navigate('/accessoires/displays');
-                        setMobileMenuOpen(false);
-                        setActiveDropdown(null);
-                      }}
-                    >
-                      Displays & Présentoirs
-                    </button>
-                    <button 
-                      className={styles.mobileDropdownItem}
-                      onClick={() => {
-                        navigate('/accessoires/jeu');
-                        setMobileMenuOpen(false);
-                        setActiveDropdown(null);
-                      }}
-                    >
-                      Accessoires de Jeu
-                    </button>
-                  </div>
-                </div>
+              <div className={styles.mobileNavItem}>
+                <button 
+                  className={styles.mobileNavButton}
+                  onClick={() => {
+                    navigate('/produits');
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className={styles.mobileNavIcon}>🛒</span>
+                  Produits TCG
+                </button>
+              </div>
 
-                <div className={styles.mobileNavItem}>
+              <div className={styles.mobileNavItem}>
+                <button 
+                  className={styles.mobileNavButton}
+                  onClick={() => {
+                    navigate('/protections');
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className={styles.mobileNavIcon}>🛡️</span>
+                  Protections
+                </button>
+              </div>
+
+                {/* Masqué temporairement - en développement */}
+                {/* <div className={styles.mobileNavItem}>
                   <button 
                     className={`${styles.mobileNavButton} ${
                       activeDropdown === 'Produits Dérivés' ? styles.active : ''
@@ -373,9 +399,10 @@ export default function App() {
                       Posters & Décos
                     </button>
                   </div>
-                </div>
+                </div> */}
                 
-                <div className={styles.mobileNavItem}>
+                {/* Masqué temporairement - en développement */}
+                {/* <div className={styles.mobileNavItem}>
                 <button 
                   className={styles.mobileNavButton}
                   onClick={() => {
@@ -386,20 +413,21 @@ export default function App() {
                   <span className={styles.mobileNavIcon}>🎯</span>
                   Concours
                 </button>
-              </div>
+              </div> */}
               
-              <div className={styles.mobileNavItem}>
+                {/* Masqué temporairement - en développement */}
+                {/* <div className={styles.mobileNavItem}>
                 <button 
                   className={styles.mobileNavButton}
                   onClick={() => {
-                    navigate('/echanges');
+                    navigate('/trade');
                     setMobileMenuOpen(false);
                   }}
                 >
                   <span className={styles.mobileNavIcon}>🔄</span>
                   Échanges
                 </button>
-              </div>
+              </div> */}
               
               <div className={styles.mobileNavItem}>
                 <button 
@@ -416,15 +444,31 @@ export default function App() {
             </nav>
             
             <div className={styles.mobileActions}>
-              <button 
-                className={styles.mobileCartButton}
-                onClick={() => {
-                  navigate('/panier');
-                  setMobileMenuOpen(false);
-                }}
-              >
-                🛒 Panier ({cartCount})
-              </button>
+              <div className={styles.mobileCartButtonWrapper}>
+                <button 
+                  className={styles.mobileCartButton}
+                  onClick={() => {
+                    navigate('/panier');
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className={styles.mobileCartIconWrapper}>
+                    🛒
+                  </span>
+                  Panier
+                </button>
+                {cartCount > 0 && (
+                  <span 
+                    className={styles.cartBadge}
+                    data-count={cartCount > 99 ? '99' : String(cartCount).length}
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </div>
+              
+              {/* Bouton de connexion mobile */}
+              <AuthButtons />
             </div>
           </div>
         )}
@@ -439,15 +483,31 @@ export default function App() {
           
           <Route path="/produits" element={<ProductsPage />} />
           <Route path="/produits/:category" element={<CategorySpecificPage />} />
+          <Route path="/protections" element={<ProtectionsPage />} />
 
           <Route path="/concours" element={<Concours />} />
-          <Route path="/produit/:id" element={<ProductDetail />} />
+          <Route path="/produit/:slug" element={<ProductDetail />} />
           <Route path="/panier" element={<CartPage />} />
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
           <Route path="/trade" element={<TradePage />} />
           <Route path="/trade/set/:id" element={<TradeSetPage />} />
-          <Route path="/contact" element={<div>Contact</div>} />
+          <Route path="/contact" element={<ContactPage />} />
+          
+          {/* Routes d'authentification */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </main>
     </div>
+  )
+}
+
+// Composant racine qui enveloppe l'application avec l'AuthProvider
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }

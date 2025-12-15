@@ -1,0 +1,213 @@
+/* ===== FOOTER LUXE PARISIEN BOULEVARDTCG ===== */
+
+.footer {
+  background: var(--bleu-nuit);
+  color: var(--blanc-lumiere-200);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.footerContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4rem 2rem 2rem;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 4rem;
+  margin-bottom: 2rem;
+}
+
+/* Brand Section */
+.footerBrand {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footerLogoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.footerLogoText {
+  font-size: 2rem;
+  font-family: var(--font-serif);
+  color: white;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.footerLogoSubtext {
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  color: var(--dore);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+.footerDescription {
+  color: rgba(242, 242, 242, 0.7);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  max-width: 400px;
+  font-family: var(--font-sans);
+}
+
+/* Social Links */
+.socialLinks {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.socialLink {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(242, 242, 242, 0.6);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.socialLink:hover {
+  color: var(--dore);
+  transform: translateY(-2px);
+}
+
+.socialLink svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Footer Sections */
+.footerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footerSectionTitle {
+  font-size: 0.875rem;
+  font-family: var(--font-serif);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  margin: 0;
+}
+
+.footerLinkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footerLink {
+  background: none;
+  border: none;
+  color: rgba(242, 242, 242, 0.7);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  padding: 0;
+}
+
+.footerLink:hover {
+  color: var(--dore);
+}
+
+/* Divider */
+.footerDivider {
+  border-top: 1px solid rgba(26, 29, 33, 1);
+  margin: 2rem 0;
+}
+
+/* Copyright */
+.footerCopyright {
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.copyrightText {
+  font-size: 0.75rem;
+  color: rgba(242, 242, 242, 0.5);
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .footerGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .footerContainer {
+    padding: 3rem 1.5rem 1.5rem;
+  }
+
+  .footerGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footerBrand {
+    text-align: center;
+    align-items: center;
+  }
+
+  .footerDescription {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .socialLinks {
+    justify-content: center;
+  }
+
+  .footerSection {
+    text-align: center;
+  }
+
+  .footerLinkList {
+    align-items: center;
+  }
+
+  .footerLink {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footerContainer {
+    padding: 2rem 1rem 1rem;
+  }
+
+  .footerLogoText {
+    font-size: 1.75rem;
+  }
+
+  .footerDescription {
+    font-size: 0.8125rem;
+  }
+}

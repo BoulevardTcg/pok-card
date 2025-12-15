@@ -1,0 +1,153 @@
+/*
+  TRAINER GALLERY HOLO
+*/
+
+.card:not(.masked)[data-rarity="trainer gallery rare holo"][data-supertype="trainer"] .card__shine,
+.card:not(.masked)[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+.card:not(.masked)[data-set="swshp"][data-number="swsh020"] .card__shine {
+
+  --mask: none;
+  /* Définir les variables par défaut si elles ne sont pas définies */
+  --foil: var(--foil, none);
+  --imgsize: var(--imgsize, 100%);
+
+}
+
+/*
+  SHINE LAYERS
+*/
+
+.card[data-rarity="trainer gallery rare holo"] .card__shine,
+.card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+.card[data-set="swshp"][data-number="swsh020"] .card__shine {
+
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: var(--imgsize, 100%); /* Fallback si pas défini */
+
+  background-image:
+    var(--foil, none), /* FOIL CDN TRAINER GALLERY avec fallback ! */
+    repeating-linear-gradient( 0deg, 
+      hsl(283, 70%, 65%) calc(var(--space)*1),      /* Violet TG */
+      hsl(2, 80%, 70%) calc(var(--space)*2),        /* Rouge vif TG */
+      hsl(53, 80%, 65%) calc(var(--space)*3),       /* Jaune doré TG */
+      hsl(93, 70%, 60%) calc(var(--space)*4),       /* Vert TG */
+      hsl(176, 70%, 65%) calc(var(--space)*5),      /* Bleu-vert TG */
+      hsl(228, 100%, 80%) calc(var(--space)*6),     /* Bleu royal TG */
+      hsl(283, 70%, 65%) calc(var(--space)*7)       /* Retour au violet TG */
+    ),
+    repeating-linear-gradient( 
+      var(--angle), 
+      #0e152e 0%, 
+      hsl(180, 10%, 60%) 3.8%, 
+      hsl(180, 29%, 66%) 4.5%, 
+      hsl(180, 10%, 60%) 5.2%, 
+      #0e152e 10% , 
+      #0e152e 12% 
+      );
+
+  background-blend-mode: soft-light, hue, hard-light; /* Changé pour Trainer Gallery */
+  background-size: var(--imgsize) 100%, 200% 700%, 300% 100%;
+  background-position: center, 0% var(--background-y), var(--background-x) var(--background-y);
+  
+  /* Foil TG modérément visible - juste milieu */
+  filter: brightness(.6) contrast(2.2) saturate(1.1);
+  opacity: 0.8;
+
+}
+
+.card[data-rarity="trainer gallery rare holo"] .card__shine:after,
+.card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine:after,
+.card[data-set="swshp"][data-number="swsh020"] .card__shine:after {
+  
+  content: "";
+
+  background-position: center, 0% var(--background-y), calc( var(--background-x) * -1) calc( var(--background-y) * -1);
+  background-size: var(--imgsize) 100%, 200% 400%, 195% 100%;
+
+  filter: brightness(1) contrast(2.5) saturate(1.75);
+  mix-blend-mode: soft-light;
+
+}
+
+/*
+  RESPONSIVE ADAPTATION
+*/
+
+/* Petites cartes (mobile) */
+@media (max-width: 768px) {
+  .card[data-rarity="trainer gallery rare holo"] .card__shine,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine {
+    --space: 3%; /* Espacement plus petit pour les petites cartes */
+    background-size: var(--imgsize) 100%, 150% 500%, 200% 100%;
+  }
+  
+  .card[data-rarity="trainer gallery rare holo"] .card__shine:after,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine:after,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine:after {
+    background-size: var(--imgsize) 100%, 150% 300%, 150% 100%;
+  }
+}
+
+/* Très petites cartes (miniatures) */
+@media (max-width: 480px) {
+  .card[data-rarity="trainer gallery rare holo"] .card__shine,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine {
+    --space: 2%; /* Espacement encore plus petit */
+    background-size: var(--imgsize) 100%, 120% 400%, 150% 100%;
+  }
+  
+  .card[data-rarity="trainer gallery rare holo"] .card__shine:after,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine:after,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine:after {
+    background-size: var(--imgsize) 100%, 120% 250%, 120% 100%;
+  }
+}
+
+/* Orientation portrait */
+@media (orientation: portrait) {
+  .card[data-rarity="trainer gallery rare holo"] .card__shine,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine {
+    background-size: var(--imgsize) 100%, 180% 600%, 250% 100%;
+  }
+}
+
+/* Orientation paysage */
+@media (orientation: landscape) {
+  .card[data-rarity="trainer gallery rare holo"] .card__shine,
+  .card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+  .card[data-set="swshp"][data-number="swsh020"] .card__shine {
+    background-size: var(--imgsize) 100%, 220% 800%, 350% 100%;
+  }
+}
+
+/*
+  GLARE LAYERS
+*/
+
+.card[data-rarity="trainer gallery rare holo"] .card__glare,
+.card[data-rarity="rare holo"][data-trainer-gallery="true"] .card__glare,
+.card[data-set="swshp"][data-number="swsh020"] .card__glare {
+  
+  mix-blend-mode: hard-light;
+  filter: brightness(1) contrast(1);
+  /* Lumière de souris supprimée pour le test */
+
+}
+
+/*
+  MASQUED CARDS
+*/
+
+.card:not(.masked)[data-rarity="trainer gallery rare holo"] .card__shine,
+.card:not(.masked)[data-rarity="rare holo"][data-trainer-gallery="true"] .card__shine,
+.card:not(.masked)[data-set="swshp"][data-number="swsh020"] .card__shine {
+  
+  /* Foil TG modérément visible - juste milieu */
+  filter: brightness(.6) contrast(2.2) saturate(1.1);
+  opacity: 0.8;
+
+}

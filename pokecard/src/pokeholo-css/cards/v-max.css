@@ -1,0 +1,169 @@
+/*
+
+  V MAX
+
+*/
+
+.card:not(.masked)[data-rarity="rare holo vmax"][data-supertype="pokémon"] .card__shine,
+.card:not(.masked)[data-rarity="rare holo vmax"][data-supertype="pokémon"] .card__shine:after {
+
+  --mask: none;
+  /* Ne pas redéfinir --foil et --imgsize, laisser les variables parent */
+
+}
+
+/*
+
+  SHINE LAYERS
+
+*/
+
+.card[data-rarity="rare holo vmax"] .card__shine {
+
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: 100%; /* Changé de 450px à 100% pour s'adapter à la carte */
+
+  background-image:
+    var(--grain),
+    repeating-linear-gradient( 0deg, 
+      hsl(0, 70%, 60%) calc(var(--space)*1),      /* Rouge vif */
+      hsl(60, 80%, 60%) calc(var(--space)*2),     /* Jaune doré */
+      hsl(120, 70%, 55%) calc(var(--space)*3),    /* Vert émeraude */
+      hsl(180, 70%, 60%) calc(var(--space)*4),    /* Bleu-vert */
+      hsl(240, 70%, 65%) calc(var(--space)*5),    /* Bleu royal */
+      hsl(300, 70%, 60%) calc(var(--space)*6),    /* Magenta */
+      hsl(0, 70%, 60%) calc(var(--space)*7)       /* Retour au rouge */
+    ),
+    repeating-linear-gradient( 
+      var(--angle), 
+      #0e152e 0%, 
+      hsl(180, 10%, 60%) 3.8%, 
+      hsl(180, 29%, 66%) 4.5%, 
+      hsl(180, 10%, 60%) 5.2%, 
+      #0e152e 10% , 
+      #0e152e 12% 
+      );
+
+  background-blend-mode: screen, hue, hard-light;
+  background-size: var(--imgsize) 100%, 200% 700%, 300% 100%;
+  background-position: center, 0% var(--background-y), var(--background-x) var(--background-y);
+  
+  /* Foil modérément visible - juste milieu */
+  filter: brightness(.55) contrast(2.1) saturate(1);
+  opacity: 0.75;
+
+}
+
+.card[data-rarity="rare holo vmax"] .card__shine:after {
+
+  content: "";
+
+  background-position: center, 0% var(--background-y), calc( var(--background-x) * -1) calc( var(--background-y) * -1), var(--background-x) var(--background-y);
+  background-size: var(--imgsize) 100%, 200% 400%, 195% 100%, 200% 100%;
+
+  filter: brightness(1) contrast(2.5) saturate(1.75);
+  mix-blend-mode: soft-light;
+
+}
+
+/*
+
+  RESPONSIVE ADAPTATION
+
+*/
+
+/* Petites cartes (mobile) */
+@media (max-width: 768px) {
+  .card[data-rarity="rare holo vmax"] .card__shine {
+    --space: 3%; /* Espacement plus petit pour les petites cartes */
+    background-size: var(--imgsize) 100%, 150% 500%, 200% 100%;
+  }
+  
+  .card[data-rarity="rare holo vmax"] .card__shine:after {
+    background-size: var(--imgsize) 100%, 150% 300%, 150% 100%, 150% 100%;
+  }
+}
+
+/* Très petites cartes (miniatures) */
+@media (max-width: 480px) {
+  .card[data-rarity="rare holo vmax"] .card__shine {
+    --space: 2%; /* Espacement encore plus petit */
+    background-size: var(--imgsize) 100%, 120% 400%, 150% 100%;
+  }
+  
+  .card[data-rarity="rare holo vmax"] .card__shine:after {
+    background-size: var(--imgsize) 100%, 120% 250%, 120% 100%, 120% 100%;
+  }
+}
+
+/* Adaptation pour les cartes en mode portrait */
+@media (orientation: portrait) {
+  .card[data-rarity="rare holo vmax"] .card__shine {
+    background-size: var(--imgsize) 100%, 180% 600%, 250% 100%;
+  }
+}
+
+/* Adaptation pour les cartes en mode paysage */
+@media (orientation: landscape) {
+  .card[data-rarity="rare holo vmax"] .card__shine {
+    background-size: var(--imgsize) 100%, 220% 800%, 350% 100%;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+/*
+
+  GLARE LAYERS
+
+*/
+
+.card[data-rarity="rare holo vmax"] .card__glare {
+
+ 
+  filter: brightness(0) contrast(0);
+
+  /* Lumière de souris supprimée pour le test */
+
+}
+
+
+
+
+
+
+
+
+
+
+/*
+
+  NO MASK
+
+*/
+
+
+
+.card:not(.masked)[data-rarity="rare holo vmax"] .card__shine {
+
+  /* Foil modérément visible - juste milieu */
+  filter: brightness(.55) contrast(2.1) saturate(1);
+  opacity: 0.75;
+
+}
+
+
+
+
+
+
+
+

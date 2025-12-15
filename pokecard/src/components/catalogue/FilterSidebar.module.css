@@ -1,0 +1,137 @@
+.sidebar {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: sticky;
+  top: 96px;
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .sidebar {
+  background: #1A1D21;
+  border-color: #2E3542;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-family: var(--font-serif);
+  color: #0C1321;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .title {
+  color: white;
+}
+
+.resetButton {
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-sans);
+}
+
+:global(.dark) .resetButton {
+  color: #9ca3af;
+}
+
+.resetButton:hover {
+  color: #0C1321;
+}
+
+:global(.dark) .resetButton:hover {
+  color: white;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.sectionButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.sectionTitle {
+  font-weight: 500;
+  color: #0C1321;
+  font-family: var(--font-sans);
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .sectionTitle {
+  color: white;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: #6b7280;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+:global(.dark) .chevron {
+  color: #9ca3af;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.radio {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #D7B56D;
+  cursor: pointer;
+}
+
+.optionLabel {
+  font-size: 0.875rem;
+  color: #4b5563;
+  transition: color 0.3s ease;
+  font-family: var(--font-sans);
+}
+
+:global(.dark) .optionLabel {
+  color: #9ca3af;
+}
+
+.option:hover .optionLabel {
+  color: #0C1321;
+}
+
+:global(.dark) .option:hover .optionLabel {
+  color: white;
+}
+
