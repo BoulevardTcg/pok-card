@@ -31,7 +31,8 @@ export default function NavbarPremium() {
     { path: '/', label: 'Accueil' },
     { path: '/produits', label: 'Collection' },
     { path: '/trade', label: 'Cartes' },
-    { path: '/actualites', label: 'Journal' },
+    { path: '/actualites', label: 'News' },
+    { path: '/contact', label: 'Contact' },
   ];
 
   return (

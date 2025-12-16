@@ -4,7 +4,7 @@
 
 .page {
   min-height: 100vh;
-  padding: var(--space-8, 2rem) var(--space-4, 1rem);
+  padding: var(--space-20, 5rem) var(--space-4, 1rem) var(--space-8, 2rem);
   background: var(--color-bg-primary);
 }
 

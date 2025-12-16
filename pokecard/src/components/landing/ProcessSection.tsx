@@ -5,20 +5,20 @@ import styles from './ProcessSection.module.css';
 const PROCESS_STEPS = [
   {
     number: '01',
-    title: 'Authentification',
-    description: 'Chaque carte passe par un processus de vérification rigoureux. Nos experts analysent l\'authenticité, l\'état et l\'origine de chaque pièce.',
+    title: 'Sélection',
+    description: 'Parcourez notre catalogue et choisissez parmi des milliers de produits scellés : boosters, displays, coffrets ETB et collections premium.',
     icon: ShieldCheckIcon,
   },
   {
     number: '02',
-    title: 'Certification',
-    description: 'Les cartes sont envoyées aux laboratoires de grading reconnus (PSA, CGC, BGS) pour obtenir une certification officielle et un grade objectif.',
+    title: 'Commande sécurisée',
+    description: 'Paiement 100% sécurisé, confirmation immédiate et suivi de commande en temps réel. Votre commande est traité avec soin.',
     icon: CertificateIcon,
   },
   {
     number: '03',
     title: 'Livraison sécurisée',
-    description: 'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre investissement arrive dans un état parfait.',
+    description: 'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre collection arrive dans un état parfait.',
     icon: PackageIcon,
   },
 ];
@@ -104,7 +104,7 @@ export default function ProcessSection() {
         <div className={styles.header}>
           <span className={styles.overline}>Notre processus</span>
           <h2 className={styles.title}>
-            De l'authentification<br />à votre collection
+            De la sélection<br />à votre collection
           </h2>
         </div>
 

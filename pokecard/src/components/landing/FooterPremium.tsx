@@ -5,7 +5,7 @@ import styles from './FooterPremium.module.css';
 const NAV_LINKS = [
   { path: '/produits', label: 'Collection' },
   { path: '/trade', label: 'Cartes' },
-  { path: '/actualites', label: 'Journal' },
+  { path: '/actualites', label: 'News' },
   { path: '/contact', label: 'Contact' },
 ];
 
@@ -30,7 +30,7 @@ export default function FooterPremium() {
       <div className={styles.container}>
         {/* Main content */}
         <div className={styles.mainContent}>
-          {/* Brand */}
+          {/* Brand Section */}
           <div className={styles.brand}>
             <button 
               className={styles.logo}
@@ -43,45 +43,61 @@ export default function FooterPremium() {
             <p className={styles.tagline}>
               La maison de vente pour collectionneurs exigeants.
             </p>
+            <div className={styles.socialSection}>
+              <span className={styles.socialLabel}>Suivez-nous</span>
+              <div className={styles.socialLinks}>
+                {SOCIAL_LINKS.map((social) => {
+                  const Icon = social.icon;
+                  return (
+                    <a
+                      key={social.href}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.socialLink}
+                      aria-label={social.label}
+                    >
+                      <Icon size={18} strokeWidth={1.5} />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className={styles.nav}>
-            <span className={styles.navTitle}>Navigation</span>
-            <div className={styles.navLinks}>
+          <nav className={styles.nav} aria-label="Navigation principale">
+            <h3 className={styles.navTitle}>Navigation</h3>
+            <ul className={styles.navLinks}>
               {NAV_LINKS.map((link) => (
-                <button
-                  key={link.path}
-                  onClick={() => navigate(link.path)}
-                  className={styles.navLink}
-                >
-                  {link.label}
-                </button>
+                <li key={link.path}>
+                  <button
+                    onClick={() => navigate(link.path)}
+                    className={styles.navLink}
+                  >
+                    {link.label}
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
           </nav>
 
-          {/* Social */}
-          <div className={styles.social}>
-            <span className={styles.navTitle}>Suivez-nous</span>
-            <div className={styles.socialLinks}>
-              {SOCIAL_LINKS.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={social.href}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.socialLink}
-                    aria-label={social.label}
+          {/* Legal */}
+          <nav className={styles.legal} aria-label="Informations légales">
+            <h3 className={styles.navTitle}>Informations</h3>
+            <ul className={styles.navLinks}>
+              {LEGAL_LINKS.map((link) => (
+                <li key={link.path}>
+                  <button
+                    onClick={() => navigate(link.path)}
+                    className={styles.navLink}
                   >
-                    <Icon size={18} />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
         {/* Bottom bar */}

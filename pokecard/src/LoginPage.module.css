@@ -5,7 +5,7 @@
 .page {
   min-height: 100vh;
   background: var(--color-bg-primary);
-  padding: var(--space-12, 3rem) 0;
+  padding: var(--space-20, 5rem) 0 var(--space-12, 3rem);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -3,7 +3,8 @@ import { useContext, useEffect, useState } from 'react';
 import { CartContext, type Product as ProductType } from './cartContext';
 import { useAuth } from './authContext';
 import styles from './ProductDetail.module.css';
-import { getProduct, getProductReviews, createReview, canReviewProduct } from './api';
+import { getProduct, getProductReviews, createReview, canReviewProduct, listProducts } from './api';
+import { ArrowRightIcon } from './components/icons/Icons';
 
 interface Review {
   id: string;
@@ -52,6 +53,10 @@ export function ProductDetail() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [canReview, setCanReview] = useState<{ canReview: boolean; reason: string | null; message: string | null } | null>(null);
+  
+  // États pour produits similaires
+  const [similarProducts, setSimilarProducts] = useState<ProductType[]>([]);
+  const [similarLoading, setSimilarLoading] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -64,6 +69,12 @@ export function ProductDetail() {
       checkCanReview();
     }
   }, [product?.id, isAuthenticated]);
+  
+  useEffect(() => {
+    if (product?.category) {
+      loadSimilarProducts();
+    }
+  }, [product?.category, product?.id]);
 
   async function loadProduct() {
     if (!slug) {
@@ -121,6 +132,30 @@ export function ProductDetail() {
     
     const result = await canReviewProduct(product.id);
     setCanReview(result);
+  }
+  
+  async function loadSimilarProducts() {
+    if (!product?.category || !product?.id) return;
+    
+    setSimilarLoading(true);
+    try {
+      const response = await listProducts({
+        category: product.category,
+        limit: 12
+      }) as { products: ProductType[] };
+      
+      // Exclure le produit actuel et limiter à 4 produits
+      const filtered = response.products
+        .filter(p => p.id !== product.id && p.slug !== product.slug)
+        .slice(0, 4);
+      
+      setSimilarProducts(filtered);
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits similaires:', error);
+      setSimilarProducts([]);
+    } finally {
+      setSimilarLoading(false);
+    }
   }
   
   async function handleSubmitReview(e: React.FormEvent) {
@@ -377,40 +412,90 @@ export function ProductDetail() {
         </div>
       </section>
 
-      {/* Section Description */}
-      {product.description && (
-        <section className={styles.descriptionSection}>
-          <div className={styles.sectionContainer}>
-            <h2 className={styles.sectionTitle}>À propos</h2>
-            <p className={styles.descriptionText}>{product.description}</p>
-          </div>
-        </section>
-      )}
+      {/* Section Détails — Regroupe Description et Contenu */}
+      <section className={styles.detailsSection}>
+        <div className={styles.detailsContainer}>
+          {/* Description */}
+          {product.description && (
+            <div className={styles.detailBlock}>
+              <h2 className={styles.detailTitle}>À propos</h2>
+              <div className={styles.detailContent}>
+                <p className={styles.detailText}>{product.description}</p>
+              </div>
+            </div>
+          )}
 
-      {/* Section Contenu — Si Display ou Booster */}
-      {(product.name.toLowerCase().includes('display') || product.name.toLowerCase().includes('booster') || product.name.toLowerCase().includes('etb')) && (
-        <section className={styles.contentSection}>
+          {/* Contenu — Si Display ou Booster */}
+          {(product.name.toLowerCase().includes('display') || product.name.toLowerCase().includes('booster') || product.name.toLowerCase().includes('etb')) && (
+            <div className={styles.detailBlock}>
+              <h2 className={styles.detailTitle}>Contenu</h2>
+              <div className={styles.detailContent}>
+                {product.name.toLowerCase().includes('display') ? (
+                  <p className={styles.detailText}>
+                    Ce display contient 24 boosters individuels, chacun contenant des cartes aléatoires de l'extension. 
+                    Chaque booster inclut une carte rare minimum, avec possibilité de cartes ultra-rares, 
+                    spéciales ou illustrées par des artistes renommés.
+                  </p>
+                ) : product.name.toLowerCase().includes('etb') || product.name.toLowerCase().includes('coffret') ? (
+                  <p className={styles.detailText}>
+                    Ce coffret dresseur d'élite contient des boosters, des dés, des marqueurs de dégâts, 
+                    un guide du joueur et des accessoires exclusifs. Une expérience complète pour les collectionneurs 
+                    et les joueurs.
+                  </p>
+                ) : (
+                  <p className={styles.detailText}>
+                    Chaque booster contient des cartes aléatoires de l'extension, avec une carte rare minimum. 
+                    Possibilité de découvrir des cartes ultra-rares, spéciales ou illustrées par des artistes renommés.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Section Produits similaires */}
+      {similarProducts.length > 0 && (
+        <section className={styles.similarSection}>
           <div className={styles.sectionContainer}>
-            <h2 className={styles.sectionTitle}>Contenu</h2>
-            <div className={styles.contentInfo}>
-              {product.name.toLowerCase().includes('display') ? (
-                <p className={styles.contentText}>
-                  Ce display contient 24 boosters individuels, chacun contenant des cartes aléatoires de l'extension. 
-                  Chaque booster inclut une carte rare minimum, avec possibilité de cartes ultra-rares, 
-                  spéciales ou illustrées par des artistes renommés.
-                </p>
-              ) : product.name.toLowerCase().includes('etb') || product.name.toLowerCase().includes('coffret') ? (
-                <p className={styles.contentText}>
-                  Ce coffret dresseur d'élite contient des boosters, des dés, des marqueurs de dégâts, 
-                  un guide du joueur et des accessoires exclusifs. Une expérience complète pour les collectionneurs 
-                  et les joueurs.
-                </p>
-              ) : (
-                <p className={styles.contentText}>
-                  Chaque booster contient des cartes aléatoires de l'extension, avec une carte rare minimum. 
-                  Possibilité de découvrir des cartes ultra-rares, spéciales ou illustrées par des artistes renommés.
-                </p>
-              )}
+            <h2 className={styles.sectionTitle}>Produits similaires</h2>
+            <div className={styles.similarGrid}>
+              {similarProducts.map((similarProduct) => {
+                const imageUrl = similarProduct.images?.[0]?.url || '/img/products/placeholder.png';
+                const price = similarProduct.minPriceCents || 0;
+                const inStock = similarProduct.variants?.some(v => v.stock > 0) || false;
+                
+                return (
+                  <article
+                    key={similarProduct.id}
+                    className={styles.similarCard}
+                    onClick={() => navigate(`/produit/${similarProduct.slug}`)}
+                  >
+                    <div className={styles.similarImageWrapper}>
+                      <img
+                        src={imageUrl}
+                        alt={similarProduct.name}
+                        className={styles.similarImage}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
+                        }}
+                      />
+                    </div>
+
+                    <div className={styles.similarContent}>
+                      <h3 className={styles.similarName}>{similarProduct.name}</h3>
+                      <div className={styles.similarFooter}>
+                        <span className={styles.similarPrice}>
+                          {price > 0 ? `${formatPrice(price)} €` : 'Prix sur demande'}
+                        </span>
+                        <span className={styles.similarAction}>
+                          <ArrowRightIcon size={16} strokeWidth={1.5} />
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
