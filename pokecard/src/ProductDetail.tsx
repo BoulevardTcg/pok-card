@@ -37,11 +37,10 @@ export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<ProductType | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -59,7 +58,6 @@ export function ProductDetail() {
     loadProduct();
   }, [slug]);
   
-  // Charger les avis et vérifier l'éligibilité quand le produit est chargé
   useEffect(() => {
     if (product?.id) {
       loadReviews();
@@ -137,7 +135,6 @@ export function ProductDetail() {
       setSubmitSuccess(true);
       setShowReviewForm(false);
       setNewReview({ rating: 5, title: '', comment: '' });
-      // Recharger les avis (le nouveau sera en attente de modération)
     } catch (err: any) {
       setSubmitError(err.message || 'Erreur lors de l\'envoi de l\'avis');
     }
@@ -152,18 +149,62 @@ export function ProductDetail() {
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
     if (selectedVariant.stock <= 0) return;
-    for (let i = 0; i < quantity; i++) {
-      addToCart(selectedVariant, product);
+    addToCart(selectedVariant, product);
+  };
+
+  const isAvailable = selectedVariant && selectedVariant.stock > 0;
+
+  // Navigation image
+  const goToImage = (index: number) => {
+    if (product?.images && index >= 0 && index < product.images.length) {
+      setSelectedImage(index);
     }
   };
+
+  // Badges subtils
+  const isNewProduct = product?.createdAt ? (new Date().getTime() - new Date(product.createdAt).getTime()) < 30 * 24 * 60 * 60 * 1000 : false;
+  const isPreorder = selectedVariant && selectedVariant.stock === 0 && !product?.outOfStock;
+
+  // Caractéristiques discrètes (basées sur catégorie/nom)
+  const getProductFeatures = () => {
+    const features: Array<{ label: string; value: string }> = [];
+    const nameLower = product?.name.toLowerCase() || '';
+    const categoryLower = product?.category.toLowerCase() || '';
+
+    // Détecter le type de produit
+    if (nameLower.includes('display') || categoryLower.includes('display')) {
+      features.push({ label: 'Type', value: 'Display 24 boosters' });
+    } else if (nameLower.includes('etb') || nameLower.includes('elite trainer') || nameLower.includes('coffret')) {
+      features.push({ label: 'Type', value: 'Coffret Dresseur d\'Élite' });
+    } else if (nameLower.includes('upc') || nameLower.includes('ultra premium')) {
+      features.push({ label: 'Type', value: 'Ultra Premium Collection' });
+    } else if (nameLower.includes('booster')) {
+      features.push({ label: 'Type', value: 'Booster' });
+    }
+
+    // Langue si disponible
+    if (selectedVariant?.language) {
+      features.push({ label: 'Langue', value: selectedVariant.language });
+    }
+
+    // Édition si disponible
+    if (selectedVariant?.edition) {
+      features.push({ label: 'Édition', value: selectedVariant.edition });
+    }
+
+    // État
+    features.push({ label: 'État', value: 'Neuf et scellé' });
+
+    return features;
+  };
+
+  const productFeatures = getProductFeatures();
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.loading}>
-            Chargement du produit...
-          </div>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
         </div>
       </div>
     );
@@ -172,18 +213,11 @@ export function ProductDetail() {
   if (error || !product) {
     return (
       <div className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.error}>
-            <div className={styles.errorTitle}>
-              {error || 'Produit introuvable'}
-            </div>
-            <button 
-              onClick={() => navigate('/produits')}
-              className={styles.backButton}
-            >
-              Retour aux produits
-            </button>
-          </div>
+        <div className={styles.errorState}>
+          <p className={styles.errorText}>{error || 'Produit introuvable'}</p>
+          <button onClick={() => navigate('/produits')} className={styles.backLink}>
+            Retour aux produits
+          </button>
         </div>
       </div>
     );
@@ -191,105 +225,112 @@ export function ProductDetail() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <button className={styles.backButton} onClick={() => navigate(-1)}>
-          ← Retour
+      {/* Navigation retour discrète */}
+      <nav className={styles.breadcrumb}>
+        <button onClick={() => navigate(-1)} className={styles.backLink}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Retour</span>
         </button>
+      </nav>
 
-        <div className={styles.content}>
-          {/* Galerie d'images */}
-          <div className={styles.gallery}>
-            <div className={styles.mainImage}>
+      {/* Zone principale — Produit */}
+      <section className={styles.heroSection}>
+        <div className={styles.heroContainer}>
+          
+          {/* Zone image dominante */}
+          <div className={styles.productShowcase}>
+            <div className={styles.imageContainer}>
               {product.images && product.images.length > 0 ? (
                 <img 
                   src={product.images[selectedImage].url} 
                   alt={product.images[selectedImage].altText || product.name}
-                  className={styles.image}
+                  className={styles.productImage}
                 />
               ) : (
-                <div className={styles.placeholderImage}>Pas d'image</div>
-              )}
-              {selectedVariant && selectedVariant.stock <= 0 && (
-                <div className={styles.outOfStockBanner}>Rupture de stock</div>
+                <div className={styles.imagePlaceholder}>
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                </div>
               )}
             </div>
+
+            {/* Navigation images discrète */}
             {product.images && product.images.length > 1 && (
-              <div className={styles.thumbnailGrid}>
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`${styles.thumbnail} ${selectedImage === index ? styles.active : ''}`}
-                  >
-                    <img src={image.url} alt={image.altText || `Vue ${index + 1}`} />
-                  </button>
-                ))}
+              <div className={styles.imageGallery}>
+                <div className={styles.imageNav}>
+                  {product.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToImage(index)}
+                      className={`${styles.imageDot} ${selectedImage === index ? styles.active : ''}`}
+                      aria-label={`Image ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                {/* Miniatures images */}
+                <div className={styles.imageThumbnails}>
+                  {product.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToImage(index)}
+                      className={`${styles.thumbnail} ${selectedImage === index ? styles.thumbnailActive : ''}`}
+                      aria-label={`Vue ${index + 1}`}
+                    >
+                      <img src={image.url} alt={image.altText || `${product.name} - vue ${index + 1}`} />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Informations produit */}
-          <div className={styles.info}>
-            <div className={styles.badges}>
-              {product.category && (
-                <span className={styles.badge}>{product.category}</span>
-              )}
-            </div>
-
-            <h1 className={styles.title}>{product.name}</h1>
-
-            {/* Rating */}
-            <div className={styles.rating}>
-              {[...Array(5)].map((_, i) => (
-                <span key={i} className={`${styles.star} ${i < Math.round(reviewsData?.stats.averageRating || 0) ? styles.filled : ''}`}>
-                  ⭐
-                </span>
-              ))}
-              <span className={styles.reviews}>
-                {reviewsData?.stats.totalReviews 
-                  ? `(${reviewsData.stats.totalReviews} avis - ${reviewsData.stats.averageRating.toFixed(1)}/5)`
-                  : '(Aucun avis)'}
-              </span>
-            </div>
-
-            {/* Prix */}
-            <div className={styles.priceSection}>
-              {selectedVariant && (
-                <>
-                  <div className={styles.priceRow}>
-                    <span className={styles.price}>
-                      {formatPrice(selectedVariant.priceCents)}€
-                    </span>
-                  </div>
-                  <div className={styles.stockInfo}>
-                    <span className={styles.stockLabel}>État :</span>
-                    <span className={styles.stockValue}>Neuf</span>
-                  </div>
-                  {selectedVariant.stock > 0 ? (
-                    <p className={styles.stockAvailable}>
-                      {selectedVariant.stock} en stock
-                    </p>
-                  ) : (
-                    <p className={styles.stockUnavailable}>
-                      Rupture de stock
-                    </p>
+          {/* Colonne information sobre */}
+          <div className={styles.productInfo}>
+            <header className={styles.productHeader}>
+              {/* Badges subtils */}
+              {(isNewProduct || isPreorder) && (
+                <div className={styles.badgesContainer}>
+                  {isNewProduct && (
+                    <span className={styles.badge}>Nouveau</span>
                   )}
-                </>
+                  {isPreorder && (
+                    <span className={styles.badge}>Précommande</span>
+                  )}
+                </div>
               )}
-            </div>
 
-            {/* Description */}
-            {product.description && (
-              <div className={styles.descriptionSection}>
-                <h2 className={styles.sectionTitle}>Description</h2>
-                <p className={styles.description}>{product.description}</p>
+              <h1 className={styles.productName}>{product.name}</h1>
+              
+              {selectedVariant && (
+                <p className={styles.productPrice}>
+                  {formatPrice(selectedVariant.priceCents)} €
+                </p>
+              )}
+            </header>
+
+            {/* Caractéristiques discrètes */}
+            {productFeatures.length > 0 && (
+              <div className={styles.featuresSection}>
+                <dl className={styles.featuresList}>
+                  {productFeatures.map((feature, index) => (
+                    <div key={index} className={styles.featureItem}>
+                      <dt className={styles.featureLabel}>{feature.label}</dt>
+                      <dd className={styles.featureValue}>{feature.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
             )}
 
-            {/* Variantes */}
+            {/* Sélection variante si plusieurs */}
             {product.variants.length > 1 && (
-              <div className={styles.variantsSection}>
-                <label className={styles.variantsLabel}>Variante :</label>
+              <div className={styles.variantSection}>
+                <label className={styles.variantLabel}>Version</label>
                 <select
                   value={selectedVariantId || ''}
                   onChange={(e) => setSelectedVariantId(e.target.value)}
@@ -298,134 +339,135 @@ export function ProductDetail() {
                   {product.variants.map(variant => (
                     <option key={variant.id} value={variant.id}>
                       {variant.name}
-                      {variant.language && ` - ${variant.language}`}
+                      {variant.language && ` — ${variant.language}`}
                       {variant.edition && ` (${variant.edition})`}
-                      {variant.stock <= 0 ? ' - Rupture' : ` - ${formatPrice(variant.priceCents)}€`}
                     </option>
                   ))}
                 </select>
               </div>
             )}
 
-            {/* Quantité et actions */}
-            <div className={styles.actionsSection}>
-              <div className={styles.quantitySection}>
-                <label className={styles.quantityLabel}>Quantité :</label>
-                <div className={styles.quantityControls}>
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className={styles.quantityButton}
-                    disabled={quantity <= 1}
-                  >
-                    −
-                  </button>
-                  <span className={styles.quantityValue}>{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(Math.min(selectedVariant?.stock || 1, quantity + 1))}
-                    className={styles.quantityButton}
-                    disabled={!selectedVariant || selectedVariant.stock <= quantity}
-                  >
-                    +
-                  </button>
-                </div>
+            {/* Signaux de confiance discrets */}
+            <div className={styles.trustSignals}>
+              <div className={styles.trustItem}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Authenticité garantie</span>
               </div>
-
-              <div className={styles.actionButtons}>
-                <button
-                  className={styles.addToCartButton}
-                  onClick={handleAddToCart}
-                  disabled={!selectedVariant || selectedVariant.stock <= 0}
-                >
-                  🛒 Ajouter au panier
-                </button>
+              <div className={styles.trustItem}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M20 7h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v3H4a1 1 0 000 2h1v9a2 2 0 002 2h10a2 2 0 002-2V9h1a1 1 0 100-2z" />
+                </svg>
+                <span>Emballage sécurisé</span>
               </div>
             </div>
 
-            {/* Garanties */}
-            <div className={styles.guarantees}>
-              <div className={styles.guaranteeItem}>
-                <span className={styles.guaranteeIcon}>🛡️</span>
-                <div>
-                  <p className={styles.guaranteeTitle}>Authenticité</p>
-                  <p className={styles.guaranteeText}>Garantie</p>
-                </div>
-              </div>
-              <div className={styles.guaranteeItem}>
-                <span className={styles.guaranteeIcon}>🚚</span>
-                <div>
-                  <p className={styles.guaranteeTitle}>Livraison</p>
-                  <p className={styles.guaranteeText}>Gratuite dès 50€</p>
-                </div>
-              </div>
-              <div className={styles.guaranteeItem}>
-                <span className={styles.guaranteeIcon}>↩️</span>
-                <div>
-                  <p className={styles.guaranteeTitle}>Retours</p>
-                  <p className={styles.guaranteeText}>Gratuits</p>
-                </div>
-              </div>
+            {/* CTA unique */}
+            <div className={styles.actionSection}>
+              <button
+                className={`${styles.addButton} ${!isAvailable ? styles.disabled : ''}`}
+                onClick={handleAddToCart}
+                disabled={!isAvailable}
+              >
+                {isAvailable ? 'Ajouter à ma collection' : 'Indisponible'}
+              </button>
             </div>
           </div>
         </div>
-        
-        {/* Section Avis */}
-        <div className={styles.reviewsSection}>
-          {/* En-tête avec note globale */}
-          <div className={styles.reviewsHeader}>
-            <div className={styles.reviewsHeaderLeft}>
-              <h2 className={styles.reviewsTitle}>Ce qu'en pensent nos clients</h2>
-              {reviewsData?.stats && reviewsData.stats.totalReviews > 0 && (
-                <div className={styles.ratingOverview}>
-                  <span className={styles.ratingScore}>{reviewsData.stats.averageRating.toFixed(1)}</span>
-                  <div className={styles.ratingDetails}>
-                    <div className={styles.starsRow}>
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className={`${styles.starIcon} ${i < Math.round(reviewsData.stats.averageRating) ? styles.starFilled : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className={styles.reviewCount}>{reviewsData.stats.totalReviews} avis vérifiés</span>
-                  </div>
-                </div>
+      </section>
+
+      {/* Section Description */}
+      {product.description && (
+        <section className={styles.descriptionSection}>
+          <div className={styles.sectionContainer}>
+            <h2 className={styles.sectionTitle}>À propos</h2>
+            <p className={styles.descriptionText}>{product.description}</p>
+          </div>
+        </section>
+      )}
+
+      {/* Section Contenu — Si Display ou Booster */}
+      {(product.name.toLowerCase().includes('display') || product.name.toLowerCase().includes('booster') || product.name.toLowerCase().includes('etb')) && (
+        <section className={styles.contentSection}>
+          <div className={styles.sectionContainer}>
+            <h2 className={styles.sectionTitle}>Contenu</h2>
+            <div className={styles.contentInfo}>
+              {product.name.toLowerCase().includes('display') ? (
+                <p className={styles.contentText}>
+                  Ce display contient 24 boosters individuels, chacun contenant des cartes aléatoires de l'extension. 
+                  Chaque booster inclut une carte rare minimum, avec possibilité de cartes ultra-rares, 
+                  spéciales ou illustrées par des artistes renommés.
+                </p>
+              ) : product.name.toLowerCase().includes('etb') || product.name.toLowerCase().includes('coffret') ? (
+                <p className={styles.contentText}>
+                  Ce coffret dresseur d'élite contient des boosters, des dés, des marqueurs de dégâts, 
+                  un guide du joueur et des accessoires exclusifs. Une expérience complète pour les collectionneurs 
+                  et les joueurs.
+                </p>
+              ) : (
+                <p className={styles.contentText}>
+                  Chaque booster contient des cartes aléatoires de l'extension, avec une carte rare minimum. 
+                  Possibilité de découvrir des cartes ultra-rares, spéciales ou illustrées par des artistes renommés.
+                </p>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Section Avis */}
+      <section className={styles.reviewsSection}>
+        <div className={styles.sectionContainer}>
+          <header className={styles.reviewsHeader}>
+            <h2 className={styles.sectionTitle}>Avis</h2>
             
-            {/* Bouton écrire un avis */}
-            {!showReviewForm && (
-              <div className={styles.reviewsHeaderRight}>
-                {submitSuccess ? (
-                  <span className={styles.thankYouMsg}>Merci pour votre avis !</span>
-                ) : canReview?.canReview ? (
-                  <button className={styles.writeBtn} onClick={() => setShowReviewForm(true)}>
-                    Écrire un avis
-                  </button>
-                ) : canReview?.reason === 'NOT_LOGGED_IN' ? (
-                  <a href="/connexion" className={styles.loginLink}>Se connecter pour donner son avis</a>
-                ) : canReview?.reason === 'ALREADY_REVIEWED' ? (
-                  <span className={styles.alreadyReviewed}>Vous avez déjà noté ce produit</span>
-                ) : canReview?.reason === 'NOT_PURCHASED' ? (
-                  <span className={styles.purchaseRequired}>Réservé aux acheteurs</span>
-                ) : null}
+            {reviewsData?.stats && reviewsData.stats.totalReviews > 0 && (
+              <div className={styles.reviewsSummary}>
+                <div className={styles.starsDisplay}>
+                  {[...Array(5)].map((_, i) => (
+                    <svg 
+                      key={i} 
+                      className={`${styles.starSvg} ${i < Math.round(reviewsData.stats.averageRating) ? styles.filled : ''}`} 
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <span className={styles.reviewsCount}>
+                  {reviewsData.stats.totalReviews} avis
+                </span>
               </div>
             )}
-          </div>
+          </header>
+
+          {/* Bouton écrire un avis */}
+          {!showReviewForm && (
+            <div className={styles.reviewAction}>
+              {submitSuccess ? (
+                <p className={styles.thankYou}>Merci pour votre avis</p>
+              ) : canReview?.canReview ? (
+                <button className={styles.writeReviewBtn} onClick={() => setShowReviewForm(true)}>
+                  Écrire un avis
+                </button>
+              ) : canReview?.reason === 'NOT_LOGGED_IN' ? (
+                <a href="/connexion" className={styles.loginPrompt}>Se connecter pour donner son avis</a>
+              ) : canReview?.reason === 'ALREADY_REVIEWED' ? (
+                <p className={styles.reviewNote}>Vous avez déjà noté ce produit</p>
+              ) : canReview?.reason === 'NOT_PURCHASED' ? (
+                <p className={styles.reviewNote}>Réservé aux acheteurs</p>
+              ) : null}
+            </div>
+          )}
 
           {/* Formulaire d'avis */}
           {showReviewForm && canReview?.canReview && (
             <div className={styles.reviewForm}>
               <form onSubmit={handleSubmitReview}>
-                <div className={styles.formHeader}>
-                  <h3>Partagez votre expérience</h3>
-                  <button type="button" className={styles.closeForm} onClick={() => setShowReviewForm(false)}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                
-                <div className={styles.ratingField}>
-                  <span className={styles.fieldLabel}>Note</span>
+                <div className={styles.formRow}>
+                  <label className={styles.formLabel}>Note</label>
                   <div className={styles.starPicker}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -433,7 +475,6 @@ export function ProductDetail() {
                         type="button"
                         onClick={() => setNewReview({ ...newReview, rating: star })}
                         className={`${styles.pickStar} ${star <= newReview.rating ? styles.picked : ''}`}
-                        aria-label={`${star} étoile${star > 1 ? 's' : ''}`}
                       >
                         <svg viewBox="0 0 20 20" fill="currentColor">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -443,69 +484,61 @@ export function ProductDetail() {
                   </div>
                 </div>
                 
-                <div className={styles.textField}>
-                  <label className={styles.fieldLabel}>
-                    Titre
-                    <span className={styles.optionalTag}>Facultatif</span>
-                  </label>
+                <div className={styles.formRow}>
+                  <label className={styles.formLabel}>Titre <span className={styles.optional}>(facultatif)</span></label>
                   <input
                     type="text"
                     placeholder="En quelques mots..."
                     value={newReview.title}
                     onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
                     maxLength={100}
+                    className={styles.formInput}
                   />
                 </div>
                 
-                <div className={styles.textField}>
-                  <label className={styles.fieldLabel}>
-                    Votre avis
-                    <span className={styles.optionalTag}>Facultatif</span>
-                  </label>
+                <div className={styles.formRow}>
+                  <label className={styles.formLabel}>Commentaire <span className={styles.optional}>(facultatif)</span></label>
                   <textarea
-                    placeholder="Qu'avez-vous pensé de ce produit ?"
+                    placeholder="Votre expérience..."
                     value={newReview.comment}
                     onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                     maxLength={1000}
                     rows={3}
+                    className={styles.formTextarea}
                   />
                 </div>
                 
-                {submitError && <p className={styles.errorMsg}>{submitError}</p>}
+                {submitError && <p className={styles.formError}>{submitError}</p>}
                 
-                <button type="submit" className={styles.publishBtn}>
-                  Publier
-                </button>
+                <div className={styles.formActions}>
+                  <button type="button" onClick={() => setShowReviewForm(false)} className={styles.cancelBtn}>
+                    Annuler
+                  </button>
+                  <button type="submit" className={styles.submitBtn}>
+                    Publier
+                  </button>
+                </div>
               </form>
             </div>
           )}
           
           {/* Liste des avis */}
           {reviewsLoading ? (
-            <div className={styles.loading}>
-              <div className={styles.spinner}></div>
+            <div className={styles.reviewsLoading}>
+              <div className={styles.spinner} />
             </div>
           ) : reviewsData?.reviews && reviewsData.reviews.length > 0 ? (
             <div className={styles.reviewsList}>
               {reviewsData.reviews.map((review) => (
-                <article key={review.id} className={styles.review}>
-                  <header className={styles.reviewTop}>
-                    <div className={styles.reviewerBlock}>
-                      <div className={styles.avatar}>
-                        {review.user.avatar ? (
-                          <img src={review.user.avatar} alt="" />
-                        ) : (
-                          (review.user.firstName || review.user.username).charAt(0).toUpperCase()
-                        )}
-                      </div>
-                      <div>
-                        <span className={styles.reviewerName}>
-                          {review.user.firstName || review.user.username}
-                        </span>
-                        {review.isVerified && (
-                          <span className={styles.verified}>Achat vérifié</span>
-                        )}
-                      </div>
+                <article key={review.id} className={styles.reviewItem}>
+                  <header className={styles.reviewMeta}>
+                    <div className={styles.reviewAuthor}>
+                      <span className={styles.authorName}>
+                        {review.user.firstName || review.user.username}
+                      </span>
+                      {review.isVerified && (
+                        <span className={styles.verifiedBadge}>Achat vérifié</span>
+                      )}
                     </div>
                     <time className={styles.reviewDate}>
                       {new Date(review.createdAt).toLocaleDateString('fr-FR', {
@@ -518,7 +551,12 @@ export function ProductDetail() {
                   
                   <div className={styles.reviewStars}>
                     {[...Array(5)].map((_, i) => (
-                      <svg key={i} className={`${styles.star} ${i < review.rating ? styles.filled : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                      <svg 
+                        key={i} 
+                        className={`${styles.starSmall} ${i < review.rating ? styles.filled : ''}`} 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
@@ -530,12 +568,10 @@ export function ProductDetail() {
               ))}
             </div>
           ) : (
-            <div className={styles.noReviews}>
-              <p>Aucun avis pour le moment</p>
-            </div>
+            <p className={styles.noReviews}>Aucun avis pour le moment</p>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

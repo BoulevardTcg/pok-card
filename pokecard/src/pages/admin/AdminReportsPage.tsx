@@ -68,9 +68,9 @@ function SalesChart({ data, formatPrice }: { data: SalePoint[]; formatPrice: (ce
   const [tooltip, setTooltip] = useState<TooltipData>({ x: 0, y: 0, data: data[0], visible: false });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const width = 800;
-  const height = 320;
-  const padding = { top: 40, right: 30, bottom: 60, left: 70 };
+  const width = 1200;
+  const height = 480;
+  const padding = { top: 50, right: 40, bottom: 80, left: 90 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
@@ -147,14 +147,14 @@ function SalesChart({ data, formatPrice }: { data: SalePoint[]; formatPrice: (ce
         ))}
 
         <path d={revenueArea} fill="url(#revenueGradient)" />
-        <path d={revenuePath} fill="none" stroke="var(--color-accent-secondary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <path d={ordersPath} fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 3" />
+        <path d={revenuePath} fill="none" stroke="var(--color-accent-secondary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={ordersPath} fill="none" stroke="var(--color-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8 4" />
 
         {data.map((point, i) => (
           <g key={i}>
-            <rect x={getX(i) - 20} y={padding.top} width={40} height={chartHeight} fill="transparent" onMouseMove={(e) => handleMouseMove(e, i)} style={{ cursor: 'crosshair' }} />
-            <circle cx={getX(i)} cy={getYRevenue(point.revenue)} r={hoveredIndex === i ? 8 : 5} fill="var(--color-accent-secondary)" stroke="var(--color-bg-elevated)" strokeWidth="2" style={{ opacity: hoveredIndex === null || hoveredIndex === i ? 1 : 0.3, transition: 'all 0.2s ease' }} />
-            <circle cx={getX(i)} cy={getYOrders(point.orders)} r={hoveredIndex === i ? 6 : 4} fill="var(--color-success)" stroke="var(--color-bg-elevated)" strokeWidth="2" style={{ opacity: hoveredIndex === null || hoveredIndex === i ? 1 : 0.3, transition: 'all 0.2s ease' }} />
+            <rect x={getX(i) - 30} y={padding.top} width={60} height={chartHeight} fill="transparent" onMouseMove={(e) => handleMouseMove(e, i)} style={{ cursor: 'crosshair' }} />
+            <circle cx={getX(i)} cy={getYRevenue(point.revenue)} r={hoveredIndex === i ? 10 : 6} fill="var(--color-accent-secondary)" stroke="var(--color-bg-elevated)" strokeWidth="2.5" style={{ opacity: hoveredIndex === null || hoveredIndex === i ? 1 : 0.3, transition: 'all 0.2s ease' }} />
+            <circle cx={getX(i)} cy={getYOrders(point.orders)} r={hoveredIndex === i ? 8 : 5} fill="var(--color-success)" stroke="var(--color-bg-elevated)" strokeWidth="2.5" style={{ opacity: hoveredIndex === null || hoveredIndex === i ? 1 : 0.3, transition: 'all 0.2s ease' }} />
             {hoveredIndex === i && <line x1={getX(i)} y1={padding.top} x2={getX(i)} y2={padding.top + chartHeight} stroke="var(--color-accent-secondary)" strokeOpacity="0.3" strokeWidth="1" strokeDasharray="4 4" />}
           </g>
         ))}

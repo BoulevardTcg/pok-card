@@ -36,6 +36,7 @@ export default function HeroSection() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const currentCard = HERO_CARDS[currentCardIndex];
@@ -53,8 +54,10 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // Effet de parallaxe subtil sur la carte
+  // Effet de parallaxe subtil sur la carte — seulement quand la souris est au-dessus
   useEffect(() => {
+    if (!isHovering) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!cardRef.current) return;
       
@@ -70,7 +73,13 @@ export default function HeroSection() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isHovering]);
+
+  // Réinitialiser la position quand la souris quitte la carte
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    setMousePosition({ x: 0, y: 0 });
+  };
 
   return (
     <section className={styles.hero}>
@@ -143,6 +152,8 @@ export default function HeroSection() {
           <div 
             ref={cardRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={handleMouseLeave}
             style={{
               transform: `perspective(1000px) rotateY(${mousePosition.x}deg) rotateX(${-mousePosition.y}deg)`,
             }}

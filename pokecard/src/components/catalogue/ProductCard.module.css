@@ -1,41 +1,36 @@
-.card {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+/* ===================================================================
+   PRODUCT CARD — Carte produit premium
+   =================================================================== */
 
-:global(.dark) .card {
-  background: #1A1D21;
-  border-color: #2E3542;
+.card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+  cursor: pointer;
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border-color: #D7B56D;
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-accent-secondary);
 }
 
-:global(.dark) .card:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
+/* ─────────────────────────────────────────────────────────────────
+   IMAGE CONTAINER
+   ───────────────────────────────────────────────────────────────── */
 
 .imageContainer {
   position: relative;
   aspect-ratio: 3/4;
   overflow: hidden;
-  background: #f9fafb;
+  background: var(--color-bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-}
-
-:global(.dark) .imageContainer {
-  background: #0C1321;
+  padding: var(--space-4, 1rem);
 }
 
 .image {
@@ -43,7 +38,7 @@
   height: 100%;
   object-fit: contain;
   object-position: center;
-  transition: transform 0.4s ease;
+  transition: transform var(--duration-slow, 400ms) var(--ease-out);
   max-width: 100%;
   max-height: 100%;
 }
@@ -55,9 +50,9 @@
 .imageOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(12, 19, 33, 0.4), transparent);
+  background: linear-gradient(to top, rgba(10, 10, 11, 0.4), transparent);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-base, 250ms) var(--ease-out);
 }
 
 .card:hover .imageOverlay {
@@ -70,39 +65,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE
+   ───────────────────────────────────────────────────────────────── */
 
 .badge {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: var(--space-4, 1rem);
+  left: var(--space-4, 1rem);
   z-index: 2;
 }
 
 .badgeText {
-  padding: 0.25rem 0.75rem;
-  background: #D7B56D;
-  color: #0C1321;
-  font-size: 0.75rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-radius: 9999px;
+  letter-spacing: var(--tracking-wide, 0.02em);
+  border-radius: var(--radius-full, 9999px);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   HOVER ACTIONS
+   ───────────────────────────────────────────────────────────────── */
 
 .hoverActions {
   position: absolute;
-  bottom: 1rem;
+  bottom: var(--space-4, 1rem);
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-base, 250ms) var(--ease-out);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
   z-index: 2;
 }
 
@@ -111,25 +114,25 @@
 }
 
 .addButton {
-  padding: 0.5rem 1rem;
-  background: #D7B56D;
-  color: #0C1321;
-  border: none;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.02em);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .addButton:hover {
-  background: #C9A55A;
+  background: var(--color-accent-gold);
 }
 
 .addButton:disabled {
@@ -137,83 +140,77 @@
   cursor: not-allowed;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   CONTENT
+   ───────────────────────────────────────────────────────────────── */
+
 .content {
-  padding: 1.25rem;
+  padding: var(--space-5, 1.25rem);
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-1, 0.25rem);
+  margin-bottom: var(--space-2, 0.5rem);
 }
 
 .star {
-  font-size: 0.875rem;
-  color: #d1d5db;
-  transition: color 0.3s ease;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-border-default);
+  transition: color var(--duration-base, 250ms) var(--ease-out);
 }
 
 .star.filled {
-  color: #D7B56D;
+  color: var(--color-accent-secondary);
 }
 
 .name {
-  font-size: 1.125rem;
-  font-family: var(--font-serif);
-  color: #0C1321;
-  margin-bottom: 0.5rem;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .name {
-  color: white;
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2, 0.5rem);
+  transition: color var(--duration-base, 250ms) var(--ease-out);
 }
 
 .card:hover .name {
-  color: #D7B56D;
+  color: var(--color-accent-secondary);
 }
 
 .description {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
+  letter-spacing: var(--tracking-wide, 0.02em);
+  margin-bottom: var(--space-3, 0.75rem);
 }
 
-:global(.dark) .description {
-  color: #9ca3af;
-}
+/* ─────────────────────────────────────────────────────────────────
+   PRICE
+   ───────────────────────────────────────────────────────────────── */
 
 .priceContainer {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
 }
 
 .price {
-  font-size: 1.25rem;
-  font-family: var(--font-serif);
-  color: #0C1321;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .price {
-  color: white;
+  font-family: var(--font-display);
+  font-size: var(--text-xl, 1.25rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
 }
 
 .outOfStock {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  margin-top: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem);
+  background: var(--color-error-muted);
+  color: var(--color-error);
+  border-radius: var(--radius-sm, 2px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
   text-align: center;
-  font-family: var(--font-sans);
 }
-

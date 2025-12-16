@@ -1,61 +1,59 @@
+/* ===================================================================
+   PRODUCTS PAGE — Catalogue premium
+   =================================================================== */
+
 .page {
   min-height: 100vh;
-  background: var(--blanc-lumiere-200);
-  padding: 3rem 0;
-  transition: background-color 0.3s ease;
-}
-
-:global(.dark) .page {
-  background: var(--bleu-nuit);
+  background: var(--color-bg-primary);
+  padding: var(--space-12, 3rem) 0;
 }
 
 .container {
-  max-width: 1280px;
+  max-width: var(--container-max, 1400px);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────── */
+
 .header {
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-12, 3rem);
 }
 
 .title {
-  font-size: clamp(2.5rem, 5vw, 3rem);
-  font-family: var(--font-serif);
-  color: #0C1321;
-  margin-bottom: 1rem;
-  font-weight: 700;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .title {
-  color: white;
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4, 1rem);
+  line-height: var(--leading-tight, 1.15);
 }
 
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
-  margin-bottom: 1.5rem;
+  background: var(--color-accent-secondary);
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .subtitle {
-  font-size: 1.125rem;
-  color: #6b7280;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
   max-width: 600px;
-  line-height: 1.6;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
+  line-height: var(--leading-relaxed, 1.65);
 }
 
-:global(.dark) .subtitle {
-  color: #9ca3af;
-}
+/* ─────────────────────────────────────────────────────────────────
+   CONTENT LAYOUT
+   ───────────────────────────────────────────────────────────────── */
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-8, 2rem);
 }
 
 .sidebar {
@@ -68,18 +66,21 @@
   width: 100%;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   LOADING STATE
+   ───────────────────────────────────────────────────────────────── */
+
 .loading {
   text-align: center;
-  padding: 3rem;
-  font-size: 1.125rem;
-  color: #6b7280;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
+  padding: var(--space-12, 3rem);
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
 }
 
-:global(.dark) .loading {
-  color: #9ca3af;
-}
+/* ─────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────── */
 
 @media (min-width: 1024px) {
   .content {
@@ -87,6 +88,6 @@
   }
 
   .sidebar {
-    width: 256px;
+    width: 280px;
   }
 }

@@ -205,13 +205,14 @@
 .chartSvg {
   width: 100%;
   height: auto;
-  max-height: 320px;
+  max-height: 480px;
+  min-height: 480px;
   color: var(--color-text-muted, #6B6B6F);
 }
 
 .axisLabel {
   font-family: var(--font-body, "Inter", sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   fill: var(--color-text-muted, #6B6B6F);
 }
 

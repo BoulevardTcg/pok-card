@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { ShieldCheckIcon, CertificateIcon, PackageIcon } from '../icons/Icons';
 import styles from './ProcessSection.module.css';
 
@@ -25,29 +25,77 @@ const PROCESS_STEPS = [
 
 export default function ProcessSection() {
   const [activeStep, setActiveStep] = useState(0);
+  const [progress, setProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const stepsRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+
+  const calculateProgress = useCallback(() => {
+    if (!sectionRef.current || !stepsRef.current) return;
+
+    const stepsContainer = stepsRef.current;
+    const stepElements = stepsContainer.querySelectorAll('[data-step]');
+    
+    if (stepElements.length === 0) return;
+
+    const viewportHeight = window.innerHeight;
+    const triggerPoint = viewportHeight * 0.5; // Point de déclenchement au milieu de l'écran
+
+    // Calculer la progression globale basée sur les positions des étapes
+    let currentStep = 0;
+    let stepProgress = 0;
+
+    stepElements.forEach((step, index) => {
+      const rect = step.getBoundingClientRect();
+      const stepCenter = rect.top + rect.height / 2;
+      
+      if (stepCenter <= triggerPoint) {
+        currentStep = index;
+        // Calculer la progression vers l'étape suivante
+        if (index < stepElements.length - 1) {
+          const nextStep = stepElements[index + 1];
+          const nextRect = nextStep.getBoundingClientRect();
+          const nextCenter = nextRect.top + nextRect.height / 2;
+          const distance = nextCenter - stepCenter;
+          const traveled = triggerPoint - stepCenter;
+          stepProgress = Math.min(1, Math.max(0, traveled / distance));
+        } else {
+          stepProgress = 1;
+        }
+      }
+    });
+
+    // Calculer la progression totale (0 à 100%)
+    const totalProgress = ((currentStep + stepProgress) / (PROCESS_STEPS.length - 1)) * 100;
+    
+    setActiveStep(currentStep);
+    setProgress(Math.min(100, Math.max(0, totalProgress)));
+  }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const stepIndex = parseInt(entry.target.getAttribute('data-step') || '0');
-            setActiveStep(stepIndex);
-          }
-        });
-      },
-      {
-        threshold: 0.5,
-        rootMargin: '-20% 0px -20% 0px',
+    const handleScroll = () => {
+      // Annuler le frame précédent pour éviter les accumulations
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
-    );
+      
+      rafRef.current = requestAnimationFrame(calculateProgress);
+    };
 
-    const steps = sectionRef.current?.querySelectorAll('[data-step]');
-    steps?.forEach((step) => observer.observe(step));
+    // Calcul initial
+    calculateProgress();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [calculateProgress]);
 
   return (
     <section ref={sectionRef} className={styles.section}>
@@ -67,7 +115,7 @@ export default function ProcessSection() {
             <div className={styles.timelineLine}>
               <div 
                 className={styles.timelineProgress}
-                style={{ height: `${((activeStep + 1) / PROCESS_STEPS.length) * 100}%` }}
+                style={{ height: `${progress}%` }}
               />
             </div>
             {PROCESS_STEPS.map((step, index) => (
@@ -79,14 +127,16 @@ export default function ProcessSection() {
           </div>
 
           {/* Steps */}
-          <div className={styles.steps}>
+          <div ref={stepsRef} className={styles.steps}>
             {PROCESS_STEPS.map((step, index) => {
               const Icon = step.icon;
+              const isActive = index <= activeStep;
+              const isCurrent = index === activeStep;
               return (
                 <div
                   key={step.number}
                   data-step={index}
-                  className={`${styles.step} ${index === activeStep ? styles.active : ''}`}
+                  className={`${styles.step} ${isActive ? styles.active : ''} ${isCurrent ? styles.current : ''}`}
                 >
                   <div className={styles.stepIcon}>
                     <Icon size={24} strokeWidth={1.5} />

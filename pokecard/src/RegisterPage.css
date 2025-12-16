@@ -1,37 +1,20 @@
-/* ===== REGISTER PAGE - DA TECH & INNOVATION ===== */
-
-/* Variables CSS pour la cohérence avec le site principal */
-:root {
-  --primary-dark: #0f172a;
-  --primary: #1e293b;
-  --primary-light: #334155;
-  --accent: #06b6d4;
-  --accent-light: #0891b2;
-  --accent-dark: #0e7490;
-  --white: #ffffff;
-  --white-soft: #f8fafc;
-  --gray-light: #e2e8f0;
-  --gray: #64748b;
-  --gray-dark: #475569;
-  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.3);
-}
+/* ===================================================================
+   REGISTER PAGE — Inscription premium
+   =================================================================== */
 
 /* Container principal */
 .register-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  background: var(--color-bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: var(--space-8, 2rem);
   position: relative;
   overflow: hidden;
 }
 
-/* Effet de fond avec gradients */
+/* Effet de fond subtil */
 .register-container::before {
   content: '';
   position: absolute;
@@ -40,23 +23,21 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(8, 145, 178, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(15, 23, 42, 0.3) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(139, 115, 85, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 115, 85, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
 }
 
 /* Carte d'inscription */
 .register-card {
-  background: rgba(30, 41, 59, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 20px;
-  padding: 3rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-12, 3rem);
   width: 100%;
   max-width: 550px;
-  box-shadow: var(--shadow-large), var(--shadow-glow);
+  box-shadow: var(--shadow-lg);
   position: relative;
   z-index: 2;
   animation: slideInUp 0.6s ease-out;
@@ -76,91 +57,91 @@
 /* En-tête */
 .register-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-10, 2.5rem);
 }
 
 .register-header h1 {
-  color: var(--white);
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, var(--white) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display);
+  font-size: var(--text-4xl, 2.5rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2, 0.5rem);
 }
 
 .register-header p {
-  color: var(--gray);
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
 }
 
 /* Message d'erreur */
 .error-message {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-  padding: 1rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
+  background: var(--color-error-muted);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--color-error);
+  padding: var(--space-4, 1rem);
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: var(--space-6, 1.5rem);
   text-align: center;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: var(--font-medium, 500);
 }
 
 /* Formulaire */
 .register-form {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8, 2rem);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-4, 1rem);
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .form-group label {
   display: block;
-  color: var(--white);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2, 0.5rem);
 }
 
 .form-input {
   width: 100%;
-  padding: 1rem 1.25rem;
-  background: rgba(15, 23, 42, 0.6);
-  border: 2px solid rgba(6, 182, 212, 0.2);
-  border-radius: 12px;
-  color: var(--white);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl, 12px);
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  color: var(--color-text-primary);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .form-input::placeholder {
-  color: var(--gray);
+  color: var(--color-text-muted);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
-  background: rgba(15, 23, 42, 0.8);
+  border-color: var(--color-accent-secondary);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+  background: var(--color-bg-elevated);
 }
 
 /* Indices de formulaire */
 .form-hint {
   display: block;
-  color: var(--gray);
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2, 0.5rem);
   font-style: italic;
 }
 
@@ -173,41 +154,43 @@
 
 .password-toggle {
   position: absolute;
-  right: 1rem;
+  right: var(--space-4, 1rem);
   background: none;
   border: none;
-  color: var(--gray);
+  color: var(--color-text-muted);
   cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  font-size: var(--text-xl, 1.25rem);
+  padding: var(--space-2, 0.5rem);
+  border-radius: var(--radius-lg, 8px);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .password-toggle:hover {
-  color: var(--accent);
-  background: rgba(6, 182, 212, 0.1);
+  color: var(--color-accent-secondary);
+  background: rgba(139, 115, 85, 0.1);
 }
 
 /* Bouton d'inscription */
 .register-button {
   width: 100%;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-  color: var(--white);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  padding: var(--space-4, 1rem) var(--space-8, 2rem);
+  border-radius: var(--radius-xl, 12px);
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-soft);
-  margin-bottom: 1.5rem;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .register-button:hover:not(:disabled) {
+  background: var(--color-accent-gold);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-medium), var(--shadow-glow);
+  box-shadow: 0 8px 20px rgba(139, 115, 85, 0.4);
 }
 
 .register-button:disabled {
@@ -219,38 +202,39 @@
 /* Pied de page */
 .register-footer {
   text-align: center;
-  color: var(--gray);
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
 }
 
 .register-footer p {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3, 0.75rem);
 }
 
 .link {
-  color: var(--accent);
+  color: var(--color-accent-secondary);
   text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: var(--font-semibold, 600);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .link:hover {
-  color: var(--accent-light);
+  color: var(--color-accent-gold);
   text-decoration: underline;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .register-container {
-    padding: 1rem;
+    padding: var(--space-4, 1rem);
   }
   
   .register-card {
-    padding: 2rem;
-    margin: 1rem;
+    padding: var(--space-8, 2rem);
+    margin: var(--space-4, 1rem);
   }
   
   .register-header h1 {
-    font-size: 2rem;
+    font-size: var(--text-3xl, 2rem);
   }
   
   .form-row {
@@ -259,16 +243,16 @@
   }
   
   .form-input {
-    padding: 0.875rem 1rem;
+    padding: var(--space-3, 0.875rem) var(--space-4, 1rem);
   }
 }
 
 @media (max-width: 480px) {
   .register-card {
-    padding: 1.5rem;
+    padding: var(--space-6, 1.5rem);
   }
   
   .register-header h1 {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl, 1.75rem);
   }
 }

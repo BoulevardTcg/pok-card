@@ -1,68 +1,76 @@
-/* ===== FOOTER LUXE PARISIEN BOULEVARDTCG ===== */
+/* ===================================================================
+   FOOTER — Footer premium
+   =================================================================== */
 
 .footer {
-  background: var(--bleu-nuit);
-  color: var(--blanc-lumiere-200);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
   width: 100%;
   position: relative;
   overflow: hidden;
 }
 
 .footerContainer {
-  max-width: 1280px;
+  max-width: var(--container-max, 1400px);
   margin: 0 auto;
-  padding: 4rem 2rem 2rem;
+  padding: var(--space-16, 4rem) var(--space-8, 2rem) var(--space-8, 2rem);
 }
 
 .footerGrid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 4rem;
-  margin-bottom: 2rem;
+  gap: var(--space-16, 4rem);
+  margin-bottom: var(--space-8, 2rem);
 }
 
-/* Brand Section */
+/* ─────────────────────────────────────────────────────────────────
+   BRAND SECTION
+   ───────────────────────────────────────────────────────────────── */
+
 .footerBrand {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6, 1.5rem);
 }
 
 .footerLogoGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1, 0.25rem);
 }
 
 .footerLogoText {
-  font-size: 2rem;
-  font-family: var(--font-serif);
-  color: white;
-  font-weight: 600;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl, 2rem);
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium, 500);
+  line-height: var(--leading-tight, 1.15);
 }
 
 .footerLogoSubtext {
-  font-size: 0.875rem;
-  font-family: var(--font-sans);
-  color: var(--dore);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-accent-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-weight: 600;
+  letter-spacing: var(--tracking-widest, 0.1em);
+  font-weight: var(--font-semibold, 600);
 }
 
 .footerDescription {
-  color: rgba(242, 242, 242, 0.7);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed, 1.65);
   max-width: 400px;
-  font-family: var(--font-sans);
 }
 
-/* Social Links */
+/* ─────────────────────────────────────────────────────────────────
+   SOCIAL LINKS
+   ───────────────────────────────────────────────────────────────── */
+
 .socialLinks {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4, 1rem);
   align-items: center;
 }
 
@@ -72,13 +80,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(242, 242, 242, 0.6);
-  transition: all 0.3s ease;
-  border-radius: 2px;
+  color: var(--color-text-muted);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+  border-radius: var(--radius-sm, 2px);
 }
 
 .socialLink:hover {
-  color: var(--dore);
+  color: var(--color-accent-secondary);
   transform: translateY(-2px);
 }
 
@@ -87,20 +95,23 @@
   height: 20px;
 }
 
-/* Footer Sections */
+/* ─────────────────────────────────────────────────────────────────
+   FOOTER SECTIONS
+   ───────────────────────────────────────────────────────────────── */
+
 .footerSection {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6, 1.5rem);
 }
 
 .footerSectionTitle {
-  font-size: 0.875rem;
-  font-family: var(--font-serif);
-  color: white;
+  font-family: var(--font-display);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
+  letter-spacing: var(--tracking-wide, 0.05em);
+  font-weight: var(--font-medium, 500);
   margin: 0;
 }
 
@@ -110,50 +121,55 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3, 0.75rem);
 }
 
 .footerLink {
   background: none;
   border: none;
-  color: rgba(242, 242, 242, 0.7);
-  font-size: 0.875rem;
-  font-family: var(--font-sans);
-  font-weight: 400;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-normal, 400);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
   text-align: left;
   padding: 0;
 }
 
 .footerLink:hover {
-  color: var(--dore);
+  color: var(--color-accent-secondary);
 }
 
-/* Divider */
+/* ─────────────────────────────────────────────────────────────────
+   DIVIDER & COPYRIGHT
+   ───────────────────────────────────────────────────────────────── */
+
 .footerDivider {
-  border-top: 1px solid rgba(26, 29, 33, 1);
-  margin: 2rem 0;
+  border-top: 1px solid var(--color-border-subtle);
+  margin: var(--space-8, 2rem) 0;
 }
 
-/* Copyright */
 .footerCopyright {
   text-align: center;
-  padding-top: 1rem;
+  padding-top: var(--space-4, 1rem);
 }
 
 .copyrightText {
-  font-size: 0.75rem;
-  color: rgba(242, 242, 242, 0.5);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted);
   margin: 0;
 }
 
-/* Responsive */
+/* ─────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────── */
+
 @media (max-width: 1024px) {
   .footerGrid {
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: var(--space-12, 3rem);
   }
 
   .footerBrand {
@@ -163,12 +179,12 @@
 
 @media (max-width: 768px) {
   .footerContainer {
-    padding: 3rem 1.5rem 1.5rem;
+    padding: var(--space-12, 3rem) var(--space-6, 1.5rem) var(--space-6, 1.5rem);
   }
 
   .footerGrid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: var(--space-10, 2.5rem);
   }
 
   .footerBrand {
@@ -200,14 +216,14 @@
 
 @media (max-width: 480px) {
   .footerContainer {
-    padding: 2rem 1rem 1rem;
+    padding: var(--space-8, 2rem) var(--space-4, 1rem) var(--space-4, 1rem);
   }
 
   .footerLogoText {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl, 1.75rem);
   }
 
   .footerDescription {
-    font-size: 0.8125rem;
+    font-size: var(--text-sm, 0.8125rem);
   }
 }
