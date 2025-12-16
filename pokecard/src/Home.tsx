@@ -1,13 +1,15 @@
+/* ===================================================================
+   HOME — Landing Page BoulevardTCG
+   Design équilibré : Premium + Passion Collectionneur
+   =================================================================== */
+
 import NavbarPremium from './components/landing/NavbarPremium';
 import HeroSection from './components/landing/HeroSection';
-import ClientLogos from './components/landing/ClientLogos';
-import LatestProductsCarousel from './components/landing/LatestProductsCarousel';
-import NewsSection from './components/landing/NewsSection';
-import BenefitsSection from './components/landing/BenefitsSection';
+import TrustSignals from './components/landing/TrustSignals';
+import FeaturedCards from './components/landing/FeaturedCards';
+import NewReleases from './components/landing/NewReleases';
 import ProcessSection from './components/landing/ProcessSection';
-import OffersSection from './components/landing/OffersSection';
-import TestimonialsSection from './components/landing/TestimonialsSection';
-import FAQSection from './components/landing/FAQSection';
+import CollectionHighlight from './components/landing/CollectionHighlight';
 import FinalCTA from './components/landing/FinalCTA';
 import FooterPremium from './components/landing/FooterPremium';
 
@@ -15,16 +17,28 @@ export function Home() {
   return (
     <>
       <NavbarPremium />
-      <HeroSection />
-      <ClientLogos />
-      <LatestProductsCarousel />
-      <NewsSection />
-      <BenefitsSection />
-      <ProcessSection />
-      <OffersSection />
-      <TestimonialsSection />
-      <FAQSection />
-      <FinalCTA />
+      <main>
+        {/* Hero — Accroche émotionnelle + rotation de cartes */}
+        <HeroSection />
+        
+        {/* Trust — Chiffres clés pour rassurer */}
+        <TrustSignals />
+        
+        {/* Pépites — Mix cartes gradées + produits scellés */}
+        <FeaturedCards />
+        
+        {/* Nouvelles sorties — Pour les chasseurs de boosters */}
+        <NewReleases />
+        
+        {/* Explorer — Collections par univers (Pokémon/One Piece) */}
+        <CollectionHighlight />
+        
+        {/* Process — Authentification, certification, livraison */}
+        <ProcessSection />
+        
+        {/* CTA Final */}
+        <FinalCTA />
+      </main>
       <FooterPremium />
     </>
   );

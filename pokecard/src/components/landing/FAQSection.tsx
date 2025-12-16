@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et n'est plus utilisé dans la landing page.
+ * La FAQ sera déplacée vers une page dédiée /faq.
+ * Ce fichier peut être supprimé de la landing lors du prochain nettoyage.
+ */
+
 import { useState } from 'react';
 import styles from './FAQSection.module.css';
 

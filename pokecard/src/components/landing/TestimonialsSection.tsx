@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et n'est plus utilisé dans la landing page.
+ * Les témoignages ont été remplacés par des données factuelles (TrustSignals).
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import styles from './TestimonialsSection.module.css';
 
 const testimonials = [

@@ -1,233 +1,164 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
-import { useDarkMode } from '../../contexts/DarkModeContext';
-import { MoonIcon } from '../icons/MoonIcon';
-import { SunIcon } from '../icons/SunIcon';
+import { CartIcon, UserIcon, MenuIcon, CloseIcon, LogOutIcon } from '../icons/Icons';
 import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { cart } = useContext(CartContext);
   const { user, isAuthenticated, logout } = useAuth();
-  const { isDark, toggleDarkMode } = useDarkMode();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fermer le menu mobile lors du changement de route
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  const navLinks = [
+    { path: '/', label: 'Accueil' },
+    { path: '/produits', label: 'Collection' },
+    { path: '/trade', label: 'Cartes' },
+    { path: '/actualites', label: 'Journal' },
+  ];
+
   return (
-    <nav className={styles.navbar}>
-      <div className={styles.navbarContainer}>
-        <div className={styles.navbarContent}>
-          {/* Logo */}
-          <div className={styles.logo} onClick={() => navigate('/')}>
-            <div className={styles.logoGroup}>
-              <span className={styles.logoText}>Boulevard</span>
-              <span className={styles.logoSubtext}>TCG</span>
-            </div>
-          </div>
+    <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
+      <div className={styles.container}>
+        {/* Logo */}
+        <button 
+          className={styles.logo}
+          onClick={() => navigate('/')}
+          aria-label="Retour à l'accueil"
+        >
+          <span className={styles.logoMark}>B</span>
+          <span className={styles.logoText}>Boulevard</span>
+        </button>
 
-          {/* Menu desktop */}
-          <div className={styles.desktopMenu}>
-            <button 
-              onClick={() => navigate('/')}
-              className={`${styles.menuLink} ${location.pathname === '/' ? styles.active : ''}`}
+        {/* Navigation desktop */}
+        <div className={styles.navLinks}>
+          {navLinks.map((link) => (
+            <button
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              className={`${styles.navLink} ${location.pathname === link.path ? styles.active : ''}`}
             >
-              Accueil
+              {link.label}
+              <span className={styles.linkUnderline} />
             </button>
-            <button 
-              onClick={() => navigate('/produits')}
-              className={`${styles.menuLink} ${location.pathname === '/produits' ? styles.active : ''}`}
-            >
-              Boutique
-            </button>
-            <button 
-              onClick={() => navigate('/trade')}
-              className={`${styles.menuLink} ${location.pathname === '/trade' ? styles.active : ''}`}
-            >
-              Cartes
-            </button>
-            <button 
-              onClick={() => navigate('/actualites')}
-              className={`${styles.menuLink} ${location.pathname === '/actualites' ? styles.active : ''}`}
-            >
-              Actualités
-            </button>
-            <button 
-              onClick={() => navigate('/contact')}
-              className={`${styles.menuLink} ${location.pathname === '/contact' ? styles.active : ''}`}
-            >
-              Contact
-            </button>
-          </div>
+          ))}
+        </div>
 
-          {/* Panier + Auth + Menu mobile */}
-          <div className={styles.navbarActions}>
-            {/* Panier */}
-            <div className={styles.cartWrapper}>
+        {/* Actions */}
+        <div className={styles.actions}>
+          {/* Panier */}
+          <button
+            onClick={() => navigate('/panier')}
+            className={styles.iconButton}
+            aria-label={`Panier${cartCount > 0 ? ` (${cartCount} articles)` : ''}`}
+          >
+            <CartIcon size={20} />
+            {cartCount > 0 && (
+              <span className={styles.cartBadge}>
+                {cartCount > 9 ? '9+' : cartCount}
+              </span>
+            )}
+          </button>
+
+          {/* Compte */}
+          {isAuthenticated && user ? (
+            <div className={styles.userMenu}>
               <button
-                onClick={() => navigate('/panier')}
-                className={styles.cartButton}
-                title="Panier"
+                onClick={() => navigate('/profile')}
+                className={styles.userButton}
+                aria-label="Mon compte"
               >
-                🛒
-                {cartCount > 0 && (
-                  <span className={styles.cartBadge}>{cartCount > 99 ? '99+' : cartCount}</span>
-                )}
+                <UserIcon size={20} />
+                <span className={styles.userName}>{user.firstName || user.username}</span>
+              </button>
+              <button
+                onClick={logout}
+                className={styles.iconButton}
+                aria-label="Se déconnecter"
+              >
+                <LogOutIcon size={18} />
               </button>
             </div>
-            
-            {/* Auth */}
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className={styles.loginButton}
+            >
+              Connexion
+            </button>
+          )}
+
+          {/* Menu mobile */}
+          <button
+            className={styles.menuButton}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={isMenuOpen}
+          >
+            {isMenuOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Menu mobile overlay */}
+      <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.open : ''}`}>
+        <div className={styles.mobileMenuContent}>
+          <div className={styles.mobileNavLinks}>
+            {navLinks.map((link, index) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <span className={styles.mobileNavNumber}>0{index + 1}</span>
+                <span className={styles.mobileNavLabel}>{link.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.mobileMenuFooter}>
             {isAuthenticated && user ? (
-              <div className={styles.authButtons}>
+              <div className={styles.mobileUserInfo}>
                 <button
                   onClick={() => navigate('/profile')}
-                  className={styles.profileButton}
-                  title="Mon profil"
+                  className={styles.mobileUserButton}
                 >
-                  👤 {user.firstName || user.username}
+                  <UserIcon size={18} />
+                  <span>Mon compte</span>
                 </button>
-                <button
-                  onClick={logout}
-                  className={styles.logoutButton}
-                  title="Se déconnecter"
-                >
-                  🚪
+                <button onClick={logout} className={styles.mobileLogout}>
+                  Déconnexion
                 </button>
               </div>
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className={styles.loginButton}
+                className={styles.mobileLoginButton}
               >
-                🔑 Connexion
+                Connexion
               </button>
             )}
-            
-            {/* Bouton Dark Mode */}
-            <button
-              onClick={toggleDarkMode}
-              className={styles.darkModeButton}
-              aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
-            >
-              {isDark ? <SunIcon size={20} /> : <MoonIcon size={20} />}
-            </button>
-            
-            <button
-              className={styles.mobileMenuButton}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Menu"
-            >
-              {isMenuOpen ? '✕' : '☰'}
-            </button>
           </div>
         </div>
-
-        {/* Menu mobile déroulant */}
-        {isMenuOpen && (
-          <div className={styles.mobileMenu}>
-            <button 
-              onClick={() => {
-                navigate('/');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              Accueil
-            </button>
-            <button 
-              onClick={() => {
-                navigate('/produits');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              Boutique
-            </button>
-            <button 
-              onClick={() => {
-                navigate('/trade');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              Cartes
-            </button>
-            <button
-              onClick={() => {
-                navigate('/actualites');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              Actualités
-            </button>
-            <button
-              onClick={() => {
-                navigate('/contact');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              Contact
-            </button>
-            <button
-              onClick={() => {
-                navigate('/panier');
-                setIsMenuOpen(false);
-              }}
-              className={styles.mobileMenuLink}
-            >
-              🛒 Panier {cartCount > 0 && `(${cartCount})`}
-            </button>
-            {isAuthenticated && user ? (
-              <>
-                <button
-                  onClick={() => {
-                    navigate('/profile');
-                    setIsMenuOpen(false);
-                  }}
-                  className={styles.mobileMenuLink}
-                >
-                  👤 Mon profil
-                </button>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className={styles.mobileMenuLink}
-                >
-                  🚪 Déconnexion
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => {
-                  navigate('/login');
-                  setIsMenuOpen(false);
-                }}
-                className={styles.mobileMenuLink}
-              >
-                🔑 Connexion
-              </button>
-            )}
-            <button
-              onClick={() => {
-                toggleDarkMode();
-              }}
-              className={styles.mobileMenuLink}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-                {isDark ? 'Mode clair' : 'Mode sombre'}
-              </span>
-            </button>
-          </div>
-        )}
       </div>
     </nav>
   );
 }
-

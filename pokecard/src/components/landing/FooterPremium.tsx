@@ -1,115 +1,112 @@
 import { useNavigate } from 'react-router-dom';
+import { InstagramIcon, TwitterIcon, MailIcon } from '../icons/Icons';
 import styles from './FooterPremium.module.css';
+
+const NAV_LINKS = [
+  { path: '/produits', label: 'Collection' },
+  { path: '/trade', label: 'Cartes' },
+  { path: '/actualites', label: 'Journal' },
+  { path: '/contact', label: 'Contact' },
+];
+
+const LEGAL_LINKS = [
+  { path: '/mentions-legales', label: 'Mentions légales' },
+  { path: '/confidentialite', label: 'Confidentialité' },
+  { path: '/cgv', label: 'CGV' },
+];
+
+const SOCIAL_LINKS = [
+  { href: 'https://instagram.com/boulevardtcg', icon: InstagramIcon, label: 'Instagram' },
+  { href: 'https://twitter.com/boulevardtcg', icon: TwitterIcon, label: 'X (Twitter)' },
+  { href: 'mailto:contact@boulevardtcg.com', icon: MailIcon, label: 'Email' },
+];
 
 export default function FooterPremium() {
   const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        <div className={styles.grid}>
+        {/* Main content */}
+        <div className={styles.mainContent}>
           {/* Brand */}
           <div className={styles.brand}>
-            <div className={styles.logoGroup}>
+            <button 
+              className={styles.logo}
+              onClick={() => navigate('/')}
+              aria-label="Retour à l'accueil"
+            >
+              <span className={styles.logoMark}>B</span>
               <span className={styles.logoText}>Boulevard</span>
-              <span className={styles.logoSubtext}>TCG</span>
-            </div>
-            <p className={styles.description}>
-              Le Boulevard Prestige du TCG. Découvrez l'excellence du Trading Card Game 
-              dans une expérience luxe parisienne, où chaque carte raconte une histoire.
+            </button>
+            <p className={styles.tagline}>
+              La maison de vente pour collectionneurs exigeants.
             </p>
-            <div className={styles.socialLinks}>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.socialLink}
-                aria-label="Instagram"
-              >
-                📷
-              </a>
-              <a 
-                href="https://facebook.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.socialLink}
-                aria-label="Facebook"
-              >
-                📘
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.socialLink}
-                aria-label="Twitter"
-              >
-                🐦
-              </a>
-              <a 
-                href="mailto:contact@boulevardtcg.com" 
-                className={styles.socialLink}
-                aria-label="Email"
-              >
-                ✉️
-              </a>
-            </div>
           </div>
 
           {/* Navigation */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              Navigation
-            </h3>
-            <ul className={styles.linkList}>
-              <li>
-                <button onClick={() => navigate('/')} className={styles.link}>Accueil</button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/produits')} className={styles.link}>Boutique</button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/cartes')} className={styles.link}>Cartes</button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/contact')} className={styles.link}>Contact</button>
-              </li>
-            </ul>
-          </div>
+          <nav className={styles.nav}>
+            <span className={styles.navTitle}>Navigation</span>
+            <div className={styles.navLinks}>
+              {NAV_LINKS.map((link) => (
+                <button
+                  key={link.path}
+                  onClick={() => navigate(link.path)}
+                  className={styles.navLink}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
+          </nav>
 
-          {/* Informations */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              Informations
-            </h3>
-            <ul className={styles.linkList}>
-              <li>
-                <button className={styles.link}>Mentions légales</button>
-              </li>
-              <li>
-                <button className={styles.link}>Confidentialité</button>
-              </li>
-              <li>
-                <button className={styles.link}>Cookies</button>
-              </li>
-              <li>
-                <button className={styles.link}>Contact</button>
-              </li>
-            </ul>
+          {/* Social */}
+          <div className={styles.social}>
+            <span className={styles.navTitle}>Suivez-nous</span>
+            <div className={styles.socialLinks}>
+              {SOCIAL_LINKS.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.href}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.socialLink}
+                    aria-label={social.label}
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className={styles.divider}></div>
-
-        {/* Copyright */}
-        <div className={styles.copyright}>
-          <p className={styles.copyrightText}>
-            © {new Date().getFullYear()} BoulevardTCG. Tous droits réservés.
-          </p>
+        {/* Bottom bar */}
+        <div className={styles.bottomBar}>
+          <span className={styles.copyright}>
+            © {currentYear} BoulevardTCG. Tous droits réservés.
+          </span>
+          
+          <div className={styles.legalLinks}>
+            {LEGAL_LINKS.map((link, index) => (
+              <span key={link.path}>
+                <button
+                  onClick={() => navigate(link.path)}
+                  className={styles.legalLink}
+                >
+                  {link.label}
+                </button>
+                {index < LEGAL_LINKS.length - 1 && (
+                  <span className={styles.legalSeparator}>·</span>
+                )}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
   );
 }
-

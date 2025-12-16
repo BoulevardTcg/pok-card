@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et n'est plus utilisé dans la landing page.
+ * Les offres promotionnelles ont été supprimées pour un positionnement plus haut de gamme.
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import { useNavigate } from 'react-router-dom';
 import styles from './OffersSection.module.css';
 

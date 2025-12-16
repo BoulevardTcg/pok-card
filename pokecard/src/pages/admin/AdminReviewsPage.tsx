@@ -3,8 +3,40 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
-import { Star, Check, X, Trash2 } from 'lucide-react';
 import styles from './AdminReviewsPage.module.css';
+
+// Icônes SVG
+const StarIcon = ({ filled }: { filled: boolean }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? '#FBBF24' : 'none'} stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const StarEmptyIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
 
 interface Review {
   id: string;
@@ -14,14 +46,8 @@ interface Review {
   isApproved: boolean;
   isVerified: boolean;
   createdAt: string;
-  user: {
-    username: string;
-    email: string;
-  };
-  product: {
-    name: string;
-    slug: string;
-  };
+  user: { username: string; email: string };
+  product: { name: string; slug: string };
 }
 
 export function AdminReviewsPage() {
@@ -47,13 +73,10 @@ export function AdminReviewsPage() {
       setLoading(true);
       const status = filter === 'all' ? undefined : filter;
       const response = await fetch(`${API_BASE}/admin/reviews?status=${status || ''}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
-
       const data = await response.json();
       setReviews(data.reviews || []);
     } catch (err: any) {
@@ -77,7 +100,6 @@ export function AdminReviewsPage() {
       });
 
       if (!response.ok) throw new Error('Erreur lors de la modération');
-
       loadReviews();
     } catch (err: any) {
       alert(err.message);
@@ -90,25 +112,23 @@ export function AdminReviewsPage() {
     try {
       const response = await fetch(`${API_BASE}/admin/reviews/${reviewId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) throw new Error('Erreur lors de la suppression');
-
       setReviews(reviews.filter(r => r.id !== reviewId));
     } catch (err: any) {
       alert(err.message);
     }
   }
 
-  const filteredReviews = reviews;
-
   if (authLoading || loading) {
     return (
       <AdminLayout>
-        <div className={styles.loading}>Chargement...</div>
+        <div className={styles.loading}>
+          <div className={styles.spinner} />
+          <p>Chargement des avis...</p>
+        </div>
       </AdminLayout>
     );
   }
@@ -117,98 +137,82 @@ export function AdminReviewsPage() {
 
   return (
     <AdminLayout>
-      <div className={styles.header}>
-        <div>
-          <h1>Modération des avis</h1>
-          <p>{reviews.length} avis au total</p>
-        </div>
-        <div className={styles.filters}>
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <p className={styles.pageCount}>{reviews.length} avis au total</p>
+        <div className={styles.filterTabs}>
           <button
             onClick={() => setFilter('all')}
-            className={filter === 'all' ? styles.active : ''}
+            className={`${styles.filterTab} ${filter === 'all' ? styles.active : ''}`}
           >
             Tous
           </button>
           <button
             onClick={() => setFilter('pending')}
-            className={filter === 'pending' ? styles.active : ''}
+            className={`${styles.filterTab} ${filter === 'pending' ? styles.active : ''}`}
           >
             En attente
           </button>
           <button
             onClick={() => setFilter('approved')}
-            className={filter === 'approved' ? styles.active : ''}
+            className={`${styles.filterTab} ${filter === 'approved' ? styles.active : ''}`}
           >
             Approuvés
           </button>
         </div>
       </div>
 
-      {filteredReviews.length === 0 ? (
+      {/* Content */}
+      {reviews.length === 0 ? (
         <div className={styles.empty}>
-          <Star size={48} />
-          <p>Aucun avis {filter === 'pending' ? 'en attente' : filter === 'approved' ? 'approuvé' : ''}</p>
+          <StarEmptyIcon />
+          <h3>Aucun avis {filter === 'pending' ? 'en attente' : filter === 'approved' ? 'approuvé' : ''}</h3>
+          <p>Les avis clients apparaîtront ici.</p>
         </div>
       ) : (
-        <div className={styles.reviewsList}>
-          {filteredReviews.map((review) => (
+        <div className={styles.reviewsGrid}>
+          {reviews.map((review) => (
             <div key={review.id} className={styles.reviewCard}>
               <div className={styles.reviewHeader}>
-                <div>
+                <div className={styles.reviewMeta}>
                   <div className={styles.rating}>
                     {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={16}
-                        fill={i < review.rating ? '#fbbf24' : 'none'}
-                        color="#fbbf24"
-                      />
+                      <StarIcon key={i} filled={i < review.rating} />
                     ))}
                   </div>
-                  <p className={styles.productName}>{review.product.name}</p>
-                  <p className={styles.userInfo}>
-                    Par {review.user.username} ({review.user.email})
-                    {review.isVerified && (
-                      <span className={styles.verified}>✓ Vérifié</span>
-                    )}
-                  </p>
+                  <span className={styles.productName}>{review.product.name}</span>
                 </div>
-                <div className={styles.status}>
-                  {review.isApproved ? (
-                    <span className={styles.badge} style={{ background: '#10b981' }}>Approuvé</span>
-                  ) : (
-                    <span className={styles.badge} style={{ background: '#f59e0b' }}>En attente</span>
-                  )}
-                </div>
+                <span className={`${styles.statusBadge} ${review.isApproved ? styles.approved : styles.pending}`}>
+                  {review.isApproved ? 'Approuvé' : 'En attente'}
+                </span>
               </div>
-              {review.title && <h3 className={styles.reviewTitle}>{review.title}</h3>}
+
+              {review.title && <h4 className={styles.reviewTitle}>{review.title}</h4>}
               {review.comment && <p className={styles.reviewComment}>{review.comment}</p>}
-              <div className={styles.reviewActions}>
-                {!review.isApproved && (
-                  <button
-                    onClick={() => moderateReview(review.id, true)}
-                    className={styles.approveButton}
-                  >
-                    <Check size={16} />
-                    Approuver
+
+              <div className={styles.reviewFooter}>
+                <div className={styles.authorInfo}>
+                  <span className={styles.authorName}>
+                    {review.user.username}
+                    {review.isVerified && <span className={styles.verifiedBadge}>✓ Achat vérifié</span>}
+                  </span>
+                  <span className={styles.authorEmail}>{review.user.email}</span>
+                </div>
+
+                <div className={styles.reviewActions}>
+                  {!review.isApproved ? (
+                    <button onClick={() => moderateReview(review.id, true)} className={styles.approveBtn}>
+                      <CheckIcon /> Approuver
+                    </button>
+                  ) : (
+                    <button onClick={() => moderateReview(review.id, false)} className={styles.rejectBtn}>
+                      <XIcon /> Rejeter
+                    </button>
+                  )}
+                  <button onClick={() => deleteReview(review.id)} className={styles.deleteBtn}>
+                    <TrashIcon />
                   </button>
-                )}
-                {review.isApproved && (
-                  <button
-                    onClick={() => moderateReview(review.id, false)}
-                    className={styles.rejectButton}
-                  >
-                    <X size={16} />
-                    Rejeter
-                  </button>
-                )}
-                <button
-                  onClick={() => deleteReview(review.id)}
-                  className={styles.deleteButton}
-                >
-                  <Trash2 size={16} />
-                  Supprimer
-                </button>
+                </div>
               </div>
             </div>
           ))}
@@ -217,4 +221,3 @@ export function AdminReviewsPage() {
     </AdminLayout>
   );
 }
-

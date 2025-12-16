@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { ArrowRightIcon } from '../icons/Icons';
 import styles from './FinalCTA.module.css';
 
 export default function FinalCTA() {
@@ -6,41 +7,61 @@ export default function FinalCTA() {
 
   return (
     <section className={styles.section}>
-      {/* Pattern décoratif */}
-      <div className={styles.pattern}></div>
+      <div className={styles.backgroundImage}>
+        {/* Image de fond ou pattern */}
+        <div className={styles.overlay} />
+      </div>
 
       <div className={styles.container}>
-        <div className={styles.iconWrapper}>
-          <span className={styles.icon}>✨</span>
+        <div className={styles.content}>
+          <span className={styles.overline}>Rejoignez l'aventure</span>
+          
+          <h2 className={styles.title}>
+            Que vous collectionniez, jouiez<br />
+            ou investissiez — bienvenue chez vous.
+          </h2>
+
+          <p className={styles.description}>
+            Des milliers de passionnés nous font déjà confiance. 
+            Cartes authentiques, produits scellés, livraison sécurisée.
+          </p>
+
+          <div className={styles.actions}>
+            <button
+              onClick={() => navigate('/produits')}
+              className={styles.primaryButton}
+            >
+              <span>Découvrir la boutique</span>
+              <ArrowRightIcon size={18} />
+            </button>
+
+            <button
+              onClick={() => navigate('/trade')}
+              className={styles.secondaryButton}
+            >
+              Explorer les cartes
+            </button>
+          </div>
+
+          {/* Trust badges */}
+          <div className={styles.trustBadges}>
+            <div className={styles.trustBadge}>
+              <span className={styles.badgeValue}>100%</span>
+              <span className={styles.badgeLabel}>Authentique</span>
+            </div>
+            <div className={styles.trustDivider} />
+            <div className={styles.trustBadge}>
+              <span className={styles.badgeValue}>3+</span>
+              <span className={styles.badgeLabel}>Univers TCG</span>
+            </div>
+            <div className={styles.trustDivider} />
+            <div className={styles.trustBadge}>
+              <span className={styles.badgeValue}>48h</span>
+              <span className={styles.badgeLabel}>Expédition</span>
+            </div>
+          </div>
         </div>
-
-        <h2 className={styles.title}>
-          Prêt à entrer dans le
-          <br />
-          <span className={styles.titleAccent}>Boulevard du TCG ?</span>
-        </h2>
-
-        <p className={styles.description}>
-          Rejoignez une communauté d'amateurs exigeants qui font confiance 
-          à BoulevardTCG pour leurs collections premium. Qualité, confiance, 
-          élégance : l'excellence à chaque carte.
-        </p>
-
-        <div className={styles.cta}>
-          <button
-            onClick={() => navigate('/produits')}
-            className={styles.ctaButton}
-          >
-            Commencer ma collection
-            <span className={styles.ctaArrow}>→</span>
-          </button>
-        </div>
-
-        {/* Éléments décoratifs */}
-        <div className={styles.decorativeGlow1}></div>
-        <div className={styles.decorativeGlow2}></div>
       </div>
     </section>
   );
 }
-

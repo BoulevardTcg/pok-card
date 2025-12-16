@@ -3,8 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
-import { Plus, Tag, Edit, Trash2 } from 'lucide-react';
 import styles from './AdminPromosPage.module.css';
+
+// Icônes SVG
+const PlusIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const TagIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2l9 4.5v7L12 22l-9-8.5v-7L12 2z" />
+    <circle cx="12" cy="10" r="2" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
 
 interface Promo {
   id: string;
@@ -39,13 +67,10 @@ export function AdminPromosPage() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/admin/promos`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
-
       const data = await response.json();
       setPromos(data.promos || []);
     } catch (err: any) {
@@ -61,27 +86,31 @@ export function AdminPromosPage() {
     try {
       const response = await fetch(`${API_BASE}/admin/promos/${promoId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) throw new Error('Erreur lors de la suppression');
-
       setPromos(promos.filter(p => p.id !== promoId));
     } catch (err: any) {
       alert(err.message);
     }
   }
 
-  const isExpired = (promo: Promo) => {
-    return new Date(promo.validUntil) < new Date();
+  const isExpired = (promo: Promo) => new Date(promo.validUntil) < new Date();
+
+  const getStatus = (promo: Promo) => {
+    if (!promo.isActive) return { label: 'Inactif', className: 'neutral' };
+    if (isExpired(promo)) return { label: 'Expiré', className: 'error' };
+    return { label: 'Actif', className: 'success' };
   };
 
   if (authLoading || loading) {
     return (
       <AdminLayout>
-        <div className={styles.loading}>Chargement...</div>
+        <div className={styles.loading}>
+          <div className={styles.spinner} />
+          <p>Chargement des codes promo...</p>
+        </div>
       </AdminLayout>
     );
   }
@@ -90,33 +119,29 @@ export function AdminPromosPage() {
 
   return (
     <AdminLayout>
-      <div className={styles.header}>
-        <div>
-          <h1>Codes promo</h1>
-          <p>{promos.length} code{promos.length > 1 ? 's' : ''} promo au total</p>
-        </div>
-        <button
-          onClick={() => navigate('/admin/promos/new')}
-          className={styles.addButton}
-        >
-          <Plus size={20} />
-          Nouveau code
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <p className={styles.pageCount}>{promos.length} code{promos.length > 1 ? 's' : ''} promo au total</p>
+        <button onClick={() => navigate('/admin/promos/new')} className={styles.addButton}>
+          <PlusIcon />
+          <span>Nouveau code</span>
         </button>
       </div>
 
+      {/* Content */}
       {promos.length === 0 ? (
         <div className={styles.empty}>
-          <Tag size={48} />
-          <p>Aucun code promo</p>
+          <TagIcon />
+          <h3>Aucun code promo</h3>
+          <p>Créez votre premier code promo pour commencer.</p>
         </div>
       ) : (
-        <div className={styles.tableWrapper}>
+        <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
               <tr>
                 <th>Code</th>
-                <th>Type</th>
-                <th>Valeur</th>
+                <th>Réduction</th>
                 <th>Utilisations</th>
                 <th>Validité</th>
                 <th>Statut</th>
@@ -124,52 +149,59 @@ export function AdminPromosPage() {
               </tr>
             </thead>
             <tbody>
-              {promos.map((promo) => (
-                <tr key={promo.id}>
-                  <td>
-                    <span className={styles.code}>{promo.code}</span>
-                  </td>
-                  <td>{promo.type === 'PERCENTAGE' ? 'Pourcentage' : 'Montant fixe'}</td>
-                  <td>
-                    {promo.type === 'PERCENTAGE' ? `${promo.value}%` : `${(promo.value / 100).toFixed(2)}€`}
-                  </td>
-                  <td>
-                    {promo.usedCount} / {promo.usageLimit || '∞'}
-                  </td>
-                  <td>
-                    <div className={styles.dates}>
-                      <span>{new Date(promo.validFrom).toLocaleDateString('fr-FR')}</span>
-                      <span>→</span>
-                      <span>{new Date(promo.validUntil).toLocaleDateString('fr-FR')}</span>
-                    </div>
-                  </td>
-                  <td>
-                    {!promo.isActive ? (
-                      <span className={styles.badge} style={{ background: '#6b7280' }}>Inactif</span>
-                    ) : isExpired(promo) ? (
-                      <span className={styles.badge} style={{ background: '#ef4444' }}>Expiré</span>
-                    ) : (
-                      <span className={styles.badge} style={{ background: '#10b981' }}>Actif</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button
-                        onClick={() => navigate(`/admin/promos/${promo.id}/edit`)}
-                        className={styles.editButton}
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => deletePromo(promo.id)}
-                        className={styles.deleteButton}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {promos.map((promo) => {
+                const status = getStatus(promo);
+                return (
+                  <tr key={promo.id}>
+                    <td>
+                      <span className={styles.code}>{promo.code}</span>
+                    </td>
+                    <td>
+                      <span className={styles.value}>
+                        {promo.type === 'PERCENTAGE' ? `${promo.value}%` : `${(promo.value / 100).toFixed(2)}€`}
+                      </span>
+                      <span className={styles.type}>
+                        {promo.type === 'PERCENTAGE' ? 'Pourcentage' : 'Montant fixe'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={styles.usage}>
+                        {promo.usedCount} / {promo.usageLimit || '∞'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className={styles.dates}>
+                        <span>{new Date(promo.validFrom).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+                        <span className={styles.arrow}>→</span>
+                        <span>{new Date(promo.validUntil).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[status.className]}`}>
+                        {status.label}
+                      </span>
+                    </td>
+                    <td>
+                      <div className={styles.actions}>
+                        <button
+                          onClick={() => navigate(`/admin/promos/${promo.id}/edit`)}
+                          className={styles.actionButton}
+                          title="Modifier"
+                        >
+                          <EditIcon />
+                        </button>
+                        <button
+                          onClick={() => deletePromo(promo.id)}
+                          className={`${styles.actionButton} ${styles.danger}`}
+                          title="Supprimer"
+                        >
+                          <TrashIcon />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -177,4 +209,3 @@ export function AdminPromosPage() {
     </AdminLayout>
   );
 }
-

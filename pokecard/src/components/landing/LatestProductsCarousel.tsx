@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et remplacé par FeaturedCards.tsx
+ * FeaturedCards offre un design orienté investissement avec grades et tendances de prix.
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listProducts } from '../../api';

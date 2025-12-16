@@ -1,80 +1,107 @@
-import { useNavigate } from 'react-router-dom';
+import { useRef, useEffect, useState } from 'react';
+import { ShieldCheckIcon, CertificateIcon, PackageIcon } from '../icons/Icons';
 import styles from './ProcessSection.module.css';
 
-const steps = [
+const PROCESS_STEPS = [
   {
     number: '01',
-    icon: '🔍',
-    title: 'Explorez le Boulevard',
-    description: 'Parcourez nos collections soigneusement sélectionnées. Filtrez par univers, rareté ou budget pour trouver votre prochaine pépite.',
+    title: 'Authentification',
+    description: 'Chaque carte passe par un processus de vérification rigoureux. Nos experts analysent l\'authenticité, l\'état et l\'origine de chaque pièce.',
+    icon: ShieldCheckIcon,
   },
   {
     number: '02',
-    icon: '🛒',
-    title: 'Choisissez vos produits',
-    description: 'Sélectionnez vos cartes favorites en toute sérénité. Photos haute définition, descriptions détaillées, tout est pensé pour votre confiance.',
+    title: 'Certification',
+    description: 'Les cartes sont envoyées aux laboratoires de grading reconnus (PSA, CGC, BGS) pour obtenir une certification officielle et un grade objectif.',
+    icon: CertificateIcon,
   },
   {
     number: '03',
-    icon: '📦',
-    title: 'Recevez-les avec style',
-    description: 'Emballage premium, protection optimale, livraison rapide et suivie. Chaque commande est préparée avec le plus grand soin.',
+    title: 'Livraison sécurisée',
+    description: 'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre investissement arrive dans un état parfait.',
+    icon: PackageIcon,
   },
 ];
 
 export default function ProcessSection() {
-  const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const stepIndex = parseInt(entry.target.getAttribute('data-step') || '0');
+            setActiveStep(stepIndex);
+          }
+        });
+      },
+      {
+        threshold: 0.5,
+        rootMargin: '-20% 0px -20% 0px',
+      }
+    );
+
+    const steps = sectionRef.current?.querySelectorAll('[data-step]');
+    steps?.forEach((step) => observer.observe(step));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section className={styles.section}>
+    <section ref={sectionRef} className={styles.section}>
       <div className={styles.container}>
+        {/* Header */}
         <div className={styles.header}>
+          <span className={styles.overline}>Notre processus</span>
           <h2 className={styles.title}>
-            Comment ça marche
+            De l'authentification<br />à votre collection
           </h2>
-          <p className={styles.subtitle}>
-            Un processus simple et élégant pour une expérience d'achat exceptionnelle
-          </p>
-          <div className={styles.divider}></div>
         </div>
 
-        <div className={styles.grid}>
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className={styles.step}
-            >
-              {/* Numéro */}
-              <div className={styles.stepNumber}>
-                {step.number}
-              </div>
-
-              {/* Icône */}
-              <div className={styles.stepIconWrapper}>
-                <div className={styles.stepIcon}>
-                  <span className={styles.iconEmoji}>{step.icon}</span>
-                </div>
-              </div>
-
-              {/* Contenu */}
-              <div className={styles.stepContent}>
-                <h3 className={styles.stepTitle}>
-                  {step.title}
-                </h3>
-                <p className={styles.stepDescription}>
-                  {step.description}
-                </p>
-              </div>
-
-              {/* Ligne de connexion (sauf dernier) */}
-              {index < steps.length - 1 && (
-                <div className={styles.connector}></div>
-              )}
+        {/* Process Steps */}
+        <div className={styles.processGrid}>
+          {/* Timeline */}
+          <div className={styles.timeline}>
+            <div className={styles.timelineLine}>
+              <div 
+                className={styles.timelineProgress}
+                style={{ height: `${((activeStep + 1) / PROCESS_STEPS.length) * 100}%` }}
+              />
             </div>
-          ))}
+            {PROCESS_STEPS.map((step, index) => (
+              <div
+                key={step.number}
+                className={`${styles.timelineDot} ${index <= activeStep ? styles.active : ''}`}
+              />
+            ))}
+          </div>
+
+          {/* Steps */}
+          <div className={styles.steps}>
+            {PROCESS_STEPS.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div
+                  key={step.number}
+                  data-step={index}
+                  className={`${styles.step} ${index === activeStep ? styles.active : ''}`}
+                >
+                  <div className={styles.stepIcon}>
+                    <Icon size={24} strokeWidth={1.5} />
+                  </div>
+                  <div className={styles.stepContent}>
+                    <span className={styles.stepNumber}>{step.number}</span>
+                    <h3 className={styles.stepTitle}>{step.title}</h3>
+                    <p className={styles.stepDescription}>{step.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
   );
 }
-

@@ -1,0 +1,352 @@
+/* ===================================================================
+   FEATURED CARDS — Mix cartes gradées + produits scellés
+   "Pépites du moment"
+   =================================================================== */
+
+.section {
+  padding: var(--section-gap-md, 7.5rem) 0;
+  background: var(--color-bg-primary, #0A0A0B);
+}
+
+.container {
+  max-width: var(--container-max, 1400px);
+  margin: 0 auto;
+  padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+  margin-bottom: var(--space-12, 3rem);
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  max-width: 500px;
+}
+
+.overline {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-widest, 0.1em);
+  text-transform: uppercase;
+  color: var(--color-accent-secondary, #8B7355);
+}
+
+.title {
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-size: clamp(var(--text-3xl, 2rem), 4vw, var(--text-4xl, 2.5rem));
+  font-weight: var(--font-medium, 500);
+  line-height: var(--leading-tight, 1.15);
+  color: var(--color-text-primary, #F5F5F3);
+}
+
+.description {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-base, 1rem);
+  line-height: var(--leading-relaxed, 1.65);
+  color: var(--color-text-secondary, #A1A1A6);
+}
+
+.viewAllButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
+  background: transparent;
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-sm, 2px);
+  color: var(--color-text-secondary, #A1A1A6);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  white-space: nowrap;
+}
+
+.viewAllButton:hover {
+  border-color: var(--color-accent-primary, #E8E4DD);
+  color: var(--color-accent-primary, #E8E4DD);
+}
+
+.viewAllButton svg {
+  transition: transform var(--duration-fast, 150ms) var(--ease-out);
+}
+
+.viewAllButton:hover svg {
+  transform: translate(2px, -2px);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ITEMS GRID
+   ───────────────────────────────────────────────────────────────── */
+
+.itemsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6, 1.5rem);
+}
+
+@media (min-width: 640px) {
+  .itemsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .itemsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6, 1.5rem);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   CARD
+   ───────────────────────────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card, #141416);
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover, 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(232, 228, 221, 0.05));
+}
+
+/* Card Image */
+.cardImageWrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--color-bg-subtle, #1A1A1D);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--space-4, 1rem);
+  transition: transform var(--duration-slow, 400ms) var(--ease-out);
+}
+
+.card:hover .cardImage {
+  transform: scale(1.05);
+}
+
+.cardImageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(10, 10, 11, 0.8) 100%
+  );
+  pointer-events: none;
+}
+
+/* Badges */
+.badge {
+  position: absolute;
+  top: var(--space-3, 0.75rem);
+  left: var(--space-3, 0.75rem);
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  background: var(--color-accent-secondary, #8B7355);
+  border-radius: var(--radius-sm, 2px);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 10px;
+  font-weight: var(--font-bold, 700);
+  letter-spacing: var(--tracking-wider, 0.05em);
+  text-transform: uppercase;
+  color: var(--color-bg-primary, #0A0A0B);
+}
+
+.badge.nouveauté {
+  background: var(--color-success, #4ADE80);
+}
+
+.badge.précommande {
+  background: var(--color-warning, #FBBF24);
+}
+
+.badge.investissement {
+  background: var(--color-accent-primary, #E8E4DD);
+}
+
+/* Grade Badge */
+.gradeBadge {
+  position: absolute;
+  top: var(--space-3, 0.75rem);
+  right: var(--space-3, 0.75rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  background: var(--color-bg-primary, #0A0A0B);
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md, 4px);
+}
+
+.gradeProvider {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 9px;
+  font-weight: var(--font-bold, 700);
+  letter-spacing: var(--tracking-wider, 0.05em);
+  color: var(--color-text-muted, #6B6B6F);
+}
+
+.gradeValue {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-bold, 700);
+  color: var(--color-success, #4ADE80);
+}
+
+/* Stock Badge */
+.stockBadge {
+  position: absolute;
+  bottom: var(--space-3, 0.75rem);
+  right: var(--space-3, 0.75rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  background: rgba(10, 10, 11, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-full, 9999px);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-success, #4ADE80);
+}
+
+.stockDot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-success, #4ADE80);
+  border-radius: var(--radius-full, 9999px);
+  animation: stockPulse 2s ease-in-out infinite;
+}
+
+@keyframes stockPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Card Content */
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  padding: var(--space-4, 1rem);
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  flex-wrap: wrap;
+}
+
+.cardUniverse {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-wider, 0.05em);
+  text-transform: uppercase;
+  color: var(--color-accent-secondary, #8B7355);
+}
+
+.metaDot {
+  color: var(--color-text-muted, #6B6B6F);
+}
+
+.cardType {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted, #6B6B6F);
+}
+
+.cardName {
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary, #F5F5F3);
+  line-height: var(--leading-snug, 1.3);
+}
+
+.cardSubtitle {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-muted, #6B6B6F);
+}
+
+/* Card Pricing */
+.cardPricing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  padding-top: var(--space-3, 0.75rem);
+  border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2, 0.5rem);
+}
+
+.priceValue {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-semibold, 600);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary, #F5F5F3);
+}
+
+.originalPrice {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-muted, #6B6B6F);
+  text-decoration: line-through;
+}
+
+.investmentHint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 0.25rem);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-success, #4ADE80);
+}
