@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { type SignOptions } from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { PrismaClient } from '@prisma/client'
 
@@ -34,9 +34,7 @@ export const generateAccessToken = (payload: JWTPayload): string => {
     throw new Error('JWT_SECRET is not defined')
   }
   
-  return jwt.sign(payload, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '15m'
-  })
+  return (jwt as any).sign(payload, secret, { expiresIn: process.env.JWT_EXPIRES_IN || '15m' })
 }
 
 // Génération du token JWT de rafraîchissement
@@ -52,7 +50,7 @@ export const generateRefreshToken = async (userId: string): Promise<string> => {
   })
 
   // Créer un nouveau token de rafraîchissement
-  const refreshToken = jwt.sign(
+  const refreshToken = (jwt as any).sign(
     { userId, tokenId: Date.now().toString() } as RefreshTokenPayload,
     secret,
     { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }

@@ -365,6 +365,65 @@
   color: var(--color-text-primary);
 }
 
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.trackingButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background: var(--color-accent-secondary);
+  color: #0f1116;
+  border-radius: var(--radius-md, 6px);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-sm, 0.875rem);
+  width: fit-content;
+}
+
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.timelineRow {
+  display: flex;
+  gap: var(--space-3, 0.75rem);
+  align-items: flex-start;
+}
+
+.timelineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent-secondary);
+  margin-top: 6px;
+}
+
+.timelineRowTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.timelineRowDate {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted);
+}
+
+.timelineRowMsg {
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+}
+
 /* ─────────────────────────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────────────────────────── */

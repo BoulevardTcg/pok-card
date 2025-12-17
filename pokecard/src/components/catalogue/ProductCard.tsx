@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '../../cartContext';
+import { useAuth } from '../../authContext';
 import type { Product } from '../../cartContext';
 import styles from './ProductCard.module.css';
 
@@ -11,6 +12,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const { isAuthenticated } = useAuth();
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -20,6 +22,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Vérifier l'authentification
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: product.slug ? `/produit/${product.slug}` : '/produits' } });
+      return;
+    }
+    
     if (!product.outOfStock) {
       // Créer un produit compatible avec le panier
       const cartProduct = {

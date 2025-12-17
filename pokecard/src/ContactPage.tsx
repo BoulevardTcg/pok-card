@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import { MailIcon, ClockIcon, GlobeIcon, MessageIcon, SendIcon, CheckIcon } from './components/icons/Icons';
 import styles from './ContactPage.module.css';
+import { sendContactMessage } from './api';
 
 interface ContactForm {
   name: string;
   email: string;
   subject: string;
   message: string;
+  companyWebsite?: string;
 }
 
 export function ContactPage() {
@@ -14,12 +17,13 @@ export function ContactPage() {
     name: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
+    companyWebsite: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -27,26 +31,23 @@ export function ContactPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     try {
-      // Simulation d'envoi (remplacez par votre vraie API)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Ici vous pourriez appeler votre API backend
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
+      await sendContactMessage({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        companyWebsite: formData.companyWebsite,
+      })
       
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', subject: '', message: '', companyWebsite: '' });
       
-      // Reset du statut après 5 secondes
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       setSubmitStatus('error');
@@ -59,7 +60,6 @@ export function ContactPage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        {/* En-tête */}
         <header className={styles.header}>
           <span className={styles.overline}>Contact</span>
           <h1 className={styles.title}>Une question ?<br />Nous sommes là pour vous aider.</h1>
@@ -68,9 +68,7 @@ export function ContactPage() {
           </p>
         </header>
 
-        {/* Contenu principal */}
         <div className={styles.content}>
-          {/* Informations de contact */}
           <aside className={styles.contactInfo}>
             <h2 className={styles.infoTitle}>Nos coordonnées</h2>
             
@@ -81,8 +79,8 @@ export function ContactPage() {
                 </div>
                 <div className={styles.infoContent}>
                   <h3 className={styles.infoItemTitle}>Email</h3>
-                  <p className={styles.infoText}>contact@boulevardtcg.com</p>
-                  <small className={styles.infoSmall}>Réponse sous 24h</small>
+                  <p className={styles.infoText}>Via le formulaire ci-contre</p>
+                  <small className={styles.infoSmall}>Réponse sous 24h (ouvrés)</small>
                 </div>
               </div>
 
@@ -139,6 +137,19 @@ export function ContactPage() {
             )}
 
             <form onSubmit={handleSubmit} className={styles.form}>
+              <div style={{ position: 'absolute', left: '-10000px', top: 'auto', width: 1, height: 1, overflow: 'hidden' }} aria-hidden="true">
+                <label htmlFor="companyWebsite">Website</label>
+                <input
+                  type="text"
+                  id="companyWebsite"
+                  name="companyWebsite"
+                  value=""
+                  readOnly
+                  tabIndex={-1}
+                  autoComplete="new-password"
+                />
+              </div>
+
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label htmlFor="name" className={styles.label}>Nom complet</label>
@@ -218,7 +229,6 @@ export function ContactPage() {
           </main>
         </div>
 
-        {/* FAQ rapide */}
         <section className={styles.faqSection}>
           <h2 className={styles.faqTitle}>Questions fréquentes</h2>
           <div className={styles.faqGrid}>

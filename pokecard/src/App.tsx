@@ -17,6 +17,7 @@ import { ContactPage } from './ContactPage'
 import { NewsPage } from './NewsPage'
 import { OrdersPage } from './OrdersPage'
 import { OrderDetailPage } from './OrderDetailPage'
+import { OrderTrackingPage } from './OrderTrackingPage'
 import { AdminOrdersPage } from './AdminOrdersPage'
 import { AuthProvider, useAuth } from './authContext'
 import { CartContext } from './cartContext'
@@ -530,6 +531,7 @@ function AppContent() {
           <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
           <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
+          <Route path="/order-tracking/:orderId" element={<OrderTrackingPage />} />
           
           {/* Routes d'administration */}
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

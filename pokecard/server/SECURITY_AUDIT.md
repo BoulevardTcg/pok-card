@@ -1,11 +1,11 @@
-# 🔒 Audit de Sécurité - BoulevardTCG
+# Audit de sécurité - BoulevardTCG
 
 ## Date: 2025-01-09
 
 ## Résumé Exécutif
 Cet audit de sécurité identifie les vulnérabilités potentielles et les améliorations nécessaires pour l'application BoulevardTCG.
 
-## ✅ Points Positifs
+## Points positifs
 
 1. **Authentification JWT** : Implémentation correcte avec tokens d'accès et de rafraîchissement
 2. **Hashage des mots de passe** : Utilisation de bcrypt avec 12 rounds (sécurisé)
@@ -17,7 +17,7 @@ Cet audit de sécurité identifie les vulnérabilités potentielles et les amél
 8. **Transactions** : Utilisation de transactions Prisma pour la cohérence des données
 9. **Gestion du stock** : Vérification avant checkout et décrémentation atomique
 
-## ⚠️ Vulnérabilités Identifiées
+## Vulnérabilités identifiées
 
 ### 1. CORS - CRITIQUE
 **Problème** : Configuration CORS permet toutes les origines (`origin: true`)
@@ -59,11 +59,11 @@ Cet audit de sécurité identifie les vulnérabilités potentielles et les amél
 **Impact** : Peut ne pas détecter toutes les tentatives d'injection
 **Solution** : Améliorer les patterns ou s'appuyer uniquement sur Prisma
 
-## 🔧 Corrections Appliquées
+## Corrections appliquées
 
 Voir les fichiers modifiés pour les corrections détaillées.
 
-## 📋 Recommandations Futures
+## Recommandations
 
 1. **HTTPS** : S'assurer que HTTPS est forcé en production
 2. **CSP** : Améliorer la Content Security Policy pour Stripe
@@ -74,7 +74,7 @@ Voir les fichiers modifiés pour les corrections détaillées.
 7. **Backup** : Mettre en place des backups réguliers de la base de données
 8. **Audit Logs** : Logger toutes les actions sensibles (changements de prix, commandes, etc.)
 
-## 🔐 Checklist de Déploiement en Production
+## Checklist de déploiement (production)
 
 - [ ] Variables d'environnement configurées et sécurisées
 - [ ] CORS configuré avec les domaines autorisés uniquement

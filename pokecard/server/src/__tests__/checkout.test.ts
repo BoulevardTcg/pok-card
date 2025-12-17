@@ -14,11 +14,11 @@ jest.mock('../config/stripe.js', () => ({
     return {
       checkout: {
         sessions: {
-          create: jest.fn().mockResolvedValue({
+          create: (jest.fn(() => Promise.resolve({
             id: 'cs_test_123',
             url: 'https://checkout.stripe.com/test',
             metadata: {},
-          }),
+          })) as any),
         },
         webhooks: {
           constructEvent: jest.fn(),
@@ -79,6 +79,14 @@ describe('Checkout Routes', () => {
           ],
           successUrl: 'http://localhost:5173/checkout/success',
           cancelUrl: 'http://localhost:5173/panier',
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
         })
 
       expect(response.status).toBe(201)
@@ -99,6 +107,14 @@ describe('Checkout Routes', () => {
           customerEmail: 'anonymous@example.com',
           successUrl: 'http://localhost:5173/checkout/success',
           cancelUrl: 'http://localhost:5173/panier',
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
         })
 
       expect(response.status).toBe(201)
@@ -127,6 +143,14 @@ describe('Checkout Routes', () => {
               quantity: 1,
             },
           ],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
         })
 
       expect(response.status).toBe(400)
@@ -144,6 +168,14 @@ describe('Checkout Routes', () => {
               quantity: 100, // Plus que le stock disponible (10)
             },
           ],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
         })
 
       expect(response.status).toBe(409)
@@ -163,9 +195,90 @@ describe('Checkout Routes', () => {
               quantity: 1,
             },
           ],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
         })
 
       expect(response.status).toBe(201)
+    })
+
+    it('devrait rejeter un mode de livraison invalide', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [
+            {
+              variantId: testVariant.id,
+              quantity: 1,
+            },
+          ],
+          shippingMethodCode: 'INVALID_METHOD',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body.code).toBe('INVALID_SHIPPING_METHOD')
+    })
+
+    it('devrait accepter un mode de livraison valide', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [
+            {
+              variantId: testVariant.id,
+              quantity: 1,
+            },
+          ],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body).toHaveProperty('sessionId')
+    })
+
+    it('devrait exiger un mode de livraison', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [
+            {
+              variantId: testVariant.id,
+              quantity: 1,
+            },
+          ],
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        })
+
+      expect(response.status).toBe(400)
     })
   })
 

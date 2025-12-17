@@ -1,13 +1,16 @@
 import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from './cartContext';
+import { useAuth } from './authContext';
 import styles from './CartPage.module.css';
 import { createCheckoutSession, getVariantsStock, validatePromoCode } from './api';
+import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
 import type { CartItem } from './cartContext';
 
 export function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart, getTotalCents } = useContext(CartContext);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const totalCents = getTotalCents();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -19,10 +22,29 @@ export function CartPage() {
   const [promoError, setPromoError] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [shipping, setShipping] = useState({
+    fullName: '',
+    addressLine1: '',
+    addressLine2: '',
+    postalCode: '',
+    city: '',
+    country: 'France',
+    phone: '',
+  });
+  const [shippingError, setShippingError] = useState('');
+  const enabledShippingMethods = getEnabledShippingMethods();
+  const [shippingMethodCode, setShippingMethodCode] = useState(
+    enabledShippingMethods[0]?.code ?? 'MONDIAL_RELAY'
+  );
 
   const formatPrice = (cents: number) => {
     return (cents / 100).toFixed(2).replace('.', ',');
   };
+
+  const selectedShippingMethod = findShippingMethod(shippingMethodCode) || enabledShippingMethods[0] || null;
+  const shippingCostCents = selectedShippingMethod?.priceCents ?? 0;
+  const totalAfterDiscount = Math.max(0, totalCents - promoDiscount);
+  const totalWithShipping = totalAfterDiscount + shippingCostCents;
 
   // Rafraîchir le stock des articles du panier
   useEffect(() => {
@@ -77,7 +99,22 @@ export function CartPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]);
 
+  function validateShipping() {
+    if (!shipping.fullName.trim()) return 'Veuillez renseigner le nom complet.';
+    if (!shipping.addressLine1.trim()) return 'Veuillez renseigner l’adresse.';
+    if (!shipping.postalCode.trim()) return 'Veuillez renseigner le code postal.';
+    if (!shipping.city.trim()) return 'Veuillez renseigner la ville.';
+    if (!shipping.country.trim()) return 'Veuillez renseigner le pays.';
+    return '';
+  }
+
   async function handleCheckout() {
+    // Vérifier l'authentification
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/panier' } });
+      return;
+    }
+    
     if (cart.length === 0) return;
     
     if (Object.keys(stockErrors).length > 0) {
@@ -94,12 +131,24 @@ export function CartPage() {
       }
     }
     
+    const shippingValidation = validateShipping();
+    if (shippingValidation) {
+      setShippingError(shippingValidation);
+      return;
+    }
+
     if (!email || !email.includes('@')) {
       setEmailError('Veuillez entrer une adresse email valide');
       return;
     }
+
+    if (!selectedShippingMethod) {
+      setShippingError('Mode de livraison indisponible');
+      return;
+    }
     
     setEmailError('');
+    setShippingError('');
     setLoading(true);
     try {
       const items = cartItemsWithStock.map(item => ({
@@ -112,8 +161,21 @@ export function CartPage() {
         setLoading(false);
         return;
       }
-      
-      const session = await createCheckoutSession(items, email || undefined, appliedPromo || undefined);
+      const session = await createCheckoutSession(
+        items,
+        email || undefined,
+        appliedPromo || undefined,
+        {
+          fullName: shipping.fullName,
+          addressLine1: shipping.addressLine1,
+          addressLine2: shipping.addressLine2 || undefined,
+          postalCode: shipping.postalCode,
+          city: shipping.city,
+          country: shipping.country,
+          phone: shipping.phone || undefined,
+        },
+        shippingMethodCode
+      );
       const url = (session as any).url;
       
       if (url) {
@@ -263,6 +325,34 @@ export function CartPage() {
           <div className={styles.summary}>
             <div className={styles.summaryCard}>
               <h2 className={styles.summaryTitle}>Résumé</h2>
+
+              <div className={styles.shippingBlock}>
+                <div className={styles.shippingBlockHeader}>
+                  <span>Mode de livraison</span>
+                </div>
+                <div className={styles.shippingOptions}>
+                  {enabledShippingMethods.map(method => (
+                    <label key={method.code} className={styles.shippingOption}>
+                      <input
+                        type="radio"
+                        name="shippingMethod"
+                        value={method.code}
+                        checked={shippingMethodCode === method.code}
+                        onChange={() => setShippingMethodCode(method.code)}
+                      />
+                      <div className={styles.shippingOptionContent}>
+                        <div className={styles.shippingOptionTop}>
+                          <span className={styles.shippingLabel}>{method.label}</span>
+                          <span className={styles.shippingPrice}>{formatPrice(method.priceCents)}€</span>
+                        </div>
+                        {method.description && (
+                          <div className={styles.shippingDescription}>{method.description}</div>
+                        )}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
               
               <div className={styles.summaryDetails}>
                 <div className={styles.summaryRow}>
@@ -271,15 +361,10 @@ export function CartPage() {
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Livraison</span>
-                  <span className={`${styles.summaryValue} ${totalCents >= 5000 ? styles.free : ''}`}>
-                    {totalCents >= 5000 ? 'Gratuite' : 'À calculer'}
+                  <span className={styles.summaryValue}>
+                    {selectedShippingMethod ? `${formatPrice(shippingCostCents)}€` : '—'}
                   </span>
                 </div>
-                {totalCents < 5000 && (
-                  <p className={styles.freeShippingHint}>
-                    Ajoutez {formatPrice(5000 - totalCents)}€ pour la livraison gratuite
-                  </p>
-                )}
                 {promoDiscount > 0 && (
                   <div className={styles.summaryRow}>
                     <span className={styles.summaryLabel}>Réduction</span>
@@ -291,7 +376,7 @@ export function CartPage() {
                 <div className={styles.summaryTotal}>
                   <span className={styles.totalLabel}>Total</span>
                   <span className={styles.totalValue}>
-                    {formatPrice(Math.max(0, totalCents - promoDiscount))}€
+                    {formatPrice(totalWithShipping)}€
                   </span>
                 </div>
               </div>
@@ -369,6 +454,65 @@ export function CartPage() {
                 {emailError && (
                   <div className={styles.emailError}>
                     {emailError}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.shippingSection}>
+                <input
+                  type="text"
+                  placeholder="Nom complet"
+                  value={shipping.fullName}
+                  onChange={(e) => setShipping({ ...shipping, fullName: e.target.value })}
+                  className={`${styles.emailInput} ${shippingError ? styles.hasError : ''}`}
+                />
+                <input
+                  type="text"
+                  placeholder="Adresse"
+                  value={shipping.addressLine1}
+                  onChange={(e) => setShipping({ ...shipping, addressLine1: e.target.value })}
+                  className={`${styles.emailInput} ${shippingError ? styles.hasError : ''}`}
+                />
+                <input
+                  type="text"
+                  placeholder="Complément d'adresse (optionnel)"
+                  value={shipping.addressLine2}
+                  onChange={(e) => setShipping({ ...shipping, addressLine2: e.target.value })}
+                  className={styles.emailInput}
+                />
+                <div className={styles.shippingRow}>
+                  <input
+                    type="text"
+                    placeholder="Code postal"
+                    value={shipping.postalCode}
+                    onChange={(e) => setShipping({ ...shipping, postalCode: e.target.value })}
+                    className={`${styles.emailInput} ${shippingError ? styles.hasError : ''}`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Ville"
+                    value={shipping.city}
+                    onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
+                    className={`${styles.emailInput} ${shippingError ? styles.hasError : ''}`}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Pays"
+                  value={shipping.country}
+                  onChange={(e) => setShipping({ ...shipping, country: e.target.value })}
+                  className={`${styles.emailInput} ${shippingError ? styles.hasError : ''}`}
+                />
+                <input
+                  type="tel"
+                  placeholder="Téléphone (optionnel)"
+                  value={shipping.phone}
+                  onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
+                  className={styles.emailInput}
+                />
+                {shippingError && (
+                  <div className={styles.emailError}>
+                    {shippingError}
                   </div>
                 )}
               </div>

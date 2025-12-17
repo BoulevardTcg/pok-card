@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
 import { API_BASE } from './api';
 import styles from './OrderDetailPage.module.css';
-import { Package, Truck, CheckCircle, XCircle, Clock, ArrowLeft, MapPin, CreditCard, Calendar } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, ArrowLeft, MapPin, CreditCard, Calendar, Link as LinkIcon } from 'lucide-react';
 
 interface OrderItem {
   id: string;
@@ -19,6 +19,10 @@ interface Order {
   id: string;
   orderNumber: string;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  fulfillmentStatus?: string;
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
   totalCents: number;
   currency: string;
   paymentMethod?: string;
@@ -158,6 +162,7 @@ export function OrderDetailPage() {
   const StatusIcon = statusConfig[order.status].icon;
   const currentStatusIndex = getStatusIndex(order.status);
   const isCancelled = order.status === 'CANCELLED' || order.status === 'REFUNDED';
+  const isShipped = order.fulfillmentStatus === 'SHIPPED';
 
   return (
     <div className={styles.page}>
@@ -267,6 +272,37 @@ export function OrderDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Suivi colis (si expédiée) */}
+            {isShipped && (
+              <div className={styles.infoCard}>
+                <h3 className={styles.cardTitle}>
+                  <Truck size={18} />
+                  Suivi du colis
+                </h3>
+                <div className={styles.summaryLines}>
+                  <div className={styles.summaryLine}>
+                    <span>Transporteur</span>
+                    <span>{order.carrier || '—'}</span>
+                  </div>
+                  <div className={styles.summaryLine}>
+                    <span>Numéro de suivi</span>
+                    <span>{order.trackingNumber || '—'}</span>
+                  </div>
+                </div>
+
+                {order.trackingUrl ? (
+                  <a className={styles.trackingButton} href={order.trackingUrl} target="_blank" rel="noreferrer">
+                    <LinkIcon size={16} />
+                    Suivre mon colis
+                  </a>
+                ) : (
+                  <p className={styles.infoText} style={{ marginTop: 8 }}>
+                    Le lien de suivi sera disponible sous peu.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Paiement */}
             <div className={styles.infoCard}>

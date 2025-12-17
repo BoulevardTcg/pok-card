@@ -3,15 +3,18 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/glo
 import { createApp } from '../app.js'
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js'
 import { generateAccessToken } from '../utils/auth.js'
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, FulfillmentStatus } from '@prisma/client'
+import { generateOrderTrackingToken } from '../utils/tracking.js'
 
 const app = createApp()
 
-describe('Orders Routes', () => {
+describe('Orders Routes - Public Tracking', () => {
   let testUser: any
   let testUserToken: string
+  let otherUser: any
   let testProduct: any
   let testVariant: any
+  let testOrder: any
 
   beforeAll(async () => {
     await cleanupDatabase()
@@ -24,10 +27,9 @@ describe('Orders Routes', () => {
 
   beforeEach(async () => {
     await cleanupDatabase()
-    
-    // Créer un utilisateur de test
+
     testUser = await createTestUser({
-      email: 'orders@example.com',
+      email: 'orderuser@test.com',
       username: 'orderuser',
     })
     testUserToken = generateAccessToken({
@@ -37,270 +39,123 @@ describe('Orders Routes', () => {
       isAdmin: false,
     })
 
-    // Créer un produit de test
+    otherUser = await createTestUser({
+      email: 'other@test.com',
+      username: 'otheruser',
+    })
+
     testProduct = await createTestProduct({
-      name: 'Test Product for Orders',
-      priceCents: 2000,
+      name: 'Test Product',
+      priceCents: 1500,
       stock: 5,
     })
     testVariant = testProduct.variants[0]
+
+    testOrder = await prisma.order.create({
+      data: {
+        userId: testUser.id,
+        orderNumber: `ORDER-${Date.now()}`,
+        status: OrderStatus.CONFIRMED,
+        fulfillmentStatus: FulfillmentStatus.PAID,
+        totalCents: 1500,
+        currency: 'EUR',
+        paymentMethod: 'card',
+        shippingMethod: 'COLISSIMO_HOME',
+        shippingCost: 790,
+        items: {
+          create: {
+            productId: testProduct.id,
+            productVariantId: testVariant.id,
+            productName: testProduct.name,
+            variantName: testVariant.name,
+            quantity: 1,
+            unitPriceCents: 1500,
+            totalPriceCents: 1500,
+          },
+        },
+        events: {
+          create: {
+            type: 'PAID',
+            message: 'Paiement confirmé',
+          },
+        },
+      },
+      include: {
+        items: true,
+        events: true,
+      },
+    })
   })
 
-  describe('GET /api/users/orders', () => {
-    it('devrait retourner un tableau vide pour un utilisateur sans commandes', async () => {
+  describe('GET /api/orders/:orderId', () => {
+    it('devrait permettre au propriétaire de voir sa commande', async () => {
       const response = await request(app)
-        .get('/api/users/orders')
+        .get(`/api/orders/${testOrder.id}`)
         .set('Authorization', `Bearer ${testUserToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body).toHaveProperty('orders')
-      expect(Array.isArray(response.body.orders)).toBe(true)
-      expect(response.body.orders).toHaveLength(0)
-      expect(response.body).toHaveProperty('pagination')
+      expect(response.body.order.id).toBe(testOrder.id)
+      expect(response.body.order.items).toHaveLength(1)
+      expect(response.body.order.events).toBeDefined()
+      expect(response.body.access).toBe('owner')
     })
 
-    it('devrait retourner les commandes d\'un utilisateur', async () => {
-      // Créer une commande de test
-      const order = await prisma.order.create({
-        data: {
-          userId: testUser.id,
-          orderNumber: 'TEST-2025-0001',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
-        include: {
-          items: true,
-        },
-      })
-
+    it('devrait permettre l\'accès avec un token de suivi valide', async () => {
+      const trackingToken = generateOrderTrackingToken(testOrder.id, testUser.email)
+      
       const response = await request(app)
-        .get('/api/users/orders')
-        .set('Authorization', `Bearer ${testUserToken}`)
+        .get(`/api/orders/${testOrder.id}?token=${trackingToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body.orders).toHaveLength(1)
-      expect(response.body.orders[0].id).toBe(order.id)
-      expect(response.body.orders[0].orderNumber).toBe('TEST-2025-0001')
-      expect(response.body.orders[0].status).toBe('CONFIRMED')
-      expect(response.body.orders[0].totalCents).toBe(2000)
-      expect(response.body.orders[0].items).toHaveLength(1)
-      expect(response.body.orders[0].items[0].productName).toBe(testProduct.name)
+      expect(response.body.order.id).toBe(testOrder.id)
+      expect(response.body.access).toBe('token')
+      // Minimisation PII: pas d'adresses/billing en accès token
+      expect(response.body.order.shippingAddress).toBeUndefined()
+      expect(response.body.order.billingAddress).toBeUndefined()
     })
 
-    it('devrait filtrer les commandes par statut', async () => {
-      // Créer plusieurs commandes avec différents statuts
-      await prisma.order.create({
-        data: {
-          userId: testUser.id,
-          orderNumber: 'TEST-2025-0002',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
-      })
-
-      await prisma.order.create({
-        data: {
-          userId: testUser.id,
-          orderNumber: 'TEST-2025-0003',
-          status: OrderStatus.SHIPPED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
-      })
-
+    it('devrait rejeter un token de suivi invalide', async () => {
       const response = await request(app)
-        .get('/api/users/orders?status=CONFIRMED')
-        .set('Authorization', `Bearer ${testUserToken}`)
-
-      expect(response.status).toBe(200)
-      expect(response.body.orders.length).toBeGreaterThan(0)
-      response.body.orders.forEach((order: any) => {
-        expect(order.status).toBe('CONFIRMED')
-      })
-    })
-
-    it('devrait rejeter une requête sans token', async () => {
-      const response = await request(app)
-        .get('/api/users/orders')
+        .get(`/api/orders/${testOrder.id}?token=invalid-token`)
 
       expect(response.status).toBe(401)
-      expect(response.body.code).toBe('ACCESS_TOKEN_REQUIRED')
+      expect(response.body.code).toBe('INVALID_TRACKING_TOKEN')
     })
 
-    it('devrait rejeter une requête avec un token invalide', async () => {
-      const response = await request(app)
-        .get('/api/users/orders')
-        .set('Authorization', 'Bearer invalid-token')
-
-      expect(response.status).toBe(403)
-      expect(response.body.code).toBe('INVALID_TOKEN')
-    })
-
-    it('ne devrait retourner que les commandes de l\'utilisateur connecté', async () => {
-      // Créer un autre utilisateur avec une commande
-      const otherUser = await createTestUser({
-        email: 'other@example.com',
-        username: 'otheruser',
-      })
-
-      await prisma.order.create({
-        data: {
-          userId: otherUser.id,
-          orderNumber: 'OTHER-2025-0001',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 3000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 3000,
-              totalPriceCents: 3000,
-            },
-          },
-        },
-      })
-
-      // Créer une commande pour l'utilisateur de test
-      await prisma.order.create({
-        data: {
-          userId: testUser.id,
-          orderNumber: 'TEST-2025-0004',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
+    it('devrait rejeter l\'accès d\'un autre utilisateur', async () => {
+      const otherUserToken = generateAccessToken({
+        userId: otherUser.id,
+        email: otherUser.email,
+        username: otherUser.username,
+        isAdmin: false,
       })
 
       const response = await request(app)
-        .get('/api/users/orders')
-        .set('Authorization', `Bearer ${testUserToken}`)
+        .get(`/api/orders/${testOrder.id}`)
+        .set('Authorization', `Bearer ${otherUserToken}`)
 
-      expect(response.status).toBe(200)
-      expect(response.body.orders.length).toBe(1)
-      expect(response.body.orders[0].orderNumber).toBe('TEST-2025-0004')
-    })
-  })
-
-  describe('GET /api/users/orders/:orderId', () => {
-    it('devrait retourner une commande spécifique', async () => {
-      const order = await prisma.order.create({
-        data: {
-          userId: testUser.id,
-          orderNumber: 'TEST-2025-0005',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
-        include: {
-          items: true,
-        },
-      })
-
-      const response = await request(app)
-        .get(`/api/users/orders/${order.id}`)
-        .set('Authorization', `Bearer ${testUserToken}`)
-
-      expect(response.status).toBe(200)
-      expect(response.body.order.id).toBe(order.id)
-      expect(response.body.order.orderNumber).toBe('TEST-2025-0005')
-      expect(response.body.order.items).toHaveLength(1)
-    })
-
-    it('devrait rejeter l\'accès à une commande d\'un autre utilisateur', async () => {
-      const otherUser = await createTestUser({
-        email: 'other2@example.com',
-        username: 'otheruser2',
-      })
-
-      const order = await prisma.order.create({
-        data: {
-          userId: otherUser.id,
-          orderNumber: 'OTHER-2025-0002',
-          status: OrderStatus.CONFIRMED,
-          totalCents: 2000,
-          currency: 'EUR',
-          items: {
-            create: {
-              productId: testProduct.id,
-              productVariantId: testVariant.id,
-              productName: testProduct.name,
-              variantName: testVariant.name,
-              quantity: 1,
-              unitPriceCents: 2000,
-              totalPriceCents: 2000,
-            },
-          },
-        },
-      })
-
-      const response = await request(app)
-        .get(`/api/users/orders/${order.id}`)
-        .set('Authorization', `Bearer ${testUserToken}`)
-
+      // Anti-enumération: on renvoie 404 si la commande n'appartient pas à l'utilisateur
       expect(response.status).toBe(404)
       expect(response.body.code).toBe('ORDER_NOT_FOUND')
     })
+
+    it('devrait rejeter l\'accès sans authentification ni token', async () => {
+      const response = await request(app)
+        .get(`/api/orders/${testOrder.id}`)
+
+      expect(response.status).toBe(401)
+      expect(response.body.code).toBe('ORDER_ACCESS_DENIED')
+    })
+
+    it('devrait inclure les événements de la commande', async () => {
+      const response = await request(app)
+        .get(`/api/orders/${testOrder.id}`)
+        .set('Authorization', `Bearer ${testUserToken}`)
+
+      expect(response.status).toBe(200)
+      expect(response.body.order.events).toBeDefined()
+      expect(Array.isArray(response.body.order.events)).toBe(true)
+      expect(response.body.order.events.length).toBeGreaterThan(0)
+    })
   })
 })
-

@@ -1,23 +1,45 @@
 import { Router, Request, Response } from 'express'
 import { body, validationResult } from 'express-validator'
-import { PrismaClient, OrderStatus } from '@prisma/client'
+import { PrismaClient, OrderStatus, Carrier, FulfillmentStatus, OrderEventType } from '@prisma/client'
 import { authenticateToken, requireAdmin } from '../middleware/auth.js'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
-import { fileURLToPath } from 'url'
 import { sendShippingNotificationEmail, sendDeliveryConfirmationEmail } from '../services/email.js'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js'
 
 const router = Router()
 const prisma = new PrismaClient()
 
-// Configuration de multer pour l'upload d'images
-const uploadDir = path.join(__dirname, '../../public/uploads')
+const carrierWhitelist = Object.values(Carrier)
 
-// Créer le dossier uploads s'il n'existe pas
+const addOrderEvent = async (
+  orderId: string,
+  type: OrderEventType,
+  message?: string,
+  createdBy?: string
+) => {
+  await prisma.orderEvent.create({
+    data: {
+      orderId,
+      type,
+      message,
+      createdBy
+    }
+  })
+}
+
+const shopBaseUrl = () => (process.env.SHOP_URL || process.env.FRONT_BASE_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '')
+
+const buildOrderTrackingLink = (orderId: string, customerEmail?: string | null) => {
+  const base = shopBaseUrl()
+  if (!base) return null
+  const token = generateOrderTrackingToken(orderId, customerEmail)
+  return `${base}/order-tracking/${orderId}?token=${token}`
+}
+
+const uploadDir = path.join(process.cwd(), 'public/uploads')
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
 }
@@ -34,9 +56,7 @@ const storage = multer.diskStorage({
 })
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  // Vérifier par type MIME
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-  // Vérifier aussi par extension (plus fiable)
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
   const ext = path.extname(file.originalname).toLowerCase()
   
@@ -59,8 +79,6 @@ const upload = multer({
 router.use(authenticateToken)
 router.use(requireAdmin)
 
-// ==================== UPLOAD D'IMAGES ====================
-// Upload d'une ou plusieurs images
 router.post('/upload', upload.array('images', 10), async (req: Request, res: Response) => {
   try {
     const files = req.files as Express.Multer.File[]
@@ -191,6 +209,9 @@ router.get('/orders/:orderId', async (req: Request, res: Response) => {
             firstName: true,
             lastName: true
           }
+        },
+        events: {
+          orderBy: { createdAt: 'asc' }
         }
       }
     })
@@ -212,11 +233,235 @@ router.get('/orders/:orderId', async (req: Request, res: Response) => {
   }
 })
 
+// Marquer une commande comme expédiée (admin)
+router.post('/orders/:orderId/ship', [
+  body('carrier')
+    .isString()
+    .custom(value => carrierWhitelist.includes(value))
+    .withMessage('Transporteur invalide'),
+  body('trackingNumber')
+    .isString()
+    .notEmpty()
+    .isLength({ max: 120 })
+    .withMessage('Numéro de suivi invalide'),
+  body('note')
+    .optional()
+    .isString()
+    .isLength({ max: 500 })
+    .withMessage('Note trop longue')
+], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: 'Données invalides',
+        details: errors.array()
+      })
+    }
+
+    const { orderId } = req.params
+    const { carrier, trackingNumber, note } = req.body as { carrier: Carrier; trackingNumber: string; note?: string }
+
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true,
+        user: {
+          select: { id: true, email: true, username: true, firstName: true, lastName: true }
+        }
+      }
+    })
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Commande non trouvée', code: 'ORDER_NOT_FOUND' })
+    }
+
+    if (
+      existingOrder.fulfillmentStatus === FulfillmentStatus.SHIPPED ||
+      existingOrder.fulfillmentStatus === FulfillmentStatus.DELIVERED
+    ) {
+      return res.status(200).json({ message: 'Commande déjà expédiée', order: existingOrder })
+    }
+
+    const trackingUrl = buildTrackingUrl(carrier, trackingNumber)
+    const now = new Date()
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        carrier,
+        trackingNumber,
+        trackingUrl,
+        shippedAt: now,
+        fulfillmentStatus: FulfillmentStatus.SHIPPED,
+        status: OrderStatus.SHIPPED,
+        events: {
+          create: {
+            type: OrderEventType.SHIPPED,
+            message: note ?? 'Commande expédiée',
+            createdBy: req.user?.userId
+          }
+        }
+      },
+      include: {
+        items: true,
+        user: {
+          select: { id: true, email: true, username: true, firstName: true, lastName: true }
+        }
+      }
+    })
+
+    const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
+    if (customerEmail) {
+      const orderDataForEmail = {
+        orderNumber: updatedOrder.orderNumber,
+        totalCents: updatedOrder.totalCents,
+        currency: updatedOrder.currency,
+        items: updatedOrder.items.map(item => ({
+          productName: item.productName,
+          variantName: item.variantName,
+          imageUrl: item.imageUrl,
+          quantity: item.quantity,
+          unitPriceCents: item.unitPriceCents,
+          totalPriceCents: item.totalPriceCents
+        })),
+        shippingAddress: updatedOrder.shippingAddress as any,
+        billingAddress: updatedOrder.billingAddress as any,
+        trackingNumber: updatedOrder.trackingNumber ?? undefined,
+        trackingUrl: updatedOrder.trackingUrl ?? undefined,
+        orderTrackingUrl: orderTrackingUrl ?? undefined
+      }
+
+      sendShippingNotificationEmail(orderDataForEmail, customerEmail)
+        .catch(err => console.error('Erreur email expedition:', err))
+    }
+
+    res.json({
+      message: 'Commande marquée comme expédiée',
+      order: updatedOrder
+    })
+  } catch (error) {
+    console.error('Erreur lors du marquage expédié:', error)
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_SERVER_ERROR'
+    })
+  }
+})
+
+// Marquer une commande comme livrée (admin)
+router.post('/orders/:orderId/deliver', [
+  body('note')
+    .optional()
+    .isString()
+    .isLength({ max: 500 })
+    .withMessage('Note trop longue')
+], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: 'Données invalides',
+        details: errors.array()
+      })
+    }
+
+    const { orderId } = req.params
+    const { note } = req.body as { note?: string }
+
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true,
+        user: {
+          select: { id: true, email: true, username: true, firstName: true, lastName: true }
+        }
+      }
+    })
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Commande non trouvée', code: 'ORDER_NOT_FOUND' })
+    }
+
+    if (existingOrder.fulfillmentStatus === FulfillmentStatus.DELIVERED) {
+      return res.status(200).json({ message: 'Commande déjà livrée', order: existingOrder })
+    }
+
+    const now = new Date()
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        deliveredAt: now,
+        fulfillmentStatus: FulfillmentStatus.DELIVERED,
+        status: OrderStatus.DELIVERED,
+        events: {
+          create: {
+            type: OrderEventType.DELIVERED,
+            message: note ?? 'Commande livrée',
+            createdBy: req.user?.userId
+          }
+        }
+      },
+      include: {
+        items: true,
+        user: {
+          select: { id: true, email: true, username: true, firstName: true, lastName: true }
+        }
+      }
+    })
+
+    const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
+    const sendDeliveredEmail = process.env.SEND_DELIVERED_EMAIL !== 'false'
+    if (customerEmail && sendDeliveredEmail) {
+      const orderDataForEmail = {
+        orderNumber: updatedOrder.orderNumber,
+        totalCents: updatedOrder.totalCents,
+        currency: updatedOrder.currency,
+        items: updatedOrder.items.map(item => ({
+          productName: item.productName,
+          variantName: item.variantName,
+          imageUrl: item.imageUrl,
+          quantity: item.quantity,
+          unitPriceCents: item.unitPriceCents,
+          totalPriceCents: item.totalPriceCents
+        })),
+        shippingAddress: updatedOrder.shippingAddress as any,
+        billingAddress: updatedOrder.billingAddress as any,
+        trackingNumber: updatedOrder.trackingNumber ?? undefined,
+        trackingUrl: updatedOrder.trackingUrl ?? undefined,
+        orderTrackingUrl: orderTrackingUrl ?? undefined
+      }
+
+      sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail)
+        .catch(err => console.error('Erreur email livraison:', err))
+    }
+
+    res.json({
+      message: 'Commande marquée comme livrée',
+      order: updatedOrder
+    })
+  } catch (error) {
+    console.error('Erreur lors du marquage livré:', error)
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_SERVER_ERROR'
+    })
+  }
+})
+
 // Modifier le statut d'une commande (admin)
 router.patch('/orders/:orderId/status', [
   body('status')
     .isIn(['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'])
     .withMessage('Statut invalide'),
+  body('carrier')
+    .optional()
+    .isString()
+    .custom(value => carrierWhitelist.includes(value))
+    .withMessage('Transporteur invalide'),
   body('trackingNumber')
     .optional()
     .isString()
@@ -240,7 +485,7 @@ router.patch('/orders/:orderId/status', [
     }
 
     const { orderId } = req.params
-    const { status } = req.body
+    const { status, trackingNumber, trackingUrl, carrier } = req.body
 
     // Vérifier que la commande existe
     const existingOrder = await prisma.order.findUnique({
@@ -254,11 +499,28 @@ router.patch('/orders/:orderId/status', [
       })
     }
 
-    // Mettre à jour le statut
+    const mapToFulfillment: Record<OrderStatus, FulfillmentStatus> = {
+      [OrderStatus.PENDING]: FulfillmentStatus.PENDING,
+      [OrderStatus.CONFIRMED]: FulfillmentStatus.PAID,
+      [OrderStatus.SHIPPED]: FulfillmentStatus.SHIPPED,
+      [OrderStatus.DELIVERED]: FulfillmentStatus.DELIVERED,
+      [OrderStatus.CANCELLED]: FulfillmentStatus.CANCELLED,
+      [OrderStatus.REFUNDED]: FulfillmentStatus.REFUNDED
+    }
+
+    const nextCarrier: Carrier | null = carrier ?? existingOrder.carrier ?? null
+    const nextTrackingNumber: string | null = trackingNumber ?? existingOrder.trackingNumber ?? null
+    const resolvedTrackingUrl: string | null = trackingUrl 
+      ?? (nextTrackingNumber ? buildTrackingUrl(nextCarrier ?? Carrier.OTHER, nextTrackingNumber) : existingOrder.trackingUrl ?? null)
+
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { 
         status: status as OrderStatus,
+        fulfillmentStatus: mapToFulfillment[status as OrderStatus],
+        carrier: nextCarrier ?? undefined,
+        trackingNumber: nextTrackingNumber ?? undefined,
+        trackingUrl: resolvedTrackingUrl ?? undefined,
         updatedAt: new Date()
       },
       include: {
@@ -273,10 +535,15 @@ router.patch('/orders/:orderId/status', [
       }
     })
 
-    console.log(`📦 Commande ${updatedOrder.orderNumber} mise à jour: ${existingOrder.status} → ${status}`)
+    await addOrderEvent(orderId, OrderEventType.STATUS_UPDATED, `Statut: ${existingOrder.status} → ${status}`, req.user?.userId)
+    if (status === 'SHIPPED') {
+      await addOrderEvent(orderId, OrderEventType.SHIPPED, 'Commande expédiée', req.user?.userId)
+    } else if (status === 'DELIVERED') {
+      await addOrderEvent(orderId, OrderEventType.DELIVERED, 'Commande livrée', req.user?.userId)
+    }
 
-    // Envoyer les notifications email selon le nouveau statut
     const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     
     if (customerEmail) {
       const orderDataForEmail = {
@@ -293,19 +560,17 @@ router.patch('/orders/:orderId/status', [
         })),
         shippingAddress: updatedOrder.shippingAddress as any,
         billingAddress: updatedOrder.billingAddress as any,
-        trackingNumber: req.body.trackingNumber,
-        trackingUrl: req.body.trackingUrl
+        trackingNumber: updatedOrder.trackingNumber ?? undefined,
+        trackingUrl: updatedOrder.trackingUrl ?? undefined,
+        orderTrackingUrl: orderTrackingUrl ?? undefined
       }
 
-      // Envoyer email selon le statut
       if (status === 'SHIPPED') {
         sendShippingNotificationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email expedition:', err))
-        console.log(`📧 Email d'expédition envoyé à ${customerEmail}`)
       } else if (status === 'DELIVERED') {
         sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email livraison:', err))
-        console.log(`📧 Email de livraison envoyé à ${customerEmail}`)
       }
     }
 
@@ -1007,8 +1272,6 @@ router.patch('/inventory/:variantId', [
         }
       }
     })
-
-    console.log(`📦 Stock ajusté pour ${variant.product.name} - ${variant.name}: ${stock} (Raison: ${reason || 'N/A'})`)
 
     res.json({ variant })
   } catch (error) {

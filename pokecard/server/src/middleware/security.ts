@@ -3,13 +3,9 @@ import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 import cors from 'cors'
 
-// ==================== RATE LIMITING AVANCÉ ====================
-
-// Store en mémoire pour le rate limiting par utilisateur
 const userRateLimitStore = new Map<string, { count: number; resetAt: number }>()
 
-// Nettoyer le store périodiquement
-setInterval(() => {
+const cleanupInterval = setInterval(() => {
   const now = Date.now()
   for (const [key, value] of userRateLimitStore.entries()) {
     if (value.resetAt < now) {
@@ -17,8 +13,8 @@ setInterval(() => {
     }
   }
 }, 60000) // Toutes les minutes
+cleanupInterval.unref?.()
 
-// Configuration des limites par type d'endpoint
 const RATE_LIMITS = {
   auth: { windowMs: 15 * 60 * 1000, max: 5 },           // Auth: 5 req / 15 min
   authStrict: { windowMs: 60 * 60 * 1000, max: 3 },    // Réinitialisation mdp: 3 req / 1h
@@ -29,14 +25,12 @@ const RATE_LIMITS = {
   checkout: { windowMs: 60 * 60 * 1000, max: 10 },      // Checkout: 10 req / 1h
 }
 
-// Générateur de clé personnalisé (par IP + User ID si authentifié)
 const keyGenerator = (req: Request): string => {
   const userId = (req as any).user?.userId
   const ip = req.ip || req.socket.remoteAddress || 'unknown'
   return userId ? `user:${userId}` : `ip:${ip}`
 }
 
-// Rate limiting pour l'authentification (login, register)
 export const authLimiter = rateLimit({
   windowMs: RATE_LIMITS.auth.windowMs,
   max: RATE_LIMITS.auth.max,
@@ -51,7 +45,6 @@ export const authLimiter = rateLimit({
   keyGenerator
 })
 
-// Rate limiting strict pour réinitialisation de mot de passe
 export const strictAuthLimiter = rateLimit({
   windowMs: RATE_LIMITS.authStrict.windowMs,
   max: RATE_LIMITS.authStrict.max,
@@ -65,7 +58,6 @@ export const strictAuthLimiter = rateLimit({
   keyGenerator
 })
 
-// Rate limiting pour l'API publique
 export const apiLimiter = rateLimit({
   windowMs: RATE_LIMITS.api.windowMs,
   max: process.env.NODE_ENV === 'development' ? 1000 : RATE_LIMITS.api.max,
@@ -82,7 +74,6 @@ export const apiLimiter = rateLimit({
   keyGenerator
 })
 
-// Rate limiting pour les utilisateurs authentifiés (plus permissif)
 export const authenticatedApiLimiter = rateLimit({
   windowMs: RATE_LIMITS.apiAuthenticated.windowMs,
   max: RATE_LIMITS.apiAuthenticated.max,
@@ -96,7 +87,6 @@ export const authenticatedApiLimiter = rateLimit({
   skip: (req) => !(req as any).user // Skip si pas authentifié
 })
 
-// Rate limiting pour l'admin
 export const adminLimiter = rateLimit({
   windowMs: RATE_LIMITS.admin.windowMs,
   max: RATE_LIMITS.admin.max,
@@ -109,7 +99,6 @@ export const adminLimiter = rateLimit({
   keyGenerator
 })
 
-// Rate limiting pour les uploads
 export const uploadLimiter = rateLimit({
   windowMs: RATE_LIMITS.upload.windowMs,
   max: RATE_LIMITS.upload.max,
@@ -122,7 +111,6 @@ export const uploadLimiter = rateLimit({
   keyGenerator
 })
 
-// Rate limiting pour le checkout
 export const checkoutLimiter = rateLimit({
   windowMs: RATE_LIMITS.checkout.windowMs,
   max: RATE_LIMITS.checkout.max,
@@ -135,7 +123,6 @@ export const checkoutLimiter = rateLimit({
   keyGenerator
 })
 
-// Middleware de rate limiting dynamique par utilisateur
 export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const key = keyGenerator(req)
@@ -162,9 +149,7 @@ export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
   }
 }
 
-// Middleware de validation des entrées
 export const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  // Vérifier la taille du body
   const contentLength = parseInt(req.headers['content-length'] || '0')
   if (contentLength > 1024 * 1024) { // 1MB max
     return res.status(413).json({
@@ -173,7 +158,6 @@ export const validateInput = (req: Request, res: Response, next: NextFunction) =
     })
   }
 
-  // Vérifier le type de contenu
   if (req.headers['content-type'] && !req.headers['content-type'].includes('application/json')) {
     return res.status(415).json({
       error: 'Type de contenu non supporté',
@@ -184,12 +168,9 @@ export const validateInput = (req: Request, res: Response, next: NextFunction) =
   next()
 }
 
-// Middleware de sanitisation améliorée
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-  // Fonction de sanitisation améliorée
   const sanitize = (obj: any): any => {
     if (typeof obj === 'string') {
-      // Retirer les caractères dangereux pour XSS
       return obj
         .replace(/[<>]/g, '') // Retirer < et >
         .replace(/javascript:/gi, '') // Retirer javascript:
@@ -207,8 +188,6 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
     
     const sanitized: any = {}
     for (const [key, value] of Object.entries(obj)) {
-      // Ne pas sanitizer les champs qui doivent contenir du HTML ou des URLs
-      // (comme les descriptions de produits ou les URLs d'images)
       if (key === 'description' || key === 'imageUrl' || key === 'url' || key === 'images') {
         sanitized[key] = value
       } else {
@@ -218,7 +197,6 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
     return sanitized
   }
 
-  // Ne pas sanitizer le body du webhook Stripe (contient des données binaires)
   if (req.path !== '/api/checkout/webhook') {
     if (req.body && typeof req.body === 'object') {
       req.body = sanitize(req.body)
@@ -236,20 +214,12 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
   next()
 }
 
-// Middleware de logging sécurisé
 export const secureLogging = (req: Request, res: Response, next: NextFunction) => {
-  // Masquer les informations sensibles dans les logs
   const sanitizedUrl = req.url.replace(/\/api\/auth\/.*/, '/api/auth/***')
-  const sanitizedHeaders = { ...req.headers }
-  delete sanitizedHeaders.authorization
-  delete sanitizedHeaders.cookie
-  
-  console.log(`🔒 ${req.method} ${sanitizedUrl} - IP: ${req.ip}`)
-  
+  console.log(`HTTP ${req.method} ${sanitizedUrl} - IP: ${req.ip}`)
   next()
 }
 
-// Middleware de protection contre les attaques par injection
 export const injectionProtection = (req: Request, res: Response, next: NextFunction) => {
   const suspiciousPatterns = [
     /<script/i,
@@ -282,7 +252,6 @@ export const injectionProtection = (req: Request, res: Response, next: NextFunct
   next()
 }
 
-// Configuration CORS sécurisée
 export const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
   credentials: true,
@@ -292,7 +261,6 @@ export const corsOptions = {
   maxAge: 86400 // 24 heures
 }
 
-// Configuration Helmet pour les headers de sécurité
 export const helmetConfig = helmet({
   contentSecurityPolicy: {
     directives: {

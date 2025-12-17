@@ -12,6 +12,7 @@ const prisma = new PrismaClient({
 // Nettoyer la base de données avant les tests
 export async function cleanupDatabase() {
   // Supprimer dans l'ordre pour respecter les contraintes de clés étrangères
+  await prisma.orderEvent.deleteMany()
   await prisma.orderItem.deleteMany()
   await prisma.order.deleteMany()
   await prisma.refreshToken.deleteMany()

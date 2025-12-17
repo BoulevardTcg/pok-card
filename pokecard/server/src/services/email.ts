@@ -1,15 +1,16 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
 
-// Configuration du transporteur email
 let transporter: Transporter | null = null
+
+// Protection CRLF: on refuse tout retour ligne dans les en-têtes.
+const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
+const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value)
 
 function getTransporter(): Transporter {
   if (!transporter) {
-    // En développement, utiliser un compte de test Ethereal ou SMTP local
     if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
-      console.log('📧 Mode développement: les emails seront loggés en console')
-      // Créer un transporteur qui log seulement
+      console.log('Email: mode développement (streamTransport)')
       transporter = nodemailer.createTransport({
         streamTransport: true,
         newline: 'unix'
@@ -29,13 +30,14 @@ function getTransporter(): Transporter {
   return transporter
 }
 
-// Informations de la boutique
 const SHOP_NAME = process.env.SHOP_NAME || 'Boulevard TCG'
 const SHOP_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 const SHOP_EMAIL = process.env.SHOP_EMAIL || 'contact@boulevardtcg.com'
 const SHOP_LOGO = `${SHOP_URL}/logo.png`
 
-// Styles communs pour les emails
+const EMAIL_FROM = process.env.EMAIL_FROM || SHOP_EMAIL
+const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || 'contact@boulevardtcg.com'
+
 const emailStyles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5; }
   .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
@@ -62,7 +64,6 @@ const emailStyles = `
   .tracking-box { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
 `
 
-// Type pour les articles de commande
 interface OrderItemForEmail {
   productName: string
   variantName?: string | null
@@ -72,7 +73,6 @@ interface OrderItemForEmail {
   totalPriceCents: number
 }
 
-// Type pour les données de commande
 interface OrderDataForEmail {
   orderNumber: string
   totalCents: number
@@ -96,14 +96,13 @@ interface OrderDataForEmail {
   promoDiscount?: number
   trackingNumber?: string
   trackingUrl?: string
+  orderTrackingUrl?: string
 }
 
-// Formater le prix
 function formatPrice(cents: number): string {
   return (cents / 100).toFixed(2).replace('.', ',') + ' €'
 }
 
-// Générer le tableau des articles
 function generateItemsTable(items: OrderItemForEmail[]): string {
   const rows = items.map(item => `
     <tr>
@@ -138,7 +137,6 @@ function generateItemsTable(items: OrderItemForEmail[]): string {
   `
 }
 
-// Template: Confirmation de commande
 function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
   const subtotal = order.items.reduce((sum, item) => sum + item.totalPriceCents, 0)
   const discount = order.promoDiscount || 0
@@ -229,6 +227,8 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
 
 // Template: Notification d'expédition
 function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: string): string {
+  const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`
+
   return `
 <!DOCTYPE html>
 <html>
@@ -281,7 +281,7 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
       ` : ''}
       
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${SHOP_URL}/commandes" class="btn">Suivre ma commande</a>
+        <a href="${trackingCtaUrl}" class="btn">Suivre ma commande</a>
       </div>
       
       <p style="color: #6b7280; font-size: 14px;">
@@ -306,6 +306,7 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
 
 // Template: Commande livrée
 function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
+  const trackingCtaUrl = order.orderTrackingUrl || `${SHOP_URL}/commandes`
   return `
 <!DOCTYPE html>
 <html>
@@ -329,7 +330,7 @@ function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: s
       <p>Nous esperons que vous etes satisfait(e) de vos achats. N'hesitez pas a nous laisser un avis, ca nous aide beaucoup !</p>
       
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${SHOP_URL}/commandes" class="btn">Laisser un avis</a>
+        <a href="${trackingCtaUrl}" class="btn">Laisser un avis</a>
       </div>
       
       <h3 style="color: #1f2937;">Rappel de votre commande</h3>
@@ -355,8 +356,6 @@ function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: s
 `
 }
 
-// ==================== FONCTIONS D'ENVOI ====================
-
 export async function sendOrderConfirmationEmail(order: OrderDataForEmail, customerEmail: string): Promise<boolean> {
   try {
     const transport = getTransporter()
@@ -370,16 +369,14 @@ export async function sendOrderConfirmationEmail(order: OrderDataForEmail, custo
     })
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('📧 Email de confirmation envoyé (dev mode)')
-      console.log('   To:', customerEmail)
-      console.log('   Order:', order.orderNumber)
+      console.log(`Email: confirmation envoyée (${order.orderNumber})`)
     } else {
-      console.log('📧 Email de confirmation envoyé:', info.messageId)
+      console.log('Email: confirmation envoyée', { messageId: info.messageId })
     }
 
     return true
   } catch (error) {
-    console.error('❌ Erreur envoi email confirmation:', error)
+    console.error('Email: erreur envoi confirmation', error)
     return false
   }
 }
@@ -397,16 +394,14 @@ export async function sendShippingNotificationEmail(order: OrderDataForEmail, cu
     })
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('📧 Email d\'expédition envoyé (dev mode)')
-      console.log('   To:', customerEmail)
-      console.log('   Order:', order.orderNumber)
+      console.log(`Email: expédition envoyée (${order.orderNumber})`)
     } else {
-      console.log('📧 Email d\'expédition envoyé:', info.messageId)
+      console.log('Email: expédition envoyée', { messageId: info.messageId })
     }
 
     return true
   } catch (error) {
-    console.error('❌ Erreur envoi email expédition:', error)
+    console.error('Email: erreur envoi expédition', error)
     return false
   }
 }
@@ -424,20 +419,163 @@ export async function sendDeliveryConfirmationEmail(order: OrderDataForEmail, cu
     })
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('📧 Email de livraison envoyé (dev mode)')
-      console.log('   To:', customerEmail)
-      console.log('   Order:', order.orderNumber)
+      console.log(`Email: livraison envoyée (${order.orderNumber})`)
     } else {
-      console.log('📧 Email de livraison envoyé:', info.messageId)
+      console.log('Email: livraison envoyée', { messageId: info.messageId })
     }
 
     return true
   } catch (error) {
-    console.error('❌ Erreur envoi email livraison:', error)
+    console.error('Email: erreur envoi livraison', error)
     return false
   }
 }
 
-// Exporter les types
+type ContactPayload = {
+  name: string
+  email: string
+  subject: string
+  message: string
+  ip?: string
+  userAgent?: string
+  createdAt?: Date
+}
+
+function contactEmailTemplate(payload: ContactPayload): string {
+  const createdAt = payload.createdAt ? payload.createdAt.toLocaleString('fr-FR') : new Date().toLocaleString('fr-FR')
+  const ip = payload.ip || '—'
+  const ua = payload.userAgent || '—'
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - ${SHOP_NAME}</title>
+  <style>${emailStyles}</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📨 Nouveau message de contact</h1>
+    </div>
+    <div class="content">
+      <div class="address-box">
+        <p style="margin: 0 0 8px 0;"><strong>Nom:</strong> ${payload.name}</p>
+        <p style="margin: 0 0 8px 0;"><strong>Email:</strong> ${payload.email}</p>
+        <p style="margin: 0;"><strong>Date:</strong> ${createdAt}</p>
+      </div>
+
+      <div class="tracking-box">
+        <p style="margin: 0 0 8px 0;"><strong>Sujet:</strong> ${payload.subject}</p>
+        <p style="margin: 0; white-space: pre-wrap;"><strong>Message:</strong><br>${payload.message}</p>
+      </div>
+
+      <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">
+        IP: ${ip}<br>
+        User-Agent: ${ua}
+      </p>
+    </div>
+    <div class="footer">
+      <p><strong>${SHOP_NAME}</strong></p>
+      <p><a href="${SHOP_URL}">Visiter la boutique</a></p>
+    </div>
+  </div>
+</body>
+</html>
+`
+}
+
+function contactAutoReplyTemplate(payload: { name: string; subject: string }): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nous avons bien reçu votre message - ${SHOP_NAME}</title>
+  <style>${emailStyles}</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✅ Message reçu</h1>
+    </div>
+    <div class="content">
+      <p>Bonjour ${payload.name},</p>
+      <p>Merci pour votre message. Notre équipe vous répondra dès que possible.</p>
+      <div class="address-box">
+        <p style="margin: 0;"><strong>Sujet:</strong> ${payload.subject}</p>
+      </div>
+      <p style="color: #6b7280; font-size: 14px;">
+        Si vous avez besoin de compléter votre demande, répondez simplement à cet email.
+      </p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${SHOP_URL}" class="btn">Retour à la boutique</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p><strong>${SHOP_NAME}</strong></p>
+      <p style="margin-top: 20px; font-size: 12px;">
+        Ceci est un message automatique, merci de ne pas envoyer d'informations sensibles.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`
+}
+
+export async function sendContactEmail(payload: ContactPayload): Promise<boolean> {
+  try {
+    const transport = getTransporter()
+    const html = contactEmailTemplate(payload)
+    const info = await transport.sendMail({
+      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+      to: CONTACT_TO_EMAIL,
+      replyTo: sanitizeEmailAddress(payload.email),
+      subject: sanitizeHeaderValue(`[Contact – Boulevard] ${payload.subject}`),
+      html,
+    })
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Email: contact envoyé')
+    } else {
+      console.log('Email: contact envoyé', { messageId: info.messageId })
+    }
+
+    return true
+  } catch (error) {
+    console.error('Email: erreur envoi contact', error)
+    return false
+  }
+}
+
+export async function sendContactAutoReply(payload: { name: string; email: string; subject: string }): Promise<boolean> {
+  try {
+    const transport = getTransporter()
+    const html = contactAutoReplyTemplate({ name: payload.name, subject: payload.subject })
+    const info = await transport.sendMail({
+      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+      to: sanitizeEmailAddress(payload.email),
+      replyTo: CONTACT_TO_EMAIL,
+      subject: sanitizeHeaderValue(`✅ Nous avons bien reçu votre message - ${SHOP_NAME}`),
+      html,
+    })
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Email: accusé réception contact envoyé')
+    } else {
+      console.log('Email: accusé réception contact envoyé', { messageId: info.messageId })
+    }
+
+    return true
+  } catch (error) {
+    console.error('Email: erreur envoi accusé réception contact', error)
+    return false
+  }
+}
+
 export type { OrderDataForEmail, OrderItemForEmail }
 

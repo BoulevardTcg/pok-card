@@ -78,23 +78,46 @@ model Favorite {
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  userId          String?
-  orderNumber     String      @unique
-  status          OrderStatus @default(PENDING)
-  totalCents      Int
-  currency        String      @default("EUR")
-  paymentMethod   String?
-  shippingAddress Json?
-  billingAddress  Json?
-  items           OrderItem[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id                String             @id @default(cuid())
+  userId            String?
+  orderNumber       String             @unique
+  status            OrderStatus        @default(PENDING)
+  fulfillmentStatus FulfillmentStatus  @default(PAID)
+  carrier           Carrier?
+  trackingNumber    String?
+  trackingUrl       String?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  totalCents        Int
+  currency          String             @default("EUR")
+  paymentMethod     String?
+  shippingMethod    String?
+  shippingCost      Int?
+  shippingAddress   Json?
+  billingAddress    Json?
+  items             OrderItem[]
+  events            OrderEvent[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   // Relations
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("orders")
+}
+
+model OrderEvent {
+  id        String          @id @default(cuid())
+  orderId   String
+  type      OrderEventType
+  message   String?
+  createdBy String?
+  createdAt DateTime        @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_events")
 }
 
 model OrderItem {
@@ -285,6 +308,38 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
   REFUNDED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  PAID
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum Carrier {
+  COLISSIMO
+  MONDIAL_RELAY
+  CHRONOPOST
+  UPS
+  DHL
+  FEDEX
+  OTHER
+}
+
+enum OrderEventType {
+  CREATED
+  PAID
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  NOTE
+  STATUS_UPDATED
 }
 
 enum TradeStatus {

@@ -184,6 +184,13 @@ export function ProductDetail() {
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
     if (selectedVariant.stock <= 0) return;
+    
+    // Vérifier l'authentification
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: `/produit/${product.slug}` } });
+      return;
+    }
+    
     addToCart(selectedVariant, product);
   };
 

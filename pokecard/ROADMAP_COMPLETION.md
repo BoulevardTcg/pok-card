@@ -458,7 +458,7 @@ Ce document liste toutes les fonctionnalités, améliorations et optimisations n
 ### 10.1 Analytics
 - [ ] **Google Analytics / Plausible**
   - Tracking des pages
-  - Événements e-commerce
+  - Événements e-commerce (checkout, conversion, etc.)
   - Conversion tracking
   
 - [ ] **Analytics internes**

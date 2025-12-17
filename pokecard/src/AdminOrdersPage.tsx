@@ -47,6 +47,24 @@ interface Order {
   id: string;
   orderNumber: string;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  fulfillmentStatus?: 'PENDING' | 'PAID' | 'PREPARING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
+  shippingMethod?: string | null;
+  shippingCost?: number | null;
+  shippingAddress?: {
+    name?: string | null;
+    address?: {
+      line1?: string | null;
+      line2?: string | null;
+      city?: string | null;
+      postal_code?: string | null;
+      country?: string | null;
+    } | null;
+  } | null;
   totalCents: number;
   currency: string;
   items: OrderItem[];
@@ -72,6 +90,9 @@ export function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [shippingDraft, setShippingDraft] = useState<{ orderId: string | null; carrier: string; trackingNumber: string; note: string }>({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
+  const [shippingLoadingId, setShippingLoadingId] = useState<string | null>(null);
+  const [deliveringId, setDeliveringId] = useState<string | null>(null);
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -137,6 +158,62 @@ export function AdminOrdersPage() {
       setUpdatingOrderId(null);
     }
   }
+
+  async function submitShip() {
+    if (!token || !shippingDraft.orderId) return;
+    const { orderId, carrier, trackingNumber, note } = shippingDraft;
+    if (!trackingNumber.trim()) {
+      alert('Le numéro de suivi est requis');
+      return;
+    }
+    setShippingLoadingId(orderId);
+    try {
+      const response = await fetch(`${API_BASE}/admin/orders/${orderId}/ship`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ carrier, trackingNumber, note })
+      });
+      if (!response.ok) throw new Error('Erreur lors du marquage expédié');
+      const data = await response.json();
+      const updated = data.order as Order;
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
+      setShippingDraft({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Erreur expédition');
+    } finally {
+      setShippingLoadingId(null);
+    }
+  }
+
+  async function markDelivered(orderId: string) {
+    if (!token) return;
+    setDeliveringId(orderId);
+    try {
+      const response = await fetch(`${API_BASE}/admin/orders/${orderId}/deliver`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      if (!response.ok) throw new Error('Erreur lors du marquage livré');
+      const data = await response.json();
+      const updated = data.order as Order;
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Erreur livraison');
+    } finally {
+      setDeliveringId(null);
+    }
+  }
+
+  const carrierOptions = ['COLISSIMO', 'MONDIAL_RELAY', 'CHRONOPOST', 'UPS', 'DHL', 'FEDEX', 'OTHER'];
 
   const formatPrice = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
@@ -229,6 +306,7 @@ export function AdminOrdersPage() {
                 <th>Client</th>
                 <th>Articles</th>
                 <th>Total</th>
+                <th>Livraison</th>
                 <th>Date</th>
                 <th>Statut</th>
                 <th>Actions</th>
@@ -257,6 +335,41 @@ export function AdminOrdersPage() {
                     </td>
                     <td>
                       <span className={styles.total}>{formatPrice(order.totalCents)}€</span>
+                      {order.shippingMethod && (
+                        <div className={styles.shippingInfo}>
+                          <span className={styles.shippingTag}>{order.shippingMethod}</span>
+                          {order.shippingCost != null && (
+                            <span className={styles.shippingCost}>{formatPrice(order.shippingCost)}€</span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      {order.shippingAddress ? (
+                        <div className={styles.shippingAddress}>
+                          {order.shippingAddress.name && (
+                            <div className={styles.shippingName}>{order.shippingAddress.name}</div>
+                          )}
+                          <div className={styles.shippingLine}>
+                            {order.shippingAddress.address?.line1 || '—'}
+                          </div>
+                          {order.shippingAddress.address?.line2 && (
+                            <div className={styles.shippingLine}>
+                              {order.shippingAddress.address.line2}
+                            </div>
+                          )}
+                          <div className={styles.shippingLine}>
+                            {[order.shippingAddress.address?.postal_code, order.shippingAddress.address?.city]
+                              .filter(Boolean)
+                              .join(' ')}
+                          </div>
+                          <div className={styles.shippingLine}>
+                            {order.shippingAddress.address?.country || ''}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className={styles.muted}>—</span>
+                      )}
                     </td>
                     <td>
                       <span className={styles.date}>{formatDate(order.createdAt)}</span>
@@ -267,19 +380,95 @@ export function AdminOrdersPage() {
                       </span>
                     </td>
                     <td>
-                      <div className={styles.statusSelectWrapper}>
-                        <select
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          disabled={updatingOrderId === order.id}
-                          className={styles.statusDropdown}
-                        >
-                          {allStatuses.map(s => (
-                            <option key={s} value={s}>{statusConfig[s].label}</option>
-                          ))}
-                        </select>
-                        {updatingOrderId === order.id && (
-                          <div className={styles.updateSpinner} />
+                      <div className={styles.actionsColumn}>
+                        <div className={styles.statusSelectWrapper}>
+                          <select
+                            value={order.status}
+                            onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                            disabled={updatingOrderId === order.id}
+                            className={styles.statusDropdown}
+                          >
+                            {allStatuses.map(s => (
+                              <option key={s} value={s}>{statusConfig[s].label}</option>
+                            ))}
+                          </select>
+                          {updatingOrderId === order.id && (
+                            <div className={styles.updateSpinner} />
+                          )}
+                        </div>
+
+                        <div className={styles.actionsRow}>
+                          <button
+                            className={styles.secondaryButton}
+                            onClick={() => setShippingDraft({
+                              orderId: order.id,
+                              carrier: order.carrier || 'COLISSIMO',
+                              trackingNumber: order.trackingNumber || '',
+                              note: ''
+                            })}
+                          >
+                            Expédier
+                          </button>
+                          <button
+                            className={styles.ghostButton}
+                            disabled={deliveringId === order.id || (order.status !== 'SHIPPED' && order.fulfillmentStatus !== 'SHIPPED')}
+                            onClick={() => markDelivered(order.id)}
+                          >
+                            {deliveringId === order.id ? '... ' : 'Marquer livré'}
+                          </button>
+                        </div>
+
+                        {shippingDraft.orderId === order.id && (
+                          <div className={styles.shipForm}>
+                            <div className={styles.shipFields}>
+                              <select
+                                value={shippingDraft.carrier}
+                                onChange={(e) => setShippingDraft(prev => ({ ...prev, carrier: e.target.value }))}
+                              >
+                                {carrierOptions.map(opt => (
+                                  <option key={opt} value={opt}>{opt.replace('_', ' ')}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="text"
+                                placeholder="Numéro de suivi"
+                                value={shippingDraft.trackingNumber}
+                                onChange={(e) => setShippingDraft(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                              />
+                              <input
+                                type="text"
+                                placeholder="Note interne (optionnel)"
+                                value={shippingDraft.note}
+                                onChange={(e) => setShippingDraft(prev => ({ ...prev, note: e.target.value }))}
+                              />
+                            </div>
+                            <div className={styles.shipActions}>
+                              <button
+                                className={styles.primaryButton}
+                                disabled={shippingLoadingId === order.id}
+                                onClick={submitShip}
+                              >
+                                {shippingLoadingId === order.id ? 'Envoi...' : 'Valider expédition'}
+                              </button>
+                              <button
+                                className={styles.ghostButton}
+                                onClick={() => setShippingDraft({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' })}
+                              >
+                                Annuler
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {order.trackingUrl && (
+                          <a
+                            className={styles.trackingLink}
+                            href={order.trackingUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Suivi transporteur
+                          </a>
                         )}
                       </div>
                     </td>

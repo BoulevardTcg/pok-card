@@ -19,6 +19,7 @@ import collectionRoutes from './routes/collection.js'
 import tradeOffersRoutes from './routes/trade-offers.js'
 import adminRoutes from './routes/admin.js'
 import twoFactorRoutes from './routes/twoFactor.js'
+import contactRoutes from './routes/contact.js'
 
 // Import des middlewares de sécurité
 import { 
@@ -36,8 +37,12 @@ import logger, { requestLoggerMiddleware } from './utils/logger.js'
 
 // Import Swagger pour la documentation API
 import { setupSwagger } from './swagger.js'
+import { validateEnvOrThrow } from './config/validateEnv.js'
 
 const app = express()
+
+// Fail-fast env (prod) / warn (dev)
+validateEnvOrThrow()
 
 // Configuration CORS sécurisée
 const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173']
@@ -141,6 +146,9 @@ app.use('/api/admin', adminRoutes)
 
 // Routes 2FA (Two-Factor Authentication)
 app.use('/api/2fa', twoFactorRoutes)
+
+// Contact (formulaire)
+app.use('/api/contact', contactRoutes)
 
 // Route de santé
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
@@ -323,6 +331,7 @@ app.listen(port, () => {
   logger.info(`🔄 API offres d'échange: http://localhost:${port}/api/trade-offers`)
   logger.info(`🃏 API trade: http://localhost:${port}/api/trade`)
   logger.info(`🔐 API 2FA: http://localhost:${port}/api/2fa`)
+  logger.info(`📨 API contact: http://localhost:${port}/api/contact`)
   logger.info(`💚 Santé: http://localhost:${port}/api/health`)
   logger.info(`📖 Documentation API: http://localhost:${port}/api-docs`)
 })

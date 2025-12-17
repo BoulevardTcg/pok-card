@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from 'express'
 import { body, validationResult } from 'express-validator'
-import { PrismaClient, OrderStatus } from '@prisma/client'
+import { PrismaClient, OrderStatus, Prisma, FulfillmentStatus, OrderEventType, Carrier } from '@prisma/client'
 import Stripe from 'stripe'
 import { ensureStripeConfigured } from '../config/stripe.js'
 import { optionalAuth } from '../middleware/auth.js'
 import { sendOrderConfirmationEmail } from '../services/email.js'
+import { findShippingMethod } from '../config/shipping.js'
 
 const router = Router()
 const prisma = new PrismaClient()
@@ -17,6 +18,39 @@ type CheckoutItemInput = {
 const MAX_ITEMS = 50
 const MAX_QUANTITY_PER_ITEM = 100
 const MAX_TOTAL_QUANTITY = 500
+
+const serializeStripeAddress = (address: Stripe.Address | null | undefined): Prisma.InputJsonValue | null => {
+  if (!address) return null
+
+  return {
+    city: address.city ?? null,
+    country: address.country ?? null,
+    line1: address.line1 ?? null,
+    line2: address.line2 ?? null,
+    postal_code: address.postal_code ?? null,
+    state: address.state ?? null
+  }
+}
+
+const buildBillingAddress = (details: Stripe.Checkout.Session.CustomerDetails | null | undefined): Prisma.InputJsonValue | undefined => {
+  if (!details) return undefined
+
+  return {
+    name: details.name ?? null,
+    email: details.email ?? null,
+    phone: details.phone ?? null,
+    address: serializeStripeAddress(details.address)
+  }
+}
+
+const buildShippingAddress = (details: Stripe.Checkout.Session.ShippingDetails | null | undefined): Prisma.InputJsonValue | undefined => {
+  if (!details) return undefined
+
+  return {
+    name: details.name ?? null,
+    address: serializeStripeAddress(details.address)
+  }
+}
 
 router.post('/create-session', optionalAuth, [
   body('items')
@@ -69,7 +103,41 @@ router.post('/create-session', optionalAuth, [
     .trim()
     .isLength({ max: 50 })
     .withMessage('Code promo invalide')
-], async (req, res) => {
+  ,
+  body('shipping')
+    .exists().withMessage('Adresse de livraison requise.')
+    .custom((value) => typeof value === 'object' && value !== null)
+    .withMessage('Adresse de livraison invalide.'),
+  body('shipping.fullName')
+    .isString()
+    .notEmpty()
+    .withMessage('Nom complet requis.'),
+  body('shipping.addressLine1')
+    .isString()
+    .notEmpty()
+    .withMessage('Adresse requise.'),
+  body('shipping.postalCode')
+    .isString()
+    .notEmpty()
+    .withMessage('Code postal requis.'),
+  body('shipping.city')
+    .isString()
+    .notEmpty()
+    .withMessage('Ville requise.'),
+  body('shipping.country')
+    .isString()
+    .notEmpty()
+    .withMessage('Pays requis.'),
+  body('shipping.phone')
+    .optional()
+    .isString()
+    .isLength({ max: 30 })
+    .withMessage('Téléphone invalide'),
+  body('shippingMethodCode')
+    .isString()
+    .notEmpty()
+    .withMessage('Mode de livraison requis')
+], async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -80,6 +148,16 @@ router.post('/create-session', optionalAuth, [
     }
 
     const requestedItems: CheckoutItemInput[] = req.body.items
+    const shipping = req.body.shipping || {}
+    const shippingMethodCode = (req.body.shippingMethodCode || '').toString().trim().toUpperCase()
+    const shippingMethod = findShippingMethod(shippingMethodCode)
+
+    if (!shippingMethod) {
+      return res.status(400).json({
+        error: 'Mode de livraison invalide',
+        code: 'INVALID_SHIPPING_METHOD'
+      })
+    }
     
     // Vérifier la quantité totale
     const totalQuantity = requestedItems.reduce((sum, item) => sum + item.quantity, 0)
@@ -304,6 +382,19 @@ router.post('/create-session', optionalAuth, [
       }
     })
 
+    // Ajouter la ligne de livraison
+    lineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: 'eur',
+        unit_amount: shippingMethod.priceCents,
+        product_data: {
+          name: `Livraison – ${shippingMethod.label}`,
+          images: []
+        }
+      }
+    })
+
     // Créer un coupon Stripe si un code promo est appliqué
     let stripeCouponId: string | null = null
     if (promoDiscount > 0 && appliedPromoCode) {
@@ -327,7 +418,17 @@ router.post('/create-session', optionalAuth, [
       items: JSON.stringify(requestedItems.map((item) => ({
         variantId: item.variantId,
         quantity: item.quantity
-      })))
+      }))),
+      shippingMethodCode,
+      shippingPriceCents: String(shippingMethod.priceCents),
+      shippingCarrier: shippingMethod.carrier,
+      shippingFullName: shipping.fullName,
+      shippingAddress1: shipping.addressLine1,
+      ...(shipping.addressLine2 ? { shippingAddress2: shipping.addressLine2 } : {}),
+      shippingPostalCode: shipping.postalCode,
+      shippingCity: shipping.city,
+      shippingCountry: shipping.country,
+      ...(shipping.phone ? { shippingPhone: shipping.phone } : {})
     }
 
     // Ajouter le userId si l'utilisateur est connecté
@@ -341,6 +442,42 @@ router.post('/create-session', optionalAuth, [
       metadata.promoDiscount = String(promoDiscount)
     }
 
+    const countryCodeMap: Record<string, string> = {
+      'FRANCE': 'FR',
+      'FR': 'FR',
+      'BELGIQUE': 'BE',
+      'BELGIUM': 'BE',
+      'BE': 'BE',
+      'ALLEMAGNE': 'DE',
+      'GERMANY': 'DE',
+      'DE': 'DE',
+      'ESPAGNE': 'ES',
+      'SPAIN': 'ES',
+      'ES': 'ES',
+      'ITALIE': 'IT',
+      'ITALY': 'IT',
+      'IT': 'IT',
+      'PAYS-BAS': 'NL',
+      'NETHERLANDS': 'NL',
+      'NL': 'NL',
+      'LUXEMBOURG': 'LU',
+      'LU': 'LU',
+      'SUISSE': 'CH',
+      'SWITZERLAND': 'CH',
+      'CH': 'CH',
+      'ROYAUME-UNI': 'GB',
+      'UK': 'GB',
+      'GB': 'GB'
+    }
+
+    const rawCountry = (shipping.country || '').trim().toUpperCase()
+    const countryCode = countryCodeMap[rawCountry] || (rawCountry.length === 2 ? rawCountry : 'FR')
+
+    const allowedCountries = Array.from(new Set([
+      'FR','BE','DE','ES','IT','NL','LU','CH','GB',
+      countryCode
+    ].filter((c) => typeof c === 'string' && c.length === 2)))
+
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
@@ -352,6 +489,9 @@ router.post('/create-session', optionalAuth, [
       metadata,
       payment_intent_data: {
         metadata
+      },
+      shipping_address_collection: {
+        allowed_countries: allowedCountries as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[]
       }
     }
 
@@ -482,6 +622,11 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
 
       let totalCents = 0
       const currency = (session.currency ?? 'eur').toUpperCase()
+      const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
+      const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
+      const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
+        ? session.metadata?.shippingCarrier as Carrier
+        : null
 
       const orderItemsData = []
 
@@ -523,6 +668,8 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
         })
       }
 
+      totalCents += shippingPriceCents
+
       const orderNumber = generateOrderNumber()
       
       // Récupérer le userId depuis les métadonnées ou depuis l'auth
@@ -535,19 +682,24 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
           userId,
           orderNumber,
           status: OrderStatus.CONFIRMED,
+          fulfillmentStatus: FulfillmentStatus.PAID,
           totalCents,
           currency,
           paymentMethod: sessionId, // Stocker le sessionId pour éviter les doublons
-          billingAddress: session.customer_details ? {
-            name: session.customer_details.name,
-            email: session.customer_details.email,
-            phone: session.customer_details.phone,
-            address: session.customer_details.address
-          } : null,
-          shippingAddress: session.shipping_details ? {
-            name: session.shipping_details.name,
-            address: session.shipping_details.address
-          } : null,
+          shippingMethod: shippingMethodCode ?? undefined,
+          shippingCost: shippingPriceCents || undefined,
+          carrier: shippingCarrier ?? undefined,
+          billingAddress: buildBillingAddress(session.customer_details),
+          shippingAddress: buildShippingAddress(session.shipping_details),
+          events: {
+            create: [
+              {
+                type: OrderEventType.PAID,
+                message: 'Paiement confirmé via Stripe',
+                createdBy: userId ?? undefined
+              }
+            ]
+          },
           items: {
             createMany: {
               data: orderItemsData
@@ -692,6 +844,11 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
         let totalCents = 0
         const currency = (session.currency ?? 'eur').toUpperCase()
         const paymentMethod = session.payment_method_types?.[0] ?? 'card'
+        const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
+        const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
+        const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
+          ? session.metadata?.shippingCarrier as Carrier
+          : null
 
         const orderItemsData = []
 
@@ -747,6 +904,8 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
           })
         }
 
+        totalCents += shippingPriceCents
+
         const orderNumber = generateOrderNumber()
         const userId = session.metadata?.userId && session.metadata.userId.trim() !== ''
           ? session.metadata.userId
@@ -757,19 +916,24 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
             userId,
             orderNumber,
             status: OrderStatus.CONFIRMED,
+            fulfillmentStatus: FulfillmentStatus.PAID,
+            shippingMethod: shippingMethodCode ?? undefined,
+            shippingCost: shippingPriceCents || undefined,
+            carrier: shippingCarrier ?? undefined,
             totalCents,
             currency,
             paymentMethod,
-            billingAddress: session.customer_details ? {
-              name: session.customer_details.name,
-              email: session.customer_details.email,
-              phone: session.customer_details.phone,
-              address: session.customer_details.address
-            } : null,
-            shippingAddress: session.shipping_details ? {
-              name: session.shipping_details.name,
-              address: session.shipping_details.address
-            } : null,
+            billingAddress: buildBillingAddress(session.customer_details),
+            shippingAddress: buildShippingAddress(session.shipping_details),
+            events: {
+              create: [
+                {
+                  type: OrderEventType.PAID,
+                  message: 'Paiement confirmé via Stripe',
+                  createdBy: userId ?? undefined
+                }
+              ]
+            },
             items: {
               createMany: {
                 data: orderItemsData

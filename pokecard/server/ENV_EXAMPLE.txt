@@ -1,0 +1,15 @@
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=contact@boulevardtcg.com
+SMTP_PASS=CHANGE_ME
+
+SHOP_EMAIL=contact@boulevardtcg.com
+EMAIL_FROM=contact@boulevardtcg.com
+CONTACT_TO_EMAIL=contact@boulevardtcg.com
+
+# Accusé de réception au client (best-effort)
+CONTACT_AUTOREPLY_ENABLED=true
+
+SHOP_NAME=Boulevard TCG
+FRONTEND_URL=http://localhost:5173
