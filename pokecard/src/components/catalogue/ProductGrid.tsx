@@ -54,11 +54,17 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
       </div>
 
       {/* Grille de produits */}
-      <div className={styles.grid}>
-        {sortedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {sortedProducts.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>Aucun produit trouvé.</p>
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {sortedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

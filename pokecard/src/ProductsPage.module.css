@@ -78,6 +78,40 @@
   color: var(--color-text-secondary);
 }
 
+.emptyState {
+  text-align: center;
+  padding: var(--space-12, 3rem);
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
+}
+
+.errorState {
+  text-align: center;
+  padding: var(--space-12, 3rem);
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-error, #dc2626);
+}
+
+.retryButton {
+  margin-top: var(--space-4, 1rem);
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: var(--color-accent-primary, #8b7355);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms);
+}
+
+.retryButton:hover {
+  background: var(--color-accent-secondary, #a68b6b);
+  transform: translateY(-1px);
+}
+
 /* ─────────────────────────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────────────────────────── */

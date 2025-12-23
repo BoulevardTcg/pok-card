@@ -65,6 +65,14 @@
   gap: var(--space-6, 1.5rem);
 }
 
+.emptyState {
+  text-align: center;
+  padding: var(--space-12, 3rem);
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
+}
+
 /* ─────────────────────────────────────────────────────────────────
    PAGINATION
    ───────────────────────────────────────────────────────────────── */

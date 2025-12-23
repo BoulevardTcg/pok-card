@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './FilterSidebar.module.css';
 
-const filters = {
+const filterOptions = {
   categories: ['Toutes', 'Pokémon', 'One Piece', 'Magic', 'Riftbound', 'Yu-Gi-Oh'],
   priceRanges: [
     { label: 'Tous les prix', value: 'all' },
@@ -69,7 +69,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('categories') && (
           <div className={styles.options}>
-            {filters.categories.map((category) => (
+            {filterOptions.categories.map((category) => (
               <label key={category} className={styles.option}>
                 <input
                   type="radio"
@@ -99,7 +99,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('price') && (
           <div className={styles.options}>
-            {filters.priceRanges.map((range) => (
+            {filterOptions.priceRanges.map((range) => (
               <label key={range.value} className={styles.option}>
                 <input
                   type="radio"
@@ -129,7 +129,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('condition') && (
           <div className={styles.options}>
-            {filters.conditions.map((condition) => (
+            {filterOptions.conditions.map((condition) => (
               <label key={condition} className={styles.option}>
                 <input
                   type="radio"
