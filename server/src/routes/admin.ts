@@ -75,9 +75,6 @@ const upload = multer({
   }
 })
 
-// Middleware: Toutes les routes admin nécessitent une authentification + rôle admin
-// ⚠️ IMPORTANT: Toutes les routes définies après ces lignes sont automatiquement protégées
-// Les routes suivantes nécessitent un token JWT valide ET le rôle admin
 router.use(authenticateToken)
 router.use(requireAdmin)
 
@@ -110,7 +107,6 @@ router.post('/upload', upload.array('images', 10), async (req: Request, res: Res
   }
 })
 
-// Supprimer une image uploadée
 router.delete('/upload/:filename', async (req: Request, res: Response) => {
   try {
     const { filename } = req.params
@@ -134,7 +130,6 @@ router.delete('/upload/:filename', async (req: Request, res: Response) => {
   }
 })
 
-// Liste toutes les commandes (admin)
 router.get('/orders', async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 50, status, search } = req.query
@@ -194,7 +189,6 @@ router.get('/orders', async (req: Request, res: Response) => {
   }
 })
 
-// Récupérer une commande spécifique (admin)
 router.get('/orders/:orderId', async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params
@@ -235,7 +229,6 @@ router.get('/orders/:orderId', async (req: Request, res: Response) => {
   }
 })
 
-// Marquer une commande comme expédiée (admin)
 router.post('/orders/:orderId/ship', [
   body('carrier')
     .isString()
@@ -311,19 +304,11 @@ router.post('/orders/:orderId/ship', [
           select: { id: true, email: true, username: true, firstName: true, lastName: true }
         }
       },
-      // billingAddress et shippingAddress sont des champs JSON, pas des relations
-      // Ils sont automatiquement inclus dans la réponse
     })
 
-    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
     const billingEmail = (updatedOrder.billingAddress as any)?.email
     const userEmail = updatedOrder.user?.email
     const customerEmail = billingEmail || userEmail
-    
-    // Log pour diagnostic
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Email expédition - Billing: ${billingEmail || 'N/A'}, User: ${userEmail || 'N/A'}, Utilisé: ${customerEmail || 'N/A'}`)
-    }
     
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     if (customerEmail) {
@@ -364,7 +349,6 @@ router.post('/orders/:orderId/ship', [
   }
 })
 
-// Marquer une commande comme livrée (admin)
 router.post('/orders/:orderId/deliver', [
   body('note')
     .optional()
@@ -426,7 +410,6 @@ router.post('/orders/:orderId/deliver', [
       }
     })
 
-    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
     const customerEmail = (updatedOrder.billingAddress as any)?.email || updatedOrder.user?.email
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     const sendDeliveredEmail = process.env.SEND_DELIVERED_EMAIL !== 'false'
@@ -468,7 +451,6 @@ router.post('/orders/:orderId/deliver', [
   }
 })
 
-// Modifier le statut d'une commande (admin)
 router.patch('/orders/:orderId/status', [
   body('status')
     .isIn(['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'])
@@ -503,7 +485,6 @@ router.patch('/orders/:orderId/status', [
     const { orderId } = req.params
     const { status, trackingNumber, trackingUrl, carrier } = req.body
 
-    // Vérifier que la commande existe
     const existingOrder = await prisma.order.findUnique({
       where: { id: orderId }
     })
@@ -529,7 +510,6 @@ router.patch('/orders/:orderId/status', [
     const resolvedTrackingUrl: string | null = trackingUrl 
       ?? (nextTrackingNumber ? buildTrackingUrl(nextCarrier ?? Carrier.OTHER, nextTrackingNumber) : existingOrder.trackingUrl ?? null)
 
-    // Préparer les données de mise à jour avec les dates appropriées
     const updateData: any = {
       status: status as OrderStatus,
       fulfillmentStatus: mapToFulfillment[status as OrderStatus],
@@ -539,7 +519,6 @@ router.patch('/orders/:orderId/status', [
       updatedAt: new Date()
     }
 
-    // Mettre à jour les dates selon le statut
     const now = new Date()
     if (status === 'SHIPPED' && !existingOrder.shippedAt) {
       updateData.shippedAt = now
@@ -570,7 +549,6 @@ router.patch('/orders/:orderId/status', [
       await addOrderEvent(orderId, OrderEventType.DELIVERED, 'Commande livrée', req.user?.userId)
     }
 
-    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
     const customerEmail = (updatedOrder.billingAddress as any)?.email || updatedOrder.user?.email
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     
@@ -595,17 +573,13 @@ router.patch('/orders/:orderId/status', [
         carrier: updatedOrder.carrier ?? undefined
       }
 
-      // Envoyer l'email approprié selon le nouveau statut
       if (status === 'CONFIRMED' && existingOrder.status !== 'CONFIRMED') {
-        // Envoyer un email de confirmation si on passe à CONFIRMED
         sendOrderConfirmationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email confirmation:', err))
       } else if (status === 'SHIPPED' && existingOrder.status !== 'SHIPPED') {
-        // Envoyer un email d'expédition si on passe à SHIPPED
         sendShippingNotificationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email expedition:', err))
       } else if (status === 'DELIVERED' && existingOrder.status !== 'DELIVERED') {
-        // Envoyer un email de livraison si on passe à DELIVERED
         sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email livraison:', err))
       }
@@ -624,7 +598,6 @@ router.patch('/orders/:orderId/status', [
   }
 })
 
-// Statistiques des commandes (admin)
 router.get('/stats/orders', async (_req: Request, res: Response) => {
   try {
     const [
@@ -679,7 +652,6 @@ router.get('/stats/orders', async (_req: Request, res: Response) => {
   }
 })
 
-// ==================== DASHBOARD ====================
 router.get('/dashboard', async (_req: Request, res: Response) => {
   try {
     const [
@@ -721,7 +693,6 @@ router.get('/dashboard', async (_req: Request, res: Response) => {
       })
     ])
 
-    // Récupérer les détails des produits les plus vendus
     const topProductsDetails = await Promise.all(
       topProducts.map(async (item) => {
         const product = await prisma.product.findUnique({
@@ -767,8 +738,6 @@ router.get('/dashboard', async (_req: Request, res: Response) => {
   }
 })
 
-// ==================== PRODUITS (CRUD) ====================
-// Liste des produits (admin)
 router.get('/products', async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 50, search, category } = req.query
@@ -802,7 +771,6 @@ router.get('/products', async (req: Request, res: Response) => {
       prisma.product.count({ where })
     ])
 
-    // Ajouter le count de reviews manuellement
     const productsWithCount = products.map(product => ({
       ...product,
       _count: {
@@ -828,7 +796,6 @@ router.get('/products', async (req: Request, res: Response) => {
   }
 })
 
-// Créer un produit
 router.post('/products', [
   body('name').isString().notEmpty().withMessage('Le nom est obligatoire'),
   body('slug').isString().notEmpty().withMessage('Le slug est obligatoire'),

@@ -36,7 +36,7 @@ Le backend est une **API REST** construite avec **Node.js** et **Express.js**. I
 │   Server    │
 └──────┬──────┘
        │
-       ├──► Prisma ──► SQLite (Base de données)
+       ├──► Prisma ──► PostgreSQL (Base de données)
        ├──► Stripe ──► Paiements
        └──► TCGdx API ──► Données cartes Pokémon
 ```
@@ -50,7 +50,7 @@ Le backend est une **API REST** construite avec **Node.js** et **Express.js**. I
 - **TypeScript** : Typage statique
 - **Express.js** : Framework web
 - **Prisma** : ORM (Object-Relational Mapping)
-- **SQLite** : Base de données
+- **PostgreSQL** : Base de données (production-ready)
 
 ### Sécurité
 - **JWT** : Tokens d'authentification
@@ -134,7 +134,7 @@ Le serveur démarre sur `http://localhost:8080`
 
 ### Schéma Prisma
 
-La base de données utilise **SQLite** avec **Prisma ORM**. Voici les modèles principaux :
+La base de données utilise **PostgreSQL** avec **Prisma ORM**. Voici les modèles principaux :
 
 #### 👤 User (Utilisateur)
 ```prisma
@@ -456,7 +456,7 @@ Toutes les données sont validées avant traitement :
 
 ```
 1. Frontend → GET /api/products/display-pikachu
-   └─► Backend → Prisma → SQLite
+   └─► Backend → Prisma → PostgreSQL
    └─► Retourne les détails du produit avec stock
 
 2. Frontend → POST /api/checkout/create-session
@@ -481,7 +481,7 @@ Toutes les données sont validées avant traitement :
        └─► Crée les OrderItems
 
 5. Frontend → GET /api/users/orders
-   └─► Backend → Prisma → SQLite
+   └─► Backend → Prisma → PostgreSQL
    └─► Retourne les commandes de l'utilisateur
 ```
 
@@ -501,7 +501,7 @@ Le backend utilise un cache en mémoire pour :
 
 ```env
 # Base de données
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://user:password@localhost:5432/boulevardtcg?schema=public"
 
 # JWT
 JWT_SECRET="votre-secret-très-long"

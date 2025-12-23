@@ -10,7 +10,6 @@ import { findShippingMethod } from '../config/shipping.js'
 
 const router = Router()
 
-// Fonction utilitaire pour valider les URLs de redirection
 function createUrlValidator(allowedOrigins: string[]) {
   return (url: string | undefined, defaultUrl: string | undefined): string => {
     if (!url) {
@@ -20,14 +19,11 @@ function createUrlValidator(allowedOrigins: string[]) {
       return defaultUrl
     }
 
-    // En développement, permettre les URLs locales
     if (process.env.NODE_ENV === 'development' && (url.includes('localhost') || url.includes('127.0.0.1'))) {
       return url
     }
 
-    // Valider que l'URL appartient à un domaine autorisé
     try {
-      // Stripe permet {CHECKOUT_SESSION_ID} dans les URLs, donc on le remplace temporairement pour la validation
       const testUrl = url.replace('{CHECKOUT_SESSION_ID}', 'test-session-id')
       const urlObj = new URL(testUrl)
       if (!allowedOrigins.includes(urlObj.origin)) {
@@ -44,7 +40,6 @@ function createUrlValidator(allowedOrigins: string[]) {
   }
 }
 
-// Fonction utilitaire pour créer une commande depuis une session Stripe (pour verify-session)
 async function createOrderFromSession(
   tx: Prisma.TransactionClient,
   session: Stripe.Checkout.Session,
@@ -52,7 +47,6 @@ async function createOrderFromSession(
   sessionId: string,
   userId: string | null
 ) {
-  // Récupérer l'email du formulaire depuis les métadonnées (priorité) ou depuis Stripe
   const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email
   const variantIds = items.map((item) => item.variantId)
   
@@ -161,7 +155,6 @@ async function createOrderFromSession(
   return createdOrder
 }
 
-// Fonction utilitaire pour traiter une session checkout complétée (webhook)
 async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
   const items = parseMetadataItems(session.metadata ?? null)
 
@@ -208,7 +201,6 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
         throw new Error(`Variant introuvable: ${item.variantId}`)
       }
 
-      // Revalider le prix (protection contre la manipulation)
       const currentVariant = await tx.productVariant.findUnique({
         where: { id: variant.id }
       })
@@ -219,7 +211,6 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
 
       const actualPriceCents = currentVariant.priceCents
 
-      // Vérifier le stock et décrémenter de manière atomique
       const updated = await tx.productVariant.updateMany({
         where: {
           id: variant.id,
@@ -292,7 +283,6 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
   })
 }
 
-// Fonction utilitaire pour valider et appliquer un code promo
 async function validateAndApplyPromoCode(
   promoCodeInput: string | undefined,
   totalCents: number
@@ -313,22 +303,18 @@ async function validateAndApplyPromoCode(
     return { promoDiscount, appliedPromoCode }
   }
 
-  // Vérifier la validité temporelle
   if (now < promoCodeRecord.validFrom || now > promoCodeRecord.validUntil) {
     return { promoDiscount, appliedPromoCode }
   }
 
-  // Vérifier le montant minimum
   if (promoCodeRecord.minPurchase && totalCents < promoCodeRecord.minPurchase) {
     return { promoDiscount, appliedPromoCode }
   }
 
-  // Vérifier la limite d'utilisation
   if (promoCodeRecord.usageLimit && promoCodeRecord.usedCount >= promoCodeRecord.usageLimit) {
     return { promoDiscount, appliedPromoCode }
   }
 
-  // Calculer la réduction
   if (promoCodeRecord.type === 'PERCENTAGE') {
     promoDiscount = Math.floor((totalCents * promoCodeRecord.value) / 100)
     if (promoCodeRecord.maxDiscount) {
@@ -339,7 +325,6 @@ async function validateAndApplyPromoCode(
   }
   appliedPromoCode = promoCodeRecord.code
 
-  // Incrémenter le compteur d'utilisation
   await prisma.promoCode.update({
     where: { code: promoCodeRecord.code },
     data: { usedCount: { increment: 1 } }
@@ -413,9 +398,7 @@ router.post('/create-session', [
     .isString()
     .custom((value) => {
       if (!value) return true
-      // Stripe permet {CHECKOUT_SESSION_ID} dans les URLs, donc on valide manuellement
       try {
-        // Remplacer temporairement le placeholder pour valider l'URL de base
         const testUrl = value.replace('{CHECKOUT_SESSION_ID}', 'test-session-id')
         new URL(testUrl)
         return true
@@ -497,7 +480,6 @@ router.post('/create-session', [
       })
     }
     
-    // Vérifier la quantité totale
     const totalQuantity = requestedItems.reduce((sum, item) => sum + item.quantity, 0)
     if (totalQuantity > MAX_TOTAL_QUANTITY) {
       return res.status(400).json({
@@ -506,10 +488,8 @@ router.post('/create-session', [
       })
     }
 
-    // Dédupliquer les variantIds
     const variantIds = [...new Set(requestedItems.map((item) => item.variantId))]
     
-    // Vérifier qu'on n'a pas de doublons (même variantId avec différentes quantités)
     if (variantIds.length !== requestedItems.length) {
       return res.status(400).json({
         error: 'Articles dupliqués détectés',
@@ -566,16 +546,13 @@ router.post('/create-session', [
 
     const stripeClient = ensureStripeConfigured()
 
-    // Validation des URLs de redirection (protection contre Open Redirect)
     const allowedDomainsRaw = process.env.ALLOWED_REDIRECT_DOMAINS?.split(',').map(d => d.trim()) || 
       (process.env.CHECKOUT_SUCCESS_URL ? [process.env.CHECKOUT_SUCCESS_URL] : [])
     
-    // Extraire les origines des domaines autorisés
     const allowedOrigins = allowedDomainsRaw.map(domain => {
       try {
         return new URL(domain).origin
       } catch {
-        // Si ce n'est pas une URL valide, essayer de la traiter comme une origine
         return domain
       }
     })
@@ -585,16 +562,13 @@ router.post('/create-session', [
     const successUrl = validateUrl(req.body.successUrl, process.env.CHECKOUT_SUCCESS_URL)
     const cancelUrl = validateUrl(req.body.cancelUrl, process.env.CHECKOUT_CANCEL_URL)
 
-    // Fonction pour convertir une URL relative en URL absolue et l'encoder
     const toAbsoluteUrl = (relativeUrl: string | null | undefined): string | undefined => {
       if (!relativeUrl) return undefined
       
-      // Si c'est déjà une URL absolue (commence par http:// ou https://), l'encoder et la retourner
       if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
         return encodeURI(relativeUrl)
       }
       
-      // Sinon, construire l'URL absolue à partir de l'origine du frontend
       try {
         // Utiliser l'origine de successUrl ou cancelUrl pour déterminer l'origine du frontend
         const frontendOrigin = successUrl ? new URL(successUrl.replace('{CHECKOUT_SESSION_ID}', 'test')).origin : 

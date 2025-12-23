@@ -3,7 +3,6 @@ import type { Transporter } from 'nodemailer'
 
 let transporter: Transporter | null = null
 
-// Protection CRLF: on refuse tout retour ligne dans les en-têtes.
 const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
 const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value)
 
@@ -21,7 +20,6 @@ function getTransporter(): Transporter {
       const smtpUser = process.env.SMTP_USER
       const smtpPass = process.env.SMTP_PASS
 
-      // Log de diagnostic (sans exposer le mot de passe complet)
       if (process.env.NODE_ENV === 'development') {
         console.log('Email: Configuration SMTP')
         console.log(`  Host: ${smtpHost}`)
@@ -33,7 +31,6 @@ function getTransporter(): Transporter {
       if (!smtpUser || !smtpPass) {
         console.warn('⚠️ SMTP_USER ou SMTP_PASS non défini. Les emails seront simulés (pas envoyés réellement).')
         console.warn('   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env')
-        // Mode développement sans SMTP
         transporter = nodemailer.createTransport({
           streamTransport: true,
           newline: 'unix'
@@ -265,7 +262,6 @@ function getCarrierDisplayName(carrier?: string | null): string {
   return carrierMap[carrier] || carrier
 }
 
-// Template: Notification d'expédition
 function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: string): string {
   const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`
   const carrierName = getCarrierDisplayName(order.carrier)
@@ -364,7 +360,6 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
 `
 }
 
-// Template: Commande livrée
 function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
   const trackingCtaUrl = order.orderTrackingUrl || `${SHOP_URL}/commandes`
   return `

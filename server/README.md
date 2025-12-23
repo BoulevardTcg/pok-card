@@ -6,7 +6,7 @@ Ce backend fournit une API complète pour l'authentification, la gestion des uti
 
 - **Node.js** avec **TypeScript**
 - **Express.js** pour l'API REST
-- **Prisma** comme ORM avec **SQLite**
+- **Prisma** comme ORM avec **PostgreSQL** (production-ready)
 - **JWT** pour l'authentification
 - **bcryptjs** pour le hashage des mots de passe
 - **express-validator** pour la validation des données
@@ -15,6 +15,7 @@ Ce backend fournit une API complète pour l'authentification, la gestion des uti
 
 - Node.js 18+ 
 - npm ou yarn
+- **PostgreSQL 14+**
 
 ## 🚀 Installation et démarrage
 
@@ -25,10 +26,15 @@ npm install
 
 ### 2. Configuration de l'environnement
 Le fichier `.env` est déjà configuré avec :
-- Base de données SQLite
+- Base de données **PostgreSQL** (voir `env.example` pour le format)
 - Clés JWT (à changer en production)
 - Port 8080
 - CORS configuré pour localhost:5173
+
+**⚠️ Important:** Configurez `DATABASE_URL` avec votre connexion PostgreSQL:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/boulevardtcg?schema=public"
+```
 - Variables Stripe :
   - `STRIPE_SECRET_KEY` : clé secrète Stripe
   - `STRIPE_WEBHOOK_SECRET` : secret du webhook Checkout
@@ -37,16 +43,34 @@ Le fichier `.env` est déjà configuré avec :
   - (Optionnel) `STRIPE_API_VERSION` pour verrouiller la version de l'API Stripe
 
 ### 3. Initialiser la base de données
+
+**Prérequis:** PostgreSQL doit être installé et en cours d'exécution.
+
 ```bash
-# Générer le client Prisma
+# ⚠️ IMPORTANT : Générer le client Prisma (OBLIGATOIRE avant d'utiliser Prisma)
 npx prisma generate
 
-# Créer et synchroniser la base de données
+# Créer les migrations PostgreSQL
+npx prisma migrate dev --name init
+
+# Ou pour synchroniser directement (développement uniquement)
 npx prisma db push
 
 # Exécuter le script de seed (optionnel)
+npm run seed
+# ou
 npx tsx prisma/seed.ts
 ```
+
+**Pour la production:**
+```bash
+npx prisma migrate deploy
+```
+
+
+**⚠️ Note importante** : Si vous obtenez l'erreur `Cannot find module '@prisma/client'`, cela signifie que :
+1. Les dépendances ne sont pas installées → exécutez `npm install`
+2. Le client Prisma n'est pas généré → exécutez `npx prisma generate`
 
 ### 4. Démarrer le serveur
 ```bash
