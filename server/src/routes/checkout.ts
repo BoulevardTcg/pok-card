@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express'
 import { body, validationResult } from 'express-validator'
-import { PrismaClient, OrderStatus, Prisma, FulfillmentStatus, OrderEventType, Carrier } from '@prisma/client'
+import { OrderStatus, Prisma, FulfillmentStatus, OrderEventType, Carrier } from '@prisma/client'
+import prisma from '../lib/prisma.js'
 import Stripe from 'stripe'
 import { ensureStripeConfigured } from '../config/stripe.js'
 import { optionalAuth } from '../middleware/auth.js'
@@ -8,7 +9,6 @@ import { sendOrderConfirmationEmail } from '../services/email.js'
 import { findShippingMethod } from '../config/shipping.js'
 
 const router = Router()
-const prisma = new PrismaClient()
 
 // Fonction utilitaire pour valider les URLs de redirection
 function createUrlValidator(allowedOrigins: string[]) {
@@ -52,6 +52,8 @@ async function createOrderFromSession(
   sessionId: string,
   userId: string | null
 ) {
+  // Récupérer l'email du formulaire depuis les métadonnées (priorité) ou depuis Stripe
+  const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email
   const variantIds = items.map((item) => item.variantId)
   
   const variants = await tx.productVariant.findMany({
@@ -130,7 +132,14 @@ async function createOrderFromSession(
       shippingMethod: shippingMethodCode ?? undefined,
       shippingCost: shippingPriceCents || undefined,
       carrier: shippingCarrier ?? undefined,
-      billingAddress: buildBillingAddress(session.customer_details),
+      billingAddress: (() => {
+        const billing = buildBillingAddress(session.customer_details) as any
+        // Forcer l'email du formulaire si disponible dans les métadonnées
+        if (customerEmailFromForm && billing) {
+          billing.email = customerEmailFromForm
+        }
+        return billing
+      })(),
       shippingAddress: buildShippingAddress(session.shipping_details),
       events: {
         create: [
@@ -255,7 +264,14 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
         totalCents,
         currency,
         paymentMethod,
-        billingAddress: buildBillingAddress(session.customer_details),
+        billingAddress: (() => {
+        const billing = buildBillingAddress(session.customer_details) as any
+        // Forcer l'email du formulaire si disponible dans les métadonnées
+        if (customerEmailFromForm && billing) {
+          billing.email = customerEmailFromForm
+        }
+        return billing
+      })(),
         shippingAddress: buildShippingAddress(session.shipping_details),
         events: {
           create: [
@@ -685,7 +701,9 @@ router.post('/create-session', [
       shippingPostalCode: shipping.postalCode,
       shippingCity: shipping.city,
       shippingCountry: shipping.country,
-      ...(shipping.phone ? { shippingPhone: shipping.phone } : {})
+      ...(shipping.phone ? { shippingPhone: shipping.phone } : {}),
+      // Stocker l'email du formulaire pour l'utiliser dans l'email de confirmation
+      ...(req.body.customerEmail ? { customerEmail: req.body.customerEmail } : {})
     }
 
     // Ajouter le userId si l'utilisateur est connecté
@@ -764,7 +782,10 @@ router.post('/create-session', [
       url: session.url
     })
   } catch (error: any) {
-    console.error('Erreur lors de la création de la session Stripe:', error)
+    console.error('❌ Erreur lors de la création de la session Stripe:', error)
+    console.error('Stack trace:', error.stack)
+    console.error('Error code:', error.code)
+    console.error('Error message:', error.message)
 
     // Ne pas exposer les détails d'erreur en production
     const isDevelopment = process.env.NODE_ENV === 'development'
@@ -784,10 +805,24 @@ router.post('/create-session', [
       })
     }
 
+    // Gérer les erreurs Prisma/PostgreSQL
+    if (error.code === 'P2002' || error.code?.startsWith('P')) {
+      console.error('Erreur Prisma:', error.code, error.meta)
+      return res.status(500).json({
+        error: 'Erreur de base de données',
+        code: 'DATABASE_ERROR',
+        ...(isDevelopment && { details: error.message, prismaCode: error.code })
+      })
+    }
+
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
-      ...(isDevelopment && { details: error.message })
+      ...(isDevelopment && { 
+        details: error.message,
+        stack: error.stack,
+        code: error.code
+      })
     })
   }
 })
@@ -870,7 +905,10 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
     console.log(`✅ Commande créée: ${order.orderNumber} pour le user ${order.userId || 'anonyme'}`)
 
     // Envoyer l'email de confirmation
-    const customerEmail = session.customer_details?.email
+    // Priorité : email du formulaire (métadonnées) > email Stripe > email utilisateur connecté
+    const customerEmail = session.metadata?.customerEmail || 
+                         session.customer_details?.email || 
+                         req.user?.email
     if (customerEmail) {
       // Récupérer la commande complète avec les items pour l'email
       const orderWithItems = await prisma.order.findUnique({

@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: boulevardtcg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-boulevardtcg}
+      POSTGRES_USER: ${POSTGRES_USER:-boulevardtcg_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-boulevardtcg_user} -d ${POSTGRES_DB:-boulevardtcg}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boulevardtcg-network
+    # Sécurité: limiter les ressources
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # PgBouncer pour connection pooling (optionnel, recommandé pour production)
+  pgbouncer:
+    image: pgbouncer/pgbouncer:latest
+    container_name: boulevardtcg-pgbouncer
+    restart: unless-stopped
+    environment:
+      DATABASES_HOST: postgres
+      DATABASES_PORT: 5432
+      DATABASES_USER: ${POSTGRES_USER:-boulevardtcg_user}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      DATABASES_DBNAME: ${POSTGRES_DB:-boulevardtcg}
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 25
+    ports:
+      - "${PGBOUNCER_PORT:-6432}:6432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - boulevardtcg-network
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  boulevardtcg-network:
+    driver: bridge
+
+

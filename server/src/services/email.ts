@@ -16,15 +16,39 @@ function getTransporter(): Transporter {
         newline: 'unix'
       })
     } else {
-      transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS
-        }
-      })
+      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com'
+      const smtpPort = parseInt(process.env.SMTP_PORT || '587')
+      const smtpUser = process.env.SMTP_USER
+      const smtpPass = process.env.SMTP_PASS
+
+      // Log de diagnostic (sans exposer le mot de passe complet)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Email: Configuration SMTP')
+        console.log(`  Host: ${smtpHost}`)
+        console.log(`  Port: ${smtpPort}`)
+        console.log(`  User: ${smtpUser ? smtpUser.substring(0, 3) + '***' : 'NON DÉFINI'}`)
+        console.log(`  Pass: ${smtpPass ? (smtpPass.length > 0 ? '***' + smtpPass.substring(smtpPass.length - 2) : 'VIDE') : 'NON DÉFINI'}`)
+      }
+
+      if (!smtpUser || !smtpPass) {
+        console.warn('⚠️ SMTP_USER ou SMTP_PASS non défini. Les emails seront simulés (pas envoyés réellement).')
+        console.warn('   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env')
+        // Mode développement sans SMTP
+        transporter = nodemailer.createTransport({
+          streamTransport: true,
+          newline: 'unix'
+        })
+      } else {
+        transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: {
+            user: smtpUser,
+            pass: smtpPass
+          }
+        })
+      }
     }
   }
   return transporter
@@ -42,7 +66,7 @@ const emailStyles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5; }
   .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
   .header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 30px; text-align: center; }
-  .header h1 { margin: 0; font-size: 24px; }
+  .header h1 { margin: 0; font-size: 24px; color: #000000; }
   .header img { max-width: 150px; margin-bottom: 15px; }
   .content { padding: 30px; }
   .order-number { background-color: #f0f9ff; border-radius: 8px; padding: 15px; text-align: center; margin: 20px 0; }
@@ -97,6 +121,7 @@ interface OrderDataForEmail {
   trackingNumber?: string
   trackingUrl?: string
   orderTrackingUrl?: string
+  carrier?: string
 }
 
 function formatPrice(cents: number): string {
@@ -153,7 +178,7 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎉 Merci pour votre commande !</h1>
+      <h1 style="color: #000000;">🎉 Merci pour votre commande !</h1>
     </div>
     
     <div class="content">
@@ -225,9 +250,25 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
 `
 }
 
+// Fonction pour obtenir le nom lisible du transporteur
+function getCarrierDisplayName(carrier?: string | null): string {
+  if (!carrier) return 'Transporteur'
+  const carrierMap: Record<string, string> = {
+    'COLISSIMO': 'Colissimo (La Poste)',
+    'CHRONOPOST': 'Chronopost',
+    'MONDIAL_RELAY': 'Mondial Relay',
+    'UPS': 'UPS',
+    'DHL': 'DHL',
+    'FEDEX': 'FedEx',
+    'OTHER': 'Transporteur'
+  }
+  return carrierMap[carrier] || carrier
+}
+
 // Template: Notification d'expédition
 function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: string): string {
   const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`
+  const carrierName = getCarrierDisplayName(order.carrier)
 
   return `
 <!DOCTYPE html>
@@ -240,54 +281,73 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>📦 Votre commande est en route !</h1>
+    <div class="header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+      <h1 style="color: #000000;">📦 Votre colis a été expédié !</h1>
     </div>
     
     <div class="content">
-      <p>Bonjour${order.billingAddress?.name ? ` ${order.billingAddress.name}` : ''},</p>
+      <p style="font-size: 16px; line-height: 1.6;">Bonjour${order.billingAddress?.name ? ` ${order.billingAddress.name}` : ''},</p>
       
-      <p>Bonne nouvelle ! Votre commande <strong>${order.orderNumber}</strong> a ete expediee et est en route vers vous.</p>
+      <p style="font-size: 16px; line-height: 1.6;">Nous avons le plaisir de vous informer que votre commande <strong style="color: #1f2937;">${order.orderNumber}</strong> a été expédiée et est en route vers vous.</p>
       
       ${order.trackingNumber ? `
-      <div class="tracking-box">
-        <h3 style="margin: 0 0 10px 0; color: #92400e;">📍 Suivi de votre colis</h3>
-        <p style="margin: 0;"><strong>Numero de suivi:</strong> ${order.trackingNumber}</p>
+      <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+        <h2 style="margin: 0 0 15px 0; color: #92400e; font-size: 20px;">📍 Informations de suivi</h2>
+        <div style="background: white; border-radius: 8px; padding: 20px; margin: 15px 0;">
+          <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">Transporteur</p>
+          <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #1f2937;">${carrierName}</p>
+          <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">Numéro de suivi</p>
+          <p style="margin: 0; font-size: 24px; font-weight: bold; color: #f59e0b; letter-spacing: 1px; font-family: 'Courier New', monospace;">${order.trackingNumber}</p>
+        </div>
         ${order.trackingUrl ? `
-        <p style="margin: 10px 0 0 0;">
-          <a href="${order.trackingUrl}" class="btn" style="background: #f59e0b;">Suivre mon colis</a>
+        <a href="${order.trackingUrl}" class="btn" style="background: #f59e0b; color: white; padding: 14px 28px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block; margin-top: 15px;">
+          🔍 Suivre mon colis en temps réel
+        </a>
+        ` : ''}
+        ${order.orderTrackingUrl ? `
+        <p style="margin: 15px 0 0 0;">
+          <a href="${order.orderTrackingUrl}" style="color: #92400e; text-decoration: underline;">Ou suivre depuis votre espace client</a>
         </p>
         ` : ''}
       </div>
       ` : `
-      <div class="tracking-box">
-        <p style="margin: 0;">Le numero de suivi sera disponible sous peu.</p>
+      <div class="tracking-box" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center;">
+        <p style="margin: 0; color: #92400e; font-size: 16px;">Le numéro de suivi sera disponible sous peu. Vous recevrez un email dès qu'il sera prêt.</p>
       </div>
       `}
       
-      <h3 style="color: #1f2937;">Contenu de votre colis</h3>
-      
-      ${generateItemsTable(order.items)}
+      <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+        <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 18px;">📋 Contenu de votre colis</h3>
+        ${generateItemsTable(order.items)}
+      </div>
       
       ${order.shippingAddress ? `
-      <h3 style="color: #1f2937; margin-top: 30px;">Adresse de livraison</h3>
-      <div class="address-box">
-        ${order.shippingAddress.name ? `<strong>${order.shippingAddress.name}</strong><br>` : ''}
-        ${order.shippingAddress.address?.line1 || ''}<br>
-        ${order.shippingAddress.address?.line2 ? `${order.shippingAddress.address.line2}<br>` : ''}
-        ${order.shippingAddress.address?.postal_code || ''} ${order.shippingAddress.address?.city || ''}<br>
-        ${order.shippingAddress.address?.country || ''}
+      <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+        <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">📍 Adresse de livraison</h3>
+        <div class="address-box" style="background: #f9fafb; padding: 15px; border-radius: 8px;">
+          ${order.shippingAddress.name ? `<strong style="font-size: 16px;">${order.shippingAddress.name}</strong><br>` : ''}
+          ${order.shippingAddress.address?.line1 || ''}<br>
+          ${order.shippingAddress.address?.line2 ? `${order.shippingAddress.address.line2}<br>` : ''}
+          ${order.shippingAddress.address?.postal_code || ''} ${order.shippingAddress.address?.city || ''}<br>
+          ${order.shippingAddress.address?.country || ''}
+        </div>
       </div>
       ` : ''}
       
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${trackingCtaUrl}" class="btn">Suivre ma commande</a>
+      <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 8px;">
+        <p style="margin: 0; color: #1e40af; font-size: 15px; line-height: 1.6;">
+          <strong>⏱️ Délai de livraison estimé :</strong> 2 à 5 jours ouvrables<br>
+          <strong>📧 Notification :</strong> Vous recevrez un email automatique une fois votre colis livré.
+        </p>
       </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        La livraison est generalement effectuee sous 2 a 5 jours ouvrables.<br>
-        Vous recevrez un email une fois votre colis livre.
-      </p>
+      ${order.trackingNumber && order.trackingUrl ? `
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${order.trackingUrl}" class="btn" style="background: #f59e0b; color: white; padding: 14px 28px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block;">
+          🔍 Suivre mon colis
+        </a>
+      </div>
+      ` : ''}
     </div>
     
     <div class="footer">
@@ -319,7 +379,7 @@ function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: s
 <body>
   <div class="container">
     <div class="header">
-      <h1>✅ Commande livree !</h1>
+      <h1 style="color: #000000;">✅ Commande livree !</h1>
     </div>
     
     <div class="content">
@@ -368,10 +428,20 @@ export async function sendOrderConfirmationEmail(order: OrderDataForEmail, custo
       html
     })
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Email: confirmation envoyée (${order.orderNumber})`)
+    // Vérifier si l'email a vraiment été envoyé ou juste simulé
+    const isStreamTransport = !info.messageId && !info.response
+    if (isStreamTransport) {
+      console.log(`⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`)
+      console.log(`   Destinataire: ${customerEmail}`)
+      console.log(`   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env`)
     } else {
-      console.log('Email: confirmation envoyée', { messageId: info.messageId })
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ Email: confirmation envoyée (${order.orderNumber})`)
+        console.log(`   MessageId: ${info.messageId || 'N/A'}`)
+        console.log(`   Destinataire: ${customerEmail}`)
+      } else {
+        console.log('Email: confirmation envoyée', { messageId: info.messageId })
+      }
     }
 
     return true
@@ -393,10 +463,19 @@ export async function sendShippingNotificationEmail(order: OrderDataForEmail, cu
       html
     })
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Email: expédition envoyée (${order.orderNumber})`)
+    // Vérifier si l'email a vraiment été envoyé ou juste simulé
+    const isStreamTransport = !info.messageId && !info.response
+    if (isStreamTransport) {
+      console.log(`⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`)
+      console.log(`   Destinataire: ${customerEmail}`)
     } else {
-      console.log('Email: expédition envoyée', { messageId: info.messageId })
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ Email: notification expédition envoyée (${order.orderNumber})`)
+        console.log(`   MessageId: ${info.messageId || 'N/A'}`)
+        console.log(`   Destinataire: ${customerEmail}`)
+      } else {
+        console.log('Email: notification expédition envoyée', { messageId: info.messageId })
+      }
     }
 
     return true
@@ -458,7 +537,7 @@ function contactEmailTemplate(payload: ContactPayload): string {
 <body>
   <div class="container">
     <div class="header">
-      <h1>📨 Nouveau message de contact</h1>
+      <h1 style="color: #000000;">📨 Nouveau message de contact</h1>
     </div>
     <div class="content">
       <div class="address-box">

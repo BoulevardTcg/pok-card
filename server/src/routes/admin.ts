@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { body, validationResult } from 'express-validator'
-import { PrismaClient, OrderStatus, Carrier, FulfillmentStatus, OrderEventType } from '@prisma/client'
+import { OrderStatus, Carrier, FulfillmentStatus, OrderEventType } from '@prisma/client'
+import prisma from '../lib/prisma.js'
 import { authenticateToken, requireAdmin } from '../middleware/auth.js'
 import multer from 'multer'
 import path from 'path'
@@ -9,7 +10,6 @@ import { sendShippingNotificationEmail, sendDeliveryConfirmationEmail, sendOrder
 import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js'
 
 const router = Router()
-const prisma = new PrismaClient()
 
 const carrierWhitelist = Object.values(Carrier)
 
@@ -310,10 +310,21 @@ router.post('/orders/:orderId/ship', [
         user: {
           select: { id: true, email: true, username: true, firstName: true, lastName: true }
         }
-      }
+      },
+      // billingAddress et shippingAddress sont des champs JSON, pas des relations
+      // Ils sont automatiquement inclus dans la réponse
     })
 
-    const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
+    const billingEmail = (updatedOrder.billingAddress as any)?.email
+    const userEmail = updatedOrder.user?.email
+    const customerEmail = billingEmail || userEmail
+    
+    // Log pour diagnostic
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Email expédition - Billing: ${billingEmail || 'N/A'}, User: ${userEmail || 'N/A'}, Utilisé: ${customerEmail || 'N/A'}`)
+    }
+    
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     if (customerEmail) {
       const orderDataForEmail = {
@@ -332,7 +343,8 @@ router.post('/orders/:orderId/ship', [
         billingAddress: updatedOrder.billingAddress as any,
         trackingNumber: updatedOrder.trackingNumber ?? undefined,
         trackingUrl: updatedOrder.trackingUrl ?? undefined,
-        orderTrackingUrl: orderTrackingUrl ?? undefined
+        orderTrackingUrl: orderTrackingUrl ?? undefined,
+        carrier: updatedOrder.carrier ?? undefined
       }
 
       sendShippingNotificationEmail(orderDataForEmail, customerEmail)
@@ -414,7 +426,8 @@ router.post('/orders/:orderId/deliver', [
       }
     })
 
-    const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
+    const customerEmail = (updatedOrder.billingAddress as any)?.email || updatedOrder.user?.email
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     const sendDeliveredEmail = process.env.SEND_DELIVERED_EMAIL !== 'false'
     if (customerEmail && sendDeliveredEmail) {
@@ -434,7 +447,8 @@ router.post('/orders/:orderId/deliver', [
         billingAddress: updatedOrder.billingAddress as any,
         trackingNumber: updatedOrder.trackingNumber ?? undefined,
         trackingUrl: updatedOrder.trackingUrl ?? undefined,
-        orderTrackingUrl: orderTrackingUrl ?? undefined
+        orderTrackingUrl: orderTrackingUrl ?? undefined,
+        carrier: updatedOrder.carrier ?? undefined
       }
 
       sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail)
@@ -556,7 +570,8 @@ router.patch('/orders/:orderId/status', [
       await addOrderEvent(orderId, OrderEventType.DELIVERED, 'Commande livrée', req.user?.userId)
     }
 
-    const customerEmail = updatedOrder.user?.email || (updatedOrder.billingAddress as any)?.email
+    // Priorité : email du formulaire (billingAddress) > email utilisateur connecté
+    const customerEmail = (updatedOrder.billingAddress as any)?.email || updatedOrder.user?.email
     const orderTrackingUrl = buildOrderTrackingLink(updatedOrder.id, customerEmail)
     
     if (customerEmail) {
@@ -576,7 +591,8 @@ router.patch('/orders/:orderId/status', [
         billingAddress: updatedOrder.billingAddress as any,
         trackingNumber: updatedOrder.trackingNumber ?? undefined,
         trackingUrl: updatedOrder.trackingUrl ?? undefined,
-        orderTrackingUrl: orderTrackingUrl ?? undefined
+        orderTrackingUrl: orderTrackingUrl ?? undefined,
+        carrier: updatedOrder.carrier ?? undefined
       }
 
       // Envoyer l'email approprié selon le nouveau statut

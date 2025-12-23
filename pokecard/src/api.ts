@@ -2,25 +2,31 @@ export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/a
 
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: customHeaders, ...restInit } = init || {}
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...restInit,
-    headers: { 
-      'Content-Type': 'application/json', 
-      ...(customHeaders || {}) 
-    },
-  })
-  if (!res.ok) {
-    let errorMessage = `HTTP ${res.status}`
-    try {
-      const errorData = await res.json()
-      errorMessage = errorData.error || errorData.message || errorMessage
-    } catch {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...restInit,
+      headers: { 
+        'Content-Type': 'application/json', 
+        ...(customHeaders || {}) 
+      },
+    })
+    if (!res.ok) {
+      let errorMessage = `HTTP ${res.status}`
+      try {
+        const errorData = await res.json()
+        errorMessage = errorData.error || errorData.message || errorMessage
+      } catch {
+        // Ignorer les erreurs de parsing JSON
+      }
+      const error = new Error(errorMessage)
+      ;(error as any).status = res.status
+      throw error
     }
-    const error = new Error(errorMessage)
-    ;(error as any).status = res.status
+    return res.json()
+  } catch (error) {
+    // Ré-émettre l'erreur pour qu'elle soit gérée par le code appelant
     throw error
   }
-  return res.json()
 }
 
 export type CheckoutItem = { variantId: string; quantity: number }

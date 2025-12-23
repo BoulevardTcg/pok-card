@@ -35,7 +35,7 @@ export function validateEnvOrThrow() {
     { key: 'SMTP_USER', requiredInProd: true },
     { key: 'SMTP_PASS', requiredInProd: true },
 
-    { key: 'SHOP_EMAIL', requiredInProd: true, pattern: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ },
+    { key: 'SHOP_EMAIL', requiredInProd: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
     { key: 'FRONTEND_URL', requiredInProd: true },
   ]
 
