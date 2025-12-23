@@ -54,10 +54,10 @@ export function ProductsPage() {
     return filteredProducts.slice(startIndex, endIndex);
   }, [filteredProducts, page, productsPerPage]);
 
-  // Charger les produits
+  // Charger les produits quand la catégorie change
   useEffect(() => {
     loadAllProducts();
-  }, []);
+  }, [selectedCategory]);
 
   // Réinitialiser la page quand les filtres changent
   useEffect(() => {
@@ -75,10 +75,13 @@ export function ProductsPage() {
       // Filtrer pour exclure les produits de la catégorie "Accessoires"
       let filteredProducts = response.products.filter(p => p.category !== 'Accessoires');
       
-      // Mélanger les produits
-      const shuffledProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
+      // Si une catégorie spécifique est sélectionnée, ne pas mélanger pour garder l'ordre
+      if (selectedCategory === 'Toutes') {
+        // Mélanger les produits seulement si toutes les catégories sont affichées
+        filteredProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
+      }
       
-      setAllProducts(shuffledProducts);
+      setAllProducts(filteredProducts);
     } catch (error) {
       console.error('Erreur lors du chargement des produits:', error);
       setAllProducts([]);
@@ -112,13 +115,17 @@ export function ProductsPage() {
           {/* Sidebar filtres */}
           <aside className={styles.sidebar}>
             <FilterSidebar
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              selectedPriceRange={selectedPriceRange}
-              onPriceRangeChange={setSelectedPriceRange}
-              selectedCondition={selectedCondition}
-              onConditionChange={setSelectedCondition}
-              onReset={handleReset}
+              filters={{
+                category: selectedCategory,
+                priceRange: selectedPriceRange,
+                condition: selectedCondition,
+              }}
+              callbacks={{
+                onCategoryChange: setSelectedCategory,
+                onPriceRangeChange: setSelectedPriceRange,
+                onConditionChange: setSelectedCondition,
+                onReset: handleReset,
+              }}
             />
           </aside>
 

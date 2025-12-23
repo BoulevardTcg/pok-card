@@ -5,6 +5,24 @@ Application e-commerce complète (frontend + backend) pour vendre des produits T
 - **Frontend** : catalogue, fiche produit, panier/checkout Stripe, compte client, suivi de commande, page contact.
 - **Backend** : API Express (auth, produits, commandes, admin, checkout Stripe, emails SMTP, contact).
 
+## 💼 Présentation Commerciale
+
+**BoulevardTCG** est une solution e-commerce complète et production-ready, développée avec les technologies modernes (React 19, Node.js, TypeScript). Le projet représente **300-500 heures de développement** et une valeur estimée de **15 000€ - 40 000€**.
+
+### Points Forts
+
+- ✅ **Application complète** : frontend React + backend Express avec toutes les fonctionnalités essentielles
+- ✅ **Code professionnel** : TypeScript, architecture modulaire, tests inclus
+- ✅ **Sécurité robuste** : authentification JWT, 2FA, rate limiting, validation stricte
+- ✅ **Prêt pour production** : Docker configuré, documentation complète
+- ✅ **E-commerce complet** : produits, panier, paiement Stripe, gestion commandes, panel admin
+- ✅ **Fonctionnalités TCG** : échanges, collection personnelle, concours
+
+📄 Pour plus de détails commerciaux, consultez [PRESENTATION_COMMERCIALE.md](./pokecard/PRESENTATION_COMMERCIALE.md)  
+📋 Liste complète des fonctionnalités : [FEATURES.md](./pokecard/FEATURES.md)
+
+---
+
 ## Présentation du projet
 
 L’objectif de ce repo est de fournir une base **e-commerce réaliste** pour une boutique TCG, avec un périmètre complet :
@@ -51,20 +69,33 @@ Le projet est volontairement pragmatique : une API REST Express + Prisma, et un 
 
 ## Fonctionnalités principales
 
-### Côté client
+### 🛍️ Côté client
 
-- Catalogue produits + recherche
-- Fiche produit (variants/stock)
-- Panier
-- Checkout Stripe
-- Détail commande + **suivi colis** (transporteur, numéro, lien de tracking quand expédiée)
-- Page **Contact** (`/contact`) avec envoi via API
+- ✅ Catalogue produits avec recherche, filtres et pagination
+- ✅ Fiche produit détaillée avec variantes (langue, édition)
+- ✅ Panier avec gestion des quantités
+- ✅ Checkout Stripe intégré et sécurisé
+- ✅ Espace client avec historique des commandes
+- ✅ Détail commande + **suivi colis** (transporteur, numéro, lien de tracking)
+- ✅ Page **Contact** (`/contact`) avec protection anti-spam
+- ✅ Collection personnelle de cartes
+- ✅ Système d'échange entre collectionneurs
+- ✅ Authentification JWT avec 2FA
 
-### Côté admin
+### 🔐 Côté admin
 
-- Liste/gestion des commandes
-- Affichage des adresses de livraison
-- Marquer une commande **expédiée** / **livrée** + transporteur / numéro de suivi
+- ✅ Dashboard avec statistiques et métriques
+- ✅ Gestion complète des produits (CRUD)
+- ✅ Gestion du stock avec alertes visuelles
+- ✅ Liste/gestion des commandes avec filtres
+- ✅ Affichage des adresses de livraison
+- ✅ Marquer une commande **expédiée** / **livrée** + transporteur / numéro de suivi
+- ✅ Gestion des utilisateurs
+- ✅ Codes promo avec règles avancées
+- ✅ Modération des avis clients
+- ✅ Rapports et statistiques
+
+> 📋 **Liste complète** : Voir [FEATURES.md](./pokecard/FEATURES.md) pour toutes les fonctionnalités détaillées
 
 ## Démarrage rapide (dev)
 
@@ -186,7 +217,13 @@ npx --prefix pokecard/server prisma db push
 
 ---
 
-## Docs complémentaires
+## 📚 Documentation Complémentaire
 
+### Documentation Technique
 - Backend: `pokecard/server/README.md`
 - Contact flow: `pokecard/server/CONTACT_FLOW.md`
+- Intégration Stripe: `pokecard/STRIPE_INTEGRATION.md`
+
+### Documentation Commerciale
+- **Présentation commerciale** : [PRESENTATION_COMMERCIALE.md](./pokecard/PRESENTATION_COMMERCIALE.md)
+- **Liste des fonctionnalités** : [FEATURES.md](./pokecard/FEATURES.md)

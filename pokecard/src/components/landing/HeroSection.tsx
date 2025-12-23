@@ -3,29 +3,30 @@ import { useEffect, useState, useRef } from 'react';
 import { ArrowRightIcon } from '../icons/Icons';
 import styles from './HeroSection.module.css';
 
-// Cartes en rotation — représentant différents univers
-const HERO_CARDS = [
+// Produits scellés en rotation — représentant différents univers
+// Les images de cartes 3D sont utilisées pour l'effet visuel
+const HERO_PRODUCTS = [
   {
     id: 1,
-    name: 'Dracaufeu ex',
-    subtitle: 'Special Art Rare',
-    set: 'Écarlate et Violet',
+    name: 'ETB Flammes Fantasmagoriques',
+    subtitle: 'Coffret Dresseur d\'Élite',
+    set: 'ME02',
     universe: 'Pokémon',
     image: '/carte_accueil/card01.png',
   },
   {
     id: 2,
-    name: 'Luffy Gear 5',
-    subtitle: 'Leader Card',
-    set: 'OP-05',
+    name: 'Display One Piece OP13',
+    subtitle: 'Display 24 boosters',
+    set: 'OP13',
     universe: 'One Piece',
     image: '/carte_accueil/card02.png',
   },
   {
     id: 3,
-    name: 'Pikachu VMAX',
-    subtitle: 'Rainbow Rare',
-    set: 'Voltage Éclatant',
+    name: 'UPC Flammes Fantasmagoriques',
+    subtitle: 'Ultra Premium Collection',
+    set: 'ME02',
     universe: 'Pokémon',
     image: '/carte_accueil/card03.png',
   },
@@ -33,20 +34,20 @@ const HERO_CARDS = [
 
 export default function HeroSection() {
   const navigate = useNavigate();
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const productRef = useRef<HTMLDivElement>(null);
 
-  const currentCard = HERO_CARDS[currentCardIndex];
+  const currentProduct = HERO_PRODUCTS[currentProductIndex];
 
-  // Rotation automatique des cartes
+  // Rotation automatique des produits
   useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentCardIndex((prev) => (prev + 1) % HERO_CARDS.length);
+        setCurrentProductIndex((prev) => (prev + 1) % HERO_PRODUCTS.length);
         setIsTransitioning(false);
       }, 300);
     }, 5000);
@@ -54,14 +55,14 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // Effet de parallaxe subtil sur la carte — seulement quand la souris est au-dessus
+  // Effet de parallaxe subtil sur le produit — seulement quand la souris est au-dessus
   useEffect(() => {
     if (!isHovering) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!cardRef.current) return;
+      if (!productRef.current) return;
       
-      const rect = cardRef.current.getBoundingClientRect();
+      const rect = productRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       
@@ -75,7 +76,7 @@ export default function HeroSection() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isHovering]);
 
-  // Réinitialiser la position quand la souris quitte la carte
+  // Réinitialiser la position quand la souris quitte le produit
   const handleMouseLeave = () => {
     setIsHovering(false);
     setMousePosition({ x: 0, y: 0 });
@@ -94,19 +95,19 @@ export default function HeroSection() {
         <div className={styles.heroContent}>
           <div className={styles.universeBadge}>
             <span className={styles.universeDot} />
-            <span>{currentCard.universe}</span>
+            <span>{currentProduct.universe}</span>
           </div>
           
           <h1 className={styles.title}>
+            <span className={styles.titleMain}>Découvrez.</span>
             <span className={styles.titleMain}>Collectionnez.</span>
-            <span className={styles.titleMain}>Investissez.</span>
             <span className={styles.titleAccent}>Vivez votre passion.</span>
           </h1>
 
           <p className={styles.description}>
-            Que vous cherchiez la carte rare qui manque à votre collection, 
-            un booster à ouvrir pour le frisson de la découverte, ou un investissement 
-            sûr pour l'avenir — Boulevard réunit tous les passionnés de TCG.
+            Boosters, displays, coffrets ETB et collections premium — 
+            Boulevard vous propose une sélection soignée de produits scellés 
+            pour tous les passionnés de TCG.
           </p>
 
           <div className={styles.heroActions}>
@@ -117,29 +118,22 @@ export default function HeroSection() {
               <span>Explorer la boutique</span>
               <ArrowRightIcon size={18} />
             </button>
-            
-            <button
-              onClick={() => navigate('/trade')}
-              className={styles.secondaryCta}
-            >
-              Parcourir les cartes
-            </button>
           </div>
 
-          {/* Card indicators */}
+          {/* Product indicators */}
           <div className={styles.cardIndicators}>
-            {HERO_CARDS.map((card, index) => (
+            {HERO_PRODUCTS.map((product, index) => (
               <button
-                key={card.id}
-                className={`${styles.indicator} ${index === currentCardIndex ? styles.active : ''}`}
+                key={product.id}
+                className={`${styles.indicator} ${index === currentProductIndex ? styles.active : ''}`}
                 onClick={() => {
                   setIsTransitioning(true);
                   setTimeout(() => {
-                    setCurrentCardIndex(index);
+                    setCurrentProductIndex(index);
                     setIsTransitioning(false);
                   }, 300);
                 }}
-                aria-label={`Voir ${card.name}`}
+                aria-label={`Voir ${product.name}`}
               >
                 <span className={styles.indicatorProgress} />
               </button>
@@ -147,10 +141,10 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Carte en vedette */}
+        {/* Produit en vedette */}
         <div className={styles.heroVisual}>
           <div 
-            ref={cardRef}
+            ref={productRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={handleMouseLeave}
@@ -161,11 +155,11 @@ export default function HeroSection() {
             {/* Glow effect */}
             <div className={styles.cardGlow} />
             
-            {/* La carte */}
+            {/* Le produit */}
             <div className={styles.cardFrame}>
               <img
-                src={currentCard.image}
-                alt={`${currentCard.name} - ${currentCard.subtitle}`}
+                src={currentProduct.image}
+                alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
               />
               
@@ -173,11 +167,11 @@ export default function HeroSection() {
               <div className={styles.holoEffect} />
             </div>
 
-            {/* Info carte */}
+            {/* Info produit */}
             <div className={styles.cardInfo}>
-              <span className={styles.cardSet}>{currentCard.set}</span>
-              <span className={styles.cardName}>{currentCard.name}</span>
-              <span className={styles.cardSubtitle}>{currentCard.subtitle}</span>
+              <span className={styles.cardSet}>{currentProduct.set}</span>
+              <span className={styles.cardName}>{currentProduct.name}</span>
+              <span className={styles.cardSubtitle}>{currentProduct.subtitle}</span>
             </div>
           </div>
 

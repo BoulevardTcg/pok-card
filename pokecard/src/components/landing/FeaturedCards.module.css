@@ -62,6 +62,7 @@
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
   color: var(--color-text-secondary, #A1A1A6);
+  text-align: justify;
 }
 
 .viewAllButton {
@@ -92,6 +93,23 @@
 
 .viewAllButton:hover svg {
   transform: translate(2px, -2px);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   LOADING & EMPTY STATES
+   ───────────────────────────────────────────────────────────────── */
+
+.loadingWrapper,
+.emptyWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: var(--space-4, 1rem);
+  color: var(--color-text-muted, #6B6B6F);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
 }
 
 /* ─────────────────────────────────────────────────────────────────

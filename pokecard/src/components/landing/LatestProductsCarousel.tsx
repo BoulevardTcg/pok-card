@@ -124,7 +124,12 @@ export default function LatestProductsCarousel() {
                 <div
                   key={product.id}
                   className={styles.productCard}
-                  onClick={() => product.slug && navigate(`/produit/${product.slug}`)}
+                  onClick={() => {
+                    if (product.slug) {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigate(`/produit/${product.slug}`);
+                    }
+                  }}
                 >
                   <div className={styles.imageContainer}>
                     {product.images && product.images.length > 0 ? (

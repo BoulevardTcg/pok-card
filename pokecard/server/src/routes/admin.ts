@@ -5,7 +5,7 @@ import { authenticateToken, requireAdmin } from '../middleware/auth.js'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
-import { sendShippingNotificationEmail, sendDeliveryConfirmationEmail } from '../services/email.js'
+import { sendShippingNotificationEmail, sendDeliveryConfirmationEmail, sendOrderConfirmationEmail } from '../services/email.js'
 import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js'
 
 const router = Router()
@@ -76,6 +76,8 @@ const upload = multer({
 })
 
 // Middleware: Toutes les routes admin nécessitent une authentification + rôle admin
+// ⚠️ IMPORTANT: Toutes les routes définies après ces lignes sont automatiquement protégées
+// Les routes suivantes nécessitent un token JWT valide ET le rôle admin
 router.use(authenticateToken)
 router.use(requireAdmin)
 
@@ -513,16 +515,28 @@ router.patch('/orders/:orderId/status', [
     const resolvedTrackingUrl: string | null = trackingUrl 
       ?? (nextTrackingNumber ? buildTrackingUrl(nextCarrier ?? Carrier.OTHER, nextTrackingNumber) : existingOrder.trackingUrl ?? null)
 
+    // Préparer les données de mise à jour avec les dates appropriées
+    const updateData: any = {
+      status: status as OrderStatus,
+      fulfillmentStatus: mapToFulfillment[status as OrderStatus],
+      carrier: nextCarrier ?? undefined,
+      trackingNumber: nextTrackingNumber ?? undefined,
+      trackingUrl: resolvedTrackingUrl ?? undefined,
+      updatedAt: new Date()
+    }
+
+    // Mettre à jour les dates selon le statut
+    const now = new Date()
+    if (status === 'SHIPPED' && !existingOrder.shippedAt) {
+      updateData.shippedAt = now
+    }
+    if (status === 'DELIVERED' && !existingOrder.deliveredAt) {
+      updateData.deliveredAt = now
+    }
+
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { 
-        status: status as OrderStatus,
-        fulfillmentStatus: mapToFulfillment[status as OrderStatus],
-        carrier: nextCarrier ?? undefined,
-        trackingNumber: nextTrackingNumber ?? undefined,
-        trackingUrl: resolvedTrackingUrl ?? undefined,
-        updatedAt: new Date()
-      },
+      data: updateData,
       include: {
         items: true,
         user: {
@@ -565,10 +579,17 @@ router.patch('/orders/:orderId/status', [
         orderTrackingUrl: orderTrackingUrl ?? undefined
       }
 
-      if (status === 'SHIPPED') {
+      // Envoyer l'email approprié selon le nouveau statut
+      if (status === 'CONFIRMED' && existingOrder.status !== 'CONFIRMED') {
+        // Envoyer un email de confirmation si on passe à CONFIRMED
+        sendOrderConfirmationEmail(orderDataForEmail, customerEmail)
+          .catch(err => console.error('Erreur email confirmation:', err))
+      } else if (status === 'SHIPPED' && existingOrder.status !== 'SHIPPED') {
+        // Envoyer un email d'expédition si on passe à SHIPPED
         sendShippingNotificationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email expedition:', err))
-      } else if (status === 'DELIVERED') {
+      } else if (status === 'DELIVERED' && existingOrder.status !== 'DELIVERED') {
+        // Envoyer un email de livraison si on passe à DELIVERED
         sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail)
           .catch(err => console.error('Erreur email livraison:', err))
       }

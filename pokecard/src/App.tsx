@@ -28,6 +28,7 @@ import NavbarPremium from './components/landing/NavbarPremium'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminRoute } from './components/AdminRoute'
+import { NavDropdown } from './components/NavDropdown'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { AdminProductsPage } from './pages/admin/AdminProductsPage'
 import { AdminUsersPage } from './pages/admin/AdminUsersPage'
@@ -217,37 +218,14 @@ function AppContent() {
             {navLinks.map(link => (
               <div key={link.path} className={styles.navItem}>
                 {link.submenu ? (
-                  <div className={styles.dropdownContainer}>
-                    <button
-                      className={`${styles.navButton} ${location.pathname === link.path ? styles.active : ''}`}
-                      onClick={() => toggleDropdown(link.label)}
-                      onMouseEnter={() => setActiveDropdown(link.label)}
-                    >
-                      <span className={styles.navIcon}>{link.icon}</span>
-                      {link.label}
-                      <span className={styles.dropdownArrow}>▼</span>
-                    </button>
-                    
-                    {activeDropdown === link.label && (
-                      <div 
-                        className={styles.dropdown}
-                        onMouseLeave={() => setActiveDropdown(null)}
-                      >
-                        {link.submenu.map(subItem => (
-                          <button
-                            key={subItem.path}
-                            className={styles.dropdownItem}
-                            onClick={() => {
-                              navigate(subItem.path)
-                              setActiveDropdown(null)
-                            }}
-                          >
-                            {subItem.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <NavDropdown
+                    link={link}
+                    isActive={location.pathname === link.path}
+                    isOpen={activeDropdown === link.label}
+                    onToggle={() => toggleDropdown(link.label)}
+                    onMouseEnter={() => setActiveDropdown(link.label)}
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  />
                 ) : (
                   <button
                     className={`${styles.navButton} ${location.pathname === link.path ? styles.active : ''}`}

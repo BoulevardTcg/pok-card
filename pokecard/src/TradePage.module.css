@@ -15,6 +15,81 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   CONSTRUCTION BANNER
+   ───────────────────────────────────────────────────────────────── */
+
+.constructionBanner {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-lg, 8px);
+  padding: var(--space-6, 1.5rem);
+  margin-bottom: var(--space-8, 2rem);
+  backdrop-filter: blur(4px);
+}
+
+.constructionContent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.constructionIcon {
+  font-size: var(--text-3xl, 2rem);
+  flex-shrink: 0;
+  animation: constructionPulse 2s ease-in-out infinite;
+}
+
+@keyframes constructionPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.constructionText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  flex: 1;
+}
+
+.constructionText strong {
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-warning, #FBBF24);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.02em);
+}
+
+.constructionText p {
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  line-height: var(--leading-relaxed, 1.65);
+  color: var(--color-text-secondary, #A1A1A6);
+  margin: 0;
+  text-align: justify;
+}
+
+@media (max-width: 640px) {
+  .constructionContent {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .constructionText {
+    text-align: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
    LOADING
    ───────────────────────────────────────────────────────────────── */
 
@@ -27,15 +102,43 @@
   text-align: center;
 }
 
-.loadingIcon {
-  font-size: var(--text-5xl, 3rem);
+.loadingDots {
+  display: flex;
+  gap: var(--space-2, 0.5rem);
   margin-bottom: var(--space-4, 1rem);
-  animation: spin 1s linear infinite;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.loadingDots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  animation: loadingDot 1.4s ease-in-out infinite;
+}
+
+.loadingDots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loadingDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loadingDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loadingDot {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .loading p {

@@ -27,7 +27,7 @@ describe('Orders Routes - Public Tracking', () => {
 
   beforeEach(async () => {
     await cleanupDatabase()
-
+    
     testUser = await createTestUser({
       email: 'orderuser@test.com',
       username: 'orderuser',
@@ -52,23 +52,23 @@ describe('Orders Routes - Public Tracking', () => {
     testVariant = testProduct.variants[0]
 
     testOrder = await prisma.order.create({
-      data: {
-        userId: testUser.id,
+        data: {
+          userId: testUser.id,
         orderNumber: `ORDER-${Date.now()}`,
-        status: OrderStatus.CONFIRMED,
+          status: OrderStatus.CONFIRMED,
         fulfillmentStatus: FulfillmentStatus.PAID,
         totalCents: 1500,
-        currency: 'EUR',
+          currency: 'EUR',
         paymentMethod: 'card',
         shippingMethod: 'COLISSIMO_HOME',
         shippingCost: 790,
-        items: {
-          create: {
-            productId: testProduct.id,
-            productVariantId: testVariant.id,
-            productName: testProduct.name,
-            variantName: testVariant.name,
-            quantity: 1,
+          items: {
+            create: {
+              productId: testProduct.id,
+              productVariantId: testVariant.id,
+              productName: testProduct.name,
+              variantName: testVariant.name,
+              quantity: 1,
             unitPriceCents: 1500,
             totalPriceCents: 1500,
           },
@@ -77,15 +77,15 @@ describe('Orders Routes - Public Tracking', () => {
           create: {
             type: 'PAID',
             message: 'Paiement confirmé',
+            },
           },
         },
-      },
-      include: {
-        items: true,
+        include: {
+          items: true,
         events: true,
-      },
+        },
     })
-  })
+      })
 
   describe('GET /api/orders/:orderId', () => {
     it('devrait permettre au propriétaire de voir sa commande', async () => {
@@ -102,7 +102,7 @@ describe('Orders Routes - Public Tracking', () => {
 
     it('devrait permettre l\'accès avec un token de suivi valide', async () => {
       const trackingToken = generateOrderTrackingToken(testOrder.id, testUser.email)
-      
+
       const response = await request(app)
         .get(`/api/orders/${testOrder.id}?token=${trackingToken}`)
 
@@ -124,7 +124,7 @@ describe('Orders Routes - Public Tracking', () => {
 
     it('devrait rejeter l\'accès d\'un autre utilisateur', async () => {
       const otherUserToken = generateAccessToken({
-        userId: otherUser.id,
+          userId: otherUser.id,
         email: otherUser.email,
         username: otherUser.username,
         isAdmin: false,

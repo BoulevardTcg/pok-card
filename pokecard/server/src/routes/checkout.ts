@@ -10,6 +10,328 @@ import { findShippingMethod } from '../config/shipping.js'
 const router = Router()
 const prisma = new PrismaClient()
 
+// Fonction utilitaire pour valider les URLs de redirection
+function createUrlValidator(allowedOrigins: string[]) {
+  return (url: string | undefined, defaultUrl: string | undefined): string => {
+    if (!url) {
+      if (!defaultUrl) {
+        throw new Error('URL de redirection non configurée')
+      }
+      return defaultUrl
+    }
+
+    // En développement, permettre les URLs locales
+    if (process.env.NODE_ENV === 'development' && (url.includes('localhost') || url.includes('127.0.0.1'))) {
+      return url
+    }
+
+    // Valider que l'URL appartient à un domaine autorisé
+    try {
+      // Stripe permet {CHECKOUT_SESSION_ID} dans les URLs, donc on le remplace temporairement pour la validation
+      const testUrl = url.replace('{CHECKOUT_SESSION_ID}', 'test-session-id')
+      const urlObj = new URL(testUrl)
+      if (!allowedOrigins.includes(urlObj.origin)) {
+        console.warn(`🚫 URL de redirection non autorisée: ${url} (origine: ${urlObj.origin}, autorisées: ${allowedOrigins.join(', ')})`)
+        throw new Error('URL de redirection non autorisée')
+      }
+      return url
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error('URL de redirection invalide')
+      }
+      throw error
+    }
+  }
+}
+
+// Fonction utilitaire pour créer une commande depuis une session Stripe (pour verify-session)
+async function createOrderFromSession(
+  tx: Prisma.TransactionClient,
+  session: Stripe.Checkout.Session,
+  items: CheckoutItemInput[],
+  sessionId: string,
+  userId: string | null
+) {
+  const variantIds = items.map((item) => item.variantId)
+  
+  const variants = await tx.productVariant.findMany({
+    where: { id: { in: variantIds } },
+    include: {
+      product: {
+        include: {
+          images: {
+            orderBy: { position: 'asc' },
+            take: 1
+          }
+        }
+      }
+    }
+  })
+
+  const variantsMap = new Map(variants.map((variant) => [variant.id, variant]))
+  let totalCents = 0
+  const currency = (session.currency ?? 'eur').toUpperCase()
+  const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
+  const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
+  const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
+    ? session.metadata?.shippingCarrier as Carrier
+    : null
+
+  const orderItemsData = []
+
+  for (const item of items) {
+    const variant = variantsMap.get(item.variantId)
+    if (!variant) {
+      throw new Error(`Variant introuvable: ${item.variantId}`)
+    }
+
+    // Vérifier le stock et décrémenter
+    const updated = await tx.productVariant.updateMany({
+      where: {
+        id: variant.id,
+        stock: { gte: item.quantity }
+      },
+      data: {
+        stock: { decrement: item.quantity }
+      }
+    })
+
+    if (updated.count === 0) {
+      throw new Error(`Stock insuffisant pour la variante ${variant.id}`)
+    }
+
+    const lineTotal = variant.priceCents * item.quantity
+    totalCents += lineTotal
+
+    orderItemsData.push({
+      productId: variant.productId,
+      productVariantId: variant.id,
+      productName: variant.product.name,
+      variantName: variant.name,
+      imageUrl: variant.product.images[0]?.url ?? null,
+      quantity: item.quantity,
+      unitPriceCents: variant.priceCents,
+      totalPriceCents: lineTotal
+    })
+  }
+
+  totalCents += shippingPriceCents
+  const orderNumber = generateOrderNumber()
+
+  const createdOrder = await tx.order.create({
+    data: {
+      userId,
+      orderNumber,
+      status: OrderStatus.CONFIRMED,
+      fulfillmentStatus: FulfillmentStatus.PAID,
+      totalCents,
+      currency,
+      paymentMethod: sessionId,
+      shippingMethod: shippingMethodCode ?? undefined,
+      shippingCost: shippingPriceCents || undefined,
+      carrier: shippingCarrier ?? undefined,
+      billingAddress: buildBillingAddress(session.customer_details),
+      shippingAddress: buildShippingAddress(session.shipping_details),
+      events: {
+        create: [
+          {
+            type: OrderEventType.PAID,
+            message: 'Paiement confirmé via Stripe',
+            createdBy: userId ?? undefined
+          }
+        ]
+      },
+      items: {
+        createMany: {
+          data: orderItemsData
+        }
+      }
+    }
+  })
+
+  return createdOrder
+}
+
+// Fonction utilitaire pour traiter une session checkout complétée (webhook)
+async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
+  const items = parseMetadataItems(session.metadata ?? null)
+
+  if (items.length === 0) {
+    console.warn('Session Stripe sans items, ignorée:', session.id)
+    return
+  }
+
+  const variantIds = items.map((item) => item.variantId)
+  const userId = session.metadata?.userId && session.metadata.userId.trim() !== ''
+    ? session.metadata.userId
+    : null
+
+  await prisma.$transaction(async (tx) => {
+    const variants = await tx.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      include: {
+        product: {
+          include: {
+            images: {
+              orderBy: { position: 'asc' },
+              take: 1
+            }
+          }
+        }
+      }
+    })
+
+    const variantsMap = new Map(variants.map((variant) => [variant.id, variant]))
+    let totalCents = 0
+    const currency = (session.currency ?? 'eur').toUpperCase()
+    const paymentMethod = session.payment_method_types?.[0] ?? 'card'
+    const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
+    const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
+    const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
+      ? session.metadata?.shippingCarrier as Carrier
+      : null
+
+    const orderItemsData = []
+
+    for (const item of items) {
+      const variant = variantsMap.get(item.variantId)
+      if (!variant) {
+        throw new Error(`Variant introuvable: ${item.variantId}`)
+      }
+
+      // Revalider le prix (protection contre la manipulation)
+      const currentVariant = await tx.productVariant.findUnique({
+        where: { id: variant.id }
+      })
+
+      if (!currentVariant) {
+        throw new Error(`Variant introuvable lors de la validation: ${item.variantId}`)
+      }
+
+      const actualPriceCents = currentVariant.priceCents
+
+      // Vérifier le stock et décrémenter de manière atomique
+      const updated = await tx.productVariant.updateMany({
+        where: {
+          id: variant.id,
+          stock: { gte: item.quantity }
+        },
+        data: {
+          stock: { decrement: item.quantity }
+        }
+      })
+
+      if (updated.count === 0) {
+        throw new Error(`Stock insuffisant pour la variante ${variant.id}`)
+      }
+
+      const lineTotal = actualPriceCents * item.quantity
+      totalCents += lineTotal
+
+      orderItemsData.push({
+        productId: variant.productId,
+        productVariantId: variant.id,
+        productName: variant.product.name,
+        variantName: variant.name,
+        imageUrl: variant.product.images[0]?.url ?? null,
+        quantity: item.quantity,
+        unitPriceCents: actualPriceCents,
+        totalPriceCents: lineTotal
+      })
+    }
+
+    totalCents += shippingPriceCents
+    const orderNumber = generateOrderNumber()
+
+    await tx.order.create({
+      data: {
+        userId,
+        orderNumber,
+        status: OrderStatus.CONFIRMED,
+        fulfillmentStatus: FulfillmentStatus.PAID,
+        shippingMethod: shippingMethodCode ?? undefined,
+        shippingCost: shippingPriceCents || undefined,
+        carrier: shippingCarrier ?? undefined,
+        totalCents,
+        currency,
+        paymentMethod,
+        billingAddress: buildBillingAddress(session.customer_details),
+        shippingAddress: buildShippingAddress(session.shipping_details),
+        events: {
+          create: [
+            {
+              type: OrderEventType.PAID,
+              message: 'Paiement confirmé via Stripe',
+              createdBy: userId ?? undefined
+            }
+          ]
+        },
+        items: {
+          createMany: {
+            data: orderItemsData
+          }
+        }
+      }
+    })
+  })
+}
+
+// Fonction utilitaire pour valider et appliquer un code promo
+async function validateAndApplyPromoCode(
+  promoCodeInput: string | undefined,
+  totalCents: number
+): Promise<{ promoDiscount: number; appliedPromoCode: string | null }> {
+  let promoDiscount = 0
+  let appliedPromoCode: string | null = null
+
+  if (!promoCodeInput) {
+    return { promoDiscount, appliedPromoCode }
+  }
+
+  const now = new Date()
+  const promoCodeRecord = await prisma.promoCode.findUnique({
+    where: { code: promoCodeInput }
+  })
+
+  if (!promoCodeRecord || !promoCodeRecord.isActive) {
+    return { promoDiscount, appliedPromoCode }
+  }
+
+  // Vérifier la validité temporelle
+  if (now < promoCodeRecord.validFrom || now > promoCodeRecord.validUntil) {
+    return { promoDiscount, appliedPromoCode }
+  }
+
+  // Vérifier le montant minimum
+  if (promoCodeRecord.minPurchase && totalCents < promoCodeRecord.minPurchase) {
+    return { promoDiscount, appliedPromoCode }
+  }
+
+  // Vérifier la limite d'utilisation
+  if (promoCodeRecord.usageLimit && promoCodeRecord.usedCount >= promoCodeRecord.usageLimit) {
+    return { promoDiscount, appliedPromoCode }
+  }
+
+  // Calculer la réduction
+  if (promoCodeRecord.type === 'PERCENTAGE') {
+    promoDiscount = Math.floor((totalCents * promoCodeRecord.value) / 100)
+    if (promoCodeRecord.maxDiscount) {
+      promoDiscount = Math.min(promoDiscount, promoCodeRecord.maxDiscount)
+    }
+  } else {
+    promoDiscount = promoCodeRecord.value
+  }
+  appliedPromoCode = promoCodeRecord.code
+
+  // Incrémenter le compteur d'utilisation
+  await prisma.promoCode.update({
+    where: { code: promoCodeRecord.code },
+    data: { usedCount: { increment: 1 } }
+  })
+
+  return { promoDiscount, appliedPromoCode }
+}
+
 type CheckoutItemInput = {
   variantId: string
   quantity: number
@@ -52,7 +374,7 @@ const buildShippingAddress = (details: Stripe.Checkout.Session.ShippingDetails |
   }
 }
 
-router.post('/create-session', optionalAuth, [
+router.post('/create-session', [
   body('items')
     .isArray({ min: 1, max: MAX_ITEMS })
     .withMessage(`La liste des articles est obligatoire (max ${MAX_ITEMS} articles).`),
@@ -137,7 +459,7 @@ router.post('/create-session', optionalAuth, [
     .isString()
     .notEmpty()
     .withMessage('Mode de livraison requis')
-], async (req: Request, res: Response) => {
+], optionalAuth, async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -242,36 +564,7 @@ router.post('/create-session', optionalAuth, [
       }
     })
 
-    const validateUrl = (url: string | undefined, defaultUrl: string | undefined): string => {
-      if (!url) {
-        if (!defaultUrl) {
-          throw new Error('URL de redirection non configurée')
-        }
-        return defaultUrl
-      }
-
-      // En développement, permettre les URLs locales
-      if (process.env.NODE_ENV === 'development' && (url.includes('localhost') || url.includes('127.0.0.1'))) {
-        return url
-      }
-
-      // Valider que l'URL appartient à un domaine autorisé
-      try {
-        // Stripe permet {CHECKOUT_SESSION_ID} dans les URLs, donc on le remplace temporairement pour la validation
-        const testUrl = url.replace('{CHECKOUT_SESSION_ID}', 'test-session-id')
-        const urlObj = new URL(testUrl)
-        if (!allowedOrigins.includes(urlObj.origin)) {
-          console.warn(`🚫 URL de redirection non autorisée: ${url} (origine: ${urlObj.origin}, autorisées: ${allowedOrigins.join(', ')})`)
-          throw new Error('URL de redirection non autorisée')
-        }
-        return url
-      } catch (error) {
-        if (error instanceof TypeError) {
-          throw new Error('URL de redirection invalide')
-        }
-        throw error
-      }
-    }
+    const validateUrl = createUrlValidator(allowedOrigins)
 
     const successUrl = validateUrl(req.body.successUrl, process.env.CHECKOUT_SUCCESS_URL)
     const cancelUrl = validateUrl(req.body.cancelUrl, process.env.CHECKOUT_CANCEL_URL)
@@ -313,44 +606,8 @@ router.post('/create-session', optionalAuth, [
     }
 
     // Valider et appliquer le code promo si fourni
-    let promoDiscount = 0
-    let appliedPromoCode: string | null = null
-    const promoCodeInput = req.body.promoCode?.toUpperCase()
-
-    if (promoCodeInput) {
-      const now = new Date()
-      const promoCodeRecord = await prisma.promoCode.findUnique({
-        where: { code: promoCodeInput }
-      })
-
-      if (promoCodeRecord && promoCodeRecord.isActive) {
-        // Vérifier la validité temporelle
-        if (now >= promoCodeRecord.validFrom && now <= promoCodeRecord.validUntil) {
-          // Vérifier le montant minimum
-          if (!promoCodeRecord.minPurchase || totalCents >= promoCodeRecord.minPurchase) {
-            // Vérifier la limite d'utilisation
-            if (!promoCodeRecord.usageLimit || promoCodeRecord.usedCount < promoCodeRecord.usageLimit) {
-              // Calculer la réduction
-              if (promoCodeRecord.type === 'PERCENTAGE') {
-                promoDiscount = Math.floor((totalCents * promoCodeRecord.value) / 100)
-                if (promoCodeRecord.maxDiscount) {
-                  promoDiscount = Math.min(promoDiscount, promoCodeRecord.maxDiscount)
-                }
-              } else {
-                promoDiscount = promoCodeRecord.value
-              }
-              appliedPromoCode = promoCodeRecord.code
-
-              // Incrémenter le compteur d'utilisation
-              await prisma.promoCode.update({
-                where: { code: promoCodeRecord.code },
-                data: { usedCount: { increment: 1 } }
-              })
-            }
-          }
-        }
-      }
-    }
+    const promoResult = await validateAndApplyPromoCode(req.body.promoCode?.toUpperCase(), totalCents)
+    const { promoDiscount, appliedPromoCode } = promoResult
 
     const lineItems = requestedItems.map((item) => {
       const variant = variantsMap.get(item.variantId)!
@@ -601,114 +858,13 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
       })
     }
 
-    const variantIds = items.map((item) => item.variantId)
+    // Récupérer le userId depuis les métadonnées ou depuis l'auth
+    const userId = session.metadata?.userId && session.metadata.userId.trim() !== ''
+      ? session.metadata.userId
+      : req.user?.userId ?? null
 
     const order = await prisma.$transaction(async (tx) => {
-      const variants = await tx.productVariant.findMany({
-        where: { id: { in: variantIds } },
-        include: {
-          product: {
-            include: {
-              images: {
-                orderBy: { position: 'asc' },
-                take: 1
-              }
-            }
-          }
-        }
-      })
-
-      const variantsMap = new Map(variants.map((variant) => [variant.id, variant]))
-
-      let totalCents = 0
-      const currency = (session.currency ?? 'eur').toUpperCase()
-      const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
-      const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
-      const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
-        ? session.metadata?.shippingCarrier as Carrier
-        : null
-
-      const orderItemsData = []
-
-      for (const item of items) {
-        const variant = variantsMap.get(item.variantId)
-        if (!variant) {
-          throw new Error(`Variant introuvable: ${item.variantId}`)
-        }
-
-        // Vérifier le stock et décrémenter
-        const updated = await tx.productVariant.updateMany({
-          where: {
-            id: variant.id,
-            stock: { gte: item.quantity }
-          },
-          data: {
-            stock: {
-              decrement: item.quantity
-            }
-          }
-        })
-
-        if (updated.count === 0) {
-          throw new Error(`Stock insuffisant pour la variante ${variant.id}`)
-        }
-
-        const lineTotal = variant.priceCents * item.quantity
-        totalCents += lineTotal
-
-        orderItemsData.push({
-          productId: variant.productId,
-          productVariantId: variant.id,
-          productName: variant.product.name,
-          variantName: variant.name,
-          imageUrl: variant.product.images[0]?.url ?? null,
-          quantity: item.quantity,
-          unitPriceCents: variant.priceCents,
-          totalPriceCents: lineTotal
-        })
-      }
-
-      totalCents += shippingPriceCents
-
-      const orderNumber = generateOrderNumber()
-      
-      // Récupérer le userId depuis les métadonnées ou depuis l'auth
-      const userId = session.metadata?.userId && session.metadata.userId.trim() !== ''
-        ? session.metadata.userId
-        : req.user?.userId ?? null
-
-      const createdOrder = await tx.order.create({
-        data: {
-          userId,
-          orderNumber,
-          status: OrderStatus.CONFIRMED,
-          fulfillmentStatus: FulfillmentStatus.PAID,
-          totalCents,
-          currency,
-          paymentMethod: sessionId, // Stocker le sessionId pour éviter les doublons
-          shippingMethod: shippingMethodCode ?? undefined,
-          shippingCost: shippingPriceCents || undefined,
-          carrier: shippingCarrier ?? undefined,
-          billingAddress: buildBillingAddress(session.customer_details),
-          shippingAddress: buildShippingAddress(session.shipping_details),
-          events: {
-            create: [
-              {
-                type: OrderEventType.PAID,
-                message: 'Paiement confirmé via Stripe',
-                createdBy: userId ?? undefined
-              }
-            ]
-          },
-          items: {
-            createMany: {
-              data: orderItemsData
-            }
-          }
-        }
-      })
-
-      return createdOrder
+      return createOrderFromSession(tx, session, items, sessionId, userId)
     })
 
     console.log(`✅ Commande créée: ${order.orderNumber} pour le user ${order.userId || 'anonyme'}`)
@@ -813,135 +969,8 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session
-    const items = parseMetadataItems(session.metadata ?? null)
-
-    if (items.length === 0) {
-      console.warn('Session Stripe sans items, ignorée:', session.id)
-      return res.status(200).json({ received: true })
-    }
-
-    const variantIds = items.map((item) => item.variantId)
-
     try {
-      await prisma.$transaction(async (tx) => {
-        const variants = await tx.productVariant.findMany({
-          where: { id: { in: variantIds } },
-          include: {
-            product: {
-              include: {
-                images: {
-                  orderBy: { position: 'asc' },
-                  take: 1
-                }
-              }
-            }
-          }
-        })
-
-        const variantsMap = new Map(variants.map((variant) => [variant.id, variant]))
-
-        let totalCents = 0
-        const currency = (session.currency ?? 'eur').toUpperCase()
-        const paymentMethod = session.payment_method_types?.[0] ?? 'card'
-        const shippingPriceCents = session.metadata?.shippingPriceCents ? parseInt(session.metadata.shippingPriceCents) || 0 : 0
-        const shippingMethodCode = session.metadata?.shippingMethodCode ?? null
-        const shippingCarrier = Object.values(Carrier).includes((session.metadata?.shippingCarrier as Carrier))
-          ? session.metadata?.shippingCarrier as Carrier
-          : null
-
-        const orderItemsData = []
-
-        for (const item of items) {
-          const variant = variantsMap.get(item.variantId)
-          if (!variant) {
-            throw new Error(`Variant introuvable: ${item.variantId}`)
-          }
-
-          // Revalider le prix (protection contre la manipulation)
-          // Le prix dans le webhook doit correspondre au prix stocké en DB
-          const currentVariant = await tx.productVariant.findUnique({
-            where: { id: variant.id }
-          })
-
-          if (!currentVariant) {
-            throw new Error(`Variant introuvable lors de la validation: ${item.variantId}`)
-          }
-
-          // Utiliser le prix actuel de la DB (pas celui du cache)
-          const actualPriceCents = currentVariant.priceCents
-
-          // Vérifier le stock et décrémenter de manière atomique
-          const updated = await tx.productVariant.updateMany({
-            where: {
-              id: variant.id,
-              stock: { gte: item.quantity }
-            },
-            data: {
-              stock: {
-                decrement: item.quantity
-              }
-            }
-          })
-
-          if (updated.count === 0) {
-            throw new Error(`Stock insuffisant pour la variante ${variant.id}`)
-          }
-
-          // Utiliser le prix actuel de la DB pour le calcul
-          const lineTotal = actualPriceCents * item.quantity
-          totalCents += lineTotal
-
-          orderItemsData.push({
-            productId: variant.productId,
-            productVariantId: variant.id,
-            productName: variant.product.name,
-            variantName: variant.name,
-            imageUrl: variant.product.images[0]?.url ?? null,
-            quantity: item.quantity,
-            unitPriceCents: actualPriceCents, // Utiliser le prix actuel de la DB
-            totalPriceCents: lineTotal
-          })
-        }
-
-        totalCents += shippingPriceCents
-
-        const orderNumber = generateOrderNumber()
-        const userId = session.metadata?.userId && session.metadata.userId.trim() !== ''
-          ? session.metadata.userId
-          : null
-
-        await tx.order.create({
-          data: {
-            userId,
-            orderNumber,
-            status: OrderStatus.CONFIRMED,
-            fulfillmentStatus: FulfillmentStatus.PAID,
-            shippingMethod: shippingMethodCode ?? undefined,
-            shippingCost: shippingPriceCents || undefined,
-            carrier: shippingCarrier ?? undefined,
-            totalCents,
-            currency,
-            paymentMethod,
-            billingAddress: buildBillingAddress(session.customer_details),
-            shippingAddress: buildShippingAddress(session.shipping_details),
-            events: {
-              create: [
-                {
-                  type: OrderEventType.PAID,
-                  message: 'Paiement confirmé via Stripe',
-                  createdBy: userId ?? undefined
-                }
-              ]
-            },
-            items: {
-              createMany: {
-                data: orderItemsData
-              }
-            }
-          }
-        })
-      })
+      await processCompletedCheckoutSession(event.data.object as Stripe.Checkout.Session)
     } catch (error: any) {
       console.error('Erreur lors du traitement du webhook Stripe:', error)
       // Ne pas exposer les détails d'erreur

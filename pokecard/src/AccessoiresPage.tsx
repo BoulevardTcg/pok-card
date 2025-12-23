@@ -494,54 +494,7 @@ export function AccessoiresPage() {
                         
                         <button 
                           className={styles.viewAccessoireButton}
-                          onClick={async () => {
-                            const normalize = (str: string) => str.toLowerCase()
-                              .normalize('NFD')
-                              .replace(/[\u0300-\u036f]/g, '')
-                              .replace(/\s+/g, ' ')
-                              .trim();
-                            
-                            const normalizedAccessoireName = normalize(accessoire.name);
-                            
-                            let matchingProduct = apiProducts.find(p => {
-                              const normalizedPName = normalize(p.name);
-                              return normalizedPName === normalizedAccessoireName ||
-                                     normalizedPName.includes(normalizedAccessoireName) ||
-                                     normalizedAccessoireName.includes(normalizedPName);
-                            });
-                            
-                            if (!matchingProduct) {
-                              const accessoireKeywords = normalizedAccessoireName.split(' ').filter(w => w.length > 3);
-                              matchingProduct = apiProducts.find(p => {
-                                const normalizedPName = normalize(p.name);
-                                return accessoireKeywords.some(keyword => normalizedPName.includes(keyword));
-                              });
-                            }
-                            
-                            if (matchingProduct && matchingProduct.slug) {
-                              navigate(`/produit/${matchingProduct.slug}`);
-                              return;
-                            }
-                            
-                            try {
-                              const response = await listProducts({ search: accessoire.name, limit: 20 }) as { products: ProductType[] };
-                              const found = response.products?.find((p: ProductType) => {
-                                const normalizedPName = normalize(p.name);
-                                return normalizedPName === normalizedAccessoireName ||
-                                       normalizedPName.includes(normalizedAccessoireName) ||
-                                       normalizedAccessoireName.includes(normalizedPName);
-                              });
-                              
-                              if (found && found.slug) {
-                                navigate(`/produit/${found.slug}`);
-                                return;
-                              }
-                            } catch (error) {
-                              console.error('Erreur lors de la recherche:', error);
-                            }
-                            
-                            navigate(`/produits?search=${encodeURIComponent(accessoire.name)}`);
-                          }}
+                          onClick={() => navigateToProduct(accessoire.name, apiProducts, navigate)}
                         >
                           Voir l'accessoire
                         </button>
@@ -609,6 +562,7 @@ export function AccessoiresPage() {
                           className={styles.viewAccessoireButton}
                           onClick={() => {
                             if (product.slug) {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
                               navigate(`/produit/${product.slug}`);
                             }
                           }}

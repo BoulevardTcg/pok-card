@@ -77,6 +77,7 @@
   line-height: var(--leading-relaxed, 1.65);
   color: var(--color-text-secondary, #A1A1A6);
   margin-bottom: var(--space-10, 2.5rem);
+  text-align: justify;
 }
 
 /* ─────────────────────────────────────────────────────────────────

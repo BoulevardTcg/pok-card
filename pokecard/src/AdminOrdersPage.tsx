@@ -381,19 +381,19 @@ export function AdminOrdersPage() {
                     </td>
                     <td>
                       <div className={styles.actionsColumn}>
-                        <div className={styles.statusSelectWrapper}>
-                          <select
-                            value={order.status}
-                            onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                            disabled={updatingOrderId === order.id}
-                            className={styles.statusDropdown}
-                          >
-                            {allStatuses.map(s => (
-                              <option key={s} value={s}>{statusConfig[s].label}</option>
-                            ))}
-                          </select>
-                          {updatingOrderId === order.id && (
-                            <div className={styles.updateSpinner} />
+                      <div className={styles.statusSelectWrapper}>
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                          disabled={updatingOrderId === order.id}
+                          className={styles.statusDropdown}
+                        >
+                          {allStatuses.map(s => (
+                            <option key={s} value={s}>{statusConfig[s].label}</option>
+                          ))}
+                        </select>
+                        {updatingOrderId === order.id && (
+                          <div className={styles.updateSpinner} />
                           )}
                         </div>
 

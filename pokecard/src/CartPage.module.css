@@ -24,6 +24,10 @@
 }
 
 .refreshingStock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
   padding: var(--space-4, 1rem);
   text-align: center;
   font-family: var(--font-body);
@@ -33,6 +37,15 @@
   border: 1px solid rgba(139, 115, 85, 0.3);
   border-radius: var(--radius-lg, 8px);
   margin-bottom: var(--space-6, 1.5rem);
+}
+
+.refreshIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ─────────────────────────────────────────────────────────────────

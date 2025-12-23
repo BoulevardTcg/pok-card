@@ -1,81 +1,99 @@
 import { useNavigate } from 'react-router-dom';
-import { TrendingUpIcon, ArrowUpRightIcon } from '../icons/Icons';
+import { useState, useEffect } from 'react';
+import { ArrowUpRightIcon } from '../icons/Icons';
+import { API_BASE } from '../../api';
+import type { Product } from '../../cartContext';
 import styles from './FeaturedCards.module.css';
 
-type ProductType = 'card' | 'sealed';
-
-interface FeaturedItem {
-  id: string;
-  type: ProductType;
-  name: string;
-  subtitle: string;
-  universe: 'Pokémon' | 'One Piece' | 'Yu-Gi-Oh' | 'Autre';
-  price: number;
-  originalPrice?: number;
-  image: string;
-  badge?: string;
-  // Pour les cartes gradées
-  grade?: string;
-  gradeProvider?: 'PSA' | 'CGC' | 'BGS';
-  // Pour les produits scellés
-  productType?: string;
-  inStock?: boolean;
+// Détermine l'univers à partir de la catégorie du produit
+function getUniverse(product: Product): 'Pokémon' | 'One Piece' | 'Yu-Gi-Oh' | 'Autre' {
+  const category = product.category?.toLowerCase() || '';
+  
+  if (category === 'one piece' || category === 'onepiece') {
+    return 'One Piece';
+  }
+  if (category === 'yu-gi-oh' || category === 'yugioh') {
+    return 'Yu-Gi-Oh';
+  }
+  if (category === 'pokémon' || category === 'pokemon') {
+    return 'Pokémon';
+  }
+  return 'Autre';
 }
 
-// Mix de cartes gradées ET produits scellés
-const FEATURED_ITEMS: FeaturedItem[] = [
-  {
-    id: '1',
-    type: 'card',
-    name: 'Dracaufeu VMAX',
-    subtitle: 'Ténèbres Embrasées',
-    universe: 'Pokémon',
-    price: 2450,
-    image: '/carte_accueil/card01.png',
-    badge: 'Investissement',
-    grade: '10',
-    gradeProvider: 'PSA',
-  },
-  {
-    id: '2',
-    type: 'sealed',
-    name: 'Display OP-09',
-    subtitle: 'One Piece TCG',
-    universe: 'One Piece',
-    price: 129,
-    originalPrice: 145,
-    image: '/img/products/Display-OP09.png',
-    badge: 'Nouveauté',
-    productType: 'Display 24 boosters',
-    inStock: true,
-  },
-  {
-    id: '3',
-    type: 'sealed',
-    name: 'ETB Méga-Évolution',
-    subtitle: 'Coffret Dresseur d\'Élite',
-    universe: 'Pokémon',
-    price: 59,
-    image: '/img/products/ETB-MegaEvolution-Gardevoir.jpg',
-    badge: 'Précommande',
-    productType: 'Elite Trainer Box',
-    inStock: true,
-  },
-  {
-    id: '4',
-    type: 'card',
-    name: 'Pikachu VMAX',
-    subtitle: 'Rainbow Rare',
-    universe: 'Pokémon',
-    price: 890,
-    image: '/carte_accueil/card02.png',
-    grade: '10',
-    gradeProvider: 'CGC',
-  },
-];
+// Détermine le type de produit à partir de la catégorie
+function getProductType(product: Product): string {
+  const category = product.category?.toLowerCase() || '';
+  const name = product.name.toLowerCase();
+  
+  if (category.includes('display') || name.includes('display')) return 'Display';
+  if (category.includes('etb') || name.includes('elite trainer') || name.includes('coffret dresseur')) return 'Coffret Dresseur d\'Élite';
+  if (category.includes('upc') || name.includes('ultra premium')) return 'Ultra Premium Collection';
+  if (category.includes('booster') || name.includes('booster')) return 'Booster';
+  if (category.includes('coffret') || name.includes('coffret')) return 'Coffret';
+  return product.category || 'Produit scellé';
+}
+
+// Vérifie si le produit est récent (moins de 30 jours)
+function isNewProduct(product: Product): boolean {
+  const createdDate = new Date(product.createdAt);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return createdDate > thirtyDaysAgo;
+}
 
 export default function FeaturedCards() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  async function loadProducts() {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/products?limit=50`);
+      if (!response.ok) throw new Error('Erreur lors du chargement');
+      const data = await response.json();
+      
+      // Filtrer pour n'avoir que les produits scellés (exclure Accessoires)
+      const sealedProducts = (data.products || []).filter((p: Product) => {
+        const category = p.category?.toLowerCase() || '';
+        return category !== 'accessoires' && (category === 'pokémon' || category === 'pokemon' || category === 'one piece' || category === 'onepiece');
+      });
+      
+      // Trier par date de création (les plus récents en premier) et prendre les 4 premiers
+      const sortedProducts = sealedProducts.sort((a: Product, b: Product) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      
+      setProducts(sortedProducts.slice(0, 4));
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Formater le prix
+  const formatPrice = (cents: number | null) => {
+    if (!cents) return 'Prix sur demande';
+    return (cents / 100).toFixed(2).replace('.', ',');
+  };
+
+  // Obtenir le prix le plus bas du produit
+  const getLowestPrice = (product: Product): number | null => {
+    if (!product.variants || product.variants.length === 0) return null;
+    return Math.min(...product.variants.map(v => v.priceCents));
+  };
+
+  // Vérifier si en stock
+  const isInStock = (product: Product): boolean => {
+    return product.variants.some(v => v.stock > 0);
+  };
 
   return (
     <section className={styles.section}>
@@ -84,10 +102,10 @@ export default function FeaturedCards() {
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <span className={styles.overline}>À la une</span>
-            <h2 className={styles.title}>Pépites du moment</h2>
+            <h2 className={styles.title}>Produits phares</h2>
             <p className={styles.description}>
-              Cartes de collection, boosters à ouvrir, coffrets à s'offrir — 
-              notre sélection pour tous les passionnés.
+              Boosters, displays, coffrets ETB et collections premium — 
+              notre sélection de produits scellés pour tous les passionnés.
             </p>
           </div>
           
@@ -101,39 +119,54 @@ export default function FeaturedCards() {
         </div>
 
         {/* Items Grid */}
+        {loading ? (
+          <div className={styles.loadingWrapper}>
+            <p>Chargement des produits...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className={styles.emptyWrapper}>
+            <p>Aucun produit disponible pour le moment.</p>
+          </div>
+        ) : (
         <div className={styles.itemsGrid}>
-          {FEATURED_ITEMS.map((item) => (
+            {products.map((product) => {
+              const isNew = isNewProduct(product);
+              const inStock = isInStock(product);
+              const price = getLowestPrice(product);
+              const productType = getProductType(product);
+              const universe = getUniverse(product);
+              const imageUrl = product.images?.[0]?.url || '/img/products/placeholder.png';
+
+              return (
             <article
-              key={item.id}
+                  key={product.id}
               className={styles.card}
-              onClick={() => navigate(`/produit/${item.id}`)}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigate(`/produit/${product.slug}`);
+                  }}
             >
               {/* Image */}
               <div className={styles.cardImageWrapper}>
                 <img
-                  src={item.image}
-                  alt={item.name}
+                      src={imageUrl}
+                      alt={product.name}
                   className={styles.cardImage}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
+                      }}
                 />
                 <div className={styles.cardImageOverlay} />
                 
                 {/* Badge */}
-                {item.badge && (
-                  <div className={`${styles.badge} ${styles[item.badge.toLowerCase().replace(' ', '')]}`}>
-                    {item.badge}
+                    {isNew && (
+                      <div className={`${styles.badge} ${styles.nouveauté}`}>
+                        Nouveauté
                   </div>
                 )}
 
-                {/* Grade Badge (pour les cartes) */}
-                {item.type === 'card' && item.grade && (
-                  <div className={styles.gradeBadge}>
-                    <span className={styles.gradeProvider}>{item.gradeProvider}</span>
-                    <span className={styles.gradeValue}>{item.grade}</span>
-                  </div>
-                )}
-
-                {/* Stock indicator (pour les sealed) */}
-                {item.type === 'sealed' && item.inStock && (
+                    {/* Stock indicator */}
+                    {inStock && (
                   <div className={styles.stockBadge}>
                     <span className={styles.stockDot} />
                     En stock
@@ -146,42 +179,39 @@ export default function FeaturedCards() {
                 {/* Info */}
                 <div className={styles.cardInfo}>
                   <div className={styles.cardMeta}>
-                    <span className={styles.cardUniverse}>{item.universe}</span>
-                    {item.type === 'sealed' && item.productType && (
+                        <span className={styles.cardUniverse}>{universe}</span>
+                        {productType && (
                       <>
                         <span className={styles.metaDot}>·</span>
-                        <span className={styles.cardType}>{item.productType}</span>
+                            <span className={styles.cardType}>{productType}</span>
                       </>
                     )}
                   </div>
-                  <h3 className={styles.cardName}>{item.name}</h3>
-                  <span className={styles.cardSubtitle}>{item.subtitle}</span>
+                      <h3 className={styles.cardName}>{product.name}</h3>
+                      <span className={styles.cardSubtitle}>
+                        {product.description ? 
+                          (product.description.length > 60 
+                            ? product.description.substring(0, 60) + '...' 
+                            : product.description)
+                          : productType
+                        }
+                      </span>
                 </div>
 
                 {/* Price */}
                 <div className={styles.cardPricing}>
                   <div className={styles.priceRow}>
                     <span className={styles.priceValue}>
-                      {item.price.toLocaleString('fr-FR')} €
-                    </span>
-                    {item.originalPrice && (
-                      <span className={styles.originalPrice}>
-                        {item.originalPrice.toLocaleString('fr-FR')} €
+                          {price ? `${formatPrice(price)} €` : 'Prix sur demande'}
                       </span>
-                    )}
-                  </div>
-                  
-                  {item.type === 'card' && (
-                    <div className={styles.investmentHint}>
-                      <TrendingUpIcon size={14} />
-                      <span>Valeur en hausse</span>
                     </div>
-                  )}
                 </div>
               </div>
             </article>
-          ))}
+              );
+            })}
         </div>
+        )}
       </div>
     </section>
   );

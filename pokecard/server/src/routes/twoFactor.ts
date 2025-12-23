@@ -37,7 +37,7 @@ router.post('/setup', async (req: Request, res: Response) => {
     const totp = new OTPAuth.TOTP({
       issuer: 'BoulevardTCG',
       label: user.email,
-      algorithm: 'SHA1',
+      algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
       digits: 6,
       period: 30,
       secret: new OTPAuth.Secret({ size: 20 })
@@ -101,14 +101,14 @@ router.post('/enable', async (req: Request, res: Response) => {
     }
 
     // Vérifier le code
-    const totp = new OTPAuth.TOTP({
-      issuer: 'BoulevardTCG',
-      label: user.email,
-      algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
-      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
-    })
+      const totp = new OTPAuth.TOTP({
+        issuer: 'BoulevardTCG',
+        label: user.email,
+        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
+      })
 
     const isValid = totp.validate({ token: code, window: 1 }) !== null
 
@@ -174,14 +174,14 @@ router.post('/disable', async (req: Request, res: Response) => {
     }
 
     // Vérifier le code 2FA
-    const totp = new OTPAuth.TOTP({
-      issuer: 'BoulevardTCG',
-      label: user.email,
-      algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
-      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
-    })
+      const totp = new OTPAuth.TOTP({
+        issuer: 'BoulevardTCG',
+        label: user.email,
+        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
+      })
 
     const isValid = totp.validate({ token: code, window: 1 }) !== null
 
@@ -237,14 +237,14 @@ router.post('/verify', async (req: Request, res: Response) => {
       })
     }
 
-    const totp = new OTPAuth.TOTP({
-      issuer: 'BoulevardTCG',
-      label: user.email,
-      algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
-      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
-    })
+      const totp = new OTPAuth.TOTP({
+        issuer: 'BoulevardTCG',
+        label: user.email,
+        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)
+      })
 
     const isValid = totp.validate({ token: code, window: 1 }) !== null
 

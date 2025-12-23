@@ -182,7 +182,7 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       const totp = new OTPAuth.TOTP({
         issuer: 'BoulevardTCG',
         label: user.email,
-        algorithm: 'SHA1',
+        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
         digits: 6,
         period: 30,
         secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret)

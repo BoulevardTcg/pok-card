@@ -183,7 +183,10 @@ export default function NewReleases() {
                 <article
                   key={product.id}
                   className={styles.releaseCard}
-                  onClick={() => navigate(`/produit/${product.slug}`)}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigate(`/produit/${product.slug}`);
+                  }}
                 >
                   <div className={styles.releaseImageWrapper}>
                     <img

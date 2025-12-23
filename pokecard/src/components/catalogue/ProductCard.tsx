@@ -29,20 +29,25 @@ export default function ProductCard({ product }: ProductCardProps) {
       return;
     }
     
-    if (!product.outOfStock) {
-      // Créer un produit compatible avec le panier
-      const cartProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.minPriceCents || 0,
-        image: product.image?.url || '',
-      };
-      addToCart(cartProduct, 1);
+    if (!product.outOfStock && product.variants && product.variants.length > 0) {
+      // Sélectionner la première variante disponible (avec stock > 0)
+      const availableVariant = product.variants.find(v => v.stock > 0);
+      
+      if (availableVariant) {
+        addToCart(availableVariant, product);
+      } else {
+        // Si aucune variante n'a de stock, rediriger vers la page de détail
+        if (product.slug) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          navigate(`/produit/${product.slug}`);
+        }
+      }
     }
   };
 
   const handleCardClick = () => {
     if (product.slug && !product.outOfStock) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       navigate(`/produit/${product.slug}`);
     }
   };
@@ -86,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className={styles.rating}>
           {[...Array(5)].map((_, i) => (
             <span key={i} className={`${styles.star} ${i < 4 ? styles.filled : ''}`}>
-              ⭐
+              ★
             </span>
           ))}
         </div>

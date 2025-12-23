@@ -17,13 +17,13 @@ export default function FinalCTA() {
           <span className={styles.overline}>Rejoignez l'aventure</span>
           
           <h2 className={styles.title}>
-            Que vous collectionniez, jouiez<br />
-            ou investissiez — bienvenue chez vous.
+            Produits scellés premium<br />
+            pour tous les passionnés.
           </h2>
 
           <p className={styles.description}>
-            Des milliers de passionnés nous font déjà confiance. 
-            Cartes authentiques, produits scellés, livraison sécurisée.
+            Boosters, displays, coffrets ETB et collections premium. 
+            Produits authentiques, livraison sécurisée.
           </p>
 
           <div className={styles.actions}>
@@ -33,13 +33,6 @@ export default function FinalCTA() {
             >
               <span>Découvrir la boutique</span>
               <ArrowRightIcon size={18} />
-            </button>
-
-            <button
-              onClick={() => navigate('/trade')}
-              className={styles.secondaryButton}
-            >
-              Explorer les cartes
             </button>
           </div>
 

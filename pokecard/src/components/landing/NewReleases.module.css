@@ -50,6 +50,7 @@
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
   color: var(--color-text-secondary, #A1A1A6);
+  text-align: justify;
 }
 
 /* ─────────────────────────────────────────────────────────────────

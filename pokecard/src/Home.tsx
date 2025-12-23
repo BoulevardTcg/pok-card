@@ -9,7 +9,6 @@ import TrustSignals from './components/landing/TrustSignals';
 import FeaturedCards from './components/landing/FeaturedCards';
 import NewReleases from './components/landing/NewReleases';
 import ProcessSection from './components/landing/ProcessSection';
-import CollectionHighlight from './components/landing/CollectionHighlight';
 import FinalCTA from './components/landing/FinalCTA';
 import FooterPremium from './components/landing/FooterPremium';
 
@@ -24,14 +23,11 @@ export function Home() {
         {/* Trust — Chiffres clés pour rassurer */}
         <TrustSignals />
         
-        {/* Pépites — Mix cartes gradées + produits scellés */}
+        {/* Produits phares — Produits scellés */}
         <FeaturedCards />
         
         {/* Nouvelles sorties — Pour les chasseurs de boosters */}
         <NewReleases />
-        
-        {/* Explorer — Collections par univers (Pokémon/One Piece) */}
-        <CollectionHighlight />
         
         {/* Process — Authentification, certification, livraison */}
         <ProcessSection />

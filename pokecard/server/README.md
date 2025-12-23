@@ -68,7 +68,7 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "username": "username",
-  "password": "Password123!",
+  "password": "your-secure-password",
   "firstName": "John",
   "lastName": "Doe"
 }
@@ -81,7 +81,7 @@ Content-Type: application/json
 
 {
   "email": "user@example.com",
-  "password": "Password123!"
+  "password": "your-secure-password"
 }
 ```
 
@@ -133,8 +133,8 @@ Authorization: Bearer your_access_token
 Content-Type: application/json
 
 {
-  "currentPassword": "OldPassword123!",
-  "newPassword": "NewPassword123!"
+  "currentPassword": "your-current-password",
+  "newPassword": "your-new-secure-password"
 }
 ```
 

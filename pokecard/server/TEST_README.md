@@ -8,8 +8,8 @@ Ce document explique comment lancer et utiliser les tests automatisés pour l'AP
 
 2. **Variables d'environnement** : Créez un fichier `.env.test` avec :
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/test_db"
-   TEST_DATABASE_URL="postgresql://user:password@localhost:5432/test_db"
+   DATABASE_URL="postgresql://username:password@localhost:5432/test_db"
+   TEST_DATABASE_URL="postgresql://username:password@localhost:5432/test_db"
    JWT_SECRET="test-secret-key"
    JWT_REFRESH_SECRET="test-refresh-secret-key"
    JWT_EXPIRES_IN="15m"

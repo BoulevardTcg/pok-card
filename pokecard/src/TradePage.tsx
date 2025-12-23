@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { API_BASE } from './api';
 import styles from './TradePage.module.css';
 
 type Set = { 
@@ -25,7 +26,7 @@ export function TradePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/trade/sets')
+    fetch(`${API_BASE}/trade/sets`)
       .then(r => r.json())
       .then((data: any[]) => {
         const mapped: Set[] = data.map(s => ({
@@ -59,7 +60,11 @@ export function TradePage() {
       <div className={styles.page}>
         <div className={styles.container}>
           <div className={styles.loading}>
-            <div className={styles.loadingIcon}>🔄</div>
+            <div className={styles.loadingDots}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
             <p>Chargement des séries...</p>
           </div>
         </div>
@@ -70,6 +75,17 @@ export function TradePage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+        {/* Panneau d'avertissement - En construction */}
+        <div className={styles.constructionBanner}>
+          <div className={styles.constructionContent}>
+            <span className={styles.constructionIcon}>🚧</span>
+            <div className={styles.constructionText}>
+              <strong>Section en construction</strong>
+              <p>Cette fonctionnalité d'échange de cartes est actuellement en développement. Elle sera bientôt disponible !</p>
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -214,7 +214,7 @@ Inscription d'un nouvel utilisateur
 {
   "email": "user@example.com",
   "username": "username",
-  "password": "Password123!",
+  "password": "your-secure-password",
   "firstName": "John",
   "lastName": "Doe"
 }
@@ -225,7 +225,7 @@ Connexion d'un utilisateur
 ```json
 {
   "email": "user@example.com",
-  "password": "Password123!"
+  "password": "your-secure-password"
 }
 ```
 **Réponse** :
@@ -271,8 +271,8 @@ Met à jour le profil
 Change le mot de passe
 ```json
 {
-  "currentPassword": "OldPassword123!",
-  "newPassword": "NewPassword123!"
+  "currentPassword": "your-current-password",
+  "newPassword": "your-new-secure-password"
 }
 ```
 
@@ -632,7 +632,7 @@ curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
-    "password": "Password123!"
+    "password": "your-secure-password"
   }'
 ```
 

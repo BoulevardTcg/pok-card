@@ -167,6 +167,7 @@
   line-height: var(--leading-relaxed, 1.65);
   color: var(--color-text-secondary, #A1A1A6);
   max-width: 520px;
+  text-align: justify;
 }
 
 /* Actions */
