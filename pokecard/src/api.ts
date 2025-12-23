@@ -2,31 +2,51 @@ export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/a
 
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: customHeaders, ...restInit } = init || {}
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...restInit,
-    headers: { 
-      'Content-Type': 'application/json', 
-      ...(customHeaders || {}) 
-    },
-  })
-  if (!res.ok) {
-    let errorMessage = `HTTP ${res.status}`
-    try {
-      const errorData = await res.json()
-      errorMessage = errorData.error || errorData.message || errorMessage
-    } catch {
-      // Si la réponse n'est pas du JSON, on garde le message par défaut
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...restInit,
+      headers: { 
+        'Content-Type': 'application/json', 
+        ...(customHeaders || {}) 
+      },
+    })
+    if (!res.ok) {
+      let errorMessage = `HTTP ${res.status}`
+      try {
+        const errorData = await res.json()
+        errorMessage = errorData.error || errorData.message || errorMessage
+      } catch {
+        // Ignorer les erreurs de parsing JSON
+      }
+      const error = new Error(errorMessage)
+      ;(error as any).status = res.status
+      throw error
     }
-    const error = new Error(errorMessage)
-    ;(error as any).status = res.status
+    return res.json()
+  } catch (error) {
+    // Ré-émettre l'erreur pour qu'elle soit gérée par le code appelant
     throw error
   }
-  return res.json()
 }
 
 export type CheckoutItem = { variantId: string; quantity: number }
+export type ShippingInfo = {
+  fullName: string
+  addressLine1: string
+  addressLine2?: string
+  postalCode: string
+  city: string
+  country: string
+  phone?: string
+}
 
-export async function createCheckoutSession(items: CheckoutItem[], email?: string, promoCode?: string): Promise<{ url: string | null; sessionId?: string } | { url?: string; sessionId: string } > {
+export async function createCheckoutSession(
+  items: CheckoutItem[],
+  email?: string,
+  promoCode?: string,
+  shipping?: ShippingInfo,
+  shippingMethodCode?: string
+): Promise<{ url: string | null; sessionId?: string } | { url?: string; sessionId: string }> {
   // Construire les URLs de redirection basées sur l'origine actuelle
   const origin = window.location.origin
   // Stripe remplace {CHECKOUT_SESSION_ID} par l'ID de session réel
@@ -54,7 +74,9 @@ export async function createCheckoutSession(items: CheckoutItem[], email?: strin
       customerEmail: email,
       promoCode,
       successUrl,
-      cancelUrl
+      cancelUrl,
+      shipping,
+      shippingMethodCode,
     })
   })
   
@@ -123,6 +145,19 @@ export async function buyConcoursTicket(data: { nom: string; email: string }) {
 
 export async function submitTrade(payload: { userEmail: string; haveCard: string; wantCard: string; message?: string }) {
   return fetchJson('/trade', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+export type ContactMessagePayload = {
+  name: string
+  email: string
+  subject: string
+  message: string
+  companyWebsite?: string
+  website?: string
+}
+
+export async function sendContactMessage(payload: ContactMessagePayload): Promise<{ ok: true } | { ok: false; code?: string; error?: string }> {
+  return fetchJson('/contact', { method: 'POST', body: JSON.stringify(payload) })
 }
 
 export async function listTradeSets(opts?: { lang?: 'fr' | 'en' }) {

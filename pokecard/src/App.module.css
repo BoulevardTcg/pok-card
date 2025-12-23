@@ -17,9 +17,9 @@ html, body {
 }
 
 body {
-  font-family: var(--font-sans);
-  background: var(--blanc-lumiere-200);
-  color: var(--bleu-nuit);
+  font-family: var(--font-body);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
   overflow-x: hidden;
   width: 100vw;
   min-height: 100vh;
@@ -28,7 +28,7 @@ body {
 /* App Container */
 .appBg {
   min-height: 100vh;
-  background: var(--blanc-lumiere-200);
+  background: var(--color-bg-primary);
   position: relative;
   padding-top: 0;
   width: 100vw;
@@ -45,12 +45,12 @@ body {
   left: 0;
   right: 0;
   height: 80px;
-  background: white;
+  background: var(--color-bg-elevated);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--ardoise-200);
-  box-shadow: var(--shadow-luxe);
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-md);
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .header.hidden {
@@ -176,19 +176,19 @@ body {
 }
 
 .logoText { 
-  color: var(--bleu-nuit); 
+  color: var(--color-text-primary); 
   font-weight: 900; 
   font-size: 1.25rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
 }
 
 .logoTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--bleu-nuit);
+  color: var(--color-text-primary);
   letter-spacing: 0.5px;
   white-space: nowrap;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   display: flex;
   flex-direction: column;
   line-height: 1.2;
@@ -197,10 +197,10 @@ body {
 .logoTitle::after {
   content: 'TCG';
   font-size: 0.75rem;
-  color: var(--dore);
+  color: var(--color-accent-secondary);
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   margin-top: -2px;
 }
 
@@ -221,14 +221,14 @@ body {
 .navButton {
   background: none;
   border: none;
-  color: var(--bleu-nuit);
+  color: var(--color-text-primary);
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   cursor: pointer;
   padding: 0.5rem 1rem;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -253,15 +253,15 @@ body {
 }
 
 .navButton:hover {
-  background: rgba(215, 181, 109, 0.1);
-  color: var(--dore);
+  background: rgba(139, 115, 85, 0.1);
+  color: var(--color-accent-secondary);
   transform: translateY(-2px);
 }
 
 .navButton.active {
-  background: rgba(215, 181, 109, 0.15);
-  color: var(--dore);
-  border: 1px solid rgba(215, 181, 109, 0.3);
+  background: rgba(139, 115, 85, 0.15);
+  color: var(--color-accent-secondary);
+  border: 1px solid rgba(139, 115, 85, 0.3);
 }
 
 .navIcon {
@@ -291,16 +291,16 @@ body {
   left: 50%;
   transform: translateX(-50%);
   min-width: 220px;
-  background: white;
+  background: var(--color-bg-elevated);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--ardoise-200);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 8px;
   padding: 0.75rem 0;
-  box-shadow: var(--shadow-luxe-lg);
+  box-shadow: var(--shadow-lg);
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%) translateY(-10px);
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   z-index: 100;
 }
 
@@ -314,12 +314,12 @@ body {
   display: block;
   width: 100%;
   padding: 0.75rem 1.5rem;
-  color: var(--bleu-nuit);
+  color: var(--color-text-primary);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: var(--font-sans);
-  transition: all 0.2s ease;
+  font-family: var(--font-body);
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
   background: none;
   border: none;
   text-align: left;
@@ -327,8 +327,8 @@ body {
 }
 
 .dropdownItem:hover {
-  background: rgba(215, 181, 109, 0.1);
-  color: var(--dore);
+  background: rgba(139, 115, 85, 0.1);
+  color: var(--color-accent-secondary);
   padding-left: 2rem;
 }
 
@@ -341,22 +341,22 @@ body {
 }
 
 .cartButton {
-  background: var(--dore);
+  background: var(--color-accent-secondary);
   border: none;
-  color: var(--bleu-nuit);
+  color: var(--color-text-inverse);
   border-radius: 2px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-weight: 600;
   font-size: 0.875rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: var(--shadow-dore);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
   position: relative;
   overflow: hidden;
   min-width: 40px;
@@ -379,8 +379,8 @@ body {
 
 .cartButton:hover {
   transform: translateY(-2px);
-  background: var(--dore-400);
-  box-shadow: 0 0 30px rgba(215, 181, 109, 0.4);
+  background: var(--color-accent-gold);
+  box-shadow: 0 0 30px rgba(139, 115, 85, 0.4);
 }
 
 .cartButtonWrapper {
@@ -499,26 +499,26 @@ body {
 }
 
 .loginButton {
-  background: var(--dore);
+  background: var(--color-accent-secondary);
   border: none;
-  color: var(--bleu-nuit);
+  color: var(--color-text-inverse);
   border-radius: 2px;
   padding: 0.5rem 0.875rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-weight: 600;
   font-size: 0.8125rem;
-  font-family: var(--font-sans);
-  box-shadow: var(--shadow-dore);
+  font-family: var(--font-body);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
 }
 
 .loginButton:hover {
   transform: translateY(-2px);
-  background: var(--dore-400);
-  box-shadow: 0 8px 20px rgba(215, 181, 109, 0.3);
+  background: var(--color-accent-gold);
+  box-shadow: 0 8px 20px rgba(139, 115, 85, 0.3);
 }
 
 .loginIcon {
@@ -530,26 +530,26 @@ body {
 }
 
 .profileButton {
-  background: var(--dore);
+  background: var(--color-accent-secondary);
   border: none;
-  color: var(--bleu-nuit);
+  color: var(--color-text-inverse);
   border-radius: 2px;
   padding: 0.5rem 0.875rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-weight: 600;
   font-size: 0.8125rem;
-  font-family: var(--font-sans);
-  box-shadow: var(--shadow-dore);
+  font-family: var(--font-body);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
 }
 
 .profileButton:hover {
   transform: translateY(-2px);
-  background: var(--dore-400);
-  box-shadow: 0 8px 20px rgba(215, 181, 109, 0.3);
+  background: var(--color-accent-gold);
+  box-shadow: 0 8px 20px rgba(139, 115, 85, 0.3);
 }
 
 .profileIcon {

@@ -105,7 +105,7 @@ const allCards: Card[] = [
   }
 ];
 
-const tcgs = ['Tous', 'Pokémon', 'One Piece', 'Yu-Gi-Oh!', 'Magic: The Gathering', 'Dragon Ball Super', 'Digimon'];
+const tcgs = ['Tous', 'Pokémon', 'One Piece', 'Yu-Gi-Oh!', 'Magic: The Gathering', 'Riftbound', 'Dragon Ball Super', 'Digimon'];
 const rarities = ['Toutes', 'Commune', 'Peu Commune', 'Rare', 'Super Rare', 'Ultra Rare', 'Mythic Rare'];
 
 export function CardsPage() {
@@ -146,6 +146,7 @@ export function CardsPage() {
       case 'One Piece': return '🏴‍☠️';
       case 'Yu-Gi-Oh!': return '🐉';
       case 'Magic: The Gathering': return '✨';
+      case 'Riftbound': return '🌌';
       case 'Dragon Ball Super': return '🐉';
       case 'Digimon': return '🦖';
       default: return '🃏';
@@ -196,6 +197,13 @@ export function CardsPage() {
           gradient: 'linear-gradient(135deg, #10b981, #059669)',
           hover: 'linear-gradient(135deg, #059669, #047857)'
         };
+      case 'Riftbound': 
+        return {
+          primary: '#6366f1',
+          secondary: '#4f46e5',
+          gradient: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+          hover: 'linear-gradient(135deg, #4f46e5, #4338ca)'
+        };
       default: 
         return {
           primary: '#94a3b8',
@@ -220,6 +228,17 @@ export function CardsPage() {
 
   return (
     <div className={styles.container}>
+      {/* Panneau d'avertissement - En construction */}
+      <div className={styles.constructionBanner}>
+        <div className={styles.constructionContent}>
+          <span className={styles.constructionIcon}>🚧</span>
+          <div className={styles.constructionText}>
+            <strong>Section en construction</strong>
+            <p>Cette fonctionnalité est actuellement en développement. Elle sera bientôt disponible !</p>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.header}>
         <h1 className={styles.title}>Cartes à Collectionner</h1>
         <p className={styles.subtitle}>

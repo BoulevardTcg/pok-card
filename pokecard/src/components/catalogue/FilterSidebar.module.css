@@ -1,61 +1,55 @@
+/* ===================================================================
+   FILTER SIDEBAR — Filtres premium
+   =================================================================== */
+
 .sidebar {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg, 8px);
+  padding: var(--space-6, 1.5rem);
   position: sticky;
   top: 96px;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
-:global(.dark) .sidebar {
-  background: #1A1D21;
-  border-color: #2E3542;
-}
+/* ─────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────── */
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .title {
-  font-size: 1.125rem;
-  font-family: var(--font-serif);
-  color: #0C1321;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .title {
-  color: white;
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
 }
 
 .resetButton {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
   background: none;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: var(--font-sans);
-}
-
-:global(.dark) .resetButton {
-  color: #9ca3af;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .resetButton:hover {
-  color: #0C1321;
+  color: var(--color-text-primary);
 }
 
-:global(.dark) .resetButton:hover {
-  color: white;
-}
+/* ─────────────────────────────────────────────────────────────────
+   SECTIONS
+   ───────────────────────────────────────────────────────────────── */
 
 .section {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .sectionButton {
@@ -68,70 +62,56 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3, 0.75rem);
 }
 
 .sectionTitle {
-  font-weight: 500;
-  color: #0C1321;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .sectionTitle {
-  color: white;
+  font-family: var(--font-body);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
 }
 
 .chevron {
-  font-size: 0.75rem;
-  color: #6b7280;
-  transition: transform 0.3s ease, color 0.3s ease;
-}
-
-:global(.dark) .chevron {
-  color: #9ca3af;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted);
+  transition: transform var(--duration-base, 250ms) var(--ease-out);
 }
 
 .chevron.open {
   transform: rotate(180deg);
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   OPTIONS
+   ───────────────────────────────────────────────────────────────── */
+
 .options {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
 }
 
 .option {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
   cursor: pointer;
 }
 
 .radio {
   width: 1rem;
   height: 1rem;
-  accent-color: #D7B56D;
+  accent-color: var(--color-accent-secondary);
   cursor: pointer;
 }
 
 .optionLabel {
-  font-size: 0.875rem;
-  color: #4b5563;
-  transition: color 0.3s ease;
-  font-family: var(--font-sans);
-}
-
-:global(.dark) .optionLabel {
-  color: #9ca3af;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+  transition: color var(--duration-base, 250ms) var(--ease-out);
 }
 
 .option:hover .optionLabel {
-  color: #0C1321;
+  color: var(--color-text-primary);
 }
-
-:global(.dark) .option:hover .optionLabel {
-  color: white;
-}
-

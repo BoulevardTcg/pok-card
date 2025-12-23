@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styles from './CategorySpecificPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
+import { navigateToProduct } from './utils/productMatching';
 
 interface Product {
   id: number;
@@ -575,118 +576,9 @@ export function CategorySpecificPage() {
                       
                       <button 
                         className={styles.viewProductButton}
-                        onClick={async () => {
-                          const normalize = (str: string) => str.toLowerCase()
-                            .normalize('NFD')
-                            .replace(/[\u0300-\u036f]/g, '')
-                            .replace(/\s+/g, ' ')
-                            .trim();
-                          
-                          const normalizedProductName = normalize(product.name);
-                          
-                          let matchingProduct = apiProducts.find(p => {
-                            const normalizedPName = normalize(p.name);
-                            return normalizedPName === normalizedProductName ||
-                                   normalizedPName.includes(normalizedProductName) ||
-                                   normalizedProductName.includes(normalizedPName);
-                          });
-                          
-                          if (!matchingProduct) {
-                            const productKeywords = normalizedProductName.split(' ').filter(w => w.length > 3);
-                            matchingProduct = apiProducts.find(p => {
-                              const normalizedPName = normalize(p.name);
-                              return productKeywords.some(keyword => normalizedPName.includes(keyword));
-                            });
-                          }
-                          
-                          if (matchingProduct && matchingProduct.slug) {
-                            navigate(`/produit/${matchingProduct.slug}`);
-                            return;
-                          }
-                          
-                          try {
-                            const response = await listProducts({ search: product.name, limit: 20 }) as { products: ProductType[] };
-                            const found = response.products?.find((p: ProductType) => {
-                              const normalizedPName = normalize(p.name);
-                              return normalizedPName === normalizedProductName ||
-                                     normalizedPName.includes(normalizedProductName) ||
-                                     normalizedProductName.includes(normalizedPName);
-                            });
-                            
-                            if (found && found.slug) {
-                              navigate(`/produit/${found.slug}`);
-                              return;
-                            }
-                          } catch (error) {
-                            console.error('Erreur lors de la recherche:', error);
-                          }
-                          
-                          navigate(`/produits?search=${encodeURIComponent(product.name)}`);
-                        }}
+                        onClick={() => navigateToProduct(product.name, apiProducts, navigate)}
                       >
                         Voir le produit
-                      </button>
-                    </div>
-                  </div>
-                );
-              } else {
-                // Produit API
-                const product = item.data;
-                const formatPrice = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
-                const maxStock = Math.max(...product.variants.map(v => v.stock));
-                const isOutOfStock = maxStock <= 0;
-                
-                return (
-                  <div key={`api-${product.id}`} className={styles.productCard}>
-                    <div className={styles.productImage}>
-                      {product.images && product.images.length > 0 ? (
-                        <img src={product.images[0].url} alt={product.images[0].altText || product.name} />
-                      ) : (
-                        <div className={styles.placeholderImage}>Pas d'image</div>
-                      )}
-                      {isOutOfStock && <span className={styles.outOfStockBanner}>Rupture de stock</span>}
-                    </div>
-                    
-                    <div className={styles.productInfo}>
-                      <div className={styles.subcategoryInfo}>
-                        <span className={styles.subcategory}>
-                          {product.name.toLowerCase().includes('demi-display') ? 'Demi-Display' : 'Display'}
-                        </span>
-                      </div>
-                      
-                      <h3 className={styles.productName}>{product.name}</h3>
-                      {product.description && (
-                        <p className={styles.productDescription}>
-                          {product.description.length > 100 
-                            ? product.description.substring(0, 100) + '...' 
-                            : product.description}
-                        </p>
-                      )}
-                      
-                      <div className={styles.priceContainer}>
-                        {product.minPriceCents !== null && (
-                          <span className={styles.price}>
-                            À partir de {formatPrice(product.minPriceCents)}€
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className={styles.stockInfo}>
-                        <span className={styles.stock}>
-                          Stock: {isOutOfStock ? 'Rupture' : maxStock}
-                        </span>
-                      </div>
-                      
-                      <button 
-                        className={styles.viewProductButton}
-                        onClick={() => {
-                          if (product.slug) {
-                            navigate(`/produit/${product.slug}`);
-                          }
-                        }}
-                        disabled={!product.slug || isOutOfStock}
-                      >
-                        {isOutOfStock ? 'Rupture de stock' : 'Voir le produit'}
                       </button>
                     </div>
                   </div>

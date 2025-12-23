@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import styles from './FilterSidebar.module.css';
 
-const filters = {
-  categories: ['Toutes', 'Pokémon', 'One Piece', 'Magic', 'Yu-Gi-Oh'],
+const filterOptions = {
+  categories: ['Toutes', 'Pokémon', 'One Piece', 'Magic', 'Riftbound', 'Yu-Gi-Oh'],
   priceRanges: [
     { label: 'Tous les prix', value: 'all' },
     { label: 'Moins de 50€', value: '0-50' },
@@ -13,25 +13,30 @@ const filters = {
   conditions: ['Toutes', 'Neuf', 'Excellent', 'Très bon', 'Bon'],
 };
 
-interface FilterSidebarProps {
-  selectedCategory: string;
+interface FilterValues {
+  category: string;
+  priceRange: string;
+  condition: string;
+}
+
+interface FilterCallbacks {
   onCategoryChange: (category: string) => void;
-  selectedPriceRange: string;
   onPriceRangeChange: (range: string) => void;
-  selectedCondition: string;
   onConditionChange: (condition: string) => void;
   onReset: () => void;
 }
 
+interface FilterSidebarProps {
+  filters: FilterValues;
+  callbacks: FilterCallbacks;
+}
+
 export default function FilterSidebar({
-  selectedCategory,
-  onCategoryChange,
-  selectedPriceRange,
-  onPriceRangeChange,
-  selectedCondition,
-  onConditionChange,
-  onReset,
+  filters,
+  callbacks,
 }: FilterSidebarProps) {
+  const { category: selectedCategory, priceRange: selectedPriceRange, condition: selectedCondition } = filters;
+  const { onCategoryChange, onPriceRangeChange, onConditionChange, onReset } = callbacks;
   const [openSections, setOpenSections] = useState<string[]>(['categories', 'price']);
 
   const toggleSection = (section: string) => {
@@ -64,7 +69,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('categories') && (
           <div className={styles.options}>
-            {filters.categories.map((category) => (
+            {filterOptions.categories.map((category) => (
               <label key={category} className={styles.option}>
                 <input
                   type="radio"
@@ -94,7 +99,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('price') && (
           <div className={styles.options}>
-            {filters.priceRanges.map((range) => (
+            {filterOptions.priceRanges.map((range) => (
               <label key={range.value} className={styles.option}>
                 <input
                   type="radio"
@@ -124,7 +129,7 @@ export default function FilterSidebar({
         </button>
         {openSections.includes('condition') && (
           <div className={styles.options}>
-            {filters.conditions.map((condition) => (
+            {filterOptions.conditions.map((condition) => (
               <label key={condition} className={styles.option}>
                 <input
                   type="radio"

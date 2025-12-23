@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '../../cartContext';
+import { useAuth } from '../../authContext';
 import type { Product } from '../../cartContext';
 import styles from './ProductCard.module.css';
 
@@ -11,6 +12,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const { isAuthenticated } = useAuth();
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -20,20 +22,32 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.outOfStock) {
-      // Créer un produit compatible avec le panier
-      const cartProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.minPriceCents || 0,
-        image: product.image?.url || '',
-      };
-      addToCart(cartProduct, 1);
+    
+    // Vérifier l'authentification
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: product.slug ? `/produit/${product.slug}` : '/produits' } });
+      return;
+    }
+    
+    if (!product.outOfStock && product.variants && product.variants.length > 0) {
+      // Sélectionner la première variante disponible (avec stock > 0)
+      const availableVariant = product.variants.find(v => v.stock > 0);
+      
+      if (availableVariant) {
+        addToCart(availableVariant, product);
+      } else {
+        // Si aucune variante n'a de stock, rediriger vers la page de détail
+        if (product.slug) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          navigate(`/produit/${product.slug}`);
+        }
+      }
     }
   };
 
   const handleCardClick = () => {
     if (product.slug && !product.outOfStock) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       navigate(`/produit/${product.slug}`);
     }
   };
@@ -77,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className={styles.rating}>
           {[...Array(5)].map((_, i) => (
             <span key={i} className={`${styles.star} ${i < 4 ? styles.filled : ''}`}>
-              ⭐
+              ★
             </span>
           ))}
         </div>

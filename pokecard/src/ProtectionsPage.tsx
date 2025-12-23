@@ -177,6 +177,7 @@ export function ProtectionsPage() {
                       e.preventDefault();
                       e.stopPropagation();
                       if (product.slug) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                         navigate(`/produit/${product.slug}`);
                       } else {
                         alert('Ce produit n\'a pas de slug. Veuillez contacter le support.');

@@ -1,0 +1,16 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/src/generated/prisma
+
+# SQLite (ancien système - à supprimer après migration)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+prisma/dev.db*
+
+# PostgreSQL (ne pas commiter les dumps)
+*.sql
+*.dump

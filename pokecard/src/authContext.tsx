@@ -124,6 +124,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  // Fonction helper pour charger le profil
+  const loadProfile = async (accessToken: string) => {
+    try {
+      const response = await fetch(`${API_BASE}/users/profile`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+      }
+    } catch {
+      // Silently fail - user is already set from decoded token
+    }
+  }
+
+  // Fonction utilitaire pour gérer le cas où on a un token d'accès
+  const handleAccessTokenCase = async (storedToken: string, refreshToken: string | null) => {
+    // Pré-remplir avec le payload décodé
+    const decoded = decodeAccessToken(storedToken)
+    if (decoded) {
+      setUser((prev) => prev ?? (decoded as User))
+    }
+    
+    // Si le token n'est pas expiré, l'utiliser directement
+    if (!isTokenExpired(storedToken)) {
+      setToken(storedToken)
+      await loadProfile(storedToken)
+      return
+    }
+    
+    // Si le token est expiré, essayer de le rafraîchir
+    if (refreshToken) {
+      const newAccessToken = await refreshAccessToken(refreshToken)
+      if (newAccessToken) {
+        const decodedNew = decodeAccessToken(newAccessToken)
+        if (decodedNew) {
+          setUser(decodedNew as User)
+        }
+        await loadProfile(newAccessToken)
+        return
+      }
+    }
+    
+    // Refresh échoué ou pas de refresh token, déconnecter
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    setToken(null)
+    setUser(null)
+  }
+
+  // Fonction utilitaire pour gérer le cas où on a seulement un refresh token
+  const handleRefreshTokenCase = async (refreshToken: string) => {
+    const newAccessToken = await refreshAccessToken(refreshToken)
+    if (newAccessToken) {
+      const decodedNew = decodeAccessToken(newAccessToken)
+      if (decodedNew) {
+        setUser(decodedNew as User)
+      }
+      await loadProfile(newAccessToken)
+    } else {
+      // Refresh token invalide
+      localStorage.removeItem('refreshToken')
+      setToken(null)
+      setUser(null)
+    }
+  }
+
   // Vérifier si l'utilisateur est déjà connecté au chargement
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -131,72 +198,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedToken = localStorage.getItem('accessToken')
         const refreshToken = localStorage.getItem('refreshToken')
         
-        // Fonction helper pour charger le profil
-        const loadProfile = async (accessToken: string) => {
-          try {
-            const response = await fetch(`${API_BASE}/users/profile`, {
-              headers: { 'Authorization': `Bearer ${accessToken}` }
-            })
-            if (response.ok) {
-              const data = await response.json()
-              setUser(data.user)
-            }
-          } catch {
-            // Silently fail - user is already set from decoded token
-          }
-        }
-        
         // Cas 1: On a un token d'accès
         if (storedToken && storedToken.length > 0) {
-          // Pré-remplir avec le payload décodé
-          const decoded = decodeAccessToken(storedToken)
-          if (decoded) {
-            setUser((prev) => prev ?? (decoded as User))
-          }
-          
-          // Si le token n'est pas expiré, l'utiliser directement
-          if (!isTokenExpired(storedToken)) {
-            setToken(storedToken)
-            await loadProfile(storedToken)
-          } 
-          // Si le token est expiré, essayer de le rafraîchir
-          else if (refreshToken) {
-            const newAccessToken = await refreshAccessToken(refreshToken)
-            if (newAccessToken) {
-              const decodedNew = decodeAccessToken(newAccessToken)
-              if (decodedNew) {
-                setUser(decodedNew as User)
-              }
-              await loadProfile(newAccessToken)
-            } else {
-              // Refresh échoué, déconnecter
-              localStorage.removeItem('accessToken')
-              localStorage.removeItem('refreshToken')
-              setToken(null)
-              setUser(null)
-            }
-          } else {
-            // Pas de refresh token, déconnecter
-            localStorage.removeItem('accessToken')
-            setToken(null)
-            setUser(null)
-          }
+          await handleAccessTokenCase(storedToken, refreshToken)
         } 
         // Cas 2: Pas de token d'accès mais on a un refresh token
         else if (refreshToken) {
-          const newAccessToken = await refreshAccessToken(refreshToken)
-          if (newAccessToken) {
-            const decodedNew = decodeAccessToken(newAccessToken)
-            if (decodedNew) {
-              setUser(decodedNew as User)
-            }
-            await loadProfile(newAccessToken)
-          } else {
-            // Refresh token invalide
-            localStorage.removeItem('refreshToken')
-            setToken(null)
-            setUser(null)
-          }
+          await handleRefreshTokenCase(refreshToken)
         }
       } catch (error) {
         console.error('Erreur auth:', error)

@@ -1,103 +1,167 @@
+/* ===================================================================
+   CONCOURS PAGE — Concours premium
+   =================================================================== */
+
 .banner {
-  background: linear-gradient(90deg, #fde047 0%, #fffbe6 100%);
-  color: #2563eb;
-  border-radius: 18px;
-  padding: 2.5rem 2rem 2rem 2rem;
+  background: linear-gradient(135deg, var(--color-accent-secondary), var(--color-accent-gold));
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-10, 2.5rem) var(--space-8, 2rem) var(--space-8, 2rem) var(--space-8, 2rem);
   text-align: center;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 4px 32px #fde04722;
+  margin-bottom: var(--space-10, 2.5rem);
+  box-shadow: var(--shadow-lg);
 }
+
 .banner h1 {
-  font-size: 2.2rem;
-  margin-bottom: 1rem;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-2xl, 1.5rem), 4vw, var(--text-4xl, 2.5rem));
+  margin-bottom: var(--space-4, 1rem);
+  font-weight: var(--font-semibold, 600);
+  letter-spacing: var(--tracking-wide, 0.02em);
 }
+
 .banner p {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  margin-bottom: var(--space-2, 0.5rem);
+  opacity: 0.9;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   STEPS
+   ───────────────────────────────────────────────────────────────── */
+
 .steps {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-10, 2.5rem);
 }
+
 .steps h2 {
   text-align: center;
-  font-size: 1.3rem;
-  margin-bottom: 1.5rem;
-  color: #2563eb;
+  font-family: var(--font-display);
+  font-size: var(--text-xl, 1.25rem);
+  font-weight: var(--font-medium, 500);
+  margin-bottom: var(--space-6, 1.5rem);
+  color: var(--color-accent-secondary);
 }
+
 .stepsGrid {
   display: flex;
   justify-content: center;
-  gap: 2.5rem;
+  gap: var(--space-10, 2.5rem);
   flex-wrap: wrap;
 }
+
 .step {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px #fde04711;
-  padding: 1.2rem 2rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5, 1.25rem) var(--space-8, 2rem);
   text-align: center;
-  font-size: 1.1rem;
-  color: #222;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 140px;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
+
+.step:hover {
+  border-color: var(--color-accent-secondary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
 .step span {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: var(--text-3xl, 2rem);
+  margin-bottom: var(--space-2, 0.5rem);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   FORM SECTION
+   ───────────────────────────────────────────────────────────────── */
+
 .formSection {
-  background: #fff;
-  border-radius: 14px;
-  padding: 2rem 1.5rem;
-  box-shadow: 0 2px 16px #fde04711;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-8, 2rem) var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-md);
   text-align: center;
   max-width: 400px;
   margin: 0 auto;
 }
+
 .formSection h3 {
-  color: #2563eb;
-  font-size: 1.1rem;
-  margin-bottom: 1.2rem;
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-accent-secondary);
+  margin-bottom: var(--space-5, 1.25rem);
 }
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: var(--space-5, 1.25rem);
 }
+
 .form input {
-  padding: 0.8rem 1rem;
-  border-radius: 7px;
-  border: 1px solid #e3e3e3;
-  font-size: 1rem;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--color-border-default);
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
   outline: none;
-  transition: border 0.2s;
+  transition: border var(--duration-fast, 150ms) var(--ease-out);
 }
+
+.form input::placeholder {
+  color: var(--color-text-muted);
+}
+
 .form input:focus {
-  border: 1.5px solid #2563eb;
+  border: 1px solid var(--color-accent-secondary);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
 }
+
 .submitBtn {
-  background: #2563eb;
-  color: #fff;
-  font-weight: bold;
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
+  font-family: var(--font-body);
+  font-weight: var(--font-semibold, 600);
   border: none;
-  border-radius: 8px;
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
+  border-radius: var(--radius-lg, 8px);
+  padding: var(--space-4, 1rem) var(--space-10, 2.5rem);
+  font-size: var(--text-lg, 1.125rem);
   cursor: pointer;
-  box-shadow: 0 2px 12px #2563eb33;
-  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 12px rgba(139, 115, 85, 0.3);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
+
 .submitBtn:hover {
-  background: #fde047;
-  color: #2563eb;
+  background: var(--color-accent-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 115, 85, 0.4);
 }
+
 .success {
-  color: #2563eb;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-top: 1.5rem;
-} 
+  font-family: var(--font-body);
+  font-weight: var(--font-semibold, 600);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-success);
+  margin-top: var(--space-6, 1.5rem);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────────────────────── */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

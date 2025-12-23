@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et remplacé par FeaturedCards.tsx
+ * FeaturedCards offre un design orienté investissement avec grades et tendances de prix.
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listProducts } from '../../api';
@@ -118,7 +124,12 @@ export default function LatestProductsCarousel() {
                 <div
                   key={product.id}
                   className={styles.productCard}
-                  onClick={() => product.slug && navigate(`/produit/${product.slug}`)}
+                  onClick={() => {
+                    if (product.slug) {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigate(`/produit/${product.slug}`);
+                    }
+                  }}
                 >
                   <div className={styles.imageContainer}>
                     {product.images && product.images.length > 0 ? (

@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié et n'est plus utilisé dans la landing page.
+ * La landing page utilise désormais : TrustSignals, FeaturedCards, ProcessSection
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import styles from './BenefitsSection.module.css';
 
 const benefits = [

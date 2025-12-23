@@ -8,6 +8,7 @@ import ProductGrid from './components/catalogue/ProductGrid';
 export function ProductsPage() {
   const [allProducts, setAllProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Toutes');
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>('all');
   const [selectedCondition, setSelectedCondition] = useState<string>('Toutes');
@@ -54,10 +55,11 @@ export function ProductsPage() {
     return filteredProducts.slice(startIndex, endIndex);
   }, [filteredProducts, page, productsPerPage]);
 
-  // Charger les produits
+  // Charger les produits au montage et quand la catégorie change
   useEffect(() => {
     loadAllProducts();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
 
   // Réinitialiser la page quand les filtres changent
   useEffect(() => {
@@ -66,21 +68,37 @@ export function ProductsPage() {
 
   async function loadAllProducts() {
     setLoading(true);
+    setError(null);
     try {
       const response = await listProducts({
         limit: 200,
         category: selectedCategory === 'Toutes' ? undefined : selectedCategory,
       }) as { products: ProductType[]; pagination: { page: number; total: number; pages: number } };
       
+      console.log('📦 Produits reçus:', response.products?.length || 0);
+      
+      if (!response || !response.products) {
+        console.error('❌ Réponse invalide de l\'API:', response);
+        setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
+        setAllProducts([]);
+        return;
+      }
+      
       // Filtrer pour exclure les produits de la catégorie "Accessoires"
       let filteredProducts = response.products.filter(p => p.category !== 'Accessoires');
       
-      // Mélanger les produits
-      const shuffledProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
+      console.log('✅ Produits filtrés:', filteredProducts.length);
       
-      setAllProducts(shuffledProducts);
+      // Si une catégorie spécifique est sélectionnée, ne pas mélanger pour garder l'ordre
+      if (selectedCategory === 'Toutes') {
+        // Mélanger les produits seulement si toutes les catégories sont affichées
+        filteredProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
+      }
+      
+      setAllProducts(filteredProducts);
     } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
+      console.error('❌ Erreur lors du chargement des produits:', error);
+      setError('Erreur lors du chargement des produits. Veuillez réessayer.');
       setAllProducts([]);
     } finally {
       setLoading(false);
@@ -112,13 +130,17 @@ export function ProductsPage() {
           {/* Sidebar filtres */}
           <aside className={styles.sidebar}>
             <FilterSidebar
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              selectedPriceRange={selectedPriceRange}
-              onPriceRangeChange={setSelectedPriceRange}
-              selectedCondition={selectedCondition}
-              onConditionChange={setSelectedCondition}
-              onReset={handleReset}
+              filters={{
+                category: selectedCategory,
+                priceRange: selectedPriceRange,
+                condition: selectedCondition,
+              }}
+              callbacks={{
+                onCategoryChange: setSelectedCategory,
+                onPriceRangeChange: setSelectedPriceRange,
+                onConditionChange: setSelectedCondition,
+                onReset: handleReset,
+              }}
             />
           </aside>
 
@@ -126,6 +148,17 @@ export function ProductsPage() {
           <main className={styles.main}>
             {loading ? (
               <div className={styles.loading}>Chargement des produits...</div>
+            ) : error ? (
+              <div className={styles.errorState}>
+                <p>{error}</p>
+                <button onClick={loadAllProducts} className={styles.retryButton}>
+                  Réessayer
+                </button>
+              </div>
+            ) : allProducts.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p>Aucun produit disponible pour le moment.</p>
+              </div>
             ) : (
               <ProductGrid
                 products={paginatedProducts}

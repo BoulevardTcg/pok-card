@@ -1,3 +1,9 @@
+/**
+ * @deprecated Ce composant est déprécié dans la landing page.
+ * Les actualités sont maintenant accessibles via la page /actualites.
+ * Ce fichier peut être supprimé de la landing lors du prochain nettoyage.
+ */
+
 import { useNavigate } from 'react-router-dom';
 import styles from './NewsSection.module.css';
 

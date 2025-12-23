@@ -1,3 +1,8 @@
+/**
+ * @deprecated Ce composant est déprécié et n'est plus utilisé dans la landing page.
+ * Ce fichier peut être supprimé lors du prochain nettoyage.
+ */
+
 import styles from './ClientLogos.module.css';
 
 export default function ClientLogos() {

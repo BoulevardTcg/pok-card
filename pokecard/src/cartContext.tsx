@@ -20,6 +20,8 @@ export interface Product {
   variants: ProductVariant[];
   minPriceCents: number | null;
   outOfStock: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CartItem {

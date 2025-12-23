@@ -1,54 +1,86 @@
-.header {
+/* ===================================================================
+   ADMIN PROMOS PAGE — Nouvelle DA Dark
+   =================================================================== */
+
+.loading, .empty {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  justify-content: center;
+  min-height: 400px;
+  gap: var(--space-4, 1rem);
+  text-align: center;
+  color: var(--color-text-muted, #6B6B6F);
 }
 
-.header h1 {
-  margin: 0 0 0.25rem 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  transition: color 0.3s ease;
-}
+.empty svg { opacity: 0.3; }
 
-.header p {
+.empty h3 {
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-size: var(--text-xl, 1.25rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary, #F5F5F3);
   margin: 0;
-  color: #666;
-  transition: color 0.3s ease;
+}
+
+.empty p {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  margin: 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-top-color: var(--color-accent-secondary, #8B7355);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.pageCount {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-muted, #6B6B6F);
+  margin: 0;
 }
 
 .addButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #3b82f6;
-  color: white;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
+  background: var(--color-accent-primary, #E8E4DD);
+  color: var(--color-bg-primary, #0A0A0B);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md, 4px);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .addButton:hover {
-  background: #2563eb;
+  background: var(--color-accent-hover, #F5F2ED);
 }
 
-.loading,
-.empty {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #999;
-}
-
-.tableWrapper {
-  background: white;
-  border-radius: 12px;
+/* Table */
+.tableContainer {
+  background: var(--color-bg-elevated, #141416);
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-lg, 8px);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .table {
@@ -56,124 +88,139 @@
   border-collapse: collapse;
 }
 
-.table thead {
-  background: #f9fafb;
-}
-
 .table th {
-  padding: 1rem;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   text-align: left;
-  font-weight: 600;
-  color: #666;
-  font-size: 0.875rem;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #6B6B6F);
+  background: var(--color-bg-subtle, #1A1A1D);
+  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
 }
 
 .table td {
-  padding: 1rem;
-  border-top: 1px solid #e5e5e5;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary, #A1A1A6);
+  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  vertical-align: middle;
 }
 
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: var(--color-bg-hover, #1F1F23); }
+
+/* Code */
 .code {
-  font-family: monospace;
-  font-weight: 600;
-  color: #3b82f6;
+  display: inline-block;
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  background: var(--color-bg-subtle, #1A1A1D);
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md, 4px);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-accent-primary, #E8E4DD);
 }
 
+/* Value */
+.value {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-primary, #F5F5F3);
+}
+
+.type {
+  display: block;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted, #6B6B6F);
+  margin-top: var(--space-1, 0.25rem);
+}
+
+/* Usage */
+.usage {
+  font-family: var(--font-mono, monospace);
+}
+
+/* Dates */
 .dates {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: var(--space-2, 0.5rem);
+  font-size: var(--text-xs, 0.75rem);
 }
 
-.badge {
+.arrow {
+  color: var(--color-text-muted, #6B6B6F);
+}
+
+/* Status Badge */
+.statusBadge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: white;
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
 }
 
+.statusBadge.success {
+  background: var(--color-success-muted, rgba(74, 222, 128, 0.15));
+  color: var(--color-success, #4ADE80);
+}
+
+.statusBadge.error {
+  background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
+  color: var(--color-error, #F87171);
+}
+
+.statusBadge.neutral {
+  background: rgba(161, 161, 166, 0.15);
+  color: var(--color-text-secondary, #A1A1A6);
+}
+
+/* Actions */
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
 }
 
-.editButton,
-.deleteButton {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 6px;
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-bg-subtle, #1A1A1D);
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md, 4px);
+  color: var(--color-text-secondary, #A1A1A6);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
-.editButton {
-  background: #f3f4f6;
-  color: #3b82f6;
+.actionButton:hover {
+  background: var(--color-bg-hover, #1F1F23);
+  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
+  color: var(--color-text-primary, #F5F5F3);
 }
 
-.editButton:hover {
-  background: #e5e7eb;
+.actionButton.danger:hover {
+  background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--color-error, #F87171);
 }
 
-.deleteButton {
-  background: #fee2e2;
-  color: #ef4444;
+/* Responsive */
+@media (max-width: 1024px) {
+  .table th:nth-child(3), .table td:nth-child(3) { display: none; }
 }
 
-.deleteButton:hover {
-  background: #fecaca;
+@media (max-width: 768px) {
+  .pageHeader { flex-direction: column; align-items: stretch; gap: var(--space-4, 1rem); }
+  .table th, .table td { padding: var(--space-3, 0.75rem); }
+  .table th:nth-child(4), .table td:nth-child(4) { display: none; }
 }
-
-/* Dark mode */
-:global(.dark) .header h1 {
-  color: #f2f2f2;
-}
-
-:global(.dark) .header p {
-  color: #9ca3af;
-}
-
-:global(.dark) .loading,
-:global(.dark) .empty {
-  color: #666;
-}
-
-:global(.dark) .tableWrapper {
-  background: #1a1a1a;
-  border: 1px solid #333;
-}
-
-:global(.dark) .table thead {
-  background: #2a2a2a;
-}
-
-:global(.dark) .table th {
-  color: #9ca3af;
-}
-
-:global(.dark) .table td {
-  border-top-color: #333;
-  color: #f2f2f2;
-}
-
-:global(.dark) .editButton {
-  background: #2a2a2a;
-}
-
-:global(.dark) .editButton:hover {
-  background: #333;
-}
-
-:global(.dark) .deleteButton {
-  background: #7f1d1d;
-}
-
-:global(.dark) .deleteButton:hover {
-  background: #991b1b;
-}
-

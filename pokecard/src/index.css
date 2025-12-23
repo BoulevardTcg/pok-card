@@ -1,9 +1,24 @@
-/* ===== NOUVELLE DA : LUXE PARISIEN BOULEVARDTCG ===== */
+/* ===================================================================
+   BOULEVARDTCG — Styles globaux
+   Import du système de design
+   =================================================================== */
 
-/* Variables CSS - Palette Premium */
+@import url('./styles/design-tokens.css');
+
+/* ===================================================================
+   FONTS — Google Fonts
+   =================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ===================================================================
+   LEGACY SUPPORT — Anciennes variables pour rétrocompatibilité
+   À supprimer progressivement lors de la migration des autres pages
+   =================================================================== */
+
 :root {
-  /* Couleurs principales */
-  --bleu-nuit: #0C1321;
+  /* Mapping des anciennes variables vers les nouvelles */
+  --bleu-nuit: var(--color-bg-primary);
   --bleu-nuit-50: #F0F4F8;
   --bleu-nuit-100: #D9E2EC;
   --bleu-nuit-200: #BCCCDC;
@@ -14,13 +29,13 @@
   --bleu-nuit-700: #334E68;
   --bleu-nuit-800: #243B53;
   --bleu-nuit-900: #102A43;
-  --bleu-nuit-950: #0C1321;
+  --bleu-nuit-950: var(--color-bg-primary);
 
-  --dore: #D7B56D;
+  --dore: var(--color-accent-secondary);
   --dore-50: #F9F6F0;
   --dore-100: #F2EDE0;
   --dore-200: #E5DBC1;
-  --dore-300: #D7B56D;
+  --dore-300: var(--color-accent-secondary);
   --dore-400: #C9A55A;
   --dore-500: #B89547;
   --dore-600: #A78534;
@@ -28,170 +43,101 @@
   --dore-800: #85650E;
   --dore-900: #74550B;
 
-  --champagne: #E8DCC3;
-  --champagne-50: #F9F7F3;
-  --champagne-100: #F3EFE7;
-  --champagne-200: #E8DCC3;
-  --champagne-300: #DDC9AF;
-  --champagne-400: #D2B69B;
-  --champagne-500: #C7A387;
-  --champagne-600: #BC9073;
-  --champagne-700: #B17D5F;
-  --champagne-800: #A66A4B;
-  --champagne-900: #9B5737;
+  --champagne: var(--color-accent-primary);
+  --ardoise: var(--color-bg-subtle);
+  --blanc-lumiere: var(--color-text-primary);
 
-  --ardoise: #2E3542;
-  --ardoise-50: #F8F9FA;
-  --ardoise-100: #E9ECEF;
-  --ardoise-200: #DEE2E6;
-  --ardoise-300: #CED4DA;
-  --ardoise-400: #ADB5BD;
-  --ardoise-500: #868E96;
-  --ardoise-600: #495057;
-  --ardoise-700: #343A40;
-  --ardoise-800: #2E3542;
-  --ardoise-900: #1A1D21;
+  /* Anciennes typographies */
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-elegant: var(--font-display);
 
-  --blanc-lumiere: #F2F2F2;
-  --blanc-lumiere-50: #FFFFFF;
-  --blanc-lumiere-100: #FAFAFA;
-  --blanc-lumiere-200: #F2F2F2;
-  --blanc-lumiere-300: #E8E8E8;
-  --blanc-lumiere-400: #DEDEDE;
+  /* Anciennes ombres */
+  --shadow-luxe: var(--shadow-md);
+  --shadow-luxe-lg: var(--shadow-lg);
+  --shadow-dore: 0 4px 20px rgba(139, 115, 85, 0.2);
 
-  --bordeaux: #4A1F2F;
-  --bordeaux-50: #F5E8ED;
-  --bordeaux-100: #EBD1DB;
-  --bordeaux-200: #D7A3B7;
-  --bordeaux-300: #C37593;
-  --bordeaux-400: #AF476F;
-  --bordeaux-500: #9B194B;
-  --bordeaux-600: #7A1439;
-  --bordeaux-700: #4A1F2F;
-  --bordeaux-800: #3A1825;
-  --bordeaux-900: #2A111B;
-
-  /* Typographie */
-  --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-elegant: 'Cormorant Garamond', serif;
-
-  /* Ombres */
-  --shadow-luxe: 0 4px 20px rgba(16, 42, 67, 0.15);
-  --shadow-luxe-lg: 0 8px 40px rgba(16, 42, 67, 0.2);
-  --shadow-dore: 0 4px 20px rgba(215, 181, 109, 0.2);
-
-  /* Transitions */
-  --transition-base: all 0.3s ease-in-out;
-  --transition-colors: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  /* Anciennes transitions */
+  --transition-base: all var(--duration-base) var(--ease-out);
+  --transition-colors: color var(--duration-fast), background-color var(--duration-fast);
 }
 
-/* Reset et base */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ===================================================================
+   DARK MODE — Le site est maintenant dark-first
+   =================================================================== */
+
+/* Le mode clair peut être activé via une classe .light si nécessaire */
+.light {
+  --color-bg-primary: #FAFAFA;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-subtle: #F5F5F5;
+  --color-bg-hover: #EFEFEF;
+  
+  --color-surface-card: #FFFFFF;
+  --color-surface-modal: #FFFFFF;
+  
+  --color-text-primary: #0A0A0B;
+  --color-text-secondary: #52525B;
+  --color-text-muted: #A1A1A6;
+  --color-text-inverse: #F5F5F3;
+  
+  --color-border-subtle: rgba(0, 0, 0, 0.06);
+  --color-border-default: rgba(0, 0, 0, 0.1);
+  --color-border-hover: rgba(0, 0, 0, 0.15);
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
+/* ===================================================================
+   GLOBAL OVERRIDES
+   =================================================================== */
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
 
-body {
-  font-family: var(--font-sans);
-  background: var(--blanc-lumiere-200);
-  color: var(--bleu-nuit);
-  overflow-x: hidden;
-  width: 100vw;
-  min-height: 100vh;
-  font-feature-settings: "kern" 1, "liga" 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* Focus visible pour accessibilité */
+:focus-visible {
+  outline: 2px solid var(--color-accent-secondary);
+  outline-offset: 2px;
 }
 
-/* Dark mode */
-.dark body {
-  background: var(--bleu-nuit);
-  color: var(--blanc-lumiere);
-}
-
-/* Typographie */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  color: var(--bleu-nuit);
-  font-feature-settings: "kern" 1, "liga" 1;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-  color: var(--blanc-lumiere);
-}
-
-/* Liens */
-a {
-  color: var(--bleu-nuit);
-  text-decoration: none;
-  transition: var(--transition-colors);
-}
-
-a:hover {
-  color: var(--dore);
-}
-
-/* Boutons de base */
-button {
-  font-family: var(--font-sans);
-  cursor: pointer;
-  transition: var(--transition-base);
-  border: none;
+/* Disable focus ring pour interactions souris */
+:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Utilitaires */
-.text-gradient-luxe {
-  background: linear-gradient(to right, var(--bleu-nuit-900), var(--bleu-nuit-700), var(--bleu-nuit-900));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Images responsive par défaut */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
-.text-gradient-dore {
-  background: linear-gradient(to right, var(--dore-500), var(--dore-600), var(--dore-500));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* ===================================================================
+   UTILITY ANIMATIONS
+   =================================================================== */
+
+.fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-out);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-in-out;
+.slide-up {
+  animation: slideUp var(--duration-slow) var(--ease-out);
 }
 
-.animate-slide-up {
-  animation: slideUp 0.6s ease-out;
-}
+/* Staggered animations */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 200ms; }
+.stagger-4 { animation-delay: 300ms; }
+.stagger-5 { animation-delay: 400ms; }

@@ -1,248 +1,208 @@
-/* ===== USER PROFILE PAGE - NOUVELLE DA BOULEVARD ===== */
+/* ===================================================================
+   USER PROFILE — Profil utilisateur premium
+   =================================================================== */
 
 .page {
   min-height: 100vh;
-  background: var(--blanc-lumiere-200);
-  padding: 3rem 0;
-  transition: background-color 0.3s ease;
-}
-
-:global(.dark) .page {
-  background: var(--bleu-nuit);
+  background: var(--color-bg-primary);
+  padding: var(--space-20, 5rem) 0 var(--space-12, 3rem);
 }
 
 .container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 var(--space-8, 2rem);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────── */
 
 .header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-12, 3rem);
 }
 
 .title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-family: var(--font-serif);
-  font-weight: 700;
-  color: #0C1321;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .title {
-  color: white;
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4, 1rem);
+  line-height: var(--leading-tight, 1.15);
 }
 
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
-  margin: 1.5rem auto;
+  background: var(--color-accent-secondary);
+  margin: var(--space-6, 1.5rem) auto;
 }
 
 .description {
-  font-size: 1.125rem;
-  color: #6b7280;
-  line-height: 1.7;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed, 1.65);
 }
 
-:global(.dark) .description {
-  color: #9ca3af;
-}
+/* ─────────────────────────────────────────────────────────────────
+   PROFILE CARD
+   ───────────────────────────────────────────────────────────────── */
 
 .profileCard {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 3rem;
-  box-shadow: 0 4px 20px rgba(16, 42, 67, 0.1);
-  transition: all 0.3s ease;
-}
-
-:global(.dark) .profileCard {
-  background: #1A1D21;
-  border-color: #2E3542;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-12, 3rem);
+  box-shadow: var(--shadow-lg);
 }
 
 .profileHeader {
   text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-:global(.dark) .profileHeader {
-  border-color: #2E3542;
+  margin-bottom: var(--space-12, 3rem);
+  padding-bottom: var(--space-8, 2rem);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .profileHeader h1 {
-  font-size: 2.5rem;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  color: #0C1321;
-  margin-bottom: 0.5rem;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .profileHeader h1 {
-  color: white;
+  font-family: var(--font-display);
+  font-size: var(--text-4xl, 2.5rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2, 0.5rem);
 }
 
 .profileHeader p {
-  font-size: 1.125rem;
-  color: #6b7280;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
+  font-family: var(--font-body);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-secondary);
 }
 
-:global(.dark) .profileHeader p {
-  color: #9ca3af;
-}
+/* ─────────────────────────────────────────────────────────────────
+   MESSAGES
+   ───────────────────────────────────────────────────────────────── */
 
 .successMessage {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
+  background: var(--color-success-muted);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: var(--color-success);
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: var(--space-6, 1.5rem);
   text-align: center;
-  font-weight: 500;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  font-weight: var(--font-medium, 500);
 }
 
 .errorMessage {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
+  background: var(--color-error-muted);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--color-error);
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: var(--space-6, 1.5rem);
   text-align: center;
-  font-weight: 500;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  font-weight: var(--font-medium, 500);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   PROFILE SECTION
+   ───────────────────────────────────────────────────────────────── */
 
 .profileSection {
-  margin-bottom: 2.5rem;
-  padding: 2rem;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
-}
-
-:global(.dark) .profileSection {
-  background: #0C1321;
-  border-color: #2E3542;
+  margin-bottom: var(--space-10, 2.5rem);
+  padding: var(--space-8, 2rem);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-xl, 12px);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-:global(.dark) .sectionHeader {
-  border-color: #2E3542;
+  margin-bottom: var(--space-6, 1.5rem);
+  padding-bottom: var(--space-4, 1rem);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .sectionHeader h2 {
-  font-size: 1.5rem;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  color: #0C1321;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
   margin: 0;
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .sectionHeader h2 {
-  color: white;
 }
 
 .editButton {
-  padding: 0.75rem 1.5rem;
-  background: #D7B56D;
-  color: #0C1321;
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.9375rem;
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .editButton:hover {
-  background: #C9A55A;
+  background: var(--color-accent-gold);
   transform: translateY(-2px);
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   PROFILE INFO
+   ───────────────────────────────────────────────────────────────── */
+
 .profileInfo {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-4, 1rem);
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
-}
-
-:global(.dark) .infoRow {
-  background: #1A1D21;
-  border-color: #2E3542;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .infoLabel {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #6b7280;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .infoLabel {
-  color: #9ca3af;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-secondary);
 }
 
 .infoValue {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #0C1321;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  color: var(--color-text-primary);
   text-align: right;
   max-width: 60%;
   word-break: break-word;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
 }
 
-:global(.dark) .infoValue {
-  color: white;
-}
+/* ─────────────────────────────────────────────────────────────────
+   EDIT FORM
+   ───────────────────────────────────────────────────────────────── */
 
 .editForm {
   display: grid;
-  gap: 1.5rem;
+  gap: var(--space-6, 1.5rem);
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--space-4, 1rem);
 }
 
 .formGroup {
@@ -251,43 +211,32 @@
 }
 
 .formGroup label {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #0C1321;
-  margin-bottom: 0.5rem;
-  font-family: var(--font-sans);
-  transition: color 0.3s ease;
-}
-
-:global(.dark) .formGroup label {
-  color: white;
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2, 0.5rem);
 }
 
 .formInput {
-  padding: 0.875rem 1rem;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  color: #0C1321;
-  font-size: 0.9375rem;
-  font-family: var(--font-sans);
-  transition: all 0.3s ease;
-}
-
-:global(.dark) .formInput {
-  background: #1A1D21;
-  border-color: #2E3542;
-  color: white;
+  padding: var(--space-3, 0.875rem) var(--space-4, 1rem);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-primary);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .formInput::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .formInput:focus {
   outline: none;
-  border-color: #D7B56D;
-  box-shadow: 0 0 0 3px rgba(215, 181, 109, 0.1);
+  border-color: var(--color-accent-secondary);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
 }
 
 .formTextarea {
@@ -297,21 +246,21 @@
 }
 
 .saveButton {
-  padding: 0.875rem 2rem;
-  background: #D7B56D;
-  color: #0C1321;
+  padding: var(--space-3, 0.875rem) var(--space-8, 2rem);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   justify-self: start;
 }
 
 .saveButton:hover:not(:disabled) {
-  background: #C9A55A;
+  background: var(--color-accent-gold);
   transform: translateY(-2px);
 }
 
@@ -321,79 +270,83 @@
   transform: none;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   PROFILE ACTIONS
+   ───────────────────────────────────────────────────────────────── */
+
 .profileActions {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-:global(.dark) .profileActions {
-  border-color: #2E3542;
+  gap: var(--space-4, 1rem);
+  margin-top: var(--space-12, 3rem);
+  padding-top: var(--space-8, 2rem);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .quickLinks {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: var(--space-4, 1rem);
+  margin-bottom: var(--space-4, 1rem);
 }
 
 .quickLink {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
-  background: #D7B56D;
-  color: #0C1321;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.875rem) var(--space-6, 1.5rem);
+  background: var(--color-accent-secondary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.9375rem;
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
   text-decoration: none;
 }
 
 .quickLink:hover {
-  background: #C9A55A;
+  background: var(--color-accent-gold);
   transform: translateY(-2px);
 }
 
 .logoutButton {
-  padding: 0.875rem 2rem;
+  padding: var(--space-3, 0.875rem) var(--space-8, 2rem);
   background: transparent;
-  color: #ef4444;
-  border: 2px solid #ef4444;
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
+  color: var(--color-error);
+  border: 2px solid var(--color-error);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .logoutButton:hover {
-  background: #ef4444;
+  background: var(--color-error);
   color: white;
   transform: translateY(-2px);
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .page {
-    padding: 2rem 0;
+    padding: var(--space-8, 2rem) 0;
   }
 
   .container {
-    padding: 0 1rem;
+    padding: 0 var(--space-4, 1rem);
   }
 
   .profileCard {
-    padding: 2rem 1.5rem;
+    padding: var(--space-8, 2rem) var(--space-6, 1.5rem);
   }
 
   .formRow {
@@ -403,7 +356,7 @@
   .infoRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: var(--space-2, 0.5rem);
   }
 
   .infoValue {
@@ -413,7 +366,7 @@
 
   .sectionHeader {
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-4, 1rem);
     align-items: flex-start;
   }
 
@@ -421,4 +374,3 @@
     grid-template-columns: 1fr;
   }
 }
-
