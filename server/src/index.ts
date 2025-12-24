@@ -319,7 +319,7 @@ app.use('*', (req, res) => {
 })
 
 const port = Number(process.env.PORT ?? 8080)
-const host = '0.0.0.0'
+const host = process.env.HOST ?? '0.0.0.0'
 
 app.listen(port, host, () => {
   logger.info(`🚀 Serveur démarré sur http://${host}:${port}`)
