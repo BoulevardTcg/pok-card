@@ -27,6 +27,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
+# Générer le client Prisma pour la production
+RUN npx prisma generate
 # Installer seulement les dépendances de production
 RUN npm ci --omit=dev
 
