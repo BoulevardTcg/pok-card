@@ -25,7 +25,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=8080
-      - DATABASE_URL=postgresql://pokecard_user:passwd@postgres:5432/pokecard_db?schema=public
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pokecard_user}:${POSTGRES_PASSWORD:-passwd}@postgres:5432/${POSTGRES_DB:-pokecard_db}?schema=public
     depends_on:
       postgres:
         condition: service_healthy
