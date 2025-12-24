@@ -93,3 +93,6 @@ coverage/
 # ==== AUTRES ====
 *.tgz
 *.tar.gz
+
+# ==== DOCKER VOLUMES ====
+postgres-data

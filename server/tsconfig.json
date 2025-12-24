@@ -11,17 +11,16 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
   },
   "include": [
-    "src/**/*",
-    "prisma/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

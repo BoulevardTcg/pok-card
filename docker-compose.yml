@@ -1,0 +1,50 @@
+
+
+services:
+  # Frontend React
+  pokecard-frontend:
+    build: ./pokecard
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://localhost:8080/api
+    depends_on:
+      - pokecard-backend
+    volumes: []
+
+  # Backend Node.js/Express
+  pokecard-backend:
+    build: ./server
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - DATABASE_URL=postgresql://pokecard_user:passwd@postgres:5432/pokecard_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: pokecard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_USER: pokecard_user
+      POSTGRES_DB: pokecard_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokecard_user -d pokecard_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
