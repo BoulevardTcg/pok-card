@@ -156,6 +156,7 @@ async function createOrderFromSession(
 }
 
 async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
+  const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email
   const items = parseMetadataItems(session.metadata ?? null)
 
   if (items.length === 0) {
