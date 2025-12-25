@@ -33,7 +33,7 @@ jobs:
     if: ${{ needs.changes.outputs.front == 'true' || needs.changes.outputs.workflow == 'true' }}
     defaults:
       run:
-        working-directory: front
+        working-directory: pokecard
     steps:
       - uses: actions/checkout@v4
 
@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: front/package-lock.json
+          cache-dependency-path: pokecard/package-lock.json
 
       - name: Install
         run: npm ci
@@ -63,7 +63,7 @@ jobs:
     if: ${{ needs.changes.outputs.back == 'true' || needs.changes.outputs.workflow == 'true' }}
     defaults:
       run:
-        working-directory: back
+        working-directory: server
 #    services:
 #      postgres:
 #        image: postgres:16
@@ -87,9 +87,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
-          cache-dependency-path: back/package-lock.json
+          cache-dependency-path: server/package-lock.json
 
       - name: Install
         run: npm ci
