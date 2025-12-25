@@ -5,13 +5,6 @@ node_modules/
 */pokecard/node_modules/
 */pokemon-cards-css/node_modules/
 
-# ==== PACKAGE LOCK ====
-package-lock.json
-*/package-lock.json
-*/server/package-lock.json
-*/pokecard/package-lock.json
-*/pokemon-cards-css/package-lock.json
-
 # ==== BUILD ET DIST ====
 dist/
 build/

@@ -10,3 +10,10 @@ node_modules
 *.db-wal
 *.db-shm
 prisma/dev.db*
+
+# Ignore generic SQL and dump files (e.g. DB dumps, ad-hoc scripts)
+*.sql
+*.dump
+
+# But keep Prisma migration SQL files under version control
+!prisma/migrations/**/migration.sql
