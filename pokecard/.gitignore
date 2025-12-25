@@ -25,6 +25,7 @@ dist-ssr
 
 # Sécurité et environnement
 .env
+.env.test
 .env.local
 .env.production
 .env.staging
