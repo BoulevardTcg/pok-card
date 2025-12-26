@@ -31,7 +31,7 @@
 
 .page {
   min-height: 100vh;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   padding-top: var(--space-20, 5rem);
 }
 
@@ -54,26 +54,28 @@
   width: 32px;
   height: 32px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--color-text-secondary, #A1A1A6);
+  border-top-color: var(--color-text-secondary, #a1a1a6);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .spinner {
     animation: none;
-    border-top-color: var(--color-text-secondary, #A1A1A6);
+    border-top-color: var(--color-text-secondary, #a1a1a6);
   }
 }
 
 .errorText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-lg, 1.125rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
   text-align: center;
 }
@@ -98,8 +100,8 @@
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md, 8px);
-  color: var(--color-text-secondary, #A1A1A6);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-secondary, #a1a1a6);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   text-decoration: none;
   cursor: pointer;
@@ -110,12 +112,12 @@
 .backLink:hover {
   background: rgba(20, 20, 22, 0.95);
   border-color: rgba(255, 255, 255, 0.12);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   transform: translateY(-1px);
 }
 
 .backLink:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
 }
 
@@ -175,14 +177,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
+  background:
     radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%),
     linear-gradient(135deg, rgba(20, 20, 22, 0.4) 0%, rgba(10, 10, 11, 0.8) 100%);
   border-radius: var(--radius-xl, 20px);
   overflow: hidden;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 
+  box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.02);
   outline: none;
@@ -195,7 +197,7 @@
 }
 
 .imageContainer:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 4px;
 }
 
@@ -209,7 +211,7 @@
 }
 
 .imagePlaceholder {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,13 +252,13 @@
 }
 
 .imageDot:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
 }
 
 .imageDot.active,
-.imageDot[aria-selected="true"] {
-  background: var(--color-text-secondary, #A1A1A6);
+.imageDot[aria-selected='true'] {
+  background: var(--color-text-secondary, #a1a1a6);
   width: 24px;
   border-radius: 12px;
 }
@@ -288,13 +290,13 @@
 }
 
 .thumbnail:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
-  border-color: var(--color-text-secondary, #A1A1A6);
+  border-color: var(--color-text-secondary, #a1a1a6);
 }
 
 .thumbnailActive {
-  border-color: var(--color-text-secondary, #A1A1A6);
+  border-color: var(--color-text-secondary, #a1a1a6);
   box-shadow: 0 0 0 2px rgba(161, 161, 166, 0.2);
 }
 
@@ -329,20 +331,20 @@
     max-height: calc(100vh - var(--space-16, 4rem));
     overflow-y: auto;
   }
-  
+
   .productInfo::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   .productInfo::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .productInfo::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
   }
-  
+
   .productInfo::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.15);
   }
@@ -369,10 +371,10 @@
 .badge {
   display: inline-block;
   padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-full, 9999px);
@@ -381,20 +383,20 @@
 }
 
 .productName {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: var(--font-medium, 500);
   line-height: 1.1;
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .productPrice {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -426,9 +428,9 @@
 }
 
 .featureLabel {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin: 0;
   font-weight: var(--font-medium, 500);
   letter-spacing: 0.05em;
@@ -436,9 +438,9 @@
 }
 
 .featureValue {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   font-weight: var(--font-normal, 400);
 }
@@ -467,9 +469,9 @@
 
 .variantLabel,
 .quantityLabel {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   font-weight: var(--font-medium, 500);
   letter-spacing: 0.02em;
 }
@@ -479,9 +481,9 @@
   background: rgba(10, 10, 11, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md, 8px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   cursor: pointer;
   transition: all 200ms ease;
   outline: none;
@@ -498,9 +500,9 @@
 }
 
 .variantSelect:focus-visible {
-  border-color: var(--color-text-secondary, #A1A1A6);
+  border-color: var(--color-text-secondary, #a1a1a6);
   background: rgba(10, 10, 11, 0.8);
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
 }
 
@@ -523,7 +525,7 @@
   height: 44px;
   background: transparent;
   border: none;
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   cursor: pointer;
   transition: background 200ms ease;
   padding: 0;
@@ -535,7 +537,7 @@
 }
 
 .quantityButton:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: -2px;
   background: rgba(255, 255, 255, 0.08);
 }
@@ -551,10 +553,10 @@
   justify-content: center;
   min-width: 60px;
   height: 44px;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -566,13 +568,13 @@
 .addButton {
   width: 100%;
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  background: var(--color-text-primary, #F5F5F3);
+  background: var(--color-text-primary, #f5f5f3);
   border: none;
   border-radius: var(--radius-md, 8px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-bg-primary, #0A0A0B);
+  color: var(--color-bg-primary, #0a0a0b);
   cursor: pointer;
   letter-spacing: 0.02em;
   transition: all 200ms ease;
@@ -581,19 +583,19 @@
 }
 
 .addButton:hover:not(.disabled) {
-  background: var(--color-text-secondary, #A1A1A6);
+  background: var(--color-text-secondary, #a1a1a6);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .addButton:focus-visible {
-  outline: 3px solid var(--color-text-primary, #F5F5F3);
+  outline: 3px solid var(--color-text-primary, #f5f5f3);
   outline-offset: 2px;
 }
 
 .addButton.disabled {
   background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -616,14 +618,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-3, 0.75rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   font-weight: var(--font-normal, 400);
 }
 
 .trustItem svg {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   flex-shrink: 0;
 }
 
@@ -644,10 +646,10 @@
 }
 
 .descriptionTitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -660,10 +662,10 @@
 }
 
 .descriptionText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   line-height: 1.75;
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
   max-width: 100%;
 }
@@ -680,16 +682,16 @@
 }
 
 .contentItem {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   font-weight: var(--font-medium, 500);
 }
 
 .contentSeparator {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   opacity: 0.5;
 }
 
@@ -704,10 +706,10 @@
 }
 
 .similarSectionTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-6, 1.5rem) 0;
   letter-spacing: -0.01em;
 }
@@ -752,9 +754,9 @@
 }
 
 .similarCard:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
-  border-color: var(--color-text-secondary, #A1A1A6);
+  border-color: var(--color-text-secondary, #a1a1a6);
 }
 
 .similarImageWrapper {
@@ -789,10 +791,10 @@
 }
 
 .similarName {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -813,22 +815,22 @@
 }
 
 .similarPrice {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .similarAction {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   transition: all 200ms ease;
 }
 
 .similarCard:hover .similarAction {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   transform: translateX(4px);
 }
 
@@ -836,7 +838,7 @@
   .similarCard:hover {
     transform: none;
   }
-  
+
   .similarCard:hover .similarImage,
   .similarCard:hover .similarAction {
     transform: none;
@@ -871,10 +873,10 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -902,9 +904,9 @@
 }
 
 .reviewsCount {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   font-weight: var(--font-medium, 500);
 }
 
@@ -917,9 +919,9 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md, 8px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all 200ms ease;
   outline: none;
@@ -928,39 +930,39 @@
 .writeReviewBtn:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.15);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .writeReviewBtn:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
-  border-color: var(--color-text-secondary, #A1A1A6);
-  color: var(--color-text-primary, #F5F5F3);
+  border-color: var(--color-text-secondary, #a1a1a6);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .loginPrompt {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   text-decoration: none;
   transition: color 200ms ease;
 }
 
 .loginPrompt:hover {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   text-decoration: underline;
 }
 
 .reviewNote,
 .thankYou {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
 }
 
 .thankYou {
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -986,29 +988,29 @@
 
 .formLabel {
   display: block;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin-bottom: var(--space-3, 0.75rem);
   font-weight: var(--font-medium, 500);
 }
 
 .formLabel legend {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin-bottom: var(--space-3, 0.75rem);
   font-weight: var(--font-medium, 500);
   padding: 0;
 }
 
 .required {
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   font-weight: var(--font-semibold, 600);
 }
 
 .optional {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   font-weight: var(--font-normal, 400);
 }
 
@@ -1036,13 +1038,13 @@
 }
 
 .pickStar:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
   color: rgba(255, 255, 255, 0.5);
 }
 
 .pickStar.picked,
-.pickStar[aria-checked="true"] {
+.pickStar[aria-checked='true'] {
   color: rgba(255, 255, 255, 0.95);
 }
 
@@ -1058,9 +1060,9 @@
   background: rgba(10, 10, 11, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md, 8px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   transition: all 200ms ease;
   outline: none;
 }
@@ -1069,8 +1071,8 @@
 .formTextarea:focus,
 .formInput:focus-visible,
 .formTextarea:focus-visible {
-  border-color: var(--color-text-secondary, #A1A1A6);
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  border-color: var(--color-text-secondary, #a1a1a6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
   background: rgba(10, 10, 11, 0.8);
 }
@@ -1082,13 +1084,13 @@
 
 .formInput::placeholder,
 .formTextarea::placeholder {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .formError {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: #F87171;
+  color: #f87171;
   margin: var(--space-4, 1rem) 0 0;
   padding: var(--space-3, 0.75rem);
   background: rgba(248, 113, 113, 0.1);
@@ -1107,7 +1109,7 @@
 .submitBtn {
   padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
   border-radius: var(--radius-md, 8px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   cursor: pointer;
   transition: all 200ms ease;
@@ -1118,36 +1120,36 @@
 .cancelBtn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .cancelBtn:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.15);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .cancelBtn:focus-visible {
-  outline: 2px solid var(--color-text-secondary, #A1A1A6);
+  outline: 2px solid var(--color-text-secondary, #a1a1a6);
   outline-offset: 2px;
-  border-color: var(--color-text-secondary, #A1A1A6);
-  color: var(--color-text-primary, #F5F5F3);
+  border-color: var(--color-text-secondary, #a1a1a6);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .submitBtn {
-  background: var(--color-text-primary, #F5F5F3);
+  background: var(--color-text-primary, #f5f5f3);
   border: none;
-  color: var(--color-bg-primary, #0A0A0B);
+  color: var(--color-bg-primary, #0a0a0b);
 }
 
 .submitBtn:hover {
-  background: var(--color-text-secondary, #A1A1A6);
+  background: var(--color-text-secondary, #a1a1a6);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .submitBtn:focus-visible {
-  outline: 3px solid var(--color-text-primary, #F5F5F3);
+  outline: 3px solid var(--color-text-primary, #f5f5f3);
   outline-offset: 2px;
 }
 
@@ -1155,7 +1157,7 @@
   .submitBtn:hover {
     transform: none;
   }
-  
+
   .pickStar:hover {
     transform: none;
   }
@@ -1202,16 +1204,16 @@
 }
 
 .authorName {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .verifiedBadge {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   padding: 2px 8px;
   background: rgba(139, 115, 85, 0.1);
   border: 1px solid rgba(139, 115, 85, 0.2);
@@ -1219,9 +1221,9 @@
 }
 
 .reviewDate {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .reviewStars {
@@ -1241,25 +1243,25 @@
 }
 
 .reviewTitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-2, 0.5rem) 0;
 }
 
 .reviewText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   line-height: 1.7;
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
 }
 
 .noReviews {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   text-align: center;
   padding: var(--space-12, 3rem) 0;
   margin: 0;
@@ -1276,15 +1278,15 @@
     left: 0;
     margin-bottom: var(--space-4, 1rem);
   }
-  
+
   .heroSection {
     padding: var(--space-12, 3rem) var(--space-4, 1rem) var(--space-16, 4rem);
   }
-  
+
   .productInfo {
     position: static;
   }
-  
+
   .purchasePanel {
     padding: var(--space-6, 1.5rem);
   }
@@ -1294,45 +1296,45 @@
   .heroSection {
     padding: var(--space-8, 2rem) var(--space-4, 1rem) var(--space-12, 3rem);
   }
-  
+
   .imageContainer {
     aspect-ratio: 1;
   }
-  
+
   .productName {
     font-size: 1.75rem;
   }
-  
+
   .productPrice {
     font-size: 1.25rem;
   }
-  
+
   .featuresList {
     grid-template-columns: 1fr;
   }
-  
+
   .similarGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .reviewsSection {
     padding: var(--space-12, 3rem) var(--space-4, 1rem);
   }
-  
+
   .reviewsHeader {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .reviewMeta {
     flex-direction: column;
     gap: var(--space-2, 0.5rem);
   }
-  
+
   .formActions {
     flex-direction: column;
   }
-  
+
   .cancelBtn,
   .submitBtn {
     width: 100%;

@@ -7,7 +7,16 @@ import styles from './AdminOrdersPage.module.css';
 
 // Icônes SVG
 const PackageIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="48"
+    height="48"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M12 2L2 7l10 5 10-5-10-5z" />
     <path d="M2 17l10 5 10-5" />
     <path d="M2 12l10 5 10-5" />
@@ -15,14 +24,32 @@ const PackageIcon = () => (
 );
 
 const SearchIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <circle cx="11" cy="11" r="7" />
     <path d="M21 21l-4.35-4.35" />
   </svg>
 );
 
 const RefreshIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M23 4v6h-6" />
     <path d="M1 20v-6h6" />
     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
@@ -30,7 +57,16 @@ const RefreshIcon = () => (
 );
 
 const ChevronDownIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M6 9l6 6 6-6" />
   </svg>
 );
@@ -47,7 +83,14 @@ interface Order {
   id: string;
   orderNumber: string;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
-  fulfillmentStatus?: 'PENDING' | 'PAID' | 'PREPARING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  fulfillmentStatus?:
+    | 'PENDING'
+    | 'PAID'
+    | 'PREPARING'
+    | 'SHIPPED'
+    | 'DELIVERED'
+    | 'CANCELLED'
+    | 'REFUNDED';
   carrier?: string | null;
   trackingNumber?: string | null;
   trackingUrl?: string | null;
@@ -78,10 +121,17 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   SHIPPED: { label: 'Expédiée', className: 'info' },
   DELIVERED: { label: 'Livrée', className: 'success' },
   CANCELLED: { label: 'Annulée', className: 'error' },
-  REFUNDED: { label: 'Remboursée', className: 'neutral' }
+  REFUNDED: { label: 'Remboursée', className: 'neutral' },
 };
 
-const allStatuses = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'] as const;
+const allStatuses = [
+  'PENDING',
+  'CONFIRMED',
+  'SHIPPED',
+  'DELIVERED',
+  'CANCELLED',
+  'REFUNDED',
+] as const;
 
 export function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -90,7 +140,12 @@ export function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const [shippingDraft, setShippingDraft] = useState<{ orderId: string | null; carrier: string; trackingNumber: string; note: string }>({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
+  const [shippingDraft, setShippingDraft] = useState<{
+    orderId: string | null;
+    carrier: string;
+    trackingNumber: string;
+    note: string;
+  }>({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
   const [shippingLoadingId, setShippingLoadingId] = useState<string | null>(null);
   const [deliveringId, setDeliveringId] = useState<string | null>(null);
   const { user, token, isLoading: authLoading } = useAuth();
@@ -113,7 +168,7 @@ export function AdminOrdersPage() {
       setError(null);
 
       const response = await fetch(`${API_BASE}/admin/orders`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -140,17 +195,19 @@ export function AdminOrdersPage() {
       const response = await fetch(`${API_BASE}/admin/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus }),
       });
 
       if (!response.ok) throw new Error('Erreur lors de la mise à jour du statut');
 
-      setOrders(prev => prev.map(order => 
-        order.id === orderId ? { ...order, status: newStatus as Order['status'] } : order
-      ));
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: newStatus as Order['status'] } : order
+        )
+      );
     } catch (err: Error) {
       console.error('Erreur:', err);
       alert(err.message);
@@ -171,15 +228,15 @@ export function AdminOrdersPage() {
       const response = await fetch(`${API_BASE}/admin/orders/${orderId}/ship`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ carrier, trackingNumber, note })
+        body: JSON.stringify({ carrier, trackingNumber, note }),
       });
       if (!response.ok) throw new Error('Erreur lors du marquage expédié');
       const data = await response.json();
       const updated = data.order as Order;
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...updated } : o)));
       setShippingDraft({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
     } catch (err: Error) {
       console.error(err);
@@ -196,15 +253,15 @@ export function AdminOrdersPage() {
       const response = await fetch(`${API_BASE}/admin/orders/${orderId}/deliver`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
       if (!response.ok) throw new Error('Erreur lors du marquage livré');
       const data = await response.json();
       const updated = data.order as Order;
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...updated } : o)));
     } catch (err: Error) {
       console.error(err);
       alert(err.message || 'Erreur livraison');
@@ -213,7 +270,15 @@ export function AdminOrdersPage() {
     }
   }
 
-  const carrierOptions = ['COLISSIMO', 'MONDIAL_RELAY', 'CHRONOPOST', 'UPS', 'DHL', 'FEDEX', 'OTHER'];
+  const carrierOptions = [
+    'COLISSIMO',
+    'MONDIAL_RELAY',
+    'CHRONOPOST',
+    'UPS',
+    'DHL',
+    'FEDEX',
+    'OTHER',
+  ];
 
   const formatPrice = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
@@ -222,16 +287,16 @@ export function AdminOrdersPage() {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.user?.username?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -253,7 +318,9 @@ export function AdminOrdersPage() {
     <AdminLayout>
       {/* Header */}
       <div className={styles.pageHeader}>
-        <p className={styles.pageCount}>{orders.length} commande{orders.length > 1 ? 's' : ''} au total</p>
+        <p className={styles.pageCount}>
+          {orders.length} commande{orders.length > 1 ? 's' : ''} au total
+        </p>
         <button onClick={loadOrders} className={styles.refreshButton}>
           <RefreshIcon />
           <span>Actualiser</span>
@@ -272,13 +339,12 @@ export function AdminOrdersPage() {
           />
         </div>
         <div className={styles.filterSelect}>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="all">Tous les statuts</option>
-            {allStatuses.map(status => (
-              <option key={status} value={status}>{statusConfig[status].label}</option>
+            {allStatuses.map((status) => (
+              <option key={status} value={status}>
+                {statusConfig[status].label}
+              </option>
             ))}
           </select>
           <ChevronDownIcon />
@@ -289,7 +355,9 @@ export function AdminOrdersPage() {
       {error ? (
         <div className={styles.error}>
           <p>{error}</p>
-          <button onClick={loadOrders} className={styles.retryButton}>Réessayer</button>
+          <button onClick={loadOrders} className={styles.retryButton}>
+            Réessayer
+          </button>
         </div>
       ) : filteredOrders.length === 0 ? (
         <div className={styles.empty}>
@@ -313,7 +381,7 @@ export function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map(order => {
+              {filteredOrders.map((order) => {
                 const status = statusConfig[order.status];
                 return (
                   <tr key={order.id}>
@@ -339,7 +407,9 @@ export function AdminOrdersPage() {
                         <div className={styles.shippingInfo}>
                           <span className={styles.shippingTag}>{order.shippingMethod}</span>
                           {order.shippingCost != null && (
-                            <span className={styles.shippingCost}>{formatPrice(order.shippingCost)}€</span>
+                            <span className={styles.shippingCost}>
+                              {formatPrice(order.shippingCost)}€
+                            </span>
                           )}
                         </div>
                       )}
@@ -359,7 +429,10 @@ export function AdminOrdersPage() {
                             </div>
                           )}
                           <div className={styles.shippingLine}>
-                            {[order.shippingAddress.address?.postal_code, order.shippingAddress.address?.city]
+                            {[
+                              order.shippingAddress.address?.postal_code,
+                              order.shippingAddress.address?.city,
+                            ]
                               .filter(Boolean)
                               .join(' ')}
                           </div>
@@ -381,37 +454,42 @@ export function AdminOrdersPage() {
                     </td>
                     <td>
                       <div className={styles.actionsColumn}>
-                      <div className={styles.statusSelectWrapper}>
-                        <select
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          disabled={updatingOrderId === order.id}
-                          className={styles.statusDropdown}
-                        >
-                          {allStatuses.map(s => (
-                            <option key={s} value={s}>{statusConfig[s].label}</option>
-                          ))}
-                        </select>
-                        {updatingOrderId === order.id && (
-                          <div className={styles.updateSpinner} />
-                          )}
+                        <div className={styles.statusSelectWrapper}>
+                          <select
+                            value={order.status}
+                            onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                            disabled={updatingOrderId === order.id}
+                            className={styles.statusDropdown}
+                          >
+                            {allStatuses.map((s) => (
+                              <option key={s} value={s}>
+                                {statusConfig[s].label}
+                              </option>
+                            ))}
+                          </select>
+                          {updatingOrderId === order.id && <div className={styles.updateSpinner} />}
                         </div>
 
                         <div className={styles.actionsRow}>
                           <button
                             className={styles.secondaryButton}
-                            onClick={() => setShippingDraft({
-                              orderId: order.id,
-                              carrier: order.carrier || 'COLISSIMO',
-                              trackingNumber: order.trackingNumber || '',
-                              note: ''
-                            })}
+                            onClick={() =>
+                              setShippingDraft({
+                                orderId: order.id,
+                                carrier: order.carrier || 'COLISSIMO',
+                                trackingNumber: order.trackingNumber || '',
+                                note: '',
+                              })
+                            }
                           >
                             Expédier
                           </button>
                           <button
                             className={styles.ghostButton}
-                            disabled={deliveringId === order.id || (order.status !== 'SHIPPED' && order.fulfillmentStatus !== 'SHIPPED')}
+                            disabled={
+                              deliveringId === order.id ||
+                              (order.status !== 'SHIPPED' && order.fulfillmentStatus !== 'SHIPPED')
+                            }
                             onClick={() => markDelivered(order.id)}
                           >
                             {deliveringId === order.id ? '... ' : 'Marquer livré'}
@@ -423,23 +501,34 @@ export function AdminOrdersPage() {
                             <div className={styles.shipFields}>
                               <select
                                 value={shippingDraft.carrier}
-                                onChange={(e) => setShippingDraft(prev => ({ ...prev, carrier: e.target.value }))}
+                                onChange={(e) =>
+                                  setShippingDraft((prev) => ({ ...prev, carrier: e.target.value }))
+                                }
                               >
-                                {carrierOptions.map(opt => (
-                                  <option key={opt} value={opt}>{opt.replace('_', ' ')}</option>
+                                {carrierOptions.map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {opt.replace('_', ' ')}
+                                  </option>
                                 ))}
                               </select>
                               <input
                                 type="text"
                                 placeholder="Numéro de suivi"
                                 value={shippingDraft.trackingNumber}
-                                onChange={(e) => setShippingDraft(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                                onChange={(e) =>
+                                  setShippingDraft((prev) => ({
+                                    ...prev,
+                                    trackingNumber: e.target.value,
+                                  }))
+                                }
                               />
                               <input
                                 type="text"
                                 placeholder="Note interne (optionnel)"
                                 value={shippingDraft.note}
-                                onChange={(e) => setShippingDraft(prev => ({ ...prev, note: e.target.value }))}
+                                onChange={(e) =>
+                                  setShippingDraft((prev) => ({ ...prev, note: e.target.value }))
+                                }
                               />
                             </div>
                             <div className={styles.shipActions}>
@@ -452,7 +541,14 @@ export function AdminOrdersPage() {
                               </button>
                               <button
                                 className={styles.ghostButton}
-                                onClick={() => setShippingDraft({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' })}
+                                onClick={() =>
+                                  setShippingDraft({
+                                    orderId: null,
+                                    carrier: 'COLISSIMO',
+                                    trackingNumber: '',
+                                    note: '',
+                                  })
+                                }
                               >
                                 Annuler
                               </button>

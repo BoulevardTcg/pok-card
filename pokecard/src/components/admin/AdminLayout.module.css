@@ -6,7 +6,7 @@
 .adminLayout {
   display: flex;
   min-height: 100vh;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -48,9 +48,9 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
   border-radius: var(--radius-sm, 2px);
@@ -62,18 +62,18 @@
 }
 
 .logoTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   line-height: 1.2;
 }
 
 .logoSubtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
 }
@@ -82,7 +82,7 @@
   display: none;
   background: none;
   border: none;
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   padding: var(--space-2, 0.5rem);
   border-radius: var(--radius-md, 4px);
@@ -90,8 +90,8 @@
 }
 
 .closeButton:hover {
-  background: var(--color-bg-hover, #1F1F23);
-  color: var(--color-text-primary, #F5F5F3);
+  background: var(--color-bg-hover, #1f1f23);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -107,12 +107,12 @@
 .navSection {
   display: block;
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin-bottom: var(--space-2, 0.5rem);
 }
 
@@ -122,10 +122,10 @@
   align-items: center;
   gap: var(--space-3, 0.75rem);
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   text-decoration: none;
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   transition: all var(--duration-fast, 150ms) var(--ease-out);
@@ -133,13 +133,13 @@
 }
 
 .navItem:hover {
-  background: var(--color-bg-hover, #1F1F23);
-  color: var(--color-text-primary, #F5F5F3);
+  background: var(--color-bg-hover, #1f1f23);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .navItem.active {
-  background: var(--color-bg-subtle, #1A1A1D);
-  color: var(--color-accent-primary, #E8E4DD);
+  background: var(--color-bg-subtle, #1a1a1d);
+  color: var(--color-accent-primary, #e8e4dd);
 }
 
 .activeIndicator {
@@ -149,7 +149,7 @@
   transform: translateY(-50%);
   width: 3px;
   height: 24px;
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: 0 var(--radius-sm, 2px) var(--radius-sm, 2px) 0;
 }
 
@@ -170,17 +170,17 @@
   align-items: center;
   gap: var(--space-3, 0.75rem);
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   text-decoration: none;
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .footerLink:hover {
-  background: var(--color-bg-hover, #1F1F23);
-  color: var(--color-text-primary, #F5F5F3);
+  background: var(--color-bg-hover, #1f1f23);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .logoutButton {
@@ -190,10 +190,10 @@
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
   background: none;
   border: none;
-  color: var(--color-error, #F87171);
+  color: var(--color-error, #f87171);
   cursor: pointer;
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   width: 100%;
   text-align: left;
@@ -232,7 +232,7 @@
   display: none;
   background: none;
   border: none;
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   cursor: pointer;
   padding: var(--space-2, 0.5rem);
   border-radius: var(--radius-md, 4px);
@@ -240,7 +240,7 @@
 }
 
 .menuButton:hover {
-  background: var(--color-bg-hover, #1F1F23);
+  background: var(--color-bg-hover, #1f1f23);
 }
 
 .headerContent {
@@ -257,17 +257,17 @@
 }
 
 .pageTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
 }
 
 .breadcrumb {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .userBadge {
@@ -275,7 +275,7 @@
   align-items: center;
   gap: var(--space-3, 0.75rem);
   padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-lg, 8px);
 }
@@ -286,9 +286,9 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: var(--color-accent-secondary, #8B7355);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-body, "Inter", sans-serif);
+  background: var(--color-accent-secondary, #8b7355);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-bold, 700);
   border-radius: var(--radius-full, 9999px);
@@ -300,17 +300,17 @@
 }
 
 .userName {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   line-height: 1.2;
 }
 
 .userRole {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -362,7 +362,7 @@
   .overlay {
     display: block;
   }
-  
+
   .userBadge {
     display: none;
   }
@@ -372,11 +372,11 @@
   .header {
     padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
   }
-  
+
   .content {
     padding: var(--space-4, 1rem);
   }
-  
+
   .pageTitle {
     font-size: var(--text-xl, 1.25rem);
   }

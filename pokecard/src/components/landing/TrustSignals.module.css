@@ -41,7 +41,7 @@
   .statItem {
     position: relative;
   }
-  
+
   .statItem:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -59,14 +59,14 @@
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: var(--font-semibold, 600);
   font-variant-numeric: tabular-nums;
-  color: var(--color-accent-primary, #E8E4DD);
+  color: var(--color-accent-primary, #e8e4dd);
   line-height: var(--leading-none, 1);
 }
 
 .statLabel {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   letter-spacing: var(--tracking-wide, 0.02em);
 }

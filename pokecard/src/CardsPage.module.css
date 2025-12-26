@@ -37,7 +37,8 @@
 }
 
 @keyframes constructionPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -58,7 +59,7 @@
   font-family: var(--font-body);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-warning, #FBBF24);
+  color: var(--color-warning, #fbbf24);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide, 0.02em);
 }
@@ -67,7 +68,7 @@
   font-family: var(--font-body);
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
   text-align: justify;
 }
@@ -78,7 +79,7 @@
     text-align: center;
     align-items: center;
   }
-  
+
   .constructionText {
     text-align: center;
   }
@@ -237,7 +238,9 @@
   transform: scale(1.1);
 }
 
-.newBadge, .saleBadge, .foilBadge {
+.newBadge,
+.saleBadge,
+.foilBadge {
   position: absolute;
   top: var(--space-4, 1rem);
   padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
@@ -386,33 +389,33 @@
   .container {
     padding: var(--space-4, 1rem);
   }
-  
+
   .title {
     font-size: var(--text-3xl, 2rem);
   }
-  
+
   .controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filters {
     gap: var(--space-2, 0.5rem);
   }
-  
+
   .filterGroup {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filterGroup label {
     min-width: auto;
   }
-  
+
   .filterSelect {
     min-width: auto;
   }
-  
+
   .cardsGrid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-4, 1rem);

@@ -4,7 +4,7 @@
 
 .page {
   min-height: 100vh;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   padding: var(--space-20, 5rem) 0 var(--space-16, 4rem);
 }
 
@@ -28,29 +28,29 @@
 
 .overline {
   display: inline-block;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   margin-bottom: var(--space-4, 1rem);
 }
 
 .title {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-6, 1.5rem) 0;
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .subtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   line-height: 1.65;
   margin: 0;
 }
@@ -84,10 +84,10 @@
 }
 
 .infoTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -119,7 +119,7 @@
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   margin-top: 2px;
 }
 
@@ -129,24 +129,24 @@
 }
 
 .infoItemTitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-2, 0.5rem) 0;
 }
 
 .infoText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0 0 var(--space-1, 0.25rem) 0;
 }
 
 .infoSmall {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -161,10 +161,10 @@
 }
 
 .formTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-6, 1.5rem) 0;
   letter-spacing: 0.02em;
 }
@@ -176,17 +176,17 @@
   padding: var(--space-4, 1rem);
   border-radius: var(--radius-md, 4px);
   margin-bottom: var(--space-6, 1.5rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   background: var(--color-success-muted, rgba(74, 222, 128, 0.15));
-  color: var(--color-success, #4ADE80);
+  color: var(--color-success, #4ade80);
   border: 1px solid rgba(74, 222, 128, 0.3);
   animation: fadeIn 250ms ease;
 }
 
 .statusMessage.error {
   background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
-  color: var(--color-error, #F87171);
+  color: var(--color-error, #f87171);
   border-color: rgba(248, 113, 113, 0.3);
 }
 
@@ -226,10 +226,10 @@
 }
 
 .label {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .input,
@@ -237,17 +237,19 @@
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
-  color: var(--color-text-primary, #F5F5F3);
-  background: var(--color-bg-primary, #0A0A0B);
-  transition: border-color 200ms ease, box-shadow 200ms ease;
+  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-bg-primary, #0a0a0b);
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
   outline: none;
 }
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .input:focus,
@@ -259,7 +261,7 @@
 .textarea {
   resize: vertical;
   min-height: 160px;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   line-height: 1.6;
 }
 
@@ -270,14 +272,14 @@
   gap: var(--space-2, 0.5rem);
   padding: var(--space-4, 1rem) var(--space-8, 2rem);
   background: transparent;
-  border: 1px solid var(--color-text-primary, #F5F5F3);
+  border: 1px solid var(--color-text-primary, #f5f5f3);
   border-radius: var(--radius-sm, 2px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   cursor: pointer;
-  transition: 
+  transition:
     background 250ms ease,
     color 250ms ease,
     border-color 250ms ease;
@@ -285,8 +287,8 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background: var(--color-text-primary, #F5F5F3);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-text-primary, #f5f5f3);
+  color: var(--color-bg-primary, #0a0a0b);
 }
 
 .submitButton:disabled {
@@ -298,13 +300,15 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(245, 245, 243, 0.2);
-  border-top-color: var(--color-text-primary, #F5F5F3);
+  border-top-color: var(--color-text-primary, #f5f5f3);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -317,10 +321,10 @@
 }
 
 .faqTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-10, 2.5rem) 0;
   text-align: center;
   letter-spacing: 0.02em;
@@ -351,17 +355,17 @@
 }
 
 .faqItemTitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-3, 0.75rem) 0;
 }
 
 .faqItemText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   line-height: 1.6;
   margin: 0;
 }

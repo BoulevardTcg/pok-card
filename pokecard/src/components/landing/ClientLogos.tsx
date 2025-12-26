@@ -17,19 +17,12 @@ export default function ClientLogos() {
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <p className={styles.label}>
-          Reconnu par les meilleurs
-        </p>
-        
+        <p className={styles.label}>Reconnu par les meilleurs</p>
+
         <div className={styles.logosGrid}>
           {logos.map((logo, index) => (
-            <div
-              key={index}
-              className={styles.logoItem}
-            >
-              <div className={styles.logoText}>
-                {logo.label}
-              </div>
+            <div key={index} className={styles.logoItem}>
+              <div className={styles.logoText}>{logo.label}</div>
             </div>
           ))}
         </div>
@@ -37,4 +30,3 @@ export default function ClientLogos() {
     </section>
   );
 }
-

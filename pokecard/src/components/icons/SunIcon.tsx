@@ -29,4 +29,3 @@ export function SunIcon({ className = '', size = 20 }: SunIconProps) {
     </svg>
   );
 }
-

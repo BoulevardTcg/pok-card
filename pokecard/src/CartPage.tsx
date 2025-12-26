@@ -8,7 +8,8 @@ import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods
 import type { CartItem } from './cartContext';
 
 export function CartPage() {
-  const { cart, removeFromCart, updateQuantity, clearCart, getTotalCents } = useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity, clearCart, getTotalCents } =
+    useContext(CartContext);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const totalCents = getTotalCents();
@@ -41,7 +42,8 @@ export function CartPage() {
     return (cents / 100).toFixed(2).replace('.', ',');
   };
 
-  const selectedShippingMethod = findShippingMethod(shippingMethodCode) || enabledShippingMethods[0] || null;
+  const selectedShippingMethod =
+    findShippingMethod(shippingMethodCode) || enabledShippingMethods[0] || null;
   const shippingCostCents = selectedShippingMethod?.priceCents ?? 0;
   const totalAfterDiscount = Math.max(0, totalCents - promoDiscount);
   const totalWithShipping = totalAfterDiscount + shippingCostCents;
@@ -57,31 +59,32 @@ export function CartPage() {
 
       setRefreshingStock(true);
       try {
-        const variantIds = cart.map(item => item.variantId);
+        const variantIds = cart.map((item) => item.variantId);
         const stockMap = await getVariantsStock(variantIds);
         const errors: Record<string, string> = {};
         const updatedCart: CartItem[] = [];
 
-        cart.forEach(item => {
+        cart.forEach((item) => {
           const currentStock = stockMap[item.variantId];
-          
+
           if (!currentStock) {
-            errors[item.variantId] = 'Ce produit n\'est plus disponible';
+            errors[item.variantId] = "Ce produit n'est plus disponible";
             return;
           }
 
           if (currentStock.stock <= 0) {
             errors[item.variantId] = 'Rupture de stock';
           } else if (currentStock.stock < item.quantity) {
-            errors[item.variantId] = `Stock insuffisant (${currentStock.stock} disponible${currentStock.stock > 1 ? 's' : ''})`;
+            errors[item.variantId] =
+              `Stock insuffisant (${currentStock.stock} disponible${currentStock.stock > 1 ? 's' : ''})`;
           }
 
           const updatedItem: CartItem = {
             ...item,
             stock: currentStock.stock,
-            priceCents: currentStock.priceCents
+            priceCents: currentStock.priceCents,
           };
-          
+
           updatedCart.push(updatedItem);
         });
 
@@ -96,7 +99,6 @@ export function CartPage() {
     }
 
     refreshStock();
-     
   }, [cart]);
 
   function validateShipping() {
@@ -114,15 +116,19 @@ export function CartPage() {
       navigate('/login', { state: { from: '/panier' } });
       return;
     }
-    
+
     if (cart.length === 0) return;
-    
+
     if (Object.keys(stockErrors).length > 0) {
-      const hasRupture = Object.values(stockErrors).some(msg => msg.includes('Rupture'));
-      const hasInsuffisant = Object.values(stockErrors).some(msg => msg.includes('Stock insuffisant'));
-      
+      const hasRupture = Object.values(stockErrors).some((msg) => msg.includes('Rupture'));
+      const hasInsuffisant = Object.values(stockErrors).some((msg) =>
+        msg.includes('Stock insuffisant')
+      );
+
       if (hasRupture) {
-        setEmailError('Impossible de procéder au paiement : certains articles sont en rupture de stock.');
+        setEmailError(
+          'Impossible de procéder au paiement : certains articles sont en rupture de stock.'
+        );
         return;
       }
       if (hasInsuffisant) {
@@ -130,7 +136,7 @@ export function CartPage() {
         return;
       }
     }
-    
+
     const shippingValidation = validateShipping();
     if (shippingValidation) {
       setShippingError(shippingValidation);
@@ -146,22 +152,24 @@ export function CartPage() {
       setShippingError('Mode de livraison indisponible');
       return;
     }
-    
+
     setEmailError('');
     setShippingError('');
     setLoading(true);
     try {
-      const items = cartItemsWithStock.map(item => ({
-        variantId: item.variantId,
-        quantity: Math.min(item.quantity, item.stock)
-      })).filter(item => item.quantity > 0);
-      
+      const items = cartItemsWithStock
+        .map((item) => ({
+          variantId: item.variantId,
+          quantity: Math.min(item.quantity, item.stock),
+        }))
+        .filter((item) => item.quantity > 0);
+
       if (items.length === 0) {
         setEmailError('Aucun article disponible dans votre panier.');
         setLoading(false);
         return;
       }
-      const {url} = await createCheckoutSession(
+      const { url } = await createCheckoutSession(
         items,
         email || undefined,
         appliedPromo || undefined,
@@ -176,7 +184,7 @@ export function CartPage() {
         },
         shippingMethodCode
       );
-      
+
       if (url) {
         window.location.href = url;
       } else {
@@ -186,13 +194,13 @@ export function CartPage() {
     } catch (e: Error) {
       console.error('Erreur checkout:', e);
       let errorMsg = 'Erreur lors de la création du paiement';
-      
+
       if (e?.status === 409 || e?.message?.includes('Stock insuffisant')) {
         errorMsg = 'Stock insuffisant pour certains articles. Veuillez vérifier votre panier.';
       } else {
         errorMsg = e?.response?.data?.error || e?.message || errorMsg;
       }
-      
+
       setEmailError(errorMsg);
       setLoading(false);
     }
@@ -206,10 +214,7 @@ export function CartPage() {
             <div className={styles.emptyIcon}>🛒</div>
             <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
             <p className={styles.emptyText}>Découvrez nos collections premium</p>
-            <button
-              onClick={() => navigate('/produits')}
-              className={styles.emptyButton}
-            >
+            <button onClick={() => navigate('/produits')} className={styles.emptyButton}>
               Explorer le catalogue
               <span className={styles.arrow}>→</span>
             </button>
@@ -226,8 +231,18 @@ export function CartPage() {
 
         {refreshingStock && (
           <div className={styles.refreshingStock}>
-            <svg className={styles.refreshIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            <svg
+              className={styles.refreshIcon}
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
             </svg>
             Vérification du stock en cours...
           </div>
@@ -236,14 +251,14 @@ export function CartPage() {
         <div className={styles.content}>
           {/* Liste des articles */}
           <div className={styles.itemsList}>
-            {cartItemsWithStock.map(item => {
+            {cartItemsWithStock.map((item) => {
               const stockError = stockErrors[item.variantId];
               const isOutOfStock = item.stock <= 0;
               const hasInsufficientStock = item.stock < item.quantity;
-              
+
               return (
-                <div 
-                  key={item.variantId} 
+                <div
+                  key={item.variantId}
                   className={`${styles.cartItem} ${stockError ? styles.hasError : ''}`}
                 >
                   {/* Image */}
@@ -308,14 +323,15 @@ export function CartPage() {
 
                     {/* Stock info */}
                     <div className={styles.stockRow}>
-                      <span className={`${styles.stockInfo} ${isOutOfStock ? styles.outOfStock : hasInsufficientStock ? styles.lowStock : ''}`}>
-                        Stock : {item.stock > 0 ? `${item.stock} disponible${item.stock > 1 ? 's' : ''}` : 'Rupture'}
+                      <span
+                        className={`${styles.stockInfo} ${isOutOfStock ? styles.outOfStock : hasInsufficientStock ? styles.lowStock : ''}`}
+                      >
+                        Stock :{' '}
+                        {item.stock > 0
+                          ? `${item.stock} disponible${item.stock > 1 ? 's' : ''}`
+                          : 'Rupture'}
                       </span>
-                      {stockError && (
-                        <div className={styles.stockError}>
-                          ⚠️ {stockError}
-                        </div>
-                      )}
+                      {stockError && <div className={styles.stockError}>⚠️ {stockError}</div>}
                     </div>
                   </div>
                 </div>
@@ -333,7 +349,7 @@ export function CartPage() {
                   <span>Mode de livraison</span>
                 </div>
                 <div className={styles.shippingOptions}>
-                  {enabledShippingMethods.map(method => (
+                  {enabledShippingMethods.map((method) => (
                     <label key={method.code} className={styles.shippingOption}>
                       <input
                         type="radio"
@@ -345,7 +361,9 @@ export function CartPage() {
                       <div className={styles.shippingOptionContent}>
                         <div className={styles.shippingOptionTop}>
                           <span className={styles.shippingLabel}>{method.label}</span>
-                          <span className={styles.shippingPrice}>{formatPrice(method.priceCents)}€</span>
+                          <span className={styles.shippingPrice}>
+                            {formatPrice(method.priceCents)}€
+                          </span>
                         </div>
                         {method.description && (
                           <div className={styles.shippingDescription}>{method.description}</div>
@@ -355,7 +373,7 @@ export function CartPage() {
                   ))}
                 </div>
               </div>
-              
+
               <div className={styles.summaryDetails}>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Sous-total</span>
@@ -377,9 +395,7 @@ export function CartPage() {
                 )}
                 <div className={styles.summaryTotal}>
                   <span className={styles.totalLabel}>Total</span>
-                  <span className={styles.totalValue}>
-                    {formatPrice(totalWithShipping)}€
-                  </span>
+                  <span className={styles.totalValue}>{formatPrice(totalWithShipping)}€</span>
                 </div>
               </div>
 
@@ -387,7 +403,9 @@ export function CartPage() {
               <div className={styles.promoSection}>
                 {appliedPromo ? (
                   <div className={styles.promoApplied}>
-                    <span>Code appliqué: <strong>{appliedPromo}</strong></span>
+                    <span>
+                      Code appliqué: <strong>{appliedPromo}</strong>
+                    </span>
                     <button
                       onClick={() => {
                         setAppliedPromo(null);
@@ -405,7 +423,7 @@ export function CartPage() {
                       type="text"
                       placeholder="Code promo"
                       value={promoCode}
-                      onChange={e => {
+                      onChange={(e) => {
                         setPromoCode(e.target.value.toUpperCase());
                         setPromoError('');
                       }}
@@ -437,9 +455,7 @@ export function CartPage() {
                     </button>
                   </div>
                 )}
-                {promoError && (
-                  <div className={styles.promoError}>{promoError}</div>
-                )}
+                {promoError && <div className={styles.promoError}>{promoError}</div>}
               </div>
 
               <div className={styles.emailSection}>
@@ -447,17 +463,13 @@ export function CartPage() {
                   type="email"
                   placeholder="Email (pour la confirmation)"
                   value={email}
-                  onChange={e => {
+                  onChange={(e) => {
                     setEmail(e.target.value);
                     if (emailError) setEmailError('');
                   }}
                   className={`${styles.emailInput} ${emailError ? styles.hasError : ''}`}
                 />
-                {emailError && (
-                  <div className={styles.emailError}>
-                    {emailError}
-                  </div>
-                )}
+                {emailError && <div className={styles.emailError}>{emailError}</div>}
               </div>
 
               <div className={styles.shippingSection}>
@@ -512,11 +524,7 @@ export function CartPage() {
                   onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
                   className={styles.emailInput}
                 />
-                {shippingError && (
-                  <div className={styles.emailError}>
-                    {shippingError}
-                  </div>
-                )}
+                {shippingError && <div className={styles.emailError}>{shippingError}</div>}
               </div>
 
               <button
@@ -528,17 +536,11 @@ export function CartPage() {
                 <span className={styles.arrow}>→</span>
               </button>
 
-              <button 
-                className={styles.continueButton}
-                onClick={() => navigate('/produits')}
-              >
+              <button className={styles.continueButton} onClick={() => navigate('/produits')}>
                 Continuer les achats
               </button>
 
-              <button 
-                className={styles.clearButton}
-                onClick={clearCart}
-              >
+              <button className={styles.clearButton} onClick={clearCart}>
                 Vider le panier
               </button>
             </div>

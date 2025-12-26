@@ -39,7 +39,7 @@ export function AdminPromoFormPage() {
     usageLimit: 0,
     validFrom: today,
     validUntil: nextMonth,
-    isActive: true
+    isActive: true,
   });
 
   useEffect(() => {
@@ -60,8 +60,8 @@ export function AdminPromoFormPage() {
       setLoading(true);
       const response = await fetch(`${API_BASE}/admin/promos`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
@@ -83,7 +83,7 @@ export function AdminPromoFormPage() {
         usageLimit: promo.usageLimit || 0,
         validFrom: new Date(promo.validFrom).toISOString().split('T')[0],
         validUntil: new Date(promo.validUntil).toISOString().split('T')[0],
-        isActive: promo.isActive
+        isActive: promo.isActive,
       });
     } catch (err: Error) {
       console.error('Erreur:', err);
@@ -99,7 +99,7 @@ export function AdminPromoFormPage() {
     for (let i = 0; i < 8; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    setFormData(prev => ({ ...prev, code }));
+    setFormData((prev) => ({ ...prev, code }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -119,22 +119,20 @@ export function AdminPromoFormPage() {
         usageLimit: formData.usageLimit > 0 ? formData.usageLimit : null,
         validFrom: new Date(formData.validFrom).toISOString(),
         validUntil: new Date(formData.validUntil).toISOString(),
-        isActive: formData.isActive
+        isActive: formData.isActive,
       };
 
-      const url = isEditing 
-        ? `${API_BASE}/admin/promos/${promoId}`
-        : `${API_BASE}/admin/promos`;
+      const url = isEditing ? `${API_BASE}/admin/promos/${promoId}` : `${API_BASE}/admin/promos`;
 
       const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -165,21 +163,14 @@ export function AdminPromoFormPage() {
     <AdminLayout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <button
-            onClick={() => navigate('/admin/promos')}
-            className={styles.backButton}
-          >
+          <button onClick={() => navigate('/admin/promos')} className={styles.backButton}>
             <ArrowLeft size={20} />
             Retour
           </button>
           <h1>{isEditing ? 'Modifier le code promo' : 'Nouveau code promo'}</h1>
         </div>
 
-        {error && (
-          <div className={styles.error}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Code promo */}
@@ -195,7 +186,9 @@ export function AdminPromoFormPage() {
                   <input
                     type="text"
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value.toUpperCase() })
+                    }
                     required
                     placeholder="PROMO2024"
                     maxLength={20}
@@ -234,14 +227,14 @@ export function AdminPromoFormPage() {
                 </div>
               </div>
               <div className={styles.formGroup}>
-                <label>
-                  Valeur *
-                </label>
+                <label>Valeur *</label>
                 <div className={styles.valueInput}>
                   <input
                     type="number"
                     value={formData.value}
-                    onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })
+                    }
                     required
                     min="0"
                     max={formData.type === 'PERCENTAGE' ? 100 : 10000}
@@ -264,7 +257,9 @@ export function AdminPromoFormPage() {
                 <input
                   type="number"
                   value={formData.minPurchase}
-                  onChange={(e) => setFormData({ ...formData, minPurchase: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minPurchase: parseFloat(e.target.value) || 0 })
+                  }
                   min="0"
                   step="0.01"
                   placeholder="0 = pas de minimum"
@@ -276,7 +271,9 @@ export function AdminPromoFormPage() {
                   <input
                     type="number"
                     value={formData.maxDiscount}
-                    onChange={(e) => setFormData({ ...formData, maxDiscount: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, maxDiscount: parseFloat(e.target.value) || 0 })
+                    }
                     min="0"
                     step="0.01"
                     placeholder="0 = illimité"
@@ -288,7 +285,9 @@ export function AdminPromoFormPage() {
                 <input
                   type="number"
                   value={formData.usageLimit}
-                  onChange={(e) => setFormData({ ...formData, usageLimit: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, usageLimit: parseInt(e.target.value) || 0 })
+                  }
                   min="0"
                   placeholder="0 = illimité"
                 />
@@ -352,7 +351,7 @@ export function AdminPromoFormPage() {
             <p>
               Code <strong>{formData.code || 'XXXX'}</strong> offre{' '}
               <strong>
-                {formData.type === 'PERCENTAGE' 
+                {formData.type === 'PERCENTAGE'
                   ? `${formData.value}% de réduction`
                   : `${formData.value}€ de réduction`}
               </strong>
@@ -369,11 +368,7 @@ export function AdminPromoFormPage() {
             >
               Annuler
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={styles.submitButton}
-            >
+            <button type="submit" disabled={loading} className={styles.submitButton}>
               <Save size={16} />
               {loading ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
@@ -383,4 +378,3 @@ export function AdminPromoFormPage() {
     </AdminLayout>
   );
 }
-

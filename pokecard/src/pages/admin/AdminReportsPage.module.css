@@ -9,19 +9,23 @@
   justify-content: center;
   min-height: 400px;
   gap: var(--space-4, 1rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   border: 3px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
-  border-top-color: var(--color-accent-secondary, #8B7355);
+  border-top-color: var(--color-accent-secondary, #8b7355);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* Page Header */
 .pageHeader {
@@ -32,9 +36,9 @@
 }
 
 .pageSubtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin: 0;
 }
 
@@ -52,18 +56,20 @@
   background: transparent;
   border: none;
   border-radius: var(--radius-sm, 2px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
-.periodBtn:hover { color: var(--color-text-secondary, #A1A1A6); }
+.periodBtn:hover {
+  color: var(--color-text-secondary, #a1a1a6);
+}
 
 .periodBtn.active {
-  background: var(--color-bg-subtle, #1A1A1D);
-  color: var(--color-text-primary, #F5F5F3);
+  background: var(--color-bg-subtle, #1a1a1d);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 /* Stats Grid */
@@ -75,7 +81,9 @@
 }
 
 @media (min-width: 1024px) {
-  .statsGrid { grid-template-columns: repeat(4, 1fr); }
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .statCard {
@@ -93,9 +101,9 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border-radius: var(--radius-md, 4px);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   flex-shrink: 0;
 }
 
@@ -106,38 +114,46 @@
 }
 
 .statLabel {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .statValue {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .statTrend {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1, 0.25rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
 }
 
-.statTrend.positive { color: var(--color-success, #4ADE80); }
-.statTrend.negative { color: var(--color-error, #F87171); }
-
-.statSubtext {
-  font-family: var(--font-body, "Inter", sans-serif);
-  font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+.statTrend.positive {
+  color: var(--color-success, #4ade80);
+}
+.statTrend.negative {
+  color: var(--color-error, #f87171);
 }
 
-.textPositive { color: var(--color-success, #4ADE80) !important; }
-.textNegative { color: var(--color-error, #F87171) !important; }
+.statSubtext {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-muted, #6b6b6f);
+}
+
+.textPositive {
+  color: var(--color-success, #4ade80) !important;
+}
+.textNegative {
+  color: var(--color-error, #f87171) !important;
+}
 
 /* Chart Card */
 .chartCard {
@@ -152,17 +168,17 @@
 }
 
 .chartTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0 0 var(--space-1, 0.25rem) 0;
 }
 
 .chartSubtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin: 0;
 }
 
@@ -173,7 +189,7 @@
 .empty {
   text-align: center;
   padding: var(--space-16, 4rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* Chart SVG */
@@ -191,9 +207,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-2, 0.5rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .legendDot {
@@ -207,13 +223,13 @@
   height: auto;
   max-height: 480px;
   min-height: 480px;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .axisLabel {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 13px;
-  fill: var(--color-text-muted, #6B6B6F);
+  fill: var(--color-text-muted, #6b6b6f);
 }
 
 /* Tooltip */
@@ -229,10 +245,10 @@
 }
 
 .tooltipHeader {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin-bottom: var(--space-2, 0.5rem);
   padding-bottom: var(--space-2, 0.5rem);
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
@@ -242,14 +258,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-2, 0.5rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin-bottom: var(--space-1, 0.25rem);
 }
 
 .tooltipRow strong {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .tooltipDot {
@@ -260,8 +276,19 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .pageHeader { flex-direction: column; align-items: stretch; gap: var(--space-4, 1rem); }
-  .statsGrid { grid-template-columns: 1fr; }
-  .statCard { flex-direction: column; text-align: center; }
-  .statIcon { margin: 0 auto; }
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4, 1rem);
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  .statCard {
+    flex-direction: column;
+    text-align: center;
+  }
+  .statIcon {
+    margin: 0 auto;
+  }
 }

@@ -22,7 +22,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 80%, rgba(139, 115, 85, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(139, 115, 85, 0.05) 0%, transparent 50%);
   pointer-events: none;
@@ -227,21 +227,21 @@
   .register-container {
     padding: var(--space-4, 1rem);
   }
-  
+
   .register-card {
     padding: var(--space-8, 2rem);
     margin: var(--space-4, 1rem);
   }
-  
+
   .register-header h1 {
     font-size: var(--text-3xl, 2rem);
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  
+
   .form-input {
     padding: var(--space-3, 0.875rem) var(--space-4, 1rem);
   }
@@ -251,7 +251,7 @@
   .register-card {
     padding: var(--space-6, 1.5rem);
   }
-  
+
   .register-header h1 {
     font-size: var(--text-2xl, 1.75rem);
   }

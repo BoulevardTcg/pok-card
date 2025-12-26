@@ -12,7 +12,7 @@ function getCardImageUrl(card: any, quality: 'low' | 'high' = 'high') {
 export function TradeSetPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-   
+
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,19 +21,19 @@ export function TradeSetPage() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     Promise.all([
       fetch(`http://localhost:8080/api/trade/sets/${encodeURIComponent(id)}/cards`)
-        .then(r => r.json())
-           
-        .then((data: any) => Array.isArray(data) ? data : [])
-        .catch(error => {
+        .then((r) => r.json())
+
+        .then((data: any) => (Array.isArray(data) ? data : []))
+        .catch((error) => {
           console.error('Erreur lors du chargement des cartes:', error);
           return [];
         }),
-      loadFoilMap().catch(() => new Map())
+      loadFoilMap().catch(() => new Map()),
     ]).then(([cardsData, foilMapData]) => {
       setCards(cardsData);
       setFoilMap(foilMapData);
@@ -42,7 +42,7 @@ export function TradeSetPage() {
   }, [id]);
 
   const filteredCards = useMemo(() => {
-    return cards.filter(card => {
+    return cards.filter((card) => {
       const matchesSearch = card.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRarity = selectedRarity === 'all' || card.rarity === selectedRarity;
       return matchesSearch && matchesRarity;
@@ -50,7 +50,7 @@ export function TradeSetPage() {
   }, [cards, searchQuery, selectedRarity]);
 
   const rarityOptions = useMemo(() => {
-    return Array.from(new Set(cards.map(card => card.rarity).filter(Boolean)));
+    return Array.from(new Set(cards.map((card) => card.rarity).filter(Boolean)));
   }, [cards]);
 
   if (loading) {
@@ -59,8 +59,17 @@ export function TradeSetPage() {
         <div className={styles.container}>
           <div className={styles.loading}>
             <div className={styles.loadingIcon}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
               </svg>
             </div>
             <p>Chargement des cartes...</p>
@@ -80,18 +89,13 @@ export function TradeSetPage() {
           transition={{ duration: 0.5 }}
           className={styles.header}
         >
-          <button
-            onClick={() => navigate('/trade')}
-            className={styles.backButton}
-          >
+          <button onClick={() => navigate('/trade')} className={styles.backButton}>
             ← Retour aux échanges
           </button>
-          
+
           <h1 className={styles.title}>Série {id}</h1>
           <div className={styles.divider}></div>
-          <p className={styles.description}>
-            {cards.length} cartes disponibles
-          </p>
+          <p className={styles.description}>{cards.length} cartes disponibles</p>
         </motion.div>
 
         {/* Barre de recherche et filtres */}
@@ -106,19 +110,21 @@ export function TradeSetPage() {
               type="text"
               placeholder="Rechercher un Pokémon..."
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
             />
           </div>
-          
+
           <select
             value={selectedRarity}
-            onChange={e => setSelectedRarity(e.target.value)}
+            onChange={(e) => setSelectedRarity(e.target.value)}
             className={styles.filterSelect}
           >
             <option value="all">Toutes les raretés</option>
-            {rarityOptions.map(rarity => (
-              <option key={rarity} value={rarity}>{rarity}</option>
+            {rarityOptions.map((rarity) => (
+              <option key={rarity} value={rarity}>
+                {rarity}
+              </option>
             ))}
           </select>
         </motion.div>
@@ -154,9 +160,7 @@ export function TradeSetPage() {
           >
             <div className={styles.emptyIcon}>🔍</div>
             <h3 className={styles.emptyTitle}>Aucune carte trouvée</h3>
-            <p className={styles.emptyText}>
-              Essayez de modifier vos critères de recherche
-            </p>
+            <p className={styles.emptyText}>Essayez de modifier vos critères de recherche</p>
           </motion.div>
         ) : (
           <motion.div
@@ -174,37 +178,31 @@ export function TradeSetPage() {
                 className={styles.cardWrapper}
               >
                 <div className={styles.cardContainer}>
-                  <HoloCard 
-                    card={{ 
-                      id: card.id, 
-                      name: card.name, 
-                      number: String(card.number ?? ''), 
-                      rarity: card.rarity, 
+                  <HoloCard
+                    card={{
+                      id: card.id,
+                      name: card.name,
+                      number: String(card.number ?? ''),
+                      rarity: card.rarity,
                       imagesSmall: getCardImageUrl(card),
                       setSeries: card.setSeries,
-                      setCode: String(id || '').toLowerCase()
+                      setCode: String(id || '').toLowerCase(),
                     }}
                     foilMap={foilMap}
                   />
                 </div>
-                
+
                 <div className={styles.cardInfo}>
                   <h3 className={styles.cardName}>{card.name}</h3>
-                  
+
                   <div className={styles.cardMeta}>
                     <span className={styles.cardNumber}>#{card.number}</span>
-                    {card.rarity && (
-                      <span className={styles.cardRarity}>{card.rarity}</span>
-                    )}
+                    {card.rarity && <span className={styles.cardRarity}>{card.rarity}</span>}
                   </div>
-                  
+
                   <div className={styles.cardActions}>
-                    <button className={styles.detailsButton}>
-                      📖 Détails
-                    </button>
-                    <button className={styles.tradeButton}>
-                      💰 Échanger
-                    </button>
+                    <button className={styles.detailsButton}>📖 Détails</button>
+                    <button className={styles.tradeButton}>💰 Échanger</button>
                   </div>
                 </div>
               </motion.div>

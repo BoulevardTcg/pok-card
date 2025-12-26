@@ -7,9 +7,9 @@
 }
 
 :global(.dark) .section {
-  background: #0C1321;
-  border-top-color: #1A1D21;
-  border-bottom-color: #1A1D21;
+  background: #0c1321;
+  border-top-color: #1a1d21;
+  border-bottom-color: #1a1d21;
 }
 
 .container {
@@ -44,10 +44,9 @@
 }
 
 .logoText {
-  color: #E8DCC3;
+  color: #e8dcc3;
   font-family: var(--font-serif);
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.05em;
 }
-

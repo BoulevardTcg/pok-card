@@ -18,12 +18,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Ne jamais rediriger tant que le chargement n'est pas terminé
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '50vh' 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+        }}
+      >
         <div>Chargement...</div>
       </div>
     );
@@ -36,4 +38,3 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   return <>{children}</>;
 }
-

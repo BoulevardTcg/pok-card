@@ -24,15 +24,13 @@ export default function LatestProductsCarousel() {
   async function loadLatestProducts() {
     setLoading(true);
     try {
-      const response = await listProducts({
+      const response = (await listProducts({
         limit: 20,
-      }) as { products: ProductType[] };
-      
+      })) as { products: ProductType[] };
+
       // Filtrer les accessoires et prendre les 8 derniers
-      const filtered = response.products
-        .filter(p => p.category !== 'Accessoires')
-        .slice(0, 8);
-      
+      const filtered = response.products.filter((p) => p.category !== 'Accessoires').slice(0, 8);
+
       setProducts(filtered);
     } catch (error) {
       console.error('Erreur lors du chargement des produits:', error);
@@ -95,21 +93,14 @@ export default function LatestProductsCarousel() {
               Découvrez nos dernières arrivées, sélectionnées avec soin pour votre collection
             </p>
           </div>
-          <button
-            onClick={() => navigate('/produits')}
-            className={styles.seeAllButton}
-          >
+          <button onClick={() => navigate('/produits')} className={styles.seeAllButton}>
             Voir tout
             <span className={styles.arrow}>→</span>
           </button>
         </div>
 
         <div className={styles.carouselWrapper}>
-          <button
-            onClick={prevSlide}
-            className={styles.navButton}
-            aria-label="Précédent"
-          >
+          <button onClick={prevSlide} className={styles.navButton} aria-label="Précédent">
             ←
           </button>
 
@@ -143,7 +134,13 @@ export default function LatestProductsCarousel() {
                     )}
                     {product.minPriceCents && product.originalPriceCents && (
                       <div className={styles.discountBadge}>
-                        -{Math.round(((product.originalPriceCents - product.minPriceCents) / product.originalPriceCents) * 100)}%
+                        -
+                        {Math.round(
+                          ((product.originalPriceCents - product.minPriceCents) /
+                            product.originalPriceCents) *
+                            100
+                        )}
+                        %
                       </div>
                     )}
                   </div>
@@ -166,11 +163,7 @@ export default function LatestProductsCarousel() {
             </div>
           </div>
 
-          <button
-            onClick={nextSlide}
-            className={styles.navButton}
-            aria-label="Suivant"
-          >
+          <button onClick={nextSlide} className={styles.navButton} aria-label="Suivant">
             →
           </button>
         </div>
@@ -189,4 +182,3 @@ export default function LatestProductsCarousel() {
     </div>
   );
 }
-

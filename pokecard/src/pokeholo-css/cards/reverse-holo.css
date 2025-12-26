@@ -4,21 +4,18 @@
 
 */
 
-
-
-
 /* ==== REVERSE HOLO — métal transparent avec foil CDN en masque ==== */
 
-.card[data-rarity$="reverse holo"] .card__shine,
-.card[data-rarity$="reverse holo"] .card__glare {
+.card[data-rarity$='reverse holo'] .card__shine,
+.card[data-rarity$='reverse holo'] .card__glare {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
 /* Couche 1: remplissage métallique "sous" le reflet spéculaire */
-.card[data-rarity$="reverse holo"] .card__shine::before {
-  content: "";
+.card[data-rarity$='reverse holo'] .card__shine::before {
+  content: '';
   position: absolute;
   inset: 0;
 
@@ -26,145 +23,131 @@
   background-image:
     /* reflets larges qui suivent le curseur */
     radial-gradient(
-      circle at var(--pointer-x,50%) var(--pointer-y,50%),
-      hsla(220, 10%, 92%, 0.60) 0%,
+      circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+      hsla(220, 10%, 92%, 0.6) 0%,
       hsla(220, 10%, 70%, 0.35) 22%,
-      hsla(220, 10%, 55%, 0.20) 45%,
-      hsla(220, 10%, 35%, 0.10) 70%,
+      hsla(220, 10%, 55%, 0.2) 45%,
+      hsla(220, 10%, 35%, 0.1) 70%,
       transparent 100%
     ),
     /* micro-irrégularités métal */
     conic-gradient(
-      from calc(var(--pointer-from-left, .5) * 360deg),
-      rgba(255,255,255,.25), rgba(255,255,255,0) 20%,
-      rgba(255,255,255,.18) 40%, rgba(255,255,255,0) 60%,
-      rgba(255,255,255,.20) 80%, rgba(255,255,255,0) 100%
-    );
-  background-size: 180% 180%, 200% 200%;
+        from calc(var(--pointer-from-left, 0.5) * 360deg),
+        rgba(255, 255, 255, 0.25),
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.18) 40%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.2) 80%,
+        rgba(255, 255, 255, 0) 100%
+      );
+  background-size:
+    180% 180%,
+    200% 200%;
   background-position:
-    calc(var(--pointer-x,50%)) calc(var(--pointer-y,50%)),
+    calc(var(--pointer-x, 50%)) calc(var(--pointer-y, 50%)),
     center;
 
   /* >>> le foil CDN sert de MASQUE (zones claires = visible) */
   -webkit-mask-image: var(--foil);
-          mask-image: var(--foil);
+  mask-image: var(--foil);
   -webkit-mask-size: cover;
-          mask-size: cover;
+  mask-size: cover;
   -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   -webkit-mask-position: center;
-          mask-position: center;
+  mask-position: center;
 
   /* fusion pour un rendu métal (ne recolore pas l'artwork) */
   mix-blend-mode: screen;
-  opacity: calc(.85 * var(--card-opacity, 1));
+  opacity: calc(0.85 * var(--card-opacity, 1));
   filter: saturate(1.5) contrast(1.1);
   z-index: 3; /* au-dessus de l'image, sous le glare */
 }
 
 /* Couche 2: highlight spéculaire (léger), pas masqué, pour le "pop" */
-.card[data-rarity$="reverse holo"] .card__glare::after {
-  content: "";
+.card[data-rarity$='reverse holo'] .card__glare::after {
+  content: '';
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(
-      circle at var(--pointer-x,50%) var(--pointer-y,50%),
-      rgba(255,255,255,.28) 0%,
-      rgba(255,255,255,.15) 22%,
-      rgba(255,255,255,.06) 45%,
-      transparent 60%
-    );
+  background: radial-gradient(
+    circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.15) 22%,
+    rgba(255, 255, 255, 0.06) 45%,
+    transparent 60%
+  );
   mix-blend-mode: screen;
-  opacity: calc(.55 * var(--card-opacity, 1));
+  opacity: calc(0.55 * var(--card-opacity, 1));
   z-index: 4;
 }
 
 /* Option: si tu veux un peu de teinte "reverse" violette/gris acier */
-.card[data-rarity$="reverse holo"] .card__shine::after {
-  content: "";
+.card[data-rarity$='reverse holo'] .card__shine::after {
+  content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(135deg,
-      hsla(280, 25%, 60%, .12),
-      hsla(220, 15%, 50%, .12) 50%,
-      hsla(200, 20%, 55%, .12)
-    );
+  background: linear-gradient(
+    135deg,
+    hsla(280, 25%, 60%, 0.12),
+    hsla(220, 15%, 50%, 0.12) 50%,
+    hsla(200, 20%, 55%, 0.12)
+  );
   -webkit-mask-image: var(--foil);
-          mask-image: var(--foil);
+  mask-image: var(--foil);
   -webkit-mask-size: cover;
-          mask-size: cover;
+  mask-size: cover;
   -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   -webkit-mask-position: center;
-          mask-position: center;
+  mask-position: center;
   mix-blend-mode: color-dodge;
-  opacity: calc(.45 * var(--card-opacity, 1));
+  opacity: calc(0.45 * var(--card-opacity, 1));
   z-index: 3;
 }
 
 /* Petits réglages de luminosité par type si tu veux */
-.card.metal    { --reverse-metal-bright: 1.00; }
-.card.darkness { --reverse-metal-bright: 1.10; }
-.card.lightning{ --reverse-metal-bright: 1.15; }
-
-
-
-
-
-
-
-
-
+.card.metal {
+  --reverse-metal-bright: 1;
+}
+.card.darkness {
+  --reverse-metal-bright: 1.1;
+}
+.card.lightning {
+  --reverse-metal-bright: 1.15;
+}
 
 /*
 
   GLARE LAYERS
 
 */
-	
-.card[data-rarity$="reverse holo"] .card__glare {
 
+.card[data-rarity$='reverse holo'] .card__glare {
   opacity: var(--card-opacity);
-  
-  background-image: 
-    radial-gradient(
-      farthest-corner circle at var(--pointer-x) var(--pointer-y),
-      hsla(0, 0%, 100%, 0.8) 10%,
-      hsla(0, 0%, 100%, 0.5) 20%,
-      hsla(0, 0%, 0%, 0.75) 90%
-    );
 
-  filter: brightness(.7) contrast(1.5);
+  background-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    hsla(0, 0%, 100%, 0.8) 10%,
+    hsla(0, 0%, 100%, 0.5) 20%,
+    hsla(0, 0%, 0%, 0.75) 90%
+  );
 
+  filter: brightness(0.7) contrast(1.5);
 }
 
-.card[data-rarity$="reverse holo"] .card__glare:after {
-
-  content: "";
+.card[data-rarity$='reverse holo'] .card__glare:after {
+  content: '';
   opacity: var(--card-opacity);
-  
-  background-image: 
-    radial-gradient( 
-      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsl(0, 0%, 100%) 10%, 
-      hsla(0, 0%, 100%, 0.5) 20%, 
-      hsla(0, 0%, 0%, 0.5) 120% 
-    );
+
+  background-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    hsl(0, 0%, 100%) 10%,
+    hsla(0, 0%, 100%, 0.5) 20%,
+    hsla(0, 0%, 0%, 0.5) 120%
+  );
 
   filter: brightness(1) contrast(1.5);
-
 }
-
-
-
-
-
-
-
-
-
 
 /*
 
@@ -172,17 +155,15 @@
 
 */
 
-.card:not(.masked)[data-rarity$="reverse holo"] .card__shine {
+.card:not(.masked)[data-rarity$='reverse holo'] .card__shine {
   --foil: none;
   clip-path: var(--clip-invert);
 }
 
-.card:not(.masked)[data-rarity$="reverse holo"][data-subtypes^="stage"] .card__glare:after {
+.card:not(.masked)[data-rarity$='reverse holo'][data-subtypes^='stage'] .card__glare:after {
   clip-path: var(--clip-stage-invert);
 }
 
-.card:not(.masked)[data-rarity$="reverse holo"][data-supertype="trainer"] .card__glare:after {
+.card:not(.masked)[data-rarity$='reverse holo'][data-supertype='trainer'] .card__glare:after {
   clip-path: var(--clip-trainer-invert);
 }
-
-

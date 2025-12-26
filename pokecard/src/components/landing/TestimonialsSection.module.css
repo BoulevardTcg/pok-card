@@ -1,6 +1,6 @@
 .section {
   padding: 5rem 0 7rem;
-  background: #0C1321;
+  background: #0c1321;
 }
 
 .container {
@@ -33,7 +33,7 @@
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
+  background: #d7b56d;
   margin: 0 auto;
 }
 
@@ -66,7 +66,7 @@
 
 .star {
   font-size: 1.25rem;
-  color: #D7B56D;
+  color: #d7b56d;
 }
 
 .content {
@@ -91,8 +91,8 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(to bottom right, #E8DCC3, #D7B56D);
-  border: 2px solid #D7B56D;
+  background: linear-gradient(to bottom right, #e8dcc3, #d7b56d);
+  border: 2px solid #d7b56d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +100,7 @@
 }
 
 .avatarInitials {
-  color: #0C1321;
+  color: #0c1321;
   font-weight: 600;
   font-size: 0.875rem;
   font-family: var(--font-sans);
@@ -138,4 +138,3 @@
     grid-template-columns: 1fr;
   }
 }
-

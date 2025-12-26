@@ -7,7 +7,16 @@ import styles from './AdminInventoryPage.module.css';
 
 // Icônes SVG
 const AlertIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
     <line x1="12" y1="9" x2="12" y2="13" />
     <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -15,14 +24,32 @@ const AlertIcon = () => (
 );
 
 const EditIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
   </svg>
 );
 
 const PackageIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M12 2L2 7l10 5 10-5-10-5z" />
     <path d="M2 17l10 5 10-5" />
     <path d="M2 12l10 5 10-5" />
@@ -64,7 +91,7 @@ export function AdminInventoryPage() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/admin/inventory`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
@@ -86,10 +113,10 @@ export function AdminInventoryPage() {
       const response = await fetch(`${API_BASE}/admin/inventory/${variantId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ stock, reason: 'Ajustement manuel' })
+        body: JSON.stringify({ stock, reason: 'Ajustement manuel' }),
       });
 
       if (!response.ok) throw new Error('Erreur lors de la mise à jour');
@@ -137,7 +164,9 @@ export function AdminInventoryPage() {
         <div className={styles.alert}>
           <AlertIcon />
           <span>
-            <strong>{lowStockVariants.length}</strong> produit{lowStockVariants.length > 1 ? 's' : ''} avec stock faible nécessite{lowStockVariants.length > 1 ? 'nt' : ''} votre attention
+            <strong>{lowStockVariants.length}</strong> produit
+            {lowStockVariants.length > 1 ? 's' : ''} avec stock faible nécessite
+            {lowStockVariants.length > 1 ? 'nt' : ''} votre attention
           </span>
         </div>
       )}
@@ -180,7 +209,9 @@ export function AdminInventoryPage() {
                     <span className={styles.variantName}>{variant.name}</span>
                   </td>
                   <td>
-                    <span className={`${styles.stockBadge} ${isOut ? styles.out : isLow ? styles.low : ''}`}>
+                    <span
+                      className={`${styles.stockBadge} ${isOut ? styles.out : isLow ? styles.low : ''}`}
+                    >
                       {variant.stock}
                     </span>
                   </td>

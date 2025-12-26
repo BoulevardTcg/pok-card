@@ -4,14 +4,14 @@ import { motion } from 'framer-motion';
 import { API_BASE } from './api';
 import styles from './TradePage.module.css';
 
-type Set = { 
-  id: string; 
-  name: string; 
-  series?: string | null; 
-  imagesLogo?: string | null; 
-  imagesSymbol?: string | null; 
+type Set = {
+  id: string;
+  name: string;
+  series?: string | null;
+  imagesLogo?: string | null;
+  imagesSymbol?: string | null;
   releaseDate?: string | null;
-}
+};
 
 function ensurePng(url?: string | null): string | null {
   if (!url) return null;
@@ -27,9 +27,9 @@ export function TradePage() {
 
   useEffect(() => {
     fetch(`${API_BASE}/trade/sets`)
-      .then(r => r.json())
+      .then((r) => r.json())
       .then((data: any[]) => {
-        const mapped: Set[] = data.map(s => ({
+        const mapped: Set[] = data.map((s) => ({
           id: s.id,
           name: s.name,
           series: s.series,
@@ -39,21 +39,22 @@ export function TradePage() {
         }));
         setSets(mapped);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Erreur lors du chargement des séries:', error);
         setSets([]);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredSets = sets.filter(set => {
-    const matchesSearch = set.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (set.series && set.series.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredSets = sets.filter((set) => {
+    const matchesSearch =
+      set.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (set.series && set.series.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesSeries = selectedSeries === 'all' || set.series === selectedSeries;
     return matchesSearch && matchesSeries;
   });
 
-  const allSeries = Array.from(new Set(sets.map(set => set.series).filter(Boolean)));
+  const allSeries = Array.from(new Set(sets.map((set) => set.series).filter(Boolean)));
 
   if (loading) {
     return (
@@ -81,7 +82,10 @@ export function TradePage() {
             <span className={styles.constructionIcon}>🚧</span>
             <div className={styles.constructionText}>
               <strong>Section en construction</strong>
-              <p>Cette fonctionnalité d'échange de cartes est actuellement en développement. Elle sera bientôt disponible !</p>
+              <p>
+                Cette fonctionnalité d'échange de cartes est actuellement en développement. Elle
+                sera bientôt disponible !
+              </p>
             </div>
           </div>
         </div>
@@ -116,15 +120,17 @@ export function TradePage() {
               className={styles.searchInput}
             />
           </div>
-          
+
           <select
             value={selectedSeries}
             onChange={(e) => setSelectedSeries(e.target.value)}
             className={styles.filterSelect}
           >
             <option value="all">Toutes les séries</option>
-            {allSeries.map(series => (
-              <option key={series} value={series}>{series}</option>
+            {allSeries.map((series) => (
+              <option key={series} value={series}>
+                {series}
+              </option>
             ))}
           </select>
         </motion.div>
@@ -156,9 +162,7 @@ export function TradePage() {
           >
             <div className={styles.emptyIcon}>🔍</div>
             <h3 className={styles.emptyTitle}>Aucune extension trouvée</h3>
-            <p className={styles.emptyText}>
-              Essayez de modifier vos critères de recherche
-            </p>
+            <p className={styles.emptyText}>Essayez de modifier vos critères de recherche</p>
           </motion.div>
         ) : (
           <motion.div
@@ -179,17 +183,9 @@ export function TradePage() {
               >
                 <div className={styles.setImageContainer}>
                   {set.imagesLogo ? (
-                    <img 
-                      src={set.imagesLogo} 
-                      alt={set.name}
-                      className={styles.setImage}
-                    />
+                    <img src={set.imagesLogo} alt={set.name} className={styles.setImage} />
                   ) : set.imagesSymbol ? (
-                    <img 
-                      src={set.imagesSymbol} 
-                      alt={set.name}
-                      className={styles.setSymbol}
-                    />
+                    <img src={set.imagesSymbol} alt={set.name} className={styles.setSymbol} />
                   ) : (
                     <div className={styles.placeholderImage}>🎴</div>
                   )}
@@ -197,13 +193,9 @@ export function TradePage() {
 
                 <div className={styles.setInfo}>
                   <h3 className={styles.setName}>{set.name}</h3>
-                  
-                  {set.series && (
-                    <div className={styles.setSeries}>
-                      📚 {set.series}
-                    </div>
-                  )}
-                  
+
+                  {set.series && <div className={styles.setSeries}>📚 {set.series}</div>}
+
                   {set.releaseDate && (
                     <div className={styles.setDate}>
                       📅 {new Date(set.releaseDate).getFullYear()}

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styles from './AccessoiresPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
-import {navigateToProduct} from "./utils/productMatching.ts";
+import { navigateToProduct } from './utils/productMatching.ts';
 
 interface Accessoire {
   id: number;
@@ -25,84 +25,84 @@ const allAccessoires: Accessoire[] = [
   // Étuis & Protections
   {
     id: 1,
-    name: "Étui Charizard Premium",
+    name: 'Étui Charizard Premium',
     price: 34.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Étui",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Étui',
     stock: 25,
     isPopular: true,
-    description: "Étui premium avec design Charizard",
-    tcgCompatible: ["Pokémon", "One Piece", "Yu-Gi-Oh!", "Magic"]
+    description: 'Étui premium avec design Charizard',
+    tcgCompatible: ['Pokémon', 'One Piece', 'Yu-Gi-Oh!', 'Magic'],
   },
   {
     id: 2,
-    name: "Étui Straw Hat Pirates",
+    name: 'Étui Straw Hat Pirates',
     price: 39.99,
-    image: "/public/img/onepiece.png",
-    category: "Étuis & Protections",
-    subcategory: "Étui",
+    image: '/public/img/onepiece.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Étui',
     stock: 22,
-    description: "Étui officiel One Piece Straw Hat Pirates",
-    tcgCompatible: ["One Piece", "Pokémon", "Yu-Gi-Oh!"]
+    description: 'Étui officiel One Piece Straw Hat Pirates',
+    tcgCompatible: ['One Piece', 'Pokémon', 'Yu-Gi-Oh!'],
   },
   {
     id: 3,
-    name: "Binder Collection Pokémon",
+    name: 'Binder Collection Pokémon',
     price: 24.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Binder",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Binder',
     stock: 31,
-    description: "Binder de collection avec pages protectrices",
-    tcgCompatible: ["Pokémon", "One Piece", "Yu-Gi-Oh!", "Magic", "Dragon Ball"]
+    description: 'Binder de collection avec pages protectrices',
+    tcgCompatible: ['Pokémon', 'One Piece', 'Yu-Gi-Oh!', 'Magic', 'Dragon Ball'],
   },
   {
     id: 4,
-    name: "Sleeves Ultra Pro Premium",
+    name: 'Sleeves Ultra Pro Premium',
     price: 9.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Sleeves",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Sleeves',
     stock: 150,
     isPopular: true,
-    description: "Sleeves ultra protection pour cartes",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Sleeves ultra protection pour cartes',
+    tcgCompatible: ['Tous TCG'],
   },
 
   // Sleeves & Binders
   {
     id: 5,
-    name: "Sleeves Dragon Shield",
+    name: 'Sleeves Dragon Shield',
     price: 12.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Sleeves",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Sleeves',
     stock: 89,
-    description: "Sleeves Dragon Shield ultra résistants",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Sleeves Dragon Shield ultra résistants',
+    tcgCompatible: ['Tous TCG'],
   },
   {
     id: 6,
-    name: "Binder Ultra Pro Premium",
+    name: 'Binder Ultra Pro Premium',
     price: 29.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Binder",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Binder',
     stock: 18,
-    description: "Binder Ultra Pro avec anneaux métalliques",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Binder Ultra Pro avec anneaux métalliques',
+    tcgCompatible: ['Tous TCG'],
   },
   {
     id: 7,
-    name: "Pages Binder 9 Pochettes",
+    name: 'Pages Binder 9 Pochettes',
     price: 4.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Pages",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Pages',
     stock: 200,
-    description: "Pages de 9 pochettes pour binder",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Pages de 9 pochettes pour binder',
+    tcgCompatible: ['Tous TCG'],
   },
 
   // Displays & Présentoirs
@@ -111,63 +111,63 @@ const allAccessoires: Accessoire[] = [
   // Accessoires de Jeu
   {
     id: 11,
-    name: "Dés TCG Premium",
+    name: 'Dés TCG Premium',
     price: 19.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Dés",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Dés',
     stock: 45,
-    description: "Set de dés premium pour TCG",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Set de dés premium pour TCG',
+    tcgCompatible: ['Tous TCG'],
   },
   {
     id: 12,
-    name: "Tapis de Jeu One Piece",
+    name: 'Tapis de Jeu One Piece',
     price: 44.99,
-    image: "/public/img/onepiece.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Tapis",
+    image: '/public/img/onepiece.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Tapis',
     stock: 12,
-    description: "Tapis de jeu officiel One Piece",
-    tcgCompatible: ["One Piece", "Pokémon", "Yu-Gi-Oh!"]
+    description: 'Tapis de jeu officiel One Piece',
+    tcgCompatible: ['One Piece', 'Pokémon', 'Yu-Gi-Oh!'],
   },
   {
     id: 13,
-    name: "Organisateur Cartes",
+    name: 'Organisateur Cartes',
     price: 14.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Organisateur",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Organisateur',
     stock: 67,
-    description: "Organisateur pratique pour cartes",
-    tcgCompatible: ["Tous TCG"]
+    description: 'Organisateur pratique pour cartes',
+    tcgCompatible: ['Tous TCG'],
   },
   {
     id: 14,
-    name: "Compteur de Points",
+    name: 'Compteur de Points',
     price: 8.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Compteur",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Compteur',
     stock: 34,
-    description: "Compteur de points pour parties de cartes",
-    tcgCompatible: ["Tous TCG"]
-  }
+    description: 'Compteur de points pour parties de cartes',
+    tcgCompatible: ['Tous TCG'],
+  },
 ];
 
 const categories = [
   'Tous',
   'Étuis & Protections',
-  'Sleeves & Binders', 
+  'Sleeves & Binders',
   'Displays & Présentoirs',
-  'Accessoires de Jeu'
+  'Accessoires de Jeu',
 ];
 
 const subcategories = {
   'Étuis & Protections': ['Tous', 'Étui', 'Binder', 'Sleeves'],
   'Sleeves & Binders': ['Tous', 'Sleeves', 'Binder', 'Pages'],
   'Displays & Présentoirs': ['Tous', 'Display', 'Support'],
-  'Accessoires de Jeu': ['Tous', 'Dés', 'Tapis', 'Organisateur', 'Compteur']
+  'Accessoires de Jeu': ['Tous', 'Dés', 'Tapis', 'Organisateur', 'Compteur'],
 };
 
 export function AccessoiresPage() {
@@ -186,10 +186,10 @@ export function AccessoiresPage() {
   useEffect(() => {
     async function loadApiProducts() {
       try {
-        const response = await listProducts({
+        const response = (await listProducts({
           category: 'Accessoires',
-          limit: 200
-        }) as { products: ProductType[] };
+          limit: 200,
+        })) as { products: ProductType[] };
         setApiProducts(response.products);
       } catch (error) {
         console.error('Erreur lors du chargement des produits API:', error);
@@ -199,28 +199,30 @@ export function AccessoiresPage() {
     }
     loadApiProducts();
   }, []);
-  
+
   // Fonction pour trouver un produit API correspondant à un accessoire statique
-// Filtrer les accessoires statiques
-  const filteredAccessoires = allAccessoires.filter(accessoire => {
+  // Filtrer les accessoires statiques
+  const filteredAccessoires = allAccessoires.filter((accessoire) => {
     const categoryMatch = selectedCategory === 'Tous' || accessoire.category === selectedCategory;
-    const subcategoryMatch = selectedSubcategory === 'Tous' || accessoire.subcategory === selectedSubcategory;
+    const subcategoryMatch =
+      selectedSubcategory === 'Tous' || accessoire.subcategory === selectedSubcategory;
     const newMatch = !showNewOnly || accessoire.isNew;
     const saleMatch = !showSaleOnly || accessoire.isSale;
     const popularMatch = !showPopularOnly || accessoire.isPopular;
-    
+
     return categoryMatch && subcategoryMatch && newMatch && saleMatch && popularMatch;
   });
-  
+
   // Filtrer les produits API qui correspondent aux critères
-  const filteredApiProducts = apiProducts.filter(apiProduct => {
+  const filteredApiProducts = apiProducts.filter((apiProduct) => {
     // Si on filtre par "Displays & Présentoirs", chercher les produits dont le nom contient "Display"
     if (selectedCategory === 'Displays & Présentoirs') {
       const nameLower = apiProduct.name.toLowerCase();
-      const isDisplay = nameLower.includes('display') || 
-                        nameLower.includes('présentoir') ||
-                        nameLower.includes('support');
-      
+      const isDisplay =
+        nameLower.includes('display') ||
+        nameLower.includes('présentoir') ||
+        nameLower.includes('support');
+
       if (selectedSubcategory === 'Display') {
         return isDisplay && nameLower.includes('display');
       } else if (selectedSubcategory === 'Support') {
@@ -230,27 +232,27 @@ export function AccessoiresPage() {
       }
       return false;
     }
-    
+
     // Pour les autres catégories, on affiche les produits API si la catégorie correspond
     if (selectedCategory !== 'Tous') {
       // Mapping des catégories statiques vers les catégories API
       const categoryMap: { [key: string]: string[] } = {
         'Étuis & Protections': ['Accessoires'],
         'Sleeves & Binders': ['Accessoires'],
-        'Accessoires de Jeu': ['Accessoires']
+        'Accessoires de Jeu': ['Accessoires'],
       };
-      
+
       const mappedCategories = categoryMap[selectedCategory] || [];
       return mappedCategories.includes(apiProduct.category);
     }
-    
+
     return true;
   });
-  
+
   // Combiner les accessoires statiques et les produits API
   const allProducts = [
-    ...filteredAccessoires.map(acc => ({ type: 'static' as const, data: acc })),
-    ...filteredApiProducts.map(prod => ({ type: 'api' as const, data: prod }))
+    ...filteredAccessoires.map((acc) => ({ type: 'static' as const, data: acc })),
+    ...filteredApiProducts.map((prod) => ({ type: 'api' as const, data: prod })),
   ];
 
   const sortedProducts = [...allProducts].sort((a, b) => {
@@ -279,10 +281,11 @@ export function AccessoiresPage() {
           return bPrice - aPrice;
         case 'name':
           return a.data.name.localeCompare(b.data.name);
-        case 'stock':
-          { const aStock = Math.max(...a.data.variants.map(v => v.stock));
-          const bStock = Math.max(...b.data.variants.map(v => v.stock));
-          return bStock - aStock; }
+        case 'stock': {
+          const aStock = Math.max(...a.data.variants.map((v) => v.stock));
+          const bStock = Math.max(...b.data.variants.map((v) => v.stock));
+          return bStock - aStock;
+        }
         case 'category':
           return a.data.category.localeCompare(b.data.category);
         default:
@@ -296,21 +299,31 @@ export function AccessoiresPage() {
 
   const getCategoryIcon = (categoryName: string) => {
     switch (categoryName) {
-      case 'Étuis & Protections': return '🛡️';
-      case 'Sleeves & Binders': return '📁';
-      case 'Displays & Présentoirs': return '🖼️';
-      case 'Accessoires de Jeu': return '🎲';
-      default: return '🛡️';
+      case 'Étuis & Protections':
+        return '🛡️';
+      case 'Sleeves & Binders':
+        return '📁';
+      case 'Displays & Présentoirs':
+        return '🖼️';
+      case 'Accessoires de Jeu':
+        return '🎲';
+      default:
+        return '🛡️';
     }
   };
 
   const getCategoryColor = (categoryName: string) => {
     switch (categoryName) {
-      case 'Étuis & Protections': return '#10b981';
-      case 'Sleeves & Binders': return '#06b6d4';
-      case 'Displays & Présentoirs': return '#f59e0b';
-      case 'Accessoires de Jeu': return '#8b5cf6';
-      default: return '#94a3b8';
+      case 'Étuis & Protections':
+        return '#10b981';
+      case 'Sleeves & Binders':
+        return '#06b6d4';
+      case 'Displays & Présentoirs':
+        return '#f59e0b';
+      case 'Accessoires de Jeu':
+        return '#8b5cf6';
+      default:
+        return '#94a3b8';
     }
   };
 
@@ -335,26 +348,31 @@ export function AccessoiresPage() {
               }}
               className={styles.filterSelect}
             >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
 
-          {selectedCategory !== 'Tous' && subcategories[selectedCategory as keyof typeof subcategories] && (
-            <div className={styles.filterGroup}>
-              <label>Sous-catégorie :</label>
-              <select
-                value={selectedSubcategory}
-                onChange={(e) => setSelectedSubcategory(e.target.value)}
-                className={styles.filterSelect}
-              >
-                {subcategories[selectedCategory as keyof typeof subcategories].map(subcat => (
-                  <option key={subcat} value={subcat}>{subcat}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          {selectedCategory !== 'Tous' &&
+            subcategories[selectedCategory as keyof typeof subcategories] && (
+              <div className={styles.filterGroup}>
+                <label>Sous-catégorie :</label>
+                <select
+                  value={selectedSubcategory}
+                  onChange={(e) => setSelectedSubcategory(e.target.value)}
+                  className={styles.filterSelect}
+                >
+                  {subcategories[selectedCategory as keyof typeof subcategories].map((subcat) => (
+                    <option key={subcat} value={subcat}>
+                      {subcat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
           <div className={styles.checkboxes}>
             <label>
@@ -419,28 +437,30 @@ export function AccessoiresPage() {
                         <img src={accessoire.image} alt={accessoire.name} />
                         {accessoire.isNew && <span className={styles.newBadge}>Nouveau</span>}
                         {accessoire.isSale && <span className={styles.saleBadge}>Promo</span>}
-                        {accessoire.isPopular && <span className={styles.popularBadge}>Populaire</span>}
+                        {accessoire.isPopular && (
+                          <span className={styles.popularBadge}>Populaire</span>
+                        )}
                       </div>
-                      
+
                       <div className={styles.accessoireInfo}>
                         <div className={styles.categoryHeader}>
-                          <span 
+                          <span
                             className={styles.categoryIcon}
                             style={{ color: getCategoryColor(accessoire.category) }}
                           >
                             {getCategoryIcon(accessoire.category)}
                           </span>
-                          <span 
+                          <span
                             className={styles.categoryName}
                             style={{ color: getCategoryColor(accessoire.category) }}
                           >
                             {accessoire.category}
                           </span>
                         </div>
-                        
+
                         <h3 className={styles.accessoireName}>{accessoire.name}</h3>
                         <p className={styles.accessoireDescription}>{accessoire.description}</p>
-                        
+
                         <div className={styles.subcategoryInfo}>
                           <span className={styles.subcategory}>{accessoire.subcategory}</span>
                         </div>
@@ -449,25 +469,29 @@ export function AccessoiresPage() {
                           <div className={styles.tcgCompatible}>
                             <span className={styles.tcgLabel}>Compatible :</span>
                             <div className={styles.tcgList}>
-                              {accessoire.tcgCompatible.map(tcg => (
-                                <span key={tcg} className={styles.tcgTag}>{tcg}</span>
+                              {accessoire.tcgCompatible.map((tcg) => (
+                                <span key={tcg} className={styles.tcgTag}>
+                                  {tcg}
+                                </span>
                               ))}
                             </div>
                           </div>
                         )}
-                        
+
                         <div className={styles.priceContainer}>
                           {accessoire.originalPrice && (
-                            <span className={styles.originalPrice}>{accessoire.originalPrice}€</span>
+                            <span className={styles.originalPrice}>
+                              {accessoire.originalPrice}€
+                            </span>
                           )}
                           <span className={styles.price}>{accessoire.price}€</span>
                         </div>
-                        
+
                         <div className={styles.stockInfo}>
                           <span className={styles.stock}>Stock: {accessoire.stock}</span>
                         </div>
-                        
-                        <button 
+
+                        <button
                           className={styles.viewAccessoireButton}
                           onClick={() => navigateToProduct(accessoire.name, apiProducts, navigate)}
                         >
@@ -480,45 +504,50 @@ export function AccessoiresPage() {
                   // Produit API
                   const product = item.data;
                   const formatPrice = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
-                  const maxStock = Math.max(...product.variants.map(v => v.stock));
+                  const maxStock = Math.max(...product.variants.map((v) => v.stock));
                   const isOutOfStock = maxStock <= 0;
-                  
+
                   return (
                     <div key={`api-${product.id}`} className={styles.accessoireCard}>
                       <div className={styles.accessoireImage}>
                         {product.images && product.images.length > 0 ? (
-                          <img src={product.images[0].url} alt={product.images[0].altText || product.name} />
+                          <img
+                            src={product.images[0].url}
+                            alt={product.images[0].altText || product.name}
+                          />
                         ) : (
                           <div className={styles.placeholderImage}>Pas d'image</div>
                         )}
-                        {isOutOfStock && <span className={styles.outOfStockBanner}>Rupture de stock</span>}
+                        {isOutOfStock && (
+                          <span className={styles.outOfStockBanner}>Rupture de stock</span>
+                        )}
                       </div>
-                      
+
                       <div className={styles.accessoireInfo}>
                         <div className={styles.categoryHeader}>
-                          <span 
+                          <span
                             className={styles.categoryIcon}
                             style={{ color: getCategoryColor('Displays & Présentoirs') }}
                           >
                             🖼️
                           </span>
-                          <span 
+                          <span
                             className={styles.categoryName}
                             style={{ color: getCategoryColor('Displays & Présentoirs') }}
                           >
                             {product.category}
                           </span>
                         </div>
-                        
+
                         <h3 className={styles.accessoireName}>{product.name}</h3>
                         {product.description && (
                           <p className={styles.accessoireDescription}>
-                            {product.description.length > 100 
-                              ? product.description.substring(0, 100) + '...' 
+                            {product.description.length > 100
+                              ? product.description.substring(0, 100) + '...'
                               : product.description}
                           </p>
                         )}
-                        
+
                         <div className={styles.priceContainer}>
                           {product.minPriceCents !== null && (
                             <span className={styles.price}>
@@ -526,14 +555,14 @@ export function AccessoiresPage() {
                             </span>
                           )}
                         </div>
-                        
+
                         <div className={styles.stockInfo}>
                           <span className={styles.stock}>
                             Stock: {isOutOfStock ? 'Rupture' : maxStock}
                           </span>
                         </div>
-                        
-                        <button 
+
+                        <button
                           className={styles.viewAccessoireButton}
                           onClick={() => {
                             if (product.slug) {

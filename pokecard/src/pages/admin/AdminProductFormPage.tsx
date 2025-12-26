@@ -37,7 +37,7 @@ export function AdminProductFormPage() {
     name: '',
     slug: '',
     category: '',
-    description: ''
+    description: '',
   });
 
   const [variants, setVariants] = useState<Variant[]>([
@@ -48,8 +48,8 @@ export function AdminProductFormPage() {
       priceCents: 0,
       stock: 0,
       sku: '',
-      isActive: true
-    }
+      isActive: true,
+    },
   ]);
 
   const [images, setImages] = useState<Image[]>([]);
@@ -76,8 +76,8 @@ export function AdminProductFormPage() {
       setLoading(true);
       const response = await fetch(`${API_BASE}/admin/products`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
@@ -94,7 +94,7 @@ export function AdminProductFormPage() {
         name: product.name,
         slug: product.slug,
         category: product.category,
-        description: product.description || ''
+        description: product.description || '',
       });
 
       setVariants(product.variants || []);
@@ -118,23 +118,26 @@ export function AdminProductFormPage() {
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const name = e.target.value;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       name,
-      slug: prev.slug || generateSlug(name)
+      slug: prev.slug || generateSlug(name),
     }));
   }
 
   function addVariant() {
-    setVariants([...variants, {
-      name: '',
-      language: '',
-      edition: '',
-      priceCents: 0,
-      stock: 0,
-      sku: '',
-      isActive: true
-    }]);
+    setVariants([
+      ...variants,
+      {
+        name: '',
+        language: '',
+        edition: '',
+        priceCents: 0,
+        stock: 0,
+        sku: '',
+        isActive: true,
+      },
+    ]);
   }
 
   function removeVariant(index: number) {
@@ -142,9 +145,7 @@ export function AdminProductFormPage() {
   }
 
   function updateVariant(index: number, field: keyof Variant, value: any) {
-    setVariants(variants.map((v, i) => 
-      i === index ? { ...v, [field]: value } : v
-    ));
+    setVariants(variants.map((v, i) => (i === index ? { ...v, [field]: value } : v)));
   }
 
   function addImage() {
@@ -156,31 +157,35 @@ export function AdminProductFormPage() {
   }
 
   function updateImage(index: number, field: keyof Image, value: string) {
-    setImages(images.map((img, i) => 
-      i === index ? { ...img, [field]: field === 'position' ? parseInt(value) || 0 : value } : img
-    ));
+    setImages(
+      images.map((img, i) =>
+        i === index ? { ...img, [field]: field === 'position' ? parseInt(value) || 0 : value } : img
+      )
+    );
   }
 
   // Upload d'images
   async function uploadImages(files: FileList | File[]) {
     if (!token) return;
-    
+
     setUploadError(null);
     const fileArray = Array.from(files);
-    
+
     // Vérifier les types de fichiers (par extension ET type MIME)
     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    
-    const invalidFiles = fileArray.filter(f => {
+
+    const invalidFiles = fileArray.filter((f) => {
       const ext = f.name.toLowerCase().substring(f.name.lastIndexOf('.'));
       const isValidExt = allowedExtensions.includes(ext);
       const isValidType = allowedTypes.includes(f.type) || f.type.startsWith('image/');
       return !isValidExt && !isValidType;
     });
-    
+
     if (invalidFiles.length > 0) {
-      setUploadError(`Fichiers non supportés: ${invalidFiles.map(f => f.name).join(', ')}. Utilisez JPG, PNG, GIF ou WebP.`);
+      setUploadError(
+        `Fichiers non supportés: ${invalidFiles.map((f) => f.name).join(', ')}. Utilisez JPG, PNG, GIF ou WebP.`
+      );
       return;
     }
 
@@ -189,38 +194,38 @@ export function AdminProductFormPage() {
       url: '',
       altText: '',
       position: images.length + i,
-      isUploading: true
+      isUploading: true,
     }));
     setImages([...images, ...placeholders]);
 
     try {
       const formData = new FormData();
-      fileArray.forEach(file => {
+      fileArray.forEach((file) => {
         formData.append('images', file);
       });
 
       const response = await fetch(`${API_BASE}/admin/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Erreur lors de l\'upload');
+        throw new Error(data.error || "Erreur lors de l'upload");
       }
 
       const data = await response.json();
-      
+
       // Remplacer les placeholders par les vraies images
-      setImages(prev => {
-        const withoutPlaceholders = prev.filter(img => !img.isUploading);
+      setImages((prev) => {
+        const withoutPlaceholders = prev.filter((img) => !img.isUploading);
         const newImages = data.images.map((img: any, i: number) => ({
           url: img.url,
           altText: '',
-          position: withoutPlaceholders.length + i
+          position: withoutPlaceholders.length + i,
         }));
         return [...withoutPlaceholders, ...newImages];
       });
@@ -228,7 +233,7 @@ export function AdminProductFormPage() {
       console.error('Upload error:', err);
       setUploadError(err.message);
       // Retirer les placeholders en cas d'erreur
-      setImages(prev => prev.filter(img => !img.isUploading));
+      setImages((prev) => prev.filter((img) => !img.isUploading));
     }
   }
 
@@ -250,16 +255,19 @@ export function AdminProductFormPage() {
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
 
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      uploadImages(files);
-    }
-  }, [token, images]);
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        uploadImages(files);
+      }
+    },
+    [token, images]
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -280,11 +288,11 @@ export function AdminProductFormPage() {
 
       const payload = {
         ...formData,
-        variants: variants.filter(v => v.name && v.priceCents > 0),
-        images: images.filter(img => img.url)
+        variants: variants.filter((v) => v.name && v.priceCents > 0),
+        images: images.filter((img) => img.url),
       };
 
-      const url = isEditing 
+      const url = isEditing
         ? `${API_BASE}/admin/products/${productId}`
         : `${API_BASE}/admin/products`;
 
@@ -293,10 +301,10 @@ export function AdminProductFormPage() {
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -327,21 +335,14 @@ export function AdminProductFormPage() {
     <AdminLayout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <button
-            onClick={() => navigate('/admin/products')}
-            className={styles.backButton}
-          >
+          <button onClick={() => navigate('/admin/products')} className={styles.backButton}>
             <ArrowLeft size={20} />
             Retour
           </button>
           <h1>{isEditing ? 'Modifier le produit' : 'Nouveau produit'}</h1>
         </div>
 
-        {error && (
-          <div className={styles.error}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Informations de base */}
@@ -350,12 +351,7 @@ export function AdminProductFormPage() {
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>Nom du produit *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={handleNameChange}
-                  required
-                />
+                <input type="text" value={formData.name} onChange={handleNameChange} required />
               </div>
               <div className={styles.formGroup}>
                 <label>Slug *</label>
@@ -416,9 +412,7 @@ export function AdminProductFormPage() {
               </div>
             </div>
 
-            {uploadError && (
-              <div className={styles.uploadError}>{uploadError}</div>
-            )}
+            {uploadError && <div className={styles.uploadError}>{uploadError}</div>}
 
             {imageMode === 'upload' ? (
               <>
@@ -440,9 +434,7 @@ export function AdminProductFormPage() {
                     className={styles.hiddenInput}
                   />
                   <Upload size={48} className={styles.dropIcon} />
-                  <p className={styles.dropText}>
-                    Glissez-déposez vos images ici
-                  </p>
+                  <p className={styles.dropText}>Glissez-déposez vos images ici</p>
                   <p className={styles.dropSubtext}>
                     ou cliquez pour parcourir (JPG, PNG, GIF, WebP - 5Mo max)
                   </p>
@@ -461,7 +453,11 @@ export function AdminProductFormPage() {
                         ) : (
                           <>
                             <img
-                              src={image.url.startsWith('/') ? `http://localhost:8080${image.url}` : image.url}
+                              src={
+                                image.url.startsWith('/')
+                                  ? `http://localhost:8080${image.url}`
+                                  : image.url
+                              }
                               alt={image.altText || `Image ${index + 1}`}
                               className={styles.previewImage}
                             />
@@ -515,11 +511,7 @@ export function AdminProductFormPage() {
                       />
                     </div>
                     {image.url && (
-                      <img
-                        src={image.url}
-                        alt="Aperçu"
-                        className={styles.urlPreview}
-                      />
+                      <img src={image.url} alt="Aperçu" className={styles.urlPreview} />
                     )}
                     <button
                       type="button"
@@ -591,7 +583,9 @@ export function AdminProductFormPage() {
                     <input
                       type="number"
                       value={variant.priceCents}
-                      onChange={(e) => updateVariant(index, 'priceCents', parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        updateVariant(index, 'priceCents', parseInt(e.target.value) || 0)
+                      }
                       required
                       min="0"
                     />
@@ -637,11 +631,7 @@ export function AdminProductFormPage() {
             >
               Annuler
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={styles.submitButton}
-            >
+            <button type="submit" disabled={loading} className={styles.submitButton}>
               <Save size={16} />
               {loading ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
@@ -651,4 +641,3 @@ export function AdminProductFormPage() {
     </AdminLayout>
   );
 }
-

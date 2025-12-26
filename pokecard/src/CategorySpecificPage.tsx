@@ -26,77 +26,77 @@ const allProducts: Product[] = [
   // Étuis & Protections
   {
     id: 1,
-    name: "Étui Charizard Premium",
+    name: 'Étui Charizard Premium',
     price: 34.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Étui",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Étui',
     stock: 25,
     isPopular: true,
-    description: "Étui premium avec design Charizard"
+    description: 'Étui premium avec design Charizard',
   },
   {
     id: 2,
-    name: "Étui Straw Hat Pirates",
+    name: 'Étui Straw Hat Pirates',
     price: 39.99,
-    image: "/public/img/onepiece.png",
-    category: "Étuis & Protections",
-    subcategory: "Étui",
+    image: '/public/img/onepiece.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Étui',
     stock: 22,
-    description: "Étui officiel One Piece Straw Hat Pirates"
+    description: 'Étui officiel One Piece Straw Hat Pirates',
   },
   {
     id: 3,
-    name: "Binder Collection Pokémon",
+    name: 'Binder Collection Pokémon',
     price: 24.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Binder",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Binder',
     stock: 31,
-    description: "Binder de collection avec pages protectrices"
+    description: 'Binder de collection avec pages protectrices',
   },
   {
     id: 4,
-    name: "Sleeves Ultra Pro Premium",
+    name: 'Sleeves Ultra Pro Premium',
     price: 9.99,
-    image: "/public/img/pokémon.png",
-    category: "Étuis & Protections",
-    subcategory: "Sleeves",
+    image: '/public/img/pokémon.png',
+    category: 'Étuis & Protections',
+    subcategory: 'Sleeves',
     stock: 150,
     isPopular: true,
-    description: "Sleeves ultra protection pour cartes"
+    description: 'Sleeves ultra protection pour cartes',
   },
 
   // Sleeves & Binders
   {
     id: 5,
-    name: "Sleeves Dragon Shield",
+    name: 'Sleeves Dragon Shield',
     price: 12.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Sleeves",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Sleeves',
     stock: 89,
-    description: "Sleeves Dragon Shield ultra résistants"
+    description: 'Sleeves Dragon Shield ultra résistants',
   },
   {
     id: 6,
-    name: "Binder Ultra Pro Premium",
+    name: 'Binder Ultra Pro Premium',
     price: 29.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Binder",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Binder',
     stock: 18,
-    description: "Binder Ultra Pro avec anneaux métalliques"
+    description: 'Binder Ultra Pro avec anneaux métalliques',
   },
   {
     id: 7,
-    name: "Pages Binder 9 Pochettes",
+    name: 'Pages Binder 9 Pochettes',
     price: 4.99,
-    image: "/public/img/pokémon.png",
-    category: "Sleeves & Binders",
-    subcategory: "Pages",
+    image: '/public/img/pokémon.png',
+    category: 'Sleeves & Binders',
+    subcategory: 'Pages',
     stock: 200,
-    description: "Pages de 9 pochettes pour binder"
+    description: 'Pages de 9 pochettes pour binder',
   },
 
   // Displays & Présentoirs
@@ -105,230 +105,230 @@ const allProducts: Product[] = [
   // Accessoires de Jeu
   {
     id: 11,
-    name: "Dés TCG Premium",
+    name: 'Dés TCG Premium',
     price: 19.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Dés",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Dés',
     stock: 45,
-    description: "Set de dés premium pour TCG"
+    description: 'Set de dés premium pour TCG',
   },
   {
     id: 12,
-    name: "Tapis de Jeu One Piece",
+    name: 'Tapis de Jeu One Piece',
     price: 44.99,
-    image: "/public/img/onepiece.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Tapis",
+    image: '/public/img/onepiece.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Tapis',
     stock: 12,
-    description: "Tapis de jeu officiel One Piece"
+    description: 'Tapis de jeu officiel One Piece',
   },
   {
     id: 13,
-    name: "Organisateur Cartes",
+    name: 'Organisateur Cartes',
     price: 14.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Organisateur",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Organisateur',
     stock: 67,
-    description: "Organisateur pratique pour cartes"
+    description: 'Organisateur pratique pour cartes',
   },
   {
     id: 14,
-    name: "Compteur de Points",
+    name: 'Compteur de Points',
     price: 8.99,
-    image: "/public/img/pokémon.png",
-    category: "Accessoires de Jeu",
-    subcategory: "Compteur",
+    image: '/public/img/pokémon.png',
+    category: 'Accessoires de Jeu',
+    subcategory: 'Compteur',
     stock: 34,
-    description: "Compteur de points pour parties de cartes"
+    description: 'Compteur de points pour parties de cartes',
   },
 
   // Produits Dérivés
   // Peluches & Figurines
   {
     id: 15,
-    name: "Peluche Mewtwo Géante",
+    name: 'Peluche Mewtwo Géante',
     price: 49.99,
-    image: "/public/img/pokémon.png",
-    category: "Peluches & Figurines",
-    subcategory: "Peluche",
+    image: '/public/img/pokémon.png',
+    category: 'Peluches & Figurines',
+    subcategory: 'Peluche',
     stock: 8,
-    description: "Peluche géante Mewtwo officielle Pokémon"
+    description: 'Peluche géante Mewtwo officielle Pokémon',
   },
   {
     id: 16,
-    name: "Peluche Zoro Roronoa",
+    name: 'Peluche Zoro Roronoa',
     price: 54.99,
-    image: "/public/img/onepiece.png",
-    category: "Peluches & Figurines",
-    subcategory: "Peluche",
+    image: '/public/img/onepiece.png',
+    category: 'Peluches & Figurines',
+    subcategory: 'Peluche',
     stock: 15,
-    description: "Peluche officielle Zoro One Piece"
+    description: 'Peluche officielle Zoro One Piece',
   },
   {
     id: 17,
-    name: "Figurine Pikachu Collection",
+    name: 'Figurine Pikachu Collection',
     price: 29.99,
-    image: "/public/img/pokémon.png",
-    category: "Peluches & Figurines",
-    subcategory: "Figurine",
+    image: '/public/img/pokémon.png',
+    category: 'Peluches & Figurines',
+    subcategory: 'Figurine',
     stock: 18,
-    description: "Figurine Pikachu de collection"
+    description: 'Figurine Pikachu de collection',
   },
   {
     id: 18,
-    name: "Peluche Eevee Collection",
+    name: 'Peluche Eevee Collection',
     price: 29.99,
-    image: "/public/img/pokémon.png",
-    category: "Peluches & Figurines",
-    subcategory: "Peluche",
+    image: '/public/img/pokémon.png',
+    category: 'Peluches & Figurines',
+    subcategory: 'Peluche',
     stock: 18,
-    description: "Peluche Eevee officielle Pokémon"
+    description: 'Peluche Eevee officielle Pokémon',
   },
   {
     id: 19,
-    name: "Figurine Luffy Gear 5",
+    name: 'Figurine Luffy Gear 5',
     price: 39.99,
-    image: "/public/img/onepiece.png",
-    category: "Peluches & Figurines",
-    subcategory: "Figurine",
+    image: '/public/img/onepiece.png',
+    category: 'Peluches & Figurines',
+    subcategory: 'Figurine',
     stock: 12,
-    description: "Figurine Luffy Gear 5 de collection"
+    description: 'Figurine Luffy Gear 5 de collection',
   },
 
   // Vêtements & Goodies
   {
     id: 20,
-    name: "T-shirt Charizard",
+    name: 'T-shirt Charizard',
     price: 24.99,
-    image: "/public/img/pokémon.png",
-    category: "Vêtements & Goodies",
-    subcategory: "T-shirt",
+    image: '/public/img/pokémon.png',
+    category: 'Vêtements & Goodies',
+    subcategory: 'T-shirt',
     stock: 35,
-    description: "T-shirt officiel avec design Charizard"
+    description: 'T-shirt officiel avec design Charizard',
   },
   {
     id: 21,
-    name: "Poster Luffy Gear 5",
+    name: 'Poster Luffy Gear 5',
     price: 19.99,
-    image: "/public/img/onepiece.png",
-    category: "Vêtements & Goodies",
-    subcategory: "Poster",
+    image: '/public/img/onepiece.png',
+    category: 'Vêtements & Goodies',
+    subcategory: 'Poster',
     stock: 28,
-    description: "Poster officiel Luffy Gear 5"
+    description: 'Poster officiel Luffy Gear 5',
   },
   {
     id: 22,
-    name: "Casquette Pokémon",
+    name: 'Casquette Pokémon',
     price: 29.99,
-    image: "/public/img/pokémon.png",
-    category: "Vêtements & Goodies",
-    subcategory: "Casquette",
+    image: '/public/img/pokémon.png',
+    category: 'Vêtements & Goodies',
+    subcategory: 'Casquette',
     stock: 20,
-    description: "Casquette officielle Pokémon"
+    description: 'Casquette officielle Pokémon',
   },
   {
     id: 23,
-    name: "Mug Collection One Piece",
+    name: 'Mug Collection One Piece',
     price: 14.99,
-    image: "/public/img/onepiece.png",
-    category: "Vêtements & Goodies",
-    subcategory: "Mug",
+    image: '/public/img/onepiece.png',
+    category: 'Vêtements & Goodies',
+    subcategory: 'Mug',
     stock: 42,
-    description: "Mug de collection One Piece"
+    description: 'Mug de collection One Piece',
   },
   {
     id: 24,
-    name: "Hoodie Pikachu",
+    name: 'Hoodie Pikachu',
     price: 44.99,
-    image: "/public/img/pokémon.png",
-    category: "Vêtements & Goodies",
-    subcategory: "Hoodie",
+    image: '/public/img/pokémon.png',
+    category: 'Vêtements & Goodies',
+    subcategory: 'Hoodie',
     stock: 15,
-    description: "Hoodie officiel avec design Pikachu"
+    description: 'Hoodie officiel avec design Pikachu',
   },
 
   // Posters & Décos
   {
     id: 25,
-    name: "Poster Charizard VMAX",
+    name: 'Poster Charizard VMAX',
     price: 12.99,
-    image: "/public/img/pokémon.png",
-    category: "Posters & Décos",
-    subcategory: "Poster",
+    image: '/public/img/pokémon.png',
+    category: 'Posters & Décos',
+    subcategory: 'Poster',
     stock: 25,
-    description: "Poster Charizard VMAX haute qualité"
+    description: 'Poster Charizard VMAX haute qualité',
   },
   {
     id: 26,
-    name: "Sticker Pack Pokémon",
+    name: 'Sticker Pack Pokémon',
     price: 8.99,
-    image: "/public/img/pokémon.png",
-    category: "Posters & Décos",
-    subcategory: "Stickers",
+    image: '/public/img/pokémon.png',
+    category: 'Posters & Décos',
+    subcategory: 'Stickers',
     stock: 50,
-    description: "Pack de stickers Pokémon officiels"
+    description: 'Pack de stickers Pokémon officiels',
   },
   {
     id: 27,
-    name: "Bannière One Piece",
+    name: 'Bannière One Piece',
     price: 34.99,
-    image: "/public/img/onepiece.png",
-    category: "Posters & Décos",
-    subcategory: "Bannière",
+    image: '/public/img/onepiece.png',
+    category: 'Posters & Décos',
+    subcategory: 'Bannière',
     stock: 8,
-    description: "Bannière One Piece pour chambre"
-  }
+    description: 'Bannière One Piece pour chambre',
+  },
 ];
 
 // Informations des catégories mises à jour
 const categoryInfo = {
   // Accessoires TCG
-  'etuis': {
+  etuis: {
     title: 'Étuis & Protections',
     icon: '🛡️',
     color: '#10b981',
-    description: 'Protégez vos cartes avec nos étuis et binders premium'
+    description: 'Protégez vos cartes avec nos étuis et binders premium',
   },
-  'sleeves': {
+  sleeves: {
     title: 'Sleeves & Binders',
     icon: '📁',
     color: '#06b6d4',
-    description: 'Organisez et protégez vos cartes avec nos sleeves et binders'
+    description: 'Organisez et protégez vos cartes avec nos sleeves et binders',
   },
-  'displays': {
+  displays: {
     title: 'Displays & Présentoirs',
     icon: '🖼️',
     color: '#f59e0b',
-    description: 'Découvrez nos présentoirs LED et supports pour cartes'
+    description: 'Découvrez nos présentoirs LED et supports pour cartes',
   },
-  'jeu': {
+  jeu: {
     title: 'Accessoires de Jeu',
     icon: '🎲',
     color: '#8b5cf6',
-    description: 'Tous les accessoires essentiels pour vos parties de cartes'
+    description: 'Tous les accessoires essentiels pour vos parties de cartes',
   },
 
   // Produits Dérivés
-  'figurines': {
+  figurines: {
     title: 'Peluches & Figurines',
     icon: '🧸',
     color: '#f59e0b',
-    description: 'Peluches et figurines officielles de vos personnages préférés'
+    description: 'Peluches et figurines officielles de vos personnages préférés',
   },
-  'goodies': {
+  goodies: {
     title: 'Vêtements & Goodies',
     icon: '👕',
     color: '#ef4444',
-    description: 'Vêtements et objets de collection officiels'
+    description: 'Vêtements et objets de collection officiels',
   },
-  'decos': {
+  decos: {
     title: 'Posters & Décos',
     icon: '🖼️',
     color: '#06b6d4',
-    description: 'Décorez votre espace avec nos posters et accessoires décoratifs'
-  }
+    description: 'Décorez votre espace avec nos posters et accessoires décoratifs',
+  },
 };
 
 export function CategorySpecificPage() {
@@ -348,15 +348,15 @@ export function CategorySpecificPage() {
         // Pour la catégorie displays, charger tous les produits (car certains sont dans "Display", d'autres dans "Accessoires")
         if (category === 'displays') {
           // Charger tous les produits sans filtre de catégorie pour trouver tous les displays
-          const response = await listProducts({
-            limit: 500
-          }) as { products: ProductType[] };
+          const response = (await listProducts({
+            limit: 500,
+          })) as { products: ProductType[] };
           setApiProducts(response.products);
         } else {
           // Pour les autres catégories, charger tous les produits
-          const response = await listProducts({
-            limit: 200
-          }) as { products: ProductType[] };
+          const response = (await listProducts({
+            limit: 200,
+          })) as { products: ProductType[] };
           setApiProducts(response.products);
         }
       } catch (error) {
@@ -369,7 +369,7 @@ export function CategorySpecificPage() {
   }, [category]);
 
   const categoryData = categoryInfo[category as keyof typeof categoryInfo];
-  
+
   if (!categoryData) {
     return (
       <div className={styles.container}>
@@ -378,10 +378,7 @@ export function CategorySpecificPage() {
           <p>Cette catégorie n'existe pas.</p>
           <p>Paramètre reçu: "{category}"</p>
           <p>Catégories disponibles: {Object.keys(categoryInfo).join(', ')}</p>
-          <button 
-            className={styles.backButton}
-            onClick={() => navigate(-1)}
-          >
+          <button className={styles.backButton} onClick={() => navigate(-1)}>
             Retour
           </button>
         </div>
@@ -390,30 +387,30 @@ export function CategorySpecificPage() {
   }
 
   // Filtrer les produits statiques
-  const filteredStaticProducts = allProducts.filter(product => {
+  const filteredStaticProducts = allProducts.filter((product) => {
     const categoryMatch = product.category === categoryData.title;
     const newMatch = !showNewOnly || product.isNew;
     const saleMatch = !showSaleOnly || product.isSale;
     const popularMatch = !showPopularOnly || product.isPopular;
-    
+
     return categoryMatch && newMatch && saleMatch && popularMatch;
   });
 
   // Filtrer les produits API selon la catégorie
-  const filteredApiProducts = apiProducts.filter(apiProduct => {
+  const filteredApiProducts = apiProducts.filter((apiProduct) => {
     // Pour la catégorie "displays", afficher TOUS les produits (pas seulement ceux avec "display" dans le nom)
     if (category === 'displays') {
       // Retourner true pour tous les produits
       return true;
     }
-    
+
     // Pour les autres catégories, filtrer par catégorie API
     const categoryMap: { [key: string]: string[] } = {
-      'etuis': ['Accessoires'],
-      'sleeves': ['Accessoires'],
-      'jeu': ['Accessoires']
+      etuis: ['Accessoires'],
+      sleeves: ['Accessoires'],
+      jeu: ['Accessoires'],
     };
-    
+
     const mappedCategories = categoryMap[category as string] || [];
     return mappedCategories.includes(apiProduct.category);
   });
@@ -423,14 +420,17 @@ export function CategorySpecificPage() {
     console.log('🔍 Debug Displays:');
     console.log('- Produits API chargés:', apiProducts.length);
     console.log('- Produits API après filtrage:', filteredApiProducts.length);
-    console.log('- Produits API filtrés:', filteredApiProducts.map(p => `${p.name} (${p.category})`));
+    console.log(
+      '- Produits API filtrés:',
+      filteredApiProducts.map((p) => `${p.name} (${p.category})`)
+    );
     console.log('- Produits statiques filtrés:', filteredStaticProducts.length);
   }
 
   // Combiner les produits statiques et API
   const allCombinedProducts = [
-    ...filteredStaticProducts.map(p => ({ type: 'static' as const, data: p })),
-    ...filteredApiProducts.map(p => ({ type: 'api' as const, data: p }))
+    ...filteredStaticProducts.map((p) => ({ type: 'static' as const, data: p })),
+    ...filteredApiProducts.map((p) => ({ type: 'api' as const, data: p })),
   ];
 
   const sortedProducts = [...allCombinedProducts].sort((a, b) => {
@@ -459,10 +459,11 @@ export function CategorySpecificPage() {
           return bPrice - aPrice;
         case 'name':
           return a.data.name.localeCompare(b.data.name);
-        case 'stock':
-          { const aStock = Math.max(...a.data.variants.map(v => v.stock));
-          const bStock = Math.max(...b.data.variants.map(v => v.stock));
-          return bStock - aStock; }
+        case 'stock': {
+          const aStock = Math.max(...a.data.variants.map((v) => v.stock));
+          const bStock = Math.max(...b.data.variants.map((v) => v.stock));
+          return bStock - aStock;
+        }
         case 'subcategory':
           return a.data.category.localeCompare(b.data.category);
         default:
@@ -554,27 +555,27 @@ export function CategorySpecificPage() {
                       {product.isSale && <span className={styles.saleBadge}>Promo</span>}
                       {product.isPopular && <span className={styles.popularBadge}>Populaire</span>}
                     </div>
-                    
+
                     <div className={styles.productInfo}>
                       <div className={styles.subcategoryInfo}>
                         <span className={styles.subcategory}>{product.subcategory}</span>
                       </div>
-                      
+
                       <h3 className={styles.productName}>{product.name}</h3>
                       <p className={styles.productDescription}>{product.description}</p>
-                      
+
                       <div className={styles.priceContainer}>
                         {product.originalPrice && (
                           <span className={styles.originalPrice}>{product.originalPrice}€</span>
                         )}
                         <span className={styles.price}>{product.price}€</span>
                       </div>
-                      
+
                       <div className={styles.stockInfo}>
                         <span className={styles.stock}>Stock: {product.stock}</span>
                       </div>
-                      
-                      <button 
+
+                      <button
                         className={styles.viewProductButton}
                         onClick={() => navigateToProduct(product.name, apiProducts, navigate)}
                       >

@@ -6,7 +6,7 @@
 .section {
   position: relative;
   padding: var(--section-gap-md, 7.5rem) 0;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   overflow: hidden;
 }
 
@@ -17,14 +17,13 @@
   width: 120%;
   height: 100%;
   opacity: 0.02;
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      var(--color-accent-primary, #E8E4DD) 0px,
-      var(--color-accent-primary, #E8E4DD) 1px,
-      transparent 1px,
-      transparent 100px
-    );
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-accent-primary, #e8e4dd) 0px,
+    var(--color-accent-primary, #e8e4dd) 1px,
+    transparent 1px,
+    transparent 100px
+  );
   pointer-events: none;
   transition: transform 0.1s linear;
 }
@@ -75,28 +74,28 @@
 }
 
 .overline {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 .title {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
   font-weight: var(--font-medium, 500);
   line-height: var(--leading-none, 1);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .subtitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-normal, 400);
   font-style: italic;
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 /* Universe Toggle */
@@ -113,21 +112,21 @@
   background: transparent;
   border: none;
   border-radius: var(--radius-full, 9999px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .universeButton:hover {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .universeButton.active {
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
 }
 
 .headerRight {
@@ -138,10 +137,10 @@
 }
 
 .description {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .viewButton {
@@ -152,8 +151,8 @@
   padding: 0;
   background: none;
   border: none;
-  color: var(--color-accent-primary, #E8E4DD);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-accent-primary, #e8e4dd);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wide, 0.02em);
@@ -182,7 +181,7 @@
 
 .scrollProgressBar {
   height: 100%;
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
   transition: width 0.1s linear;
 }
@@ -237,7 +236,7 @@
   aspect-ratio: 2.5 / 3.5;
   border-radius: var(--radius-lg, 8px);
   overflow: hidden;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   transition: transform var(--duration-base, 250ms) var(--ease-out);
 }
 
@@ -274,15 +273,15 @@
 .setCardsCount {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
   margin-bottom: var(--space-1, 0.25rem);
 }
 
 .setName {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   line-height: var(--leading-snug, 1.3);
 }
 
@@ -299,7 +298,7 @@
   gap: var(--space-4, 1rem);
   width: clamp(200px, 25vw, 260px);
   aspect-ratio: 2.5 / 3.5;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border: 1px dashed var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-lg, 8px);
   cursor: pointer;
@@ -307,23 +306,23 @@
 }
 
 .ctaCard:hover {
-  border-color: var(--color-accent-secondary, #8B7355);
+  border-color: var(--color-accent-secondary, #8b7355);
 }
 
 .ctaText {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .ctaButton {
   padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
-  background: var(--color-accent-primary, #E8E4DD);
+  background: var(--color-accent-primary, #e8e4dd);
   border: none;
   border-radius: var(--radius-sm, 2px);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
@@ -331,6 +330,6 @@
 }
 
 .ctaButton:hover {
-  background: var(--color-accent-hover, #F5F2ED);
+  background: var(--color-accent-hover, #f5f2ed);
   transform: translateY(-2px);
 }

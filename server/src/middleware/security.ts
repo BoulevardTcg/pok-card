@@ -1,35 +1,35 @@
-import { Request, Response, NextFunction } from 'express'
-import rateLimit from 'express-rate-limit'
-import helmet from 'helmet'
-import cors from 'cors'
+import { Request, Response, NextFunction } from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import cors from 'cors';
 
-const userRateLimitStore = new Map<string, { count: number; resetAt: number }>()
+const userRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 const cleanupInterval = setInterval(() => {
-  const now = Date.now()
+  const now = Date.now();
   for (const [key, value] of userRateLimitStore.entries()) {
     if (value.resetAt < now) {
-      userRateLimitStore.delete(key)
+      userRateLimitStore.delete(key);
     }
   }
-}, 60000) // Toutes les minutes
-cleanupInterval.unref?.()
+}, 60000); // Toutes les minutes
+cleanupInterval.unref?.();
 
 const RATE_LIMITS = {
-  auth: { windowMs: 15 * 60 * 1000, max: 5 },           // Auth: 5 req / 15 min
-  authStrict: { windowMs: 60 * 60 * 1000, max: 3 },    // Réinitialisation mdp: 3 req / 1h
-  api: { windowMs: 15 * 60 * 1000, max: 100 },          // API publique: 100 req / 15 min
+  auth: { windowMs: 15 * 60 * 1000, max: 5 }, // Auth: 5 req / 15 min
+  authStrict: { windowMs: 60 * 60 * 1000, max: 3 }, // Réinitialisation mdp: 3 req / 1h
+  api: { windowMs: 15 * 60 * 1000, max: 100 }, // API publique: 100 req / 15 min
   apiAuthenticated: { windowMs: 15 * 60 * 1000, max: 500 }, // API authentifié: 500 req / 15 min
-  admin: { windowMs: 15 * 60 * 1000, max: 200 },        // Admin: 200 req / 15 min
-  upload: { windowMs: 60 * 60 * 1000, max: 50 },        // Upload: 50 req / 1h
-  checkout: { windowMs: 60 * 60 * 1000, max: 10 },      // Checkout: 10 req / 1h
-}
+  admin: { windowMs: 15 * 60 * 1000, max: 200 }, // Admin: 200 req / 15 min
+  upload: { windowMs: 60 * 60 * 1000, max: 50 }, // Upload: 50 req / 1h
+  checkout: { windowMs: 60 * 60 * 1000, max: 10 }, // Checkout: 10 req / 1h
+};
 
 const keyGenerator = (req: Request): string => {
-  const userId = (req as any).user?.userId
-  const ip = req.ip || req.socket.remoteAddress || 'unknown'
-  return userId ? `user:${userId}` : `ip:${ip}`
-}
+  const userId = (req as any).user?.userId;
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  return userId ? `user:${userId}` : `ip:${ip}`;
+};
 
 export const authLimiter = rateLimit({
   windowMs: RATE_LIMITS.auth.windowMs,
@@ -37,13 +37,13 @@ export const authLimiter = rateLimit({
   message: {
     error: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.',
     code: 'RATE_LIMIT_EXCEEDED',
-    retryAfter: Math.ceil(RATE_LIMITS.auth.windowMs / 1000)
+    retryAfter: Math.ceil(RATE_LIMITS.auth.windowMs / 1000),
   },
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const strictAuthLimiter = rateLimit({
   windowMs: RATE_LIMITS.authStrict.windowMs,
@@ -51,12 +51,12 @@ export const strictAuthLimiter = rateLimit({
   message: {
     error: 'Trop de tentatives. Réessayez dans 1 heure.',
     code: 'RATE_LIMIT_EXCEEDED',
-    retryAfter: 3600
+    retryAfter: 3600,
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const apiLimiter = rateLimit({
   windowMs: RATE_LIMITS.api.windowMs,
@@ -64,109 +64,110 @@ export const apiLimiter = rateLimit({
   message: {
     error: 'Trop de requêtes. Réessayez dans 15 minutes.',
     code: 'RATE_LIMIT_EXCEEDED',
-    retryAfter: Math.ceil(RATE_LIMITS.api.windowMs / 1000)
+    retryAfter: Math.ceil(RATE_LIMITS.api.windowMs / 1000),
   },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    return req.path === '/api/health' || req.path === '/api/checkout/webhook'
+    return req.path === '/api/health' || req.path === '/api/checkout/webhook';
   },
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const authenticatedApiLimiter = rateLimit({
   windowMs: RATE_LIMITS.apiAuthenticated.windowMs,
   max: RATE_LIMITS.apiAuthenticated.max,
   message: {
     error: 'Trop de requêtes. Réessayez dans 15 minutes.',
-    code: 'RATE_LIMIT_EXCEEDED'
+    code: 'RATE_LIMIT_EXCEEDED',
   },
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
-  skip: (req) => !(req as any).user // Skip si pas authentifié
-})
+  skip: (req) => !(req as any).user, // Skip si pas authentifié
+});
 
 export const adminLimiter = rateLimit({
   windowMs: RATE_LIMITS.admin.windowMs,
   max: RATE_LIMITS.admin.max,
   message: {
     error: 'Trop de requêtes admin. Réessayez dans 15 minutes.',
-    code: 'RATE_LIMIT_EXCEEDED'
+    code: 'RATE_LIMIT_EXCEEDED',
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const uploadLimiter = rateLimit({
   windowMs: RATE_LIMITS.upload.windowMs,
   max: RATE_LIMITS.upload.max,
   message: {
-    error: 'Trop d\'uploads. Réessayez dans 1 heure.',
-    code: 'RATE_LIMIT_EXCEEDED'
+    error: "Trop d'uploads. Réessayez dans 1 heure.",
+    code: 'RATE_LIMIT_EXCEEDED',
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const checkoutLimiter = rateLimit({
   windowMs: RATE_LIMITS.checkout.windowMs,
   max: RATE_LIMITS.checkout.max,
   message: {
     error: 'Trop de tentatives de paiement. Réessayez dans 1 heure.',
-    code: 'RATE_LIMIT_EXCEEDED'
+    code: 'RATE_LIMIT_EXCEEDED',
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator
-})
+  keyGenerator,
+});
 
 export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const key = keyGenerator(req)
-    const now = Date.now()
-    const record = userRateLimitStore.get(key)
+    const key = keyGenerator(req);
+    const now = Date.now();
+    const record = userRateLimitStore.get(key);
 
     if (!record || record.resetAt < now) {
-      userRateLimitStore.set(key, { count: 1, resetAt: now + windowMs })
-      return next()
+      userRateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+      return next();
     }
 
     if (record.count >= maxRequests) {
-      const retryAfter = Math.ceil((record.resetAt - now) / 1000)
-      res.set('Retry-After', String(retryAfter))
+      const retryAfter = Math.ceil((record.resetAt - now) / 1000);
+      res.set('Retry-After', String(retryAfter));
       return res.status(429).json({
         error: 'Trop de requêtes',
         code: 'RATE_LIMIT_EXCEEDED',
-        retryAfter
-      })
+        retryAfter,
+      });
     }
 
-    record.count++
-    next()
-  }
-}
+    record.count++;
+    next();
+  };
+};
 
 export const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  const contentLength = parseInt(req.headers['content-length'] || '0')
-  if (contentLength > 1024 * 1024) { // 1MB max
+  const contentLength = parseInt(req.headers['content-length'] || '0');
+  if (contentLength > 1024 * 1024) {
+    // 1MB max
     return res.status(413).json({
       error: 'Payload trop volumineux',
-      code: 'PAYLOAD_TOO_LARGE'
-    })
+      code: 'PAYLOAD_TOO_LARGE',
+    });
   }
 
   if (req.headers['content-type'] && !req.headers['content-type'].includes('application/json')) {
     return res.status(415).json({
       error: 'Type de contenu non supporté',
-      code: 'UNSUPPORTED_MEDIA_TYPE'
-    })
+      code: 'UNSUPPORTED_MEDIA_TYPE',
+    });
   }
 
-  next()
-}
+  next();
+};
 
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
   const sanitize = (obj: any): any => {
@@ -175,50 +176,50 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
         .replace(/[<>]/g, '') // Retirer < et >
         .replace(/javascript:/gi, '') // Retirer javascript:
         .replace(/on\w+\s*=/gi, '') // Retirer les event handlers (onclick=, etc.)
-        .trim()
+        .trim();
     }
-    
+
     if (typeof obj !== 'object' || obj === null) {
-      return obj
+      return obj;
     }
-    
+
     if (Array.isArray(obj)) {
-      return obj.map(sanitize)
+      return obj.map(sanitize);
     }
-    
-    const sanitized: any = {}
+
+    const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
       if (key === 'description' || key === 'imageUrl' || key === 'url' || key === 'images') {
-        sanitized[key] = value
+        sanitized[key] = value;
       } else {
-        sanitized[key] = sanitize(value)
+        sanitized[key] = sanitize(value);
       }
     }
-    return sanitized
-  }
+    return sanitized;
+  };
 
   if (req.path !== '/api/checkout/webhook') {
     if (req.body && typeof req.body === 'object') {
-      req.body = sanitize(req.body)
+      req.body = sanitize(req.body);
     }
   }
-  
+
   if (req.query) {
-    req.query = sanitize(req.query)
-  }
-  
-  if (req.params) {
-    req.params = sanitize(req.params)
+    req.query = sanitize(req.query);
   }
 
-  next()
-}
+  if (req.params) {
+    req.params = sanitize(req.params);
+  }
+
+  next();
+};
 
 export const secureLogging = (req: Request, res: Response, next: NextFunction) => {
-  const sanitizedUrl = req.url.replace(/\/api\/auth\/.*/, '/api/auth/***')
-  console.log(`HTTP ${req.method} ${sanitizedUrl} - IP: ${req.ip}`)
-  next()
-}
+  const sanitizedUrl = req.url.replace(/\/api\/auth\/.*/, '/api/auth/***');
+  console.log(`HTTP ${req.method} ${sanitizedUrl} - IP: ${req.ip}`);
+  next();
+};
 
 export const injectionProtection = (req: Request, res: Response, next: NextFunction) => {
   const suspiciousPatterns = [
@@ -229,28 +230,28 @@ export const injectionProtection = (req: Request, res: Response, next: NextFunct
     /drop\s+table/i,
     /delete\s+from/i,
     /insert\s+into/i,
-    /update\s+set/i
-  ]
+    /update\s+set/i,
+  ];
 
   const checkInjection = (obj: any): boolean => {
     if (typeof obj === 'string') {
-      return suspiciousPatterns.some(pattern => pattern.test(obj))
+      return suspiciousPatterns.some((pattern) => pattern.test(obj));
     }
     if (typeof obj === 'object' && obj !== null) {
-      return Object.values(obj).some(checkInjection)
+      return Object.values(obj).some(checkInjection);
     }
-    return false
-  }
+    return false;
+  };
 
   if (checkInjection(req.body) || checkInjection(req.query) || checkInjection(req.params)) {
     return res.status(400).json({
       error: 'Contenu suspect détecté',
-      code: 'SUSPICIOUS_CONTENT'
-    })
+      code: 'SUSPICIOUS_CONTENT',
+    });
   }
 
-  next()
-}
+  next();
+};
 
 export const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
@@ -258,34 +259,34 @@ export const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['X-Total-Count'],
-  maxAge: 86400 // 24 heures
-}
+  maxAge: 86400, // 24 heures
+};
 
 export const helmetConfig = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://checkout.stripe.com"],
-      scriptSrc: ["'self'", "https://js.stripe.com", "https://checkout.stripe.com"],
-      imgSrc: ["'self'", "data:", "https:", "https://*.stripe.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://checkout.stripe.com'],
+      scriptSrc: ["'self'", 'https://js.stripe.com', 'https://checkout.stripe.com'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://*.stripe.com'],
       connectSrc: [
-        "'self'", 
-        "https://api.tcgdex.net",
-        "https://*.stripe.com",
-        "https://r.stripe.com",
-        "https://errors.stripe.com"
+        "'self'",
+        'https://api.tcgdex.net',
+        'https://*.stripe.com',
+        'https://r.stripe.com',
+        'https://errors.stripe.com',
       ],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'self'", "https://checkout.stripe.com", "https://js.stripe.com"]
-    }
+      frameSrc: ["'self'", 'https://checkout.stripe.com', 'https://js.stripe.com'],
+    },
   },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
-    preload: true
+    preload: true,
   },
   noSniff: true,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-})
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+});

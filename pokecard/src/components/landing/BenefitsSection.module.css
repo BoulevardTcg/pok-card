@@ -5,7 +5,7 @@
 }
 
 :global(.dark) .section {
-  background: linear-gradient(to bottom, #0C1321, #1A1D21);
+  background: linear-gradient(to bottom, #0c1321, #1a1d21);
 }
 
 .container {
@@ -23,7 +23,7 @@
   font-size: clamp(1.875rem, 4vw, 3rem);
   font-family: var(--font-serif);
   font-weight: 700;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 1rem;
   transition: color 0.3s ease;
 }
@@ -35,7 +35,7 @@
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
+  background: #d7b56d;
   margin: 0 auto;
 }
 
@@ -54,12 +54,12 @@
 }
 
 :global(.dark) .card {
-  background: #1A1D21;
+  background: #1a1d21;
   border-color: rgba(215, 181, 109, 0.3);
 }
 
 .card:hover {
-  border-color: #D7B56D;
+  border-color: #d7b56d;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   transform: translateY(-4px);
 }
@@ -83,14 +83,14 @@
 
 .icon {
   font-size: 2rem;
-  color: #D7B56D;
+  color: #d7b56d;
 }
 
 .cardTitle {
   font-size: 1.25rem;
   font-family: var(--font-serif);
   font-weight: 600;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 0.75rem;
   transition: color 0.3s ease;
 }
@@ -115,4 +115,3 @@
     grid-template-columns: 1fr;
   }
 }
-

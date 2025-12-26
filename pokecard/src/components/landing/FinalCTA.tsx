@@ -15,22 +15,20 @@ export default function FinalCTA() {
       <div className={styles.container}>
         <div className={styles.content}>
           <span className={styles.overline}>Rejoignez l'aventure</span>
-          
+
           <h2 className={styles.title}>
-            Produits scellés premium<br />
+            Produits scellés premium
+            <br />
             pour tous les passionnés.
           </h2>
 
           <p className={styles.description}>
-            Boosters, displays, coffrets ETB et collections premium. 
-            Produits authentiques, livraison sécurisée.
+            Boosters, displays, coffrets ETB et collections premium. Produits authentiques,
+            livraison sécurisée.
           </p>
 
           <div className={styles.actions}>
-            <button
-              onClick={() => navigate('/produits')}
-              className={styles.primaryButton}
-            >
+            <button onClick={() => navigate('/produits')} className={styles.primaryButton}>
               <span>Découvrir la boutique</span>
               <ArrowRightIcon size={18} />
             </button>

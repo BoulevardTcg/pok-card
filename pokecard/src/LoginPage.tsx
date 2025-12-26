@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const result = await login(email, password);
-      
+
       if (result.success) {
         navigate('/');
       } else if (result.requiresTwoFactor) {
@@ -49,7 +49,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const result = await login(pendingEmail, password, twoFactorCode);
-      
+
       if (result.success) {
         navigate('/');
       } else if (result.requiresTwoFactor) {
@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
   const handleDemoLogin = async () => {
     setEmail('john.doe@example.com');
     setPassword('Test123!');
-    
+
     setTimeout(async () => {
       const result = await login('john.doe@example.com', 'Test123!');
       if (result.success) {
@@ -104,11 +104,7 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            {error && (
-              <div className={styles.errorMessage}>
-                {error}
-              </div>
-            )}
+            {error && <div className={styles.errorMessage}>{error}</div>}
 
             <form onSubmit={handleTwoFactorSubmit} className={styles.form}>
               <div className={styles.formGroup}>
@@ -171,15 +167,13 @@ const LoginPage: React.FC = () => {
             <p className={styles.subtitle}>Connectez-vous à votre compte BoulevardTCG</p>
           </div>
 
-          {error && (
-            <div className={styles.errorMessage}>
-              {error}
-            </div>
-          )}
+          {error && <div className={styles.errorMessage}>{error}</div>}
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.label}>Email</label>
+              <label htmlFor="email" className={styles.label}>
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -192,7 +186,9 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.label}>Mot de passe</label>
+              <label htmlFor="password" className={styles.label}>
+                Mot de passe
+              </label>
               <div className={styles.passwordContainer}>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -213,21 +209,13 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={styles.submitButton}
-            >
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
 
           <div className={styles.demoSection}>
-            <button
-              onClick={handleDemoLogin}
-              className={styles.demoButton}
-              disabled={isLoading}
-            >
+            <button onClick={handleDemoLogin} className={styles.demoButton} disabled={isLoading}>
               🧪 Connexion de démonstration
             </button>
             <small className={styles.demoText}>Utilisez les identifiants de test</small>

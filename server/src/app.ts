@@ -1,131 +1,141 @@
-import 'dotenv/config'
-import express from 'express'
-import fetch from 'node-fetch'
-import cors from 'cors'
+import 'dotenv/config';
+import express from 'express';
+import fetch from 'node-fetch';
+import cors from 'cors';
 
 // Import des routes
-import authRoutes from './routes/auth.js'
-import userRoutes from './routes/users.js'
-import productRoutes from './routes/products.js'
-import checkoutRoutes, { checkoutWebhookHandler } from './routes/checkout.js'
-import reviewsRoutes from './routes/reviews.js'
-import promoRoutes from './routes/promo.js'
-import collectionRoutes from './routes/collection.js'
-import tradeOffersRoutes from './routes/trade-offers.js'
-import adminRoutes from './routes/admin.js'
-import orderRoutes from './routes/orders.js'
-import contactRoutes from './routes/contact.js'
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
+import productRoutes from './routes/products.js';
+import checkoutRoutes, { checkoutWebhookHandler } from './routes/checkout.js';
+import reviewsRoutes from './routes/reviews.js';
+import promoRoutes from './routes/promo.js';
+import collectionRoutes from './routes/collection.js';
+import tradeOffersRoutes from './routes/trade-offers.js';
+import adminRoutes from './routes/admin.js';
+import orderRoutes from './routes/orders.js';
+import contactRoutes from './routes/contact.js';
 
 // Import des middlewares de sécurité
-import { 
-  helmetConfig, 
-  corsOptions, 
-  apiLimiter, 
-  validateInput, 
-  sanitizeInput, 
-  secureLogging, 
-  injectionProtection 
-} from './middleware/security.js'
+import {
+  helmetConfig,
+  corsOptions,
+  apiLimiter,
+  validateInput,
+  sanitizeInput,
+  secureLogging,
+  injectionProtection,
+} from './middleware/security.js';
 
 export const createApp = () => {
-  const app = express()
+  const app = express();
 
   // Configuration CORS sécurisée
-  const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173']
-  const isDevelopment = process.env.NODE_ENV === 'development'
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()) || [
+    'http://localhost:5173',
+  ];
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
-  app.use(cors({
-    origin: (origin, callback) => {
-      // En développement, permettre localhost et les origines configurées
-      if (isDevelopment && (!origin || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-        return callback(null, true)
-      }
-      // En production, vérifier strictement les origines autorisées
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`)
-        callback(new Error('Not allowed by CORS'))
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    optionsSuccessStatus: 200
-  }))
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // En développement, permettre localhost et les origines configurées
+        if (
+          isDevelopment &&
+          (!origin || origin.includes('localhost') || origin.includes('127.0.0.1'))
+        ) {
+          return callback(null, true);
+        }
+        // En production, vérifier strictement les origines autorisées
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      optionsSuccessStatus: 200,
+    })
+  );
 
   // Middleware de debug CORS (uniquement en développement)
   if (isDevelopment) {
     app.use((req, res, next) => {
-      console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`)
-      next()
-    })
+      console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+      next();
+    });
   }
 
   // Middlewares de sécurité
-  app.use(helmetConfig)
-  app.use(express.json({ limit: '10mb' }))
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }))
-  app.use(validateInput)
-  app.use(sanitizeInput)
-  app.use(injectionProtection)
-  app.use(secureLogging)
+  app.use(helmetConfig);
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  app.use(validateInput);
+  app.use(sanitizeInput);
+  app.use(injectionProtection);
+  app.use(secureLogging);
 
   // Rate limiting global
-  app.use('/api', apiLimiter)
+  app.use('/api', apiLimiter);
 
   // Routes d'authentification
-  app.use('/api/auth', authRoutes)
+  app.use('/api/auth', authRoutes);
 
   // Routes des utilisateurs
-  app.use('/api/users', userRoutes)
+  app.use('/api/users', userRoutes);
 
   // Routes des produits
-  app.use('/api/products', productRoutes)
+  app.use('/api/products', productRoutes);
 
   // Routes de checkout
-  app.use('/api/checkout', checkoutRoutes)
-  app.post('/api/checkout/webhook', express.raw({ type: 'application/json' }), checkoutWebhookHandler)
+  app.use('/api/checkout', checkoutRoutes);
+  app.post(
+    '/api/checkout/webhook',
+    express.raw({ type: 'application/json' }),
+    checkoutWebhookHandler
+  );
 
   // Routes des avis
-  app.use('/api/reviews', reviewsRoutes)
+  app.use('/api/reviews', reviewsRoutes);
 
   // Routes des codes promo
-  app.use('/api/promo', promoRoutes)
+  app.use('/api/promo', promoRoutes);
 
   // Routes de collection
-  app.use('/api/collection', collectionRoutes)
+  app.use('/api/collection', collectionRoutes);
 
   // Routes d'échange
-  app.use('/api/trade-offers', tradeOffersRoutes)
+  app.use('/api/trade-offers', tradeOffersRoutes);
 
   // Routes d'administration
-  app.use('/api/admin', adminRoutes)
+  app.use('/api/admin', adminRoutes);
 
   // Routes de suivi commande
-  app.use('/api/orders', orderRoutes)
+  app.use('/api/orders', orderRoutes);
 
   // Contact (formulaire)
-  app.use('/api/contact', contactRoutes)
+  app.use('/api/contact', contactRoutes);
 
   // Gestion des erreurs globales
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Erreur globale:', err)
+    console.error('Erreur globale:', err);
     res.status(500).json({
       error: 'Erreur interne du serveur',
-      code: 'INTERNAL_SERVER_ERROR'
-    })
-  })
+      code: 'INTERNAL_SERVER_ERROR',
+    });
+  });
 
   // Gestion des routes non trouvées
   app.use('*', (req, res) => {
     res.status(404).json({
       error: 'Route non trouvée',
       code: 'ROUTE_NOT_FOUND',
-      path: req.originalUrl
-    })
-  })
+      path: req.originalUrl,
+    });
+  });
 
-  return app
-}
-
+  return app;
+};

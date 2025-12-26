@@ -6,19 +6,22 @@ const PROCESS_STEPS = [
   {
     number: '01',
     title: 'Sélection',
-    description: 'Parcourez notre catalogue et choisissez parmi des milliers de produits scellés : boosters, displays, coffrets ETB et collections premium.',
+    description:
+      'Parcourez notre catalogue et choisissez parmi des milliers de produits scellés : boosters, displays, coffrets ETB et collections premium.',
     icon: ShieldCheckIcon,
   },
   {
     number: '02',
     title: 'Commande sécurisée',
-    description: 'Paiement 100% sécurisé, confirmation immédiate et suivi de commande en temps réel. Votre commande est traité avec soin.',
+    description:
+      'Paiement 100% sécurisé, confirmation immédiate et suivi de commande en temps réel. Votre commande est traité avec soin.',
     icon: CertificateIcon,
   },
   {
     number: '03',
     title: 'Livraison sécurisée',
-    description: 'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre collection arrive dans un état parfait.',
+    description:
+      'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre collection arrive dans un état parfait.',
     icon: PackageIcon,
   },
 ];
@@ -35,7 +38,7 @@ export default function ProcessSection() {
 
     const stepsContainer = stepsRef.current;
     const stepElements = stepsContainer.querySelectorAll('[data-step]');
-    
+
     if (stepElements.length === 0) return;
 
     const viewportHeight = window.innerHeight;
@@ -48,7 +51,7 @@ export default function ProcessSection() {
     stepElements.forEach((step, index) => {
       const rect = step.getBoundingClientRect();
       const stepCenter = rect.top + rect.height / 2;
-      
+
       if (stepCenter <= triggerPoint) {
         currentStep = index;
         // Calculer la progression vers l'étape suivante
@@ -67,7 +70,7 @@ export default function ProcessSection() {
 
     // Calculer la progression totale (0 à 100%)
     const totalProgress = ((currentStep + stepProgress) / (PROCESS_STEPS.length - 1)) * 100;
-    
+
     setActiveStep(currentStep);
     setProgress(Math.min(100, Math.max(0, totalProgress)));
   }, []);
@@ -78,13 +81,13 @@ export default function ProcessSection() {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
-      
+
       rafRef.current = requestAnimationFrame(calculateProgress);
     };
 
     // Calcul initial
     calculateProgress();
-    
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
 
@@ -104,7 +107,8 @@ export default function ProcessSection() {
         <div className={styles.header}>
           <span className={styles.overline}>Notre processus</span>
           <h2 className={styles.title}>
-            De la sélection<br />à votre collection
+            De la sélection
+            <br />à votre collection
           </h2>
         </div>
 
@@ -113,10 +117,7 @@ export default function ProcessSection() {
           {/* Timeline */}
           <div className={styles.timeline}>
             <div className={styles.timelineLine}>
-              <div 
-                className={styles.timelineProgress}
-                style={{ height: `${progress}%` }}
-              />
+              <div className={styles.timelineProgress} style={{ height: `${progress}%` }} />
             </div>
             {PROCESS_STEPS.map((step, index) => (
               <div

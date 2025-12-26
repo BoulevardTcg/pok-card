@@ -21,4 +21,3 @@ export function MoonIcon({ className = '', size = 20 }: MoonIconProps) {
     </svg>
   );
 }
-

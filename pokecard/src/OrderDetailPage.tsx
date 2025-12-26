@@ -3,7 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
 import { API_BASE } from './api';
 import styles from './OrderDetailPage.module.css';
-import { Package, Truck, CheckCircle, XCircle, Clock, ArrowLeft, MapPin, CreditCard, Calendar, Link as LinkIcon } from 'lucide-react';
+import {
+  Package,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Clock,
+  ArrowLeft,
+  MapPin,
+  CreditCard,
+  Calendar,
+  Link as LinkIcon,
+} from 'lucide-react';
 
 interface OrderItem {
   id: string;
@@ -54,12 +65,37 @@ interface Order {
 }
 
 const statusConfig = {
-  PENDING: { label: 'En attente', icon: Clock, color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
-  CONFIRMED: { label: 'Confirmée', icon: CheckCircle, color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.1)' },
+  PENDING: {
+    label: 'En attente',
+    icon: Clock,
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
+  },
+  CONFIRMED: {
+    label: 'Confirmée',
+    icon: CheckCircle,
+    color: '#3b82f6',
+    bgColor: 'rgba(59, 130, 246, 0.1)',
+  },
   SHIPPED: { label: 'Expédiée', icon: Truck, color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
-  DELIVERED: { label: 'Livrée', icon: Package, color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
-  CANCELLED: { label: 'Annulée', icon: XCircle, color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.1)' },
-  REFUNDED: { label: 'Remboursée', icon: XCircle, color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.1)' }
+  DELIVERED: {
+    label: 'Livrée',
+    icon: Package,
+    color: '#10b981',
+    bgColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  CANCELLED: {
+    label: 'Annulée',
+    icon: XCircle,
+    color: '#ef4444',
+    bgColor: 'rgba(239, 68, 68, 0.1)',
+  },
+  REFUNDED: {
+    label: 'Remboursée',
+    icon: XCircle,
+    color: '#6b7280',
+    bgColor: 'rgba(107, 114, 128, 0.1)',
+  },
 };
 
 const statusTimeline = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
@@ -91,8 +127,8 @@ export function OrderDetailPage() {
 
       const response = await fetch(`${API_BASE}/users/orders/${orderId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -122,7 +158,7 @@ export function OrderDetailPage() {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -181,11 +217,11 @@ export function OrderDetailPage() {
                 Passée le {formatDate(order.createdAt)}
               </p>
             </div>
-            <div 
+            <div
               className={styles.statusBadge}
-              style={{ 
+              style={{
                 color: statusConfig[order.status].color,
-                backgroundColor: statusConfig[order.status].bgColor
+                backgroundColor: statusConfig[order.status].bgColor,
               }}
             >
               <StatusIcon size={18} />
@@ -204,9 +240,16 @@ export function OrderDetailPage() {
                 const StatusStepIcon = statusConfig[status as keyof typeof statusConfig].icon;
                 return (
                   <div key={status} className={styles.timelineStep}>
-                    <div 
+                    <div
                       className={`${styles.timelineIcon} ${isActive ? styles.active : ''}`}
-                      style={isActive ? { backgroundColor: statusConfig[status as keyof typeof statusConfig].color } : {}}
+                      style={
+                        isActive
+                          ? {
+                              backgroundColor:
+                                statusConfig[status as keyof typeof statusConfig].color,
+                            }
+                          : {}
+                      }
                     >
                       <StatusStepIcon size={20} />
                     </div>
@@ -214,7 +257,9 @@ export function OrderDetailPage() {
                       {statusConfig[status as keyof typeof statusConfig].label}
                     </span>
                     {index < statusTimeline.length - 1 && (
-                      <div className={`${styles.timelineLine} ${index < currentStatusIndex ? styles.active : ''}`} />
+                      <div
+                        className={`${styles.timelineLine} ${index < currentStatusIndex ? styles.active : ''}`}
+                      />
                     )}
                   </div>
                 );
@@ -237,13 +282,13 @@ export function OrderDetailPage() {
                   )}
                   <div className={styles.itemDetails}>
                     <h3 className={styles.itemName}>{item.productName}</h3>
-                    {item.variantName && (
-                      <p className={styles.itemVariant}>{item.variantName}</p>
-                    )}
+                    {item.variantName && <p className={styles.itemVariant}>{item.variantName}</p>}
                     <p className={styles.itemQuantity}>Quantité: {item.quantity}</p>
                   </div>
                   <div className={styles.itemPrices}>
-                    <span className={styles.unitPrice}>{formatPrice(item.unitPriceCents)}€ / unité</span>
+                    <span className={styles.unitPrice}>
+                      {formatPrice(item.unitPriceCents)}€ / unité
+                    </span>
                     <span className={styles.totalPrice}>{formatPrice(item.totalPriceCents)}€</span>
                   </div>
                 </div>
@@ -292,7 +337,12 @@ export function OrderDetailPage() {
                 </div>
 
                 {order.trackingUrl ? (
-                  <a className={styles.trackingButton} href={order.trackingUrl} target="_blank" rel="noreferrer">
+                  <a
+                    className={styles.trackingButton}
+                    href={order.trackingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <LinkIcon size={16} />
                     Suivre mon colis
                   </a>
@@ -311,7 +361,9 @@ export function OrderDetailPage() {
                 Paiement
               </h3>
               <p className={styles.infoText}>
-                {order.paymentMethod === 'card' ? 'Carte bancaire' : order.paymentMethod || 'Carte bancaire'}
+                {order.paymentMethod === 'card'
+                  ? 'Carte bancaire'
+                  : order.paymentMethod || 'Carte bancaire'}
               </p>
               {order.billingAddress?.email && (
                 <p className={styles.infoText}>{order.billingAddress.email}</p>
@@ -326,7 +378,9 @@ export function OrderDetailPage() {
                   Adresse de livraison
                 </h3>
                 {order.shippingAddress.name && (
-                  <p className={styles.infoText}><strong>{order.shippingAddress.name}</strong></p>
+                  <p className={styles.infoText}>
+                    <strong>{order.shippingAddress.name}</strong>
+                  </p>
                 )}
                 {order.shippingAddress.address && (
                   <>
@@ -337,7 +391,8 @@ export function OrderDetailPage() {
                       <p className={styles.infoText}>{order.shippingAddress.address.line2}</p>
                     )}
                     <p className={styles.infoText}>
-                      {order.shippingAddress.address.postal_code} {order.shippingAddress.address.city}
+                      {order.shippingAddress.address.postal_code}{' '}
+                      {order.shippingAddress.address.city}
                     </p>
                     {order.shippingAddress.address.country && (
                       <p className={styles.infoText}>{order.shippingAddress.address.country}</p>
@@ -352,4 +407,3 @@ export function OrderDetailPage() {
     </div>
   );
 }
-

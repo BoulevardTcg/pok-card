@@ -39,7 +39,7 @@ const UNIVERSE_LABELS: Record<Universe, string> = {
 // Détermine l'univers à partir de la catégorie du produit
 function getUniverse(product: Product): Exclude<Universe, 'all'> {
   const category = product.category?.toLowerCase() || '';
-  
+
   if (category === 'one piece' || category === 'onepiece') {
     return 'onepiece';
   }
@@ -54,9 +54,14 @@ function getUniverse(product: Product): Exclude<Universe, 'all'> {
 function getProductType(product: Product): string {
   const category = product.category?.toLowerCase() || '';
   const name = product.name.toLowerCase();
-  
+
   if (category.includes('display') || name.includes('display')) return 'Display';
-  if (category.includes('etb') || name.includes('elite trainer') || name.includes('coffret dresseur')) return 'Coffret Dresseur d\'Élite';
+  if (
+    category.includes('etb') ||
+    name.includes('elite trainer') ||
+    name.includes('coffret dresseur')
+  )
+    return "Coffret Dresseur d'Élite";
   if (category.includes('upc') || name.includes('ultra premium')) return 'Ultra Premium Collection';
   if (category.includes('booster') || name.includes('booster')) return 'Booster';
   if (category.includes('coffret') || name.includes('coffret')) return 'Coffret';
@@ -87,18 +92,23 @@ export default function NewReleases() {
       const response = await fetch(`${API_BASE}/products?limit=50`);
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
-      
+
       // Filtrer pour n'avoir que les produits TCG (exclure Accessoires)
       const tcgProducts = (data.products || []).filter((p: Product) => {
         const category = p.category?.toLowerCase() || '';
-        return category === 'pokémon' || category === 'pokemon' || category === 'one piece' || category === 'onepiece';
+        return (
+          category === 'pokémon' ||
+          category === 'pokemon' ||
+          category === 'one piece' ||
+          category === 'onepiece'
+        );
       });
-      
+
       // Trier par date de création (les plus récents en premier)
       const sortedProducts = tcgProducts.sort((a: Product, b: Product) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-      
+
       setProducts(sortedProducts.slice(0, 8)); // Prendre les 8 plus récents
     } catch (error) {
       console.error('Erreur:', error);
@@ -108,12 +118,11 @@ export default function NewReleases() {
   }
 
   // Filtrer par univers
-  const filteredProducts = activeUniverse === 'all' 
-    ? products 
-    : products.filter(p => getUniverse(p) === activeUniverse);
+  const filteredProducts =
+    activeUniverse === 'all' ? products : products.filter((p) => getUniverse(p) === activeUniverse);
 
   // Obtenir les univers disponibles
-  const availableUniverses = ['all', ...new Set(products.map(p => getUniverse(p)))] as Universe[];
+  const availableUniverses = ['all', ...new Set(products.map((p) => getUniverse(p)))] as Universe[];
 
   // Formater le prix
   const formatPrice = (cents: number) => {
@@ -123,12 +132,12 @@ export default function NewReleases() {
   // Obtenir le prix le plus bas du produit
   const getLowestPrice = (product: Product): number => {
     if (!product.variants || product.variants.length === 0) return 0;
-    return Math.min(...product.variants.map(v => v.priceCents));
+    return Math.min(...product.variants.map((v) => v.priceCents));
   };
 
   // Vérifier si en stock
   const isInStock = (product: Product): boolean => {
-    return product.variants.some(v => v.stock > 0);
+    return product.variants.some((v) => v.stock > 0);
   };
 
   return (
@@ -140,8 +149,8 @@ export default function NewReleases() {
             <span className={styles.overline}>Pour les chasseurs</span>
             <h2 className={styles.title}>Dernières sorties</h2>
             <p className={styles.description}>
-              Boosters fraîchement sortis, précommandes ouvertes — 
-              tout ce qu'il faut pour le frisson de l'ouverture.
+              Boosters fraîchement sortis, précommandes ouvertes — tout ce qu'il faut pour le
+              frisson de l'ouverture.
             </p>
           </div>
         </div>
@@ -197,15 +206,11 @@ export default function NewReleases() {
                         (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
                       }}
                     />
-                    
+
                     {/* Status badges */}
                     <div className={styles.statusBadges}>
-                      {isNew && (
-                        <span className={styles.newBadge}>Nouveau</span>
-                      )}
-                      {!inStock && (
-                        <span className={styles.preorderBadge}>Rupture</span>
-                      )}
+                      {isNew && <span className={styles.newBadge}>Nouveau</span>}
+                      {!inStock && <span className={styles.preorderBadge}>Rupture</span>}
                     </div>
                   </div>
 
@@ -235,10 +240,7 @@ export default function NewReleases() {
 
         {/* View all CTA */}
         <div className={styles.viewAllWrapper}>
-          <button
-            onClick={() => navigate('/produits')}
-            className={styles.viewAllButton}
-          >
+          <button onClick={() => navigate('/produits')} className={styles.viewAllButton}>
             <span>Voir tous les produits</span>
             <ArrowRightIcon size={16} />
           </button>

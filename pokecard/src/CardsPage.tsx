@@ -20,93 +20,110 @@ const allCards: Card[] = [
   // Pokémon
   {
     id: 1,
-    name: "Charizard VMAX",
+    name: 'Charizard VMAX',
     price: 89.99,
     originalPrice: 129.99,
-    image: "/public/img/pokémon.png",
-    tcg: "Pokémon",
-    rarity: "Ultra Rare",
+    image: '/public/img/pokémon.png',
+    tcg: 'Pokémon',
+    rarity: 'Ultra Rare',
     stock: 15,
     isNew: true,
     isSale: true,
-    isFoil: true
+    isFoil: true,
   },
   {
     id: 2,
-    name: "Pikachu V",
+    name: 'Pikachu V',
     price: 24.99,
-    image: "/public/img/pokémon.png",
-    tcg: "Pokémon",
-    rarity: "Rare",
+    image: '/public/img/pokémon.png',
+    tcg: 'Pokémon',
+    rarity: 'Rare',
     stock: 42,
-    isFoil: true
+    isFoil: true,
   },
   // One Piece
   {
     id: 3,
-    name: "Luffy Gear 5",
+    name: 'Luffy Gear 5',
     price: 34.99,
-    image: "/public/img/onepiece.png",
-    tcg: "One Piece",
-    rarity: "Super Rare",
+    image: '/public/img/onepiece.png',
+    tcg: 'One Piece',
+    rarity: 'Super Rare',
     stock: 28,
-    isNew: true
+    isNew: true,
   },
   {
     id: 4,
-    name: "Zoro Roronoa",
+    name: 'Zoro Roronoa',
     price: 29.99,
-    image: "/public/img/onepiece.png",
-    tcg: "One Piece",
-    rarity: "Rare",
-    stock: 25
+    image: '/public/img/onepiece.png',
+    tcg: 'One Piece',
+    rarity: 'Rare',
+    stock: 25,
   },
   // Yu-Gi-Oh!
   {
     id: 5,
-    name: "Blue-Eyes White Dragon",
+    name: 'Blue-Eyes White Dragon',
     price: 44.99,
-    image: "/public/img/pokémon.png", // Placeholder
-    tcg: "Yu-Gi-Oh!",
-    rarity: "Ultra Rare",
+    image: '/public/img/pokémon.png', // Placeholder
+    tcg: 'Yu-Gi-Oh!',
+    rarity: 'Ultra Rare',
     stock: 19,
-    isFoil: true
+    isFoil: true,
   },
   // Magic
   {
     id: 6,
-    name: "Black Lotus",
+    name: 'Black Lotus',
     price: 299.99,
-    image: "/public/img/pokémon.png", // Placeholder
-    tcg: "Magic: The Gathering",
-    rarity: "Mythic Rare",
+    image: '/public/img/pokémon.png', // Placeholder
+    tcg: 'Magic: The Gathering',
+    rarity: 'Mythic Rare',
     stock: 3,
-    isFoil: true
+    isFoil: true,
   },
   // Dragon Ball
   {
     id: 7,
-    name: "Goku Ultra Instinct",
+    name: 'Goku Ultra Instinct',
     price: 44.99,
-    image: "/public/img/pokémon.png", // Placeholder
-    tcg: "Dragon Ball Super",
-    rarity: "Super Rare",
-    stock: 19
+    image: '/public/img/pokémon.png', // Placeholder
+    tcg: 'Dragon Ball Super',
+    rarity: 'Super Rare',
+    stock: 19,
   },
   // Digimon
   {
     id: 8,
-    name: "Agumon",
+    name: 'Agumon',
     price: 19.99,
-    image: "/public/img/pokémon.png", // Placeholder
-    tcg: "Digimon",
-    rarity: "Rare",
-    stock: 35
-  }
+    image: '/public/img/pokémon.png', // Placeholder
+    tcg: 'Digimon',
+    rarity: 'Rare',
+    stock: 35,
+  },
 ];
 
-const tcgs = ['Tous', 'Pokémon', 'One Piece', 'Yu-Gi-Oh!', 'Magic: The Gathering', 'Riftbound', 'Dragon Ball Super', 'Digimon'];
-const rarities = ['Toutes', 'Commune', 'Peu Commune', 'Rare', 'Super Rare', 'Ultra Rare', 'Mythic Rare'];
+const tcgs = [
+  'Tous',
+  'Pokémon',
+  'One Piece',
+  'Yu-Gi-Oh!',
+  'Magic: The Gathering',
+  'Riftbound',
+  'Dragon Ball Super',
+  'Digimon',
+];
+const rarities = [
+  'Toutes',
+  'Commune',
+  'Peu Commune',
+  'Rare',
+  'Super Rare',
+  'Ultra Rare',
+  'Mythic Rare',
+];
 
 export function CardsPage() {
   const navigate = useNavigate();
@@ -116,7 +133,7 @@ export function CardsPage() {
   const [sortBy, setSortBy] = useState('name');
   const [showFoilOnly, setShowFoilOnly] = useState(false);
 
-  const filteredCards = allCards.filter(card => {
+  const filteredCards = allCards.filter((card) => {
     const tcgMatch = selectedTcg === 'Tous' || card.tcg === selectedTcg;
     const rarityMatch = selectedRarity === 'Toutes' || card.rarity === selectedRarity;
     const foilMatch = !showFoilOnly || card.isFoil;
@@ -142,87 +159,102 @@ export function CardsPage() {
 
   const getTcgIcon = (tcgName: string) => {
     switch (tcgName) {
-      case 'Pokémon': return '⚡';
-      case 'One Piece': return '🏴‍☠️';
-      case 'Yu-Gi-Oh!': return '🐉';
-      case 'Magic: The Gathering': return '✨';
-      case 'Riftbound': return '🌌';
-      case 'Dragon Ball Super': return '🐉';
-      case 'Digimon': return '🦖';
-      default: return '🃏';
+      case 'Pokémon':
+        return '⚡';
+      case 'One Piece':
+        return '🏴‍☠️';
+      case 'Yu-Gi-Oh!':
+        return '🐉';
+      case 'Magic: The Gathering':
+        return '✨';
+      case 'Riftbound':
+        return '🌌';
+      case 'Dragon Ball Super':
+        return '🐉';
+      case 'Digimon':
+        return '🦖';
+      default:
+        return '🃏';
     }
   };
 
   const getTcgColors = (tcgName: string) => {
     switch (tcgName) {
-      case 'Pokémon': 
+      case 'Pokémon':
         return {
           primary: '#f59e0b',
           secondary: '#d97706',
           gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
-          hover: 'linear-gradient(135deg, #d97706, #b45309)'
+          hover: 'linear-gradient(135deg, #d97706, #b45309)',
         };
-      case 'One Piece': 
+      case 'One Piece':
         return {
           primary: '#ef4444',
           secondary: '#dc2626',
           gradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
-          hover: 'linear-gradient(135deg, #dc2626, #b91c1c)'
+          hover: 'linear-gradient(135deg, #dc2626, #b91c1c)',
         };
-      case 'Yu-Gi-Oh!': 
+      case 'Yu-Gi-Oh!':
         return {
           primary: '#3b82f6',
           secondary: '#1d4ed8',
           gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-          hover: 'linear-gradient(135deg, #1d4ed8, #1e40af)'
+          hover: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
         };
-      case 'Magic: The Gathering': 
+      case 'Magic: The Gathering':
         return {
           primary: '#8b5cf6',
           secondary: '#7c3aed',
           gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-          hover: 'linear-gradient(135deg, #7c3aed, #6d28d9)'
+          hover: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
         };
-      case 'Dragon Ball Super': 
+      case 'Dragon Ball Super':
         return {
           primary: '#06b6d4',
           secondary: '#0891b2',
           gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)',
-          hover: 'linear-gradient(135deg, #0891b2, #0e7490)'
+          hover: 'linear-gradient(135deg, #0891b2, #0e7490)',
         };
-      case 'Digimon': 
+      case 'Digimon':
         return {
           primary: '#10b981',
           secondary: '#059669',
           gradient: 'linear-gradient(135deg, #10b981, #059669)',
-          hover: 'linear-gradient(135deg, #059669, #047857)'
+          hover: 'linear-gradient(135deg, #059669, #047857)',
         };
-      case 'Riftbound': 
+      case 'Riftbound':
         return {
           primary: '#6366f1',
           secondary: '#4f46e5',
           gradient: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-          hover: 'linear-gradient(135deg, #4f46e5, #4338ca)'
+          hover: 'linear-gradient(135deg, #4f46e5, #4338ca)',
         };
-      default: 
+      default:
         return {
           primary: '#94a3b8',
           secondary: '#64748b',
           gradient: 'linear-gradient(135deg, #94a3b8, #64748b)',
-          hover: 'linear-gradient(135deg, #64748b, #475569)'
+          hover: 'linear-gradient(135deg, #64748b, #475569)',
         };
     }
   };
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'Commune': return '#94a3b8';
-      case 'Peu Commune': return '#06b6d4';
-      case 'Rare': return '#10b981';
-      case 'Super Rare': return '#f59e0b';
-      case 'Ultra Rare': return '#ef4444';
-      case 'Mythic Rare': return '#8b5cf6';
-      default: return '#94a3b8';
+      case 'Commune':
+        return '#94a3b8';
+      case 'Peu Commune':
+        return '#06b6d4';
+      case 'Rare':
+        return '#10b981';
+      case 'Super Rare':
+        return '#f59e0b';
+      case 'Ultra Rare':
+        return '#ef4444';
+      case 'Mythic Rare':
+        return '#8b5cf6';
+      default:
+        return '#94a3b8';
     }
   };
 
@@ -234,7 +266,9 @@ export function CardsPage() {
           <span className={styles.constructionIcon}>🚧</span>
           <div className={styles.constructionText}>
             <strong>Section en construction</strong>
-            <p>Cette fonctionnalité est actuellement en développement. Elle sera bientôt disponible !</p>
+            <p>
+              Cette fonctionnalité est actuellement en développement. Elle sera bientôt disponible !
+            </p>
           </div>
         </div>
       </div>
@@ -255,8 +289,10 @@ export function CardsPage() {
               onChange={(e) => setSelectedTcg(e.target.value)}
               className={styles.filterSelect}
             >
-              {tcgs.map(tcg => (
-                <option key={tcg} value={tcg}>{tcg}</option>
+              {tcgs.map((tcg) => (
+                <option key={tcg} value={tcg}>
+                  {tcg}
+                </option>
               ))}
             </select>
           </div>
@@ -268,8 +304,10 @@ export function CardsPage() {
               onChange={(e) => setSelectedRarity(e.target.value)}
               className={styles.filterSelect}
             >
-              {rarities.map(rarity => (
-                <option key={rarity} value={rarity}>{rarity}</option>
+              {rarities.map((rarity) => (
+                <option key={rarity} value={rarity}>
+                  {rarity}
+                </option>
               ))}
             </select>
           </div>
@@ -305,7 +343,7 @@ export function CardsPage() {
       </div>
 
       <div className={styles.cardsGrid}>
-        {sortedCards.map(card => (
+        {sortedCards.map((card) => (
           <div key={card.id} className={styles.cardItem}>
             <div className={styles.cardImage}>
               <img src={card.image} alt={card.name} />
@@ -313,51 +351,44 @@ export function CardsPage() {
               {card.isSale && <span className={styles.saleBadge}>Promo</span>}
               {card.isFoil && <span className={styles.foilBadge}>Foil</span>}
             </div>
-            
+
             <div className={styles.cardInfo}>
               <div className={styles.cardHeader}>
-                <span 
-                  className={styles.tcgIcon}
-                  style={{ color: getTcgColors(card.tcg).primary }}
-                >
+                <span className={styles.tcgIcon} style={{ color: getTcgColors(card.tcg).primary }}>
                   {getTcgIcon(card.tcg)}
                 </span>
-                <span 
-                  className={styles.tcgName}
-                  style={{ color: getTcgColors(card.tcg).primary }}
-                >
+                <span className={styles.tcgName} style={{ color: getTcgColors(card.tcg).primary }}>
                   {card.tcg}
                 </span>
               </div>
-              
+
               <h3 className={styles.cardName}>{card.name}</h3>
-              
+
               <div className={styles.rarityContainer}>
-                <span 
-                  className={styles.rarity}
-                  style={{ color: getRarityColor(card.rarity) }}
-                >
+                <span className={styles.rarity} style={{ color: getRarityColor(card.rarity) }}>
                   {card.rarity}
                 </span>
               </div>
-              
+
               <div className={styles.priceContainer}>
                 {card.originalPrice && (
                   <span className={styles.originalPrice}>{card.originalPrice}€</span>
                 )}
                 <span className={styles.price}>{card.price}€</span>
               </div>
-              
+
               <div className={styles.stockInfo}>
                 <span className={styles.stock}>Stock: {card.stock}</span>
               </div>
-              
-              <button 
+
+              <button
                 className={styles.viewCardButton}
-                style={{ 
-                  background: getTcgColors(card.tcg).gradient,
-                  '--hover-gradient': getTcgColors(card.tcg).hover
-                } as React.CSSProperties}
+                style={
+                  {
+                    background: getTcgColors(card.tcg).gradient,
+                    '--hover-gradient': getTcgColors(card.tcg).hover,
+                  } as React.CSSProperties
+                }
                 onClick={() => navigate('/cartes')}
               >
                 Voir la carte

@@ -1,26 +1,27 @@
 type EnvCheck = {
-  key: string
-  requiredInProd?: boolean
-  minLength?: number
-  pattern?: RegExp
-}
+  key: string;
+  requiredInProd?: boolean;
+  minLength?: number;
+  pattern?: RegExp;
+};
 
-const isProd = () => (process.env.NODE_ENV || '').toLowerCase() === 'production'
+const isProd = () => (process.env.NODE_ENV || '').toLowerCase() === 'production';
 
 const requireEnv = (checks: EnvCheck[]) => {
-  const errors: string[] = []
+  const errors: string[] = [];
   for (const c of checks) {
-    const v = process.env[c.key]
-    const must = isProd() ? (c.requiredInProd ?? true) : false
+    const v = process.env[c.key];
+    const must = isProd() ? (c.requiredInProd ?? true) : false;
     if (!v || v.trim() === '') {
-      if (must) errors.push(`${c.key} est requis en production`)
-      continue
+      if (must) errors.push(`${c.key} est requis en production`);
+      continue;
     }
-    if (c.minLength && v.length < c.minLength) errors.push(`${c.key} doit faire au moins ${c.minLength} caractères`)
-    if (c.pattern && !c.pattern.test(v)) errors.push(`${c.key} ne respecte pas le format attendu`)
+    if (c.minLength && v.length < c.minLength)
+      errors.push(`${c.key} doit faire au moins ${c.minLength} caractères`);
+    if (c.pattern && !c.pattern.test(v)) errors.push(`${c.key} ne respecte pas le format attendu`);
   }
-  return errors
-}
+  return errors;
+};
 
 export function validateEnvOrThrow() {
   const checks: EnvCheck[] = [
@@ -37,17 +38,16 @@ export function validateEnvOrThrow() {
 
     { key: 'SHOP_EMAIL', requiredInProd: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
     { key: 'FRONTEND_URL', requiredInProd: true },
-  ]
+  ];
 
-  const errors = requireEnv(checks)
-  if (errors.length === 0) return
+  const errors = requireEnv(checks);
+  if (errors.length === 0) return;
 
-  const message = `Configuration invalide (env):\n- ${errors.join('\n- ')}`
+  const message = `Configuration invalide (env):\n- ${errors.join('\n- ')}`;
 
   if (isProd()) {
-    throw new Error(message)
+    throw new Error(message);
   } else {
-    console.warn(message)
+    console.warn(message);
   }
 }
-

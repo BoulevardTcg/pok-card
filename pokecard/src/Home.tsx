@@ -19,19 +19,19 @@ export function Home() {
       <main>
         {/* Hero — Accroche émotionnelle + rotation de cartes */}
         <HeroSection />
-        
+
         {/* Trust — Chiffres clés pour rassurer */}
         <TrustSignals />
-        
+
         {/* Produits phares — Produits scellés */}
         <FeaturedCards />
-        
+
         {/* Nouvelles sorties — Pour les chasseurs de boosters */}
         <NewReleases />
-        
+
         {/* Process — Authentification, certification, livraison */}
         <ProcessSection />
-        
+
         {/* CTA Final */}
         <FinalCTA />
       </main>

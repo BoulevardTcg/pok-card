@@ -26,20 +26,20 @@
 }
 
 .overline {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 .title {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
   font-weight: var(--font-medium, 500);
   line-height: var(--leading-tight, 1.15);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -85,8 +85,8 @@
   width: 100%;
   background: linear-gradient(
     180deg,
-    var(--color-accent-secondary, #8B7355) 0%,
-    var(--color-accent-secondary, #8B7355) 90%,
+    var(--color-accent-secondary, #8b7355) 0%,
+    var(--color-accent-secondary, #8b7355) 90%,
     transparent 100%
   );
   /* Transition ultra-fluide avec will-change pour optimiser le GPU */
@@ -103,7 +103,7 @@
   background: var(--color-bg-elevated, #141416);
   border: 2px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   /* Transition plus douce pour les dots */
-  transition: 
+  transition:
     background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -117,8 +117,8 @@
 }
 
 .timelineDot.active {
-  background: var(--color-accent-secondary, #8B7355);
-  border-color: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
+  border-color: var(--color-accent-secondary, #8b7355);
   box-shadow: 0 0 20px rgba(139, 115, 85, 0.4);
   transform: scale(1.15);
 }
@@ -139,7 +139,7 @@
   opacity: 0.35;
   transform: translateX(0);
   /* Transition fluide avec plusieurs propriétés */
-  transition: 
+  transition:
     opacity 400ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
@@ -168,12 +168,12 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-lg, 8px);
-  color: var(--color-accent-primary, #E8E4DD);
+  color: var(--color-accent-primary, #e8e4dd);
   /* Transitions fluides pour l'icône */
-  transition: 
+  transition:
     background-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
     color 350ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -184,13 +184,13 @@
 .step.active .stepIcon {
   background: rgba(139, 115, 85, 0.3);
   border-color: rgba(139, 115, 85, 0.5);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 .step.current .stepIcon {
-  background: var(--color-accent-secondary, #8B7355);
-  border-color: var(--color-accent-secondary, #8B7355);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-accent-secondary, #8b7355);
+  border-color: var(--color-accent-secondary, #8b7355);
+  color: var(--color-bg-primary, #0a0a0b);
   box-shadow: 0 4px 20px rgba(139, 115, 85, 0.3);
 }
 
@@ -204,21 +204,21 @@
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .stepTitle {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .stepDescription {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   max-width: 480px;
   text-align: justify;
 }
