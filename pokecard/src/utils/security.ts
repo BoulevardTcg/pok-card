@@ -16,12 +16,14 @@ export const validateInput = (
       return usernameRegex.test(input);
     }
 
-    case 'password': { // Au moins 8 caractères, une minuscule, une majuscule, un chiffre
+    case 'password': {
+      // Au moins 8 caractères, une minuscule, une majuscule, un chiffre
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
       return passwordRegex.test(input) && input.length <= 128;
     }
 
-    case 'text': { // Pas de caractères dangereux
+    case 'text': {
+      // Pas de caractères dangereux
       const dangerousChars = /[<>"'&]/;
       return !dangerousChars.test(input) && input.length <= 1000;
     }
