@@ -1,0 +1,7 @@
+node_modules
+dist
+build
+.husky
+postgres-data
+package-lock.json
+*.iml
