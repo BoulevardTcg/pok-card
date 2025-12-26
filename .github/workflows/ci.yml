@@ -46,7 +46,7 @@ jobs:
           cache-dependency-path: pokecard/package-lock.json
 
       - name: Install
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Lint
         run: npm run lint --if-present
@@ -93,7 +93,7 @@ jobs:
           cache-dependency-path: server/package-lock.json
 
       - name: Install
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Prisma generate
         run: npx prisma generate
