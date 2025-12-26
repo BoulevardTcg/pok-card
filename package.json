@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Application e-commerce complète (frontend + backend) pour vendre des produits TCG.",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "prepare": "husky",
     "dev:front": "npm run dev --workspace pokecard",

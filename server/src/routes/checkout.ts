@@ -1002,7 +1002,7 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
   try {
     const rawBody = (req as unknown as { body: Buffer }).body;
     event = stripeClient.webhooks.constructEvent(rawBody, signature, webhookSecret);
-  } catch (err: Error) {
+  } catch (err: any) {
     console.error('Signature Stripe invalide:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }

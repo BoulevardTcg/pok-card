@@ -23,6 +23,14 @@ services:
     env_file:
       - ./server/.env
     environment:
+      - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+      - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+      - ORDER_TRACKING_SECRET=test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
+      - STRIPE_SECRET_KEY=sk_test_mock_key
+      - CHECKOUT_SUCCESS_URL=http://pokecard-frontend:80/checkout/success
+      - CHECKOUT_CANCEL_URL=http://pokecard-frontend:80/panier
+      - ALLOWED_REDIRECT_DOMAINS=http://pokecard-frontend:80
+      - FRONTEND_URL=http://pokecard-frontend:80
       - NODE_ENV=production
       - PORT=8080
       - DATABASE_URL=postgresql://${POSTGRES_USER:-pokecard_user}:${POSTGRES_PASSWORD:-passwd}@postgres:5432/${POSTGRES_DB:-pokecard_db}?schema=public
@@ -40,7 +48,7 @@ services:
       POSTGRES_DB: "${POSTGRES_DB:-pokecard_db}"
       PGDATA: "${PGDATA:-/var/lib/postgresql/data/pgdata}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pokecard_user -d pokecard_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-pokecard_user} -d $${POSTGRES_DB:-pokecard_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
