@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p .",
+    "lint:fix": "eslint src --fix",
+    "lint": "eslint src",
     "start": "node dist/index.js",
     "seed": "tsx prisma/seed.ts",
     "db:seed": "tsx prisma/seed.ts",
@@ -41,6 +43,7 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
@@ -54,11 +57,14 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "cross-env": "^10.1.0",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
     "jest": "^29.7.0",
     "prisma": "^6.15.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.2",
     "tsx": "^4.7.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.50.1"
   }
 }

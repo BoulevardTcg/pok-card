@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from '@jest/globals'
 import { sendShippingNotificationEmail, sendDeliveryConfirmationEmail, type OrderDataForEmail } from '../services/email.js'
 
 // Jest hoiste jest.mock(); utiliser var pour éviter la TDZ.
-var mockSendMail: any
-var mockCreateTransport: any
+let mockSendMail: any
+let mockCreateTransport: any
 
 jest.mock('nodemailer', () => {
   mockSendMail = jest.fn(() => Promise.resolve({ messageId: 'test-message-id' }))

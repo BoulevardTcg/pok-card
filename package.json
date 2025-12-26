@@ -1,5 +1,34 @@
 {
-  "dependencies": {
-    "node-fetch": "^3.3.2"
+  "name": "pok-card",
+  "version": "1.0.0",
+  "description": "Application e-commerce complète (frontend + backend) pour vendre des produits TCG.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VincentMorais/pok-card.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VincentMorais/pok-card/issues"
+  },
+  "homepage": "https://github.com/VincentMorais/pok-card#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "pokecard/**/*.{ts,tsx,js,jsx}": [
+      "npm --prefix pokecard run lint:fix"
+    ],
+    "server/**/*.{ts,js}": [
+      "npm --prefix server run lint -- --fix"
+    ]
   }
 }
