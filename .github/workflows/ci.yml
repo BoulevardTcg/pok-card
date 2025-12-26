@@ -65,20 +65,20 @@ jobs:
     defaults:
       run:
         working-directory: server
-#    services:
-#      postgres:
-#        image: postgres:16
-#        env:
-#          POSTGRES_USER: postgres
-#          POSTGRES_PASSWORD: postgres
-#          POSTGRES_DB: testdb
-#        ports:
-#          - 5432:5432
-#        options: >-
-#          --health-cmd="pg_isready -U postgres"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=5
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
       NODE_ENV: test
@@ -98,8 +98,8 @@ jobs:
       - name: Prisma generate
         run: npx prisma generate
 
-#      - name: Prisma migrate (test DB)
-#        run: npx prisma migrate deploy
+      - name: Prisma migrate (test DB)
+        run: npx prisma migrate deploy
 
       - name: Lint
         run: npm run lint --if-present
