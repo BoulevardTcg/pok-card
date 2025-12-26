@@ -443,6 +443,7 @@ export function HoloCard({ card, foilMap }: Props & { foilMap?: Map<string, stri
               handleMove(e)
             }}
             onMouseLeave={handleLeave}
+            /* eslint-disable-next-line @typescript-eslint/no-unused-expressions */
             onClick={(e) => { e.stopPropagation(); active ? deactivate() : activate() }}
           >
             {/* Only front image is necessary for effect; back is optional */}

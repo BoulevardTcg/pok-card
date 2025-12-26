@@ -95,7 +95,7 @@ export function CheckoutButton({
       if (result.error) {
         throw new Error(result.error.message)
       }
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur lors du checkout:', err)
       setError(err.message || 'Une erreur est survenue lors du paiement')
     } finally {

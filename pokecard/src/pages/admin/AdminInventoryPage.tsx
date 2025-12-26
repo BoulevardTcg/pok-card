@@ -72,7 +72,7 @@ export function AdminInventoryPage() {
       setVariants(data.variants || []);
       setLowStockVariants(data.lowStock || []);
       setStats(data.stats);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
     } finally {
       setLoading(false);
@@ -94,7 +94,7 @@ export function AdminInventoryPage() {
 
       if (!response.ok) throw new Error('Erreur lors de la mise à jour');
       loadInventory();
-    } catch (err: any) {
+    } catch (err: Error) {
       alert(err.message);
     }
   }

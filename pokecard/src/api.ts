@@ -2,6 +2,7 @@ export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/a
 
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: customHeaders, ...restInit } = init || {}
+  // eslint-disable-next-line no-useless-catch
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       ...restInit,
@@ -19,6 +20,7 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
         // Ignorer les erreurs de parsing JSON
       }
       const error = new Error(errorMessage)
+           
       ;(error as any).status = res.status
       throw error
     }

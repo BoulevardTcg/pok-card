@@ -177,7 +177,7 @@ export function ProductDetail() {
       setSubmitSuccess(true);
       setShowReviewForm(false);
       setNewReview({ rating: 5, title: '', comment: '' });
-    } catch (err: any) {
+    } catch (err: Error) {
       setSubmitError(err.message || 'Erreur lors de l\'envoi de l\'avis');
     }
   }

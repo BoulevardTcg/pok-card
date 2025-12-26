@@ -96,7 +96,7 @@ export function CartPage() {
     }
 
     refreshStock();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [cart]);
 
   function validateShipping() {
@@ -161,7 +161,7 @@ export function CartPage() {
         setLoading(false);
         return;
       }
-      const session = await createCheckoutSession(
+      const {url} = await createCheckoutSession(
         items,
         email || undefined,
         appliedPromo || undefined,
@@ -176,7 +176,6 @@ export function CartPage() {
         },
         shippingMethodCode
       );
-      const url = (session as any).url;
       
       if (url) {
         window.location.href = url;
@@ -184,7 +183,7 @@ export function CartPage() {
         setEmailError('Session de paiement créée, mais aucune URL retournée.');
         setLoading(false);
       }
-    } catch (e: any) {
+    } catch (e: Error) {
       console.error('Erreur checkout:', e);
       let errorMsg = 'Erreur lors de la création du paiement';
       
@@ -428,7 +427,7 @@ export function CartPage() {
                           } else {
                             setPromoError('Code promo invalide');
                           }
-                        } catch (err: any) {
+                        } catch (err: Error) {
                           setPromoError(err.message || 'Code promo invalide');
                         }
                       }}

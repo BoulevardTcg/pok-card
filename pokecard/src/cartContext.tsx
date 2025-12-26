@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useState, type ReactNode, useEffect } from 'react';
 
 export interface ProductVariant {
   id: string;
@@ -44,6 +44,7 @@ interface CartContextType {
   getTotalCents: () => number;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const CartContext = createContext<CartContextType>({
   cart: [],
   addToCart: () => {},

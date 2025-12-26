@@ -4,22 +4,22 @@
 export const validateInput = (input: string, type: 'email' | 'username' | 'password' | 'text'): boolean => {
   switch (type) {
     case 'email':
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      return emailRegex.test(input) && input.length <= 254
+      { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return emailRegex.test(input) && input.length <= 254 }
       
     case 'username':
-      const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
-      return usernameRegex.test(input)
+      { const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
+      return usernameRegex.test(input) }
       
     case 'password':
       // Au moins 8 caractères, une minuscule, une majuscule, un chiffre
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
-      return passwordRegex.test(input) && input.length <= 128
+      { const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+      return passwordRegex.test(input) && input.length <= 128 }
       
     case 'text':
       // Pas de caractères dangereux
-      const dangerousChars = /[<>\"'&]/
-      return !dangerousChars.test(input) && input.length <= 1000
+      { const dangerousChars = /[<>"'&]/
+      return !dangerousChars.test(input) && input.length <= 1000 }
       
     default:
       return false
@@ -117,20 +117,3 @@ export class BruteForceProtection {
 // Instance globale
 export const bruteForceProtection = new BruteForceProtection()
 
-// Validation des formulaires
-export const validateForm = (formData: Record<string, any>): { isValid: boolean; errors: string[] } => {
-  const errors: string[] = []
-  
-  for (const [key, value] of Object.entries(formData)) {
-    if (typeof value === 'string') {
-      if (!validateInput(value, 'text')) {
-        errors.push(`Le champ ${key} contient des caractères non autorisés`)
-      }
-    }
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  }
-}

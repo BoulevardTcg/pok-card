@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
-import { ArrowLeft, Plus, X, Save, Upload, Image as ImageIcon, Link } from 'lucide-react';
+import { ArrowLeft, Plus, X, Save, Upload, Link } from 'lucide-react';
 import styles from './AdminProductFormPage.module.css';
 
 interface Variant {
@@ -99,7 +99,7 @@ export function AdminProductFormPage() {
 
       setVariants(product.variants || []);
       setImages(product.images || [{ url: '', altText: '', position: 0 }]);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {
@@ -224,7 +224,7 @@ export function AdminProductFormPage() {
         }));
         return [...withoutPlaceholders, ...newImages];
       });
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Upload error:', err);
       setUploadError(err.message);
       // Retirer les placeholders en cas d'erreur
@@ -305,7 +305,7 @@ export function AdminProductFormPage() {
       }
 
       navigate('/admin/products');
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {

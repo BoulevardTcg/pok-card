@@ -49,7 +49,8 @@ export function ContactPage() {
       setFormData({ name: '', email: '', subject: '', message: '', companyWebsite: '' });
       
       setTimeout(() => setSubmitStatus('idle'), 5000);
-    } catch (error) {
+    } catch (error: any) {
+      console.error(error);
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } finally {

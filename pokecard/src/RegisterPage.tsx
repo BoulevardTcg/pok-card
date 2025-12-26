@@ -84,8 +84,8 @@ const RegisterPage: React.FC = () => {
       } else {
         setError(result.error || 'Erreur lors de l\'inscription')
       }
-    } catch (err) {
-      setError('Erreur inattendue')
+    } catch (err: any) {
+      setError('Erreur inattendue :' + err.message)
     } finally {
       setIsLoading(false)
     }

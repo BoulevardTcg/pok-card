@@ -73,7 +73,7 @@ export function AdminPromosPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setPromos(data.promos || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
     } finally {
       setLoading(false);
@@ -91,7 +91,7 @@ export function AdminPromosPage() {
 
       if (!response.ok) throw new Error('Erreur lors de la suppression');
       setPromos(promos.filter(p => p.id !== promoId));
-    } catch (err: any) {
+    } catch (err: Error) {
       alert(err.message);
     }
   }

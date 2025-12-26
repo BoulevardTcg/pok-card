@@ -123,7 +123,7 @@ export function AdminOrdersPage() {
 
       const data = await response.json();
       setOrders(data.orders || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {
@@ -151,7 +151,7 @@ export function AdminOrdersPage() {
       setOrders(prev => prev.map(order => 
         order.id === orderId ? { ...order, status: newStatus as Order['status'] } : order
       ));
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       alert(err.message);
     } finally {
@@ -181,7 +181,7 @@ export function AdminOrdersPage() {
       const updated = data.order as Order;
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
       setShippingDraft({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error(err);
       alert(err.message || 'Erreur expédition');
     } finally {
@@ -205,7 +205,7 @@ export function AdminOrdersPage() {
       const data = await response.json();
       const updated = data.order as Order;
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updated } : o));
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error(err);
       alert(err.message || 'Erreur livraison');
     } finally {

@@ -35,8 +35,8 @@ const LoginPage: React.FC = () => {
       } else {
         setError(result.error || 'Erreur de connexion');
       }
-    } catch (err) {
-      setError('Erreur inattendue');
+    } catch (err: any) {
+      setError('Erreur inattendue: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +58,8 @@ const LoginPage: React.FC = () => {
       } else {
         setError(result.error || 'Erreur de connexion');
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err);
       setError('Erreur inattendue');
     } finally {
       setIsLoading(false);

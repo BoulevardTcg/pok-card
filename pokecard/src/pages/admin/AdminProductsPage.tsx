@@ -81,7 +81,7 @@ export function AdminProductsPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setProducts(data.products || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ export function AdminProductsPage() {
 
       if (!response.ok) throw new Error('Erreur lors de la suppression');
       setProducts(products.filter(p => p.id !== productId));
-    } catch (err: any) {
+    } catch (err: Error) {
       alert(err.message);
     }
   }

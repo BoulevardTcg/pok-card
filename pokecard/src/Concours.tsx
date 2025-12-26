@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from './components/AnimatedSection';
 import { AnimatedGrid } from './components/AnimatedGrid';
-import styles from './Concours.module.css';
 
 interface Contest {
   id: string;

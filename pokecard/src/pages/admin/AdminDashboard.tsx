@@ -130,7 +130,7 @@ export function AdminDashboard() {
         }, 0);
         setTotalStock(stock);
       }
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {

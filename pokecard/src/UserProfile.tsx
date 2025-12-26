@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from './authContext'
-import { Package, Heart, Shield } from 'lucide-react'
+import { Package, Shield } from 'lucide-react'
 import { TwoFactorSettings } from './components/TwoFactorSettings'
 import styles from './UserProfile.module.css'
 
@@ -91,8 +91,8 @@ const UserProfile: React.FC = () => {
         const data = await response.json()
         setError(data.error || 'Erreur lors de la mise à jour')
       }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+    } catch (err: Error) {
+      setError('Erreur de connexion au serveur: ' + err.message || 'Erreur inattendue')
     } finally {
       setIsLoading(false)
     }
@@ -121,8 +121,8 @@ const UserProfile: React.FC = () => {
         const data = await response.json()
         setError(data.error || 'Erreur lors de la mise à jour')
       }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+    } catch (err: Error) {
+      setError('Erreur de connexion au serveur: ' + err.message || 'Erreur inattendue')
     } finally {
       setIsLoading(false)
     }

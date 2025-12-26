@@ -12,6 +12,7 @@ function getCardImageUrl(card: any, quality: 'low' | 'high' = 'high') {
 export function TradeSetPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+   
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +27,7 @@ export function TradeSetPage() {
     Promise.all([
       fetch(`http://localhost:8080/api/trade/sets/${encodeURIComponent(id)}/cards`)
         .then(r => r.json())
+           
         .then((data: any) => Array.isArray(data) ? data : [])
         .catch(error => {
           console.error('Erreur lors du chargement des cartes:', error);

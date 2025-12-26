@@ -85,7 +85,7 @@ export function AdminPromoFormPage() {
         validUntil: new Date(promo.validUntil).toISOString().split('T')[0],
         isActive: promo.isActive
       });
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {
@@ -143,7 +143,7 @@ export function AdminPromoFormPage() {
       }
 
       navigate('/admin/promos');
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {

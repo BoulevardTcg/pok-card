@@ -79,7 +79,7 @@ export function AdminReviewsPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setReviews(data.reviews || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
     } finally {
       setLoading(false);
@@ -101,7 +101,7 @@ export function AdminReviewsPage() {
 
       if (!response.ok) throw new Error('Erreur lors de la modération');
       loadReviews();
-    } catch (err: any) {
+    } catch (err: Error) {
       alert(err.message);
     }
   }
@@ -117,7 +117,7 @@ export function AdminReviewsPage() {
 
       if (!response.ok) throw new Error('Erreur lors de la suppression');
       setReviews(reviews.filter(r => r.id !== reviewId));
-    } catch (err: any) {
+    } catch (err: Error) {
       alert(err.message);
     }
   }

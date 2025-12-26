@@ -460,9 +460,9 @@ export function CategorySpecificPage() {
         case 'name':
           return a.data.name.localeCompare(b.data.name);
         case 'stock':
-          const aStock = Math.max(...a.data.variants.map(v => v.stock));
+          { const aStock = Math.max(...a.data.variants.map(v => v.stock));
           const bStock = Math.max(...b.data.variants.map(v => v.stock));
-          return bStock - aStock;
+          return bStock - aStock; }
         case 'subcategory':
           return a.data.category.localeCompare(b.data.category);
         default:
@@ -543,7 +543,7 @@ export function CategorySpecificPage() {
       ) : (
         <>
           <div className={styles.productsGrid}>
-            {sortedProducts.map((item, index) => {
+            {sortedProducts.map((item) => {
               if (item.type === 'static') {
                 const product = item.data;
                 return (

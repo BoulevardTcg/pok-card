@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styles from './AccessoiresPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
+import {navigateToProduct} from "./utils/productMatching.ts";
 
 interface Accessoire {
   id: number;
@@ -200,33 +201,7 @@ export function AccessoiresPage() {
   }, []);
   
   // Fonction pour trouver un produit API correspondant à un accessoire statique
-  const findApiProduct = (accessoireName: string): ProductType | null => {
-    const normalizedName = accessoireName.toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]/g, '');
-    
-    return apiProducts.find(apiProduct => {
-      const apiName = apiProduct.name.toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]/g, '');
-      
-      // Recherche exacte ou par mots-clés
-      if (apiName === normalizedName) return true;
-      
-      // Recherche par mots-clés communs
-      const accessoireWords = normalizedName.split(/\s+/);
-      const apiWords = apiName.split(/\s+/);
-      const commonWords = accessoireWords.filter(word => 
-        word.length > 3 && apiWords.some(apiWord => apiWord.includes(word) || word.includes(apiWord))
-      );
-      
-      return commonWords.length >= 2;
-    }) || null;
-  };
-
-  // Filtrer les accessoires statiques
+// Filtrer les accessoires statiques
   const filteredAccessoires = allAccessoires.filter(accessoire => {
     const categoryMatch = selectedCategory === 'Tous' || accessoire.category === selectedCategory;
     const subcategoryMatch = selectedSubcategory === 'Tous' || accessoire.subcategory === selectedSubcategory;
@@ -305,9 +280,9 @@ export function AccessoiresPage() {
         case 'name':
           return a.data.name.localeCompare(b.data.name);
         case 'stock':
-          const aStock = Math.max(...a.data.variants.map(v => v.stock));
+          { const aStock = Math.max(...a.data.variants.map(v => v.stock));
           const bStock = Math.max(...b.data.variants.map(v => v.stock));
-          return bStock - aStock;
+          return bStock - aStock; }
         case 'category':
           return a.data.category.localeCompare(b.data.category);
         default:
@@ -435,7 +410,7 @@ export function AccessoiresPage() {
         <>
           {sortedProducts.length > 0 ? (
             <div className={styles.accessoiresGrid}>
-              {sortedProducts.map((item, index) => {
+              {sortedProducts.map((item) => {
                 if (item.type === 'static') {
                   const accessoire = item.data;
                   return (

@@ -64,7 +64,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setQrCode(data.qrCode);
       setSecret(data.secret);
       setSetupMode(true);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -103,7 +103,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setSuccess('Authentification à deux facteurs activée avec succès !');
       
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -141,7 +141,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setSuccess('Authentification à deux facteurs désactivée');
       
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);

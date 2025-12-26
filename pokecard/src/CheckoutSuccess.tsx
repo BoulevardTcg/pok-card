@@ -7,7 +7,6 @@ import styles from './CheckoutSuccess.module.css';
 export function CheckoutSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -18,7 +17,6 @@ export function CheckoutSuccess() {
     // Stripe utilise "sid" comme paramètre (évite un bug d'encodage avec "session_id")
     const sessionIdParam = searchParams.get('sid') || searchParams.get('session_id');
     if (sessionIdParam) {
-      setSessionId(sessionIdParam);
       verifyAndCreateOrder(sessionIdParam);
     } else {
       setLoading(false);
@@ -57,7 +55,7 @@ export function CheckoutSuccess() {
           setError(data.error || 'Erreur lors de la création de la commande');
         }
       }
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur lors de la vérification:', err);
       setError(err.message || 'Erreur de connexion au serveur');
     } finally {

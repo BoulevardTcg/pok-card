@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noUnusedLocals false --noUnusedParameters false && vite build",
-    "lint": "eslint .",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "preview": "vite preview"
   },
   "dependencies": {

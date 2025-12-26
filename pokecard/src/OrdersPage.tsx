@@ -81,7 +81,7 @@ export function OrdersPage() {
 
       const data = await response.json();
       setOrders(data.orders || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message || 'Erreur lors du chargement des commandes');
     } finally {
