@@ -2,15 +2,24 @@
   "name": "pok-card",
   "version": "1.0.0",
   "description": "Application e-commerce complète (frontend + backend) pour vendre des produits TCG.",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:front": "npm run dev --workspace pokecard",
+    "dev:back": "npm run dev --workspace server",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "format": "npm run format --workspaces"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VincentMorais/pok-card.git"
   },
+  "workspaces": [
+    "pokecard",
+    "server"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,14 +30,17 @@
   "homepage": "https://github.com/VincentMorais/pok-card#readme",
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7"
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
   },
   "lint-staged": {
-    "pokecard/**/*.{ts,tsx,js,jsx}": [
-      "npm --prefix pokecard run lint:fix"
+    "pokecard/**/*.{ts,tsx,js,jsx,css,json}": [
+      "npm run format --workspace pokecard",
+      "npm run lint:fix --workspace pokecard"
     ],
-    "server/**/*.{ts,js}": [
-      "npm --prefix server run lint -- --fix"
+    "server/**/*.{ts,js,json}": [
+      "npm run format --workspace server",
+      "npm run lint:fix --workspace server"
     ]
   }
 }
