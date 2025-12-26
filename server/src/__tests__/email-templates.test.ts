@@ -1,18 +1,20 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   sendShippingNotificationEmail,
   sendDeliveryConfirmationEmail,
   type OrderDataForEmail,
 } from '../services/email.js';
 
-// Jest hoiste jest.mock(); utiliser var pour éviter la TDZ.
-let mockSendMail: any;
-let mockCreateTransport: any;
+// Vitest hoiste vi.mock();
+const { mockSendMail, mockCreateTransport } = vi.hoisted(() => {
+  const sendMail = vi.fn(() => Promise.resolve({ messageId: 'test-message-id' }));
+  return {
+    mockSendMail: sendMail,
+    mockCreateTransport: vi.fn(() => ({ sendMail })),
+  };
+});
 
-jest.mock('nodemailer', () => {
-  mockSendMail = jest.fn(() => Promise.resolve({ messageId: 'test-message-id' }));
-  mockCreateTransport = jest.fn(() => ({ sendMail: mockSendMail }));
-
+vi.mock('nodemailer', () => {
   return {
     __esModule: true,
     default: { createTransport: mockCreateTransport },

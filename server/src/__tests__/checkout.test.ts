@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
 import { generateAccessToken } from '../utils/auth.js';
@@ -8,13 +8,13 @@ import Stripe from 'stripe';
 const app = createApp();
 
 // Mock Stripe pour les tests
-jest.mock('../config/stripe.js', () => ({
+vi.mock('../config/stripe.js', () => ({
   ensureStripeConfigured: () => {
     // Retourner un mock Stripe client
     return {
       checkout: {
         sessions: {
-          create: jest.fn(() =>
+          create: vi.fn(() =>
             Promise.resolve({
               id: 'cs_test_123',
               url: 'https://checkout.stripe.com/test',
@@ -23,7 +23,7 @@ jest.mock('../config/stripe.js', () => ({
           ) as any,
         },
         webhooks: {
-          constructEvent: jest.fn(),
+          constructEvent: vi.fn(),
         },
       },
     } as unknown as Stripe;

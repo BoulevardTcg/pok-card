@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
 import { generateAccessToken } from '../utils/auth.js';

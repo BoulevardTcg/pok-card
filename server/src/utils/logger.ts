@@ -3,8 +3,8 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 // Définir les niveaux de log personnalisés
 const levels = {
@@ -45,7 +45,7 @@ const consoleFormat = winston.format.combine(
 
 // Rotation des fichiers de log
 const fileRotateTransport = new DailyRotateFile({
-  filename: path.join(__dirname, '../../logs/app-%DATE%.log'),
+  filename: path.join(dirname, '../../logs/app-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   maxSize: '20m',
   maxFiles: '14d',
@@ -53,7 +53,7 @@ const fileRotateTransport = new DailyRotateFile({
 });
 
 const errorFileRotateTransport = new DailyRotateFile({
-  filename: path.join(__dirname, '../../logs/error-%DATE%.log'),
+  filename: path.join(dirname, '../../logs/error-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   maxSize: '20m',
   maxFiles: '30d',

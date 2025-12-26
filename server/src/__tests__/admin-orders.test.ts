@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
 import { generateAccessToken } from '../utils/auth.js';
@@ -9,12 +9,12 @@ import Stripe from 'stripe';
 const app = createApp();
 
 // Mock Stripe pour les tests
-jest.mock('../config/stripe.js', () => ({
+vi.mock('../config/stripe.js', () => ({
   ensureStripeConfigured: () => {
     return {
       checkout: {
         sessions: {
-          create: jest.fn(() =>
+          create: vi.fn(() =>
             Promise.resolve({
               id: 'cs_test_123',
               url: 'https://checkout.stripe.com/test',
@@ -23,7 +23,7 @@ jest.mock('../config/stripe.js', () => ({
           ) as any,
         },
         webhooks: {
-          constructEvent: jest.fn(),
+          constructEvent: vi.fn(),
         },
       },
     } as unknown as Stripe;
@@ -31,10 +31,10 @@ jest.mock('../config/stripe.js', () => ({
 }));
 
 // Mock email service pour éviter d'envoyer de vrais emails
-jest.mock('../services/email.js', () => ({
-  sendShippingNotificationEmail: jest.fn(() => Promise.resolve(true)),
-  sendDeliveryConfirmationEmail: jest.fn(() => Promise.resolve(true)),
-  sendOrderConfirmationEmail: jest.fn(() => Promise.resolve(true)),
+vi.mock('../services/email.js', () => ({
+  sendShippingNotificationEmail: vi.fn(() => Promise.resolve(true)),
+  sendDeliveryConfirmationEmail: vi.fn(() => Promise.resolve(true)),
+  sendOrderConfirmationEmail: vi.fn(() => Promise.resolve(true)),
 }));
 
 describe('Admin Orders Routes - Shipping', () => {

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, prisma } from './setup.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/auth.js';
+import { generateRefreshToken } from '../utils/auth.js';
 
 const app = createApp();
 
