@@ -3,6 +3,7 @@ import { verifyAccessToken, JWTPayload } from '../utils/auth.js'
 
 // Étendre l'interface Request pour inclure l'utilisateur
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JWTPayload

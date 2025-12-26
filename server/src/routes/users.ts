@@ -125,7 +125,7 @@ router.put('/profile', authenticateToken, [
 router.put('/profile/extended', authenticateToken, [
   body('phone')
     .optional()
-    .matches(/^[\+]?[0-9\s\-\(\)]+$/)
+    .matches(/^[+]?[0-9\s\-()]+$/)
     .withMessage('Numéro de téléphone invalide'),
   body('address')
     .optional()
@@ -137,7 +137,7 @@ router.put('/profile/extended', authenticateToken, [
     .withMessage('La ville ne peut pas dépasser 100 caractères'),
   body('postalCode')
     .optional()
-    .matches(/^[0-9A-Z\s\-]+$/i)
+    .matches(/^[0-9A-Z\s-]+$/i)
     .withMessage('Code postal invalide'),
   body('country')
     .optional()
