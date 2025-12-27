@@ -72,21 +72,6 @@ const LoginPage: React.FC = () => {
     setError('');
   };
 
-  const handleDemoLogin = async () => {
-    setEmail('john.doe@example.com');
-    setPassword('Test123!');
-
-    setTimeout(async () => {
-      const result = await login('john.doe@example.com', 'Test123!');
-      if (result.success) {
-        navigate('/');
-      } else if (result.requiresTwoFactor) {
-        setRequiresTwoFactor(true);
-        setPendingEmail('john.doe@example.com');
-      }
-    }, 100);
-  };
-
   // Formulaire 2FA
   if (requiresTwoFactor) {
     return (
@@ -213,13 +198,6 @@ const LoginPage: React.FC = () => {
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
-
-          <div className={styles.demoSection}>
-            <button onClick={handleDemoLogin} className={styles.demoButton} disabled={isLoading}>
-              🧪 Connexion de démonstration
-            </button>
-            <small className={styles.demoText}>Utilisez les identifiants de test</small>
-          </div>
 
           <div className={styles.footer}>
             <p className={styles.footerText}>

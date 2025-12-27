@@ -22,7 +22,7 @@ export const SHIPPING_METHODS: ShippingMethod[] = [
     priceCents: 790,
     carrier: 'COLISSIMO',
     enabled: true,
-    description: 'Livraison à domicile (48h)',
+    description: 'Livraison à domicile (3 à 5 jours ouvrés)',
   },
 ];
 

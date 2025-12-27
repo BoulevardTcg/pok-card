@@ -42,13 +42,13 @@ export default function FinalCTA() {
             </div>
             <div className={styles.trustDivider} />
             <div className={styles.trustBadge}>
-              <span className={styles.badgeValue}>3+</span>
+              <span className={styles.badgeValue}>5</span>
               <span className={styles.badgeLabel}>Univers TCG</span>
             </div>
             <div className={styles.trustDivider} />
             <div className={styles.trustBadge}>
-              <span className={styles.badgeValue}>48h</span>
-              <span className={styles.badgeLabel}>Expédition</span>
+              <span className={styles.badgeValue}>30</span>
+              <span className={styles.badgeLabel}>Produits</span>
             </div>
           </div>
         </div>
