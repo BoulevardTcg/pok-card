@@ -15,9 +15,25 @@ export default function NavbarPremium() {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
+    let ticking = false;
+    let lastScrollY = window.scrollY;
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          // Seulement mettre à jour si le changement de scroll est significatif
+          // Cela évite les faux positifs lors des gestes tactiles sur la navbar
+          if (Math.abs(currentScrollY - lastScrollY) > 5 || currentScrollY <= 20) {
+            setIsScrolled(currentScrollY > 20);
+            lastScrollY = currentScrollY;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -26,6 +42,24 @@ export default function NavbarPremium() {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
+
+  // Empêcher le scroll du body quand le menu mobile est ouvert
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isMenuOpen]);
 
   const navLinks = [
     { path: '/', label: 'Accueil' },
