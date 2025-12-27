@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import { sendContactEmail, sendContactAutoReply } from '../services/email.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -58,7 +59,7 @@ const contactValidation = [
   body('companyWebsite').optional().isLength({ max: 0 }).withMessage('Spam détecté'),
 ];
 
-router.post('/', contactLimiter, contactValidation, async (req: Request, res: Response) => {
+router.post('/', authenticateToken, contactLimiter, contactValidation, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const hasHoneypot = errors

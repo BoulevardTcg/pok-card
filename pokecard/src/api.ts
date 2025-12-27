@@ -13,15 +13,16 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
     });
     if (!res.ok) {
       let errorMessage = `HTTP ${res.status}`;
+      let errorData: any = {};
       try {
-        const errorData = await res.json();
+        errorData = await res.json();
         errorMessage = errorData.error || errorData.message || errorMessage;
       } catch {
         // Ignorer les erreurs de parsing JSON
       }
-      const error = new Error(errorMessage);
-
-      (error as any).status = res.status;
+      const error = new Error(errorMessage) as any;
+      error.status = res.status;
+      error.response = { data: errorData, status: res.status };
       throw error;
     }
     return res.json();
@@ -173,7 +174,18 @@ export type ContactMessagePayload = {
 export async function sendContactMessage(
   payload: ContactMessagePayload
 ): Promise<{ ok: true } | { ok: false; code?: string; error?: string }> {
-  return fetchJson('/contact', { method: 'POST', body: JSON.stringify(payload) });
+  const token = localStorage.getItem('accessToken');
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return fetchJson('/contact', { 
+    method: 'POST', 
+    body: JSON.stringify(payload),
+    headers,
+  });
 }
 
 export async function listTradeSets(opts?: { lang?: 'fr' | 'en' }) {

@@ -7,12 +7,11 @@ interface StatItem {
   label: string;
 }
 
-// Stats équilibrées entre communauté et valeur
 const STATS: StatItem[] = [
-  { value: 12400, suffix: '+', label: 'Cartes disponibles' },
-  { value: 2847, suffix: '', label: 'Collectionneurs actifs' },
-  { value: 45, suffix: '+', label: 'Extensions Pokémon & One Piece' },
-  { value: 99.8, suffix: '%', label: 'Clients satisfaits' },
+  { value: 30, suffix: '', label: 'Produits disponibles' },
+  { value: 100, suffix: '+', label: 'Commandes honorées' },
+  { value: 5, suffix: '', label: 'Univers TCG' },
+  { value: 100, suffix: '%', label: 'Authenticité garantie' },
 ];
 
 function AnimatedNumber({
