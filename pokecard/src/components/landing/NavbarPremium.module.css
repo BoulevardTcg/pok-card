@@ -11,6 +11,8 @@
   padding: var(--space-5, 1.25rem) 0;
   background: transparent;
   transition: all var(--duration-base, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .navbar.scrolled {
@@ -27,6 +29,7 @@
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
   padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
+  touch-action: manipulation;
 }
 
 /* ─────────────────────────────────────────────────────────────────
