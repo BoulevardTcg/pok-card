@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Shield, ShieldCheck, ShieldOff, Smartphone, Key, AlertTriangle, Check, X, Loader2 } from 'lucide-react';
+import {
+  Shield,
+  ShieldCheck,
+  ShieldOff,
+  Smartphone,
+  Key,
+  AlertTriangle,
+  Check,
+  X,
+  Loader2,
+} from 'lucide-react';
 import styles from './TwoFactorSettings.module.css';
 
 interface TwoFactorSettingsProps {
@@ -28,8 +38,8 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setLoading(true);
       const response = await fetch('http://localhost:8080/api/2fa/status', {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -47,12 +57,12 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
     try {
       setActionLoading(true);
       setError(null);
-      
+
       const response = await fetch('http://localhost:8080/api/2fa/setup', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -64,7 +74,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setQrCode(data.qrCode);
       setSecret(data.secret);
       setSetupMode(true);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -84,10 +94,10 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       const response = await fetch('http://localhost:8080/api/2fa/enable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code: verificationCode })
+        body: JSON.stringify({ code: verificationCode }),
       });
 
       if (!response.ok) {
@@ -101,9 +111,9 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setSecret(null);
       setVerificationCode('');
       setSuccess('Authentification à deux facteurs activée avec succès !');
-      
+
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -123,10 +133,10 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       const response = await fetch('http://localhost:8080/api/2fa/disable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code: verificationCode, password })
+        body: JSON.stringify({ code: verificationCode, password }),
       });
 
       if (!response.ok) {
@@ -139,9 +149,9 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setVerificationCode('');
       setPassword('');
       setSuccess('Authentification à deux facteurs désactivée');
-      
+
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -215,10 +225,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
           {isEnabled ? (
             <div className={styles.enabledInfo}>
               <p>Votre compte est protégé par l'authentification à deux facteurs.</p>
-              <button 
-                onClick={() => setDisableMode(true)} 
-                className={styles.dangerButton}
-              >
+              <button onClick={() => setDisableMode(true)} className={styles.dangerButton}>
                 Désactiver 2FA
               </button>
             </div>
@@ -227,20 +234,30 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
               <div className={styles.benefits}>
                 <h4>Pourquoi activer le 2FA ?</h4>
                 <ul>
-                  <li><Check size={14} /> Protection contre le vol de mot de passe</li>
-                  <li><Check size={14} /> Sécurité renforcée pour vos données</li>
-                  <li><Check size={14} /> Tranquillité d'esprit</li>
+                  <li>
+                    <Check size={14} /> Protection contre le vol de mot de passe
+                  </li>
+                  <li>
+                    <Check size={14} /> Sécurité renforcée pour vos données
+                  </li>
+                  <li>
+                    <Check size={14} /> Tranquillité d'esprit
+                  </li>
                 </ul>
               </div>
-              <button 
-                onClick={startSetup} 
+              <button
+                onClick={startSetup}
                 disabled={actionLoading}
                 className={styles.primaryButton}
               >
                 {actionLoading ? (
-                  <><Loader2 className={styles.spinner} size={16} /> Configuration...</>
+                  <>
+                    <Loader2 className={styles.spinner} size={16} /> Configuration...
+                  </>
                 ) : (
-                  <><Smartphone size={16} /> Configurer 2FA</>
+                  <>
+                    <Smartphone size={16} /> Configurer 2FA
+                  </>
                 )}
               </button>
             </div>
@@ -284,7 +301,9 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
                   <input
                     type="text"
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
                     placeholder="000000"
                     maxLength={6}
                     className={styles.input}
@@ -298,15 +317,19 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
             <button onClick={cancelSetup} className={styles.secondaryButton}>
               <X size={16} /> Annuler
             </button>
-            <button 
-              onClick={enableTwoFactor} 
+            <button
+              onClick={enableTwoFactor}
               disabled={actionLoading || verificationCode.length !== 6}
               className={styles.primaryButton}
             >
               {actionLoading ? (
-                <><Loader2 className={styles.spinner} size={16} /> Vérification...</>
+                <>
+                  <Loader2 className={styles.spinner} size={16} /> Vérification...
+                </>
               ) : (
-                <><Check size={16} /> Activer 2FA</>
+                <>
+                  <Check size={16} /> Activer 2FA
+                </>
               )}
             </button>
           </div>
@@ -332,7 +355,9 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
                 <input
                   type="text"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
                   placeholder="000000"
                   maxLength={6}
                   className={styles.input}
@@ -356,15 +381,19 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
             <button onClick={cancelSetup} className={styles.secondaryButton}>
               <X size={16} /> Annuler
             </button>
-            <button 
-              onClick={disableTwoFactor} 
+            <button
+              onClick={disableTwoFactor}
               disabled={actionLoading || verificationCode.length !== 6 || !password}
               className={styles.dangerButton}
             >
               {actionLoading ? (
-                <><Loader2 className={styles.spinner} size={16} /> Désactivation...</>
+                <>
+                  <Loader2 className={styles.spinner} size={16} /> Désactivation...
+                </>
               ) : (
-                <><ShieldOff size={16} /> Désactiver 2FA</>
+                <>
+                  <ShieldOff size={16} /> Désactiver 2FA
+                </>
               )}
             </button>
           </div>
@@ -373,4 +402,3 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
     </div>
   );
 }
-

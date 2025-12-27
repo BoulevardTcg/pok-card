@@ -37,8 +37,12 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading p {
@@ -60,7 +64,7 @@
 .backButton {
   background: none;
   border: 1px solid #e5e7eb;
-  color: #0C1321;
+  color: #0c1321;
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 2rem;
@@ -72,13 +76,13 @@
 }
 
 :global(.dark) .backButton {
-  border-color: #2E3542;
+  border-color: #2e3542;
   color: white;
 }
 
 .backButton:hover {
-  border-color: #D7B56D;
-  color: #D7B56D;
+  border-color: #d7b56d;
+  color: #d7b56d;
   transform: translateX(-4px);
 }
 
@@ -86,7 +90,7 @@
   font-size: clamp(2rem, 4vw, 3rem);
   font-family: var(--font-serif);
   font-weight: 700;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 1rem;
   line-height: 1.2;
   transition: color 0.3s ease;
@@ -99,7 +103,7 @@
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
+  background: #d7b56d;
   margin: 1.5rem auto;
 }
 
@@ -136,20 +140,20 @@
   border-radius: 8px;
   font-size: 1rem;
   font-family: var(--font-sans);
-  color: #0C1321;
+  color: #0c1321;
   background: white;
   transition: all 0.3s ease;
   outline: none;
 }
 
 :global(.dark) .searchInput {
-  border-color: #2E3542;
-  background: #1A1D21;
+  border-color: #2e3542;
+  background: #1a1d21;
   color: white;
 }
 
 .searchInput:focus {
-  border-color: #D7B56D;
+  border-color: #d7b56d;
   box-shadow: 0 0 0 3px rgba(215, 181, 109, 0.1);
 }
 
@@ -163,7 +167,7 @@
   border-radius: 8px;
   font-size: 1rem;
   font-family: var(--font-sans);
-  color: #0C1321;
+  color: #0c1321;
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -172,13 +176,13 @@
 }
 
 :global(.dark) .filterSelect {
-  border-color: #2E3542;
-  background: #1A1D21;
+  border-color: #2e3542;
+  background: #1a1d21;
   color: white;
 }
 
 .filterSelect:focus {
-  border-color: #D7B56D;
+  border-color: #d7b56d;
   box-shadow: 0 0 0 3px rgba(215, 181, 109, 0.1);
 }
 
@@ -200,12 +204,12 @@
 }
 
 :global(.dark) .statCard {
-  background: #1A1D21;
-  border-color: #2E3542;
+  background: #1a1d21;
+  border-color: #2e3542;
 }
 
 .statCard:hover {
-  border-color: #D7B56D;
+  border-color: #d7b56d;
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
@@ -214,7 +218,7 @@
   font-size: 2rem;
   font-family: var(--font-serif);
   font-weight: 700;
-  color: #D7B56D;
+  color: #d7b56d;
   margin-bottom: 0.5rem;
 }
 
@@ -260,12 +264,12 @@
 }
 
 :global(.dark) .cardInfo {
-  background: #1A1D21;
-  border-color: #2E3542;
+  background: #1a1d21;
+  border-color: #2e3542;
 }
 
 .cardWrapper:hover .cardInfo {
-  border-color: #D7B56D;
+  border-color: #d7b56d;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -273,7 +277,7 @@
   font-size: 1.125rem;
   font-family: var(--font-serif);
   font-weight: 600;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 0.75rem;
   line-height: 1.4;
   transition: color 0.3s ease;
@@ -302,7 +306,7 @@
 }
 
 .cardRarity {
-  color: #D7B56D;
+  color: #d7b56d;
   font-weight: 500;
   padding: 0.25rem 0.75rem;
   background: rgba(215, 181, 109, 0.1);
@@ -330,23 +334,23 @@
 .detailsButton {
   background: rgba(215, 181, 109, 0.1);
   border-color: rgba(215, 181, 109, 0.3);
-  color: #D7B56D;
+  color: #d7b56d;
 }
 
 .detailsButton:hover {
   background: rgba(215, 181, 109, 0.2);
-  border-color: #D7B56D;
+  border-color: #d7b56d;
 }
 
 .tradeButton {
   background: rgba(215, 181, 109, 0.1);
   border-color: rgba(215, 181, 109, 0.3);
-  color: #D7B56D;
+  color: #d7b56d;
 }
 
 .tradeButton:hover {
   background: rgba(215, 181, 109, 0.2);
-  border-color: #D7B56D;
+  border-color: #d7b56d;
 }
 
 .emptyState {
@@ -364,7 +368,7 @@
   font-size: 1.5rem;
   font-family: var(--font-serif);
   font-weight: 600;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 0.5rem;
   transition: color 0.3s ease;
 }
@@ -406,4 +410,3 @@
     gap: 1.5rem;
   }
 }
-

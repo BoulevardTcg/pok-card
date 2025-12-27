@@ -15,7 +15,15 @@ const STATS: StatItem[] = [
   { value: 99.8, suffix: '%', label: 'Clients satisfaits' },
 ];
 
-function AnimatedNumber({ value, suffix, duration = 2000 }: { value: number; suffix: string; duration?: number }) {
+function AnimatedNumber({
+  value,
+  suffix,
+  duration = 2000,
+}: {
+  value: number;
+  suffix: string;
+  duration?: number;
+}) {
   const [displayValue, setDisplayValue] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -27,22 +35,24 @@ function AnimatedNumber({ value, suffix, duration = 2000 }: { value: number; suf
           setHasAnimated(true);
           const startTime = Date.now();
           const isDecimal = value % 1 !== 0;
-          
+
           const animate = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             // Easing function
             const easeOutQuart = 1 - Math.pow(1 - progress, 4);
             const currentValue = value * easeOutQuart;
-            
-            setDisplayValue(isDecimal ? parseFloat(currentValue.toFixed(1)) : Math.floor(currentValue));
-            
+
+            setDisplayValue(
+              isDecimal ? parseFloat(currentValue.toFixed(1)) : Math.floor(currentValue)
+            );
+
             if (progress < 1) {
               requestAnimationFrame(animate);
             }
           };
-          
+
           requestAnimationFrame(animate);
         }
       },
@@ -65,7 +75,8 @@ function AnimatedNumber({ value, suffix, duration = 2000 }: { value: number; suf
 
   return (
     <span ref={ref} className={styles.statValue}>
-      {formatValue(displayValue)}{suffix}
+      {formatValue(displayValue)}
+      {suffix}
     </span>
   );
 }

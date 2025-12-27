@@ -19,8 +19,10 @@ const mockNews: NewsItem[] = [
     category: 'Pokémon',
     date: '2024-01-15',
     image: '/actualiter/pokemon.png',
-    excerpt: 'Découvrez les nouvelles cartes ultra-rares de la dernière extension Pokémon avec des illustrations exclusives.',
-    content: 'L\'extension Obsidienne Ardente apporte une collection exceptionnelle de cartes Pokémon avec des illustrations exclusives créées par des artistes renommés. Cette extension comprend plus de 200 nouvelles cartes, incluant des cartes ultra-rares, des cartes holographiques et des cartes signature. Les collectionneurs pourront découvrir de nouveaux Pokémon légendaires et des mécaniques de jeu innovantes.',
+    excerpt:
+      'Découvrez les nouvelles cartes ultra-rares de la dernière extension Pokémon avec des illustrations exclusives.',
+    content:
+      "L'extension Obsidienne Ardente apporte une collection exceptionnelle de cartes Pokémon avec des illustrations exclusives créées par des artistes renommés. Cette extension comprend plus de 200 nouvelles cartes, incluant des cartes ultra-rares, des cartes holographiques et des cartes signature. Les collectionneurs pourront découvrir de nouveaux Pokémon légendaires et des mécaniques de jeu innovantes.",
     type: 'latest',
   },
   {
@@ -29,8 +31,10 @@ const mockNews: NewsItem[] = [
     category: 'One Piece',
     date: '2024-01-10',
     image: '/actualiter/one_piece.png',
-    excerpt: 'La nouvelle extension One Piece arrive avec des cartes de personnages emblématiques et des effets de jeu inédits.',
-    content: 'L\'extension Grand Line marque un tournant dans le One Piece Card Game avec l\'introduction de nouveaux personnages emblématiques de la série. Cette extension comprend des cartes de Luffy, Zoro, Nami et bien d\'autres avec des illustrations exclusives. De nouvelles mécaniques de jeu permettent des stratégies plus complexes et des combats plus intenses.',
+    excerpt:
+      'La nouvelle extension One Piece arrive avec des cartes de personnages emblématiques et des effets de jeu inédits.',
+    content:
+      "L'extension Grand Line marque un tournant dans le One Piece Card Game avec l'introduction de nouveaux personnages emblématiques de la série. Cette extension comprend des cartes de Luffy, Zoro, Nami et bien d'autres avec des illustrations exclusives. De nouvelles mécaniques de jeu permettent des stratégies plus complexes et des combats plus intenses.",
     type: 'latest',
   },
   {
@@ -39,8 +43,10 @@ const mockNews: NewsItem[] = [
     category: 'Pokémon',
     date: '2024-02-01',
     image: 'https://images.unsplash.com/photo-1608198399988-3414a3e7bafb?w=800&h=600&fit=crop',
-    excerpt: 'Préparez-vous pour la sortie de la nouvelle extension basée sur les jeux Écarlate et Violet.',
-    content: 'L\'extension Pokémon Écarlate et Violet s\'inspire directement des derniers jeux de la série principale. Les collectionneurs pourront retrouver les nouveaux Pokémon de la région de Paldea, incluant les starters Floragato, Crocalibur et Coiffeton. Cette extension introduit également de nouvelles cartes VMAX et des cartes spéciales avec des effets uniques.',
+    excerpt:
+      'Préparez-vous pour la sortie de la nouvelle extension basée sur les jeux Écarlate et Violet.',
+    content:
+      "L'extension Pokémon Écarlate et Violet s'inspire directement des derniers jeux de la série principale. Les collectionneurs pourront retrouver les nouveaux Pokémon de la région de Paldea, incluant les starters Floragato, Crocalibur et Coiffeton. Cette extension introduit également de nouvelles cartes VMAX et des cartes spéciales avec des effets uniques.",
     type: 'upcoming',
   },
   {
@@ -49,8 +55,10 @@ const mockNews: NewsItem[] = [
     category: 'One Piece',
     date: '2024-02-15',
     image: 'https://images.unsplash.com/photo-1608198399988-3414a3e7bafb?w=800&h=600&fit=crop',
-    excerpt: 'L\'arc Wano arrive dans le Card Game avec de nouvelles mécaniques de jeu et des cartes collector.',
-    content: 'L\'arc Wano, l\'un des arcs les plus épiques de One Piece, arrive enfin dans le Card Game. Cette extension comprend des cartes des personnages clés de l\'arc, incluant les neuf Akazaya, Kaido et Big Mom. De nouvelles mécaniques de jeu permettent de recréer les combats épiques de l\'arc, avec des effets spéciaux uniques pour chaque personnage.',
+    excerpt:
+      "L'arc Wano arrive dans le Card Game avec de nouvelles mécaniques de jeu et des cartes collector.",
+    content:
+      "L'arc Wano, l'un des arcs les plus épiques de One Piece, arrive enfin dans le Card Game. Cette extension comprend des cartes des personnages clés de l'arc, incluant les neuf Akazaya, Kaido et Big Mom. De nouvelles mécaniques de jeu permettent de recréer les combats épiques de l'arc, avec des effets spéciaux uniques pour chaque personnage.",
     type: 'upcoming',
   },
   {
@@ -59,8 +67,10 @@ const mockNews: NewsItem[] = [
     category: 'Pokémon',
     date: '2024-03-01',
     image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop',
-    excerpt: 'Inscrivez-vous dès maintenant pour le tournoi national Pokémon 2024 avec des prix exclusifs.',
-    content: 'Le tournoi national Pokémon 2024 se déroulera du 15 au 17 mars à Paris. Les participants pourront concourir dans différentes catégories et gagner des prix exclusifs, incluant des cartes promo rares, des produits collector et des invitations aux championnats internationaux. Les inscriptions sont ouvertes jusqu\'au 1er mars.',
+    excerpt:
+      'Inscrivez-vous dès maintenant pour le tournoi national Pokémon 2024 avec des prix exclusifs.',
+    content:
+      "Le tournoi national Pokémon 2024 se déroulera du 15 au 17 mars à Paris. Les participants pourront concourir dans différentes catégories et gagner des prix exclusifs, incluant des cartes promo rares, des produits collector et des invitations aux championnats internationaux. Les inscriptions sont ouvertes jusqu'au 1er mars.",
     type: 'latest',
   },
   {
@@ -69,8 +79,10 @@ const mockNews: NewsItem[] = [
     category: 'One Piece',
     date: '2024-03-10',
     image: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&h=600&fit=crop',
-    excerpt: 'Une nouvelle série de cartes premium One Piece avec des illustrations exclusives d\'artistes japonais.',
-    content: 'Une série limitée de cartes premium One Piece sera disponible en précommande à partir du 10 mars. Ces cartes présentent des illustrations exclusives créées par des artistes japonais renommés, avec des finitions spéciales et des effets holographiques uniques. Chaque carte est numérotée et accompagnée d\'un certificat d\'authenticité.',
+    excerpt:
+      "Une nouvelle série de cartes premium One Piece avec des illustrations exclusives d'artistes japonais.",
+    content:
+      "Une série limitée de cartes premium One Piece sera disponible en précommande à partir du 10 mars. Ces cartes présentent des illustrations exclusives créées par des artistes japonais renommés, avec des finitions spéciales et des effets holographiques uniques. Chaque carte est numérotée et accompagnée d'un certificat d'authenticité.",
     type: 'upcoming',
   },
 ];
@@ -80,7 +92,7 @@ export function NewsPage() {
   const [selectedType, setSelectedType] = useState<'all' | 'latest' | 'upcoming'>('all');
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
-  const filteredNews = mockNews.filter(news => {
+  const filteredNews = mockNews.filter((news) => {
     if (selectedCategory !== 'all' && news.category !== selectedCategory) return false;
     if (selectedType !== 'all' && news.type !== selectedType) return false;
     return true;
@@ -112,14 +124,18 @@ export function NewsPage() {
                   {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                     day: 'numeric',
                     month: 'long',
-                    year: 'numeric'
+                    year: 'numeric',
                   })}
                 </span>
               </div>
               <h1 className={styles.newsDetailTitle}>{selectedNews.title}</h1>
             </div>
             <div className={styles.newsDetailImageContainer}>
-              <img src={selectedNews.image} alt={selectedNews.title} className={styles.newsDetailImage} />
+              <img
+                src={selectedNews.image}
+                alt={selectedNews.title}
+                className={styles.newsDetailImage}
+              />
             </div>
             <div className={styles.newsDetailContent}>
               <p className={styles.newsDetailText}>{selectedNews.content}</p>
@@ -230,4 +246,3 @@ export function NewsPage() {
     </div>
   );
 }
-

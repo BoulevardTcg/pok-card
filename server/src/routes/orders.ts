@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-import { optionalAuth } from '../middleware/auth.js'
-import { verifyOrderTrackingToken } from '../utils/tracking.js'
+import { Router, Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { optionalAuth } from '../middleware/auth.js';
+import { verifyOrderTrackingToken } from '../utils/tracking.js';
 
-const router = Router()
-const prisma = new PrismaClient()
+const router = Router();
+const prisma = new PrismaClient();
 
 const toPublicTrackingOrderDto = (order: any) => ({
   id: order.id,
@@ -35,55 +35,57 @@ const toPublicTrackingOrderDto = (order: any) => ({
   updatedAt: order.updatedAt,
   currency: order.currency,
   totalCents: order.totalCents,
-})
+});
 
 router.get('/:orderId', optionalAuth, async (req: Request, res: Response) => {
   try {
-    const { orderId } = req.params
-    const token = typeof req.query.token === 'string' ? req.query.token : undefined
+    const { orderId } = req.params;
+    const token = typeof req.query.token === 'string' ? req.query.token : undefined;
 
-    let tokenOrderId: string | null = null
+    let tokenOrderId: string | null = null;
     try {
       if (token) {
-        const payload = verifyOrderTrackingToken(token)
-        tokenOrderId = payload.orderId
+        const payload = verifyOrderTrackingToken(token);
+        tokenOrderId = payload.orderId;
       }
     } catch (error) {
-      return res.status(401).json({ error: 'Token de suivi invalide', code: 'INVALID_TRACKING_TOKEN' })
+      return res
+        .status(401)
+        .json({ error: 'Token de suivi invalide', code: 'INVALID_TRACKING_TOKEN' });
     }
 
-    const isOwner = !!req.user?.userId
-    const canUseToken = !!token && tokenOrderId === orderId
+    const isOwner = !!req.user?.userId;
+    const canUseToken = !!token && tokenOrderId === orderId;
 
     if (!isOwner && !canUseToken) {
-      return res.status(401).json({ error: 'Accès non autorisé', code: 'ORDER_ACCESS_DENIED' })
+      return res.status(401).json({ error: 'Accès non autorisé', code: 'ORDER_ACCESS_DENIED' });
     }
 
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
-        ...(isOwner ? { userId: req.user!.userId } : {})
+        ...(isOwner ? { userId: req.user!.userId } : {}),
       },
       include: {
         items: true,
         events: {
-          orderBy: { createdAt: 'asc' }
-        }
-      }
-    })
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
 
     if (!order) {
-      return res.status(404).json({ error: 'Commande non trouvée', code: 'ORDER_NOT_FOUND' })
+      return res.status(404).json({ error: 'Commande non trouvée', code: 'ORDER_NOT_FOUND' });
     }
 
     res.json({
       order: canUseToken ? toPublicTrackingOrderDto(order) : order,
-      access: canUseToken ? 'token' : 'owner'
-    })
+      access: canUseToken ? 'token' : 'owner',
+    });
   } catch (error) {
-    console.error('Erreur lors de la récupération de la commande:', error)
-    res.status(500).json({ error: 'Erreur interne du serveur', code: 'INTERNAL_SERVER_ERROR' })
+    console.error('Erreur lors de la récupération de la commande:', error);
+    res.status(500).json({ error: 'Erreur interne du serveur', code: 'INTERNAL_SERVER_ERROR' });
   }
-})
+});
 
-export default router
+export default router;

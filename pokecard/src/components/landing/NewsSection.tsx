@@ -24,7 +24,8 @@ const mockNews: NewsItem[] = [
     category: 'Pokémon',
     date: '2024-01-15',
     image: '/actualiter/pokemon.png',
-    excerpt: 'Découvrez les nouvelles cartes ultra-rares de la dernière extension Pokémon avec des illustrations exclusives.',
+    excerpt:
+      'Découvrez les nouvelles cartes ultra-rares de la dernière extension Pokémon avec des illustrations exclusives.',
     type: 'latest',
   },
   {
@@ -33,14 +34,15 @@ const mockNews: NewsItem[] = [
     category: 'One Piece',
     date: '2024-01-10',
     image: '/actualiter/one_piece.png',
-    excerpt: 'La nouvelle extension One Piece arrive avec des cartes de personnages emblématiques et des effets de jeu inédits.',
+    excerpt:
+      'La nouvelle extension One Piece arrive avec des cartes de personnages emblématiques et des effets de jeu inédits.',
     type: 'latest',
   },
 ];
 
 export default function NewsSection() {
   const navigate = useNavigate();
-  
+
   // Afficher seulement les 2 dernières actualités
   const latestNews = mockNews.slice(0, 2);
 
@@ -55,10 +57,7 @@ export default function NewsSection() {
               Restez informé des dernières sorties et des prochaines nouveautés Pokémon et One Piece
             </p>
           </div>
-          <button
-            onClick={() => navigate('/actualites')}
-            className={styles.seeAllButton}
-          >
+          <button onClick={() => navigate('/actualites')} className={styles.seeAllButton}>
             Voir toutes les actualités
             <span className={styles.arrow}>→</span>
           </button>
@@ -81,9 +80,7 @@ export default function NewsSection() {
                 </div>
               </div>
               <div className={styles.newsContent}>
-                <div className={styles.newsTypeBadge}>
-                  🆕 Dernière sortie
-                </div>
+                <div className={styles.newsTypeBadge}>🆕 Dernière sortie</div>
                 <h4 className={styles.newsTitle}>{news.title}</h4>
                 <p className={styles.newsExcerpt}>{news.excerpt}</p>
                 <button className={styles.readMoreButton}>
@@ -98,4 +95,3 @@ export default function NewsSection() {
     </div>
   );
 }
-

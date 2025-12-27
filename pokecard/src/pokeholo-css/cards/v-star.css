@@ -4,12 +4,10 @@
 
 */
 
-.card:not(.masked)[data-rarity="rare holo vstar"][data-supertype="pokémon"] .card__shine,
-.card:not(.masked)[data-rarity="rare holo vstar"][data-supertype="pokémon"] .card__shine:after {
-
+.card:not(.masked)[data-rarity='rare holo vstar'][data-supertype='pokémon'] .card__shine,
+.card:not(.masked)[data-rarity='rare holo vstar'][data-supertype='pokémon'] .card__shine:after {
   --mask: none;
   /* Ne pas redéfinir --foil et --imgsize, laisser les variables parent */
-
 }
 
 /*
@@ -18,53 +16,63 @@
 
 */
 
-.card[data-rarity="rare holo vstar"] .card__shine {
-
+.card[data-rarity='rare holo vstar'] .card__shine {
   --space: 5%;
   --angle: 133deg;
   --imgsize: 100%; /* Changé de 450px à 100% pour s'adapter à la carte */
 
   background-image:
-    var(--foil), /* FOIL CDN VSTAR ! */
-    repeating-linear-gradient( 0deg, 
-      hsl(280, 70%, 65%) calc(var(--space)*1),      /* Violet VSTAR */
-      hsl(240, 80%, 70%) calc(var(--space)*2),      /* Bleu royal */
-      hsl(200, 70%, 60%) calc(var(--space)*3),      /* Bleu-vert */
-      hsl(160, 70%, 55%) calc(var(--space)*4),      /* Vert émeraude */
-      hsl(120, 70%, 60%) calc(var(--space)*5),      /* Vert vif */
-      hsl(80, 80%, 65%) calc(var(--space)*6),       /* Jaune-vert */
-      hsl(280, 70%, 65%) calc(var(--space)*7)       /* Retour au violet */
-    ),
-    repeating-linear-gradient( 
-      var(--angle), 
-      #0e152e 0%, 
-      hsl(180, 10%, 60%) 3.8%, 
-      hsl(180, 29%, 66%) 4.5%, 
-      hsl(180, 10%, 60%) 5.2%, 
-      #0e152e 10% , 
-      #0e152e 12% 
-      );
+    var(--foil),
+    /* FOIL CDN VSTAR ! */
+    repeating-linear-gradient(
+        0deg,
+        hsl(280, 70%, 65%) calc(var(--space) * 1),
+        /* Violet VSTAR */ hsl(240, 80%, 70%) calc(var(--space) * 2),
+        /* Bleu royal */ hsl(200, 70%, 60%) calc(var(--space) * 3),
+        /* Bleu-vert */ hsl(160, 70%, 55%) calc(var(--space) * 4),
+        /* Vert émeraude */ hsl(120, 70%, 60%) calc(var(--space) * 5),
+        /* Vert vif */ hsl(80, 80%, 65%) calc(var(--space) * 6),
+        /* Jaune-vert */ hsl(280, 70%, 65%) calc(var(--space) * 7) /* Retour au violet */
+      ),
+    repeating-linear-gradient(
+      var(--angle),
+      #0e152e 0%,
+      hsl(180, 10%, 60%) 3.8%,
+      hsl(180, 29%, 66%) 4.5%,
+      hsl(180, 10%, 60%) 5.2%,
+      #0e152e 10%,
+      #0e152e 12%
+    );
 
   background-blend-mode: soft-light, hue, hard-light; /* Changé pour VSTAR */
-  background-size: var(--imgsize) 100%, 200% 700%, 300% 100%;
-  background-position: center, 0% var(--background-y), var(--background-x) var(--background-y);
-  
-  /* Foil VSTAR modérément visible - juste milieu */
-  filter: brightness(.6) contrast(2.2) saturate(1.1);
-  opacity: 0.8;
+  background-size:
+    var(--imgsize) 100%,
+    200% 700%,
+    300% 100%;
+  background-position:
+    center,
+    0% var(--background-y),
+    var(--background-x) var(--background-y);
 
+  /* Foil VSTAR modérément visible - juste milieu */
+  filter: brightness(0.6) contrast(2.2) saturate(1.1);
+  opacity: 0.8;
 }
 
-.card[data-rarity="rare holo vstar"] .card__shine:after {
+.card[data-rarity='rare holo vstar'] .card__shine:after {
+  content: '';
 
-  content: "";
-
-  background-position: center, 0% var(--background-y), calc( var(--background-x) * -1) calc( var(--background-y) * -1);
-  background-size: var(--imgsize) 100%, 200% 400%, 195% 100%;
+  background-position:
+    center,
+    0% var(--background-y),
+    calc(var(--background-x) * -1) calc(var(--background-y) * -1);
+  background-size:
+    var(--imgsize) 100%,
+    200% 400%,
+    195% 100%;
 
   filter: brightness(1) contrast(2.5) saturate(1.75);
   mix-blend-mode: soft-light;
-
 }
 
 /*
@@ -75,39 +83,57 @@
 
 /* Petites cartes (mobile) */
 @media (max-width: 768px) {
-  .card[data-rarity="rare holo vstar"] .card__shine {
+  .card[data-rarity='rare holo vstar'] .card__shine {
     --space: 3%; /* Espacement plus petit pour les petites cartes */
-    background-size: var(--imgsize) 100%, 150% 500%, 200% 100%;
+    background-size:
+      var(--imgsize) 100%,
+      150% 500%,
+      200% 100%;
   }
-  
-  .card[data-rarity="rare holo vstar"] .card__shine:after {
-    background-size: var(--imgsize) 100%, 150% 300%, 150% 100%;
+
+  .card[data-rarity='rare holo vstar'] .card__shine:after {
+    background-size:
+      var(--imgsize) 100%,
+      150% 300%,
+      150% 100%;
   }
 }
 
 /* Très petites cartes (miniatures) */
 @media (max-width: 480px) {
-  .card[data-rarity="rare holo vstar"] .card__shine {
+  .card[data-rarity='rare holo vstar'] .card__shine {
     --space: 2%; /* Espacement encore plus petit */
-    background-size: var(--imgsize) 100%, 120% 400%, 150% 100%;
+    background-size:
+      var(--imgsize) 100%,
+      120% 400%,
+      150% 100%;
   }
-  
-  .card[data-rarity="rare holo vstar"] .card__shine:after {
-    background-size: var(--imgsize) 100%, 120% 250%, 120% 100%;
+
+  .card[data-rarity='rare holo vstar'] .card__shine:after {
+    background-size:
+      var(--imgsize) 100%,
+      120% 250%,
+      120% 100%;
   }
 }
 
 /* Adaptation pour les cartes en mode portrait */
 @media (orientation: portrait) {
-  .card[data-rarity="rare holo vstar"] .card__shine {
-    background-size: var(--imgsize) 100%, 180% 600%, 250% 100%;
+  .card[data-rarity='rare holo vstar'] .card__shine {
+    background-size:
+      var(--imgsize) 100%,
+      180% 600%,
+      250% 100%;
   }
 }
 
 /* Adaptation pour les cartes en mode paysage */
 @media (orientation: landscape) {
-  .card[data-rarity="rare holo vstar"] .card__shine {
-    background-size: var(--imgsize) 100%, 220% 800%, 350% 100%;
+  .card[data-rarity='rare holo vstar'] .card__shine {
+    background-size:
+      var(--imgsize) 100%,
+      220% 800%,
+      350% 100%;
   }
 }
 
@@ -117,13 +143,11 @@
 
 */
 
-.card[data-rarity="rare holo vstar"] .card__glare {
-
+.card[data-rarity='rare holo vstar'] .card__glare {
   mix-blend-mode: hard-light;
   filter: brightness(0.5) contrast(0.5);
 
   /* Lumière de souris supprimée pour le test */
-
 }
 
 /*
@@ -132,10 +156,8 @@
 
 */
 
-.card:not(.masked)[data-rarity="rare holo vstar"] .card__shine {
-
+.card:not(.masked)[data-rarity='rare holo vstar'] .card__shine {
   /* Foil VSTAR modérément visible - juste milieu */
-  filter: brightness(.6) contrast(2.2) saturate(1.1);
+  filter: brightness(0.6) contrast(2.2) saturate(1.1);
   opacity: 0.8;
-
 }

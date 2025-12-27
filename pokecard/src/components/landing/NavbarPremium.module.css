@@ -49,19 +49,19 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-semibold, 600);
   border-radius: var(--radius-sm, 2px);
 }
 
 .logoText {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   letter-spacing: var(--tracking-wide, 0.02em);
 }
 
@@ -86,10 +86,10 @@
   background: none;
   border: none;
   padding: var(--space-2, 0.5rem) 0;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   letter-spacing: var(--tracking-wide, 0.02em);
   cursor: pointer;
   transition: color var(--duration-fast, 150ms) var(--ease-out);
@@ -97,7 +97,7 @@
 
 .navLink:hover,
 .navLink.active {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .linkUnderline {
@@ -106,7 +106,7 @@
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--color-accent-primary, #E8E4DD);
+  background: var(--color-accent-primary, #e8e4dd);
   transition: width var(--duration-base, 250ms) var(--ease-out);
 }
 
@@ -135,14 +135,14 @@
   background: transparent;
   border: none;
   border-radius: var(--radius-md, 4px);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .iconButton:hover {
-  color: var(--color-text-primary, #F5F5F3);
-  background: var(--color-bg-hover, #1F1F23);
+  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-bg-hover, #1f1f23);
 }
 
 .cartBadge {
@@ -155,8 +155,8 @@
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   font-weight: var(--font-semibold, 600);
@@ -184,8 +184,8 @@
   background: var(--color-bg-elevated, #141416);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
-  color: var(--color-text-primary, #F5F5F3);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-primary, #f5f5f3);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
@@ -193,7 +193,7 @@
 
 .userButton:hover {
   border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
-  background: var(--color-bg-hover, #1F1F23);
+  background: var(--color-bg-hover, #1f1f23);
 }
 
 .userName {
@@ -210,8 +210,8 @@
   background: transparent;
   border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-sm, 2px);
-  color: var(--color-text-primary, #F5F5F3);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-primary, #f5f5f3);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wide, 0.02em);
@@ -226,9 +226,9 @@
 }
 
 .loginButton:hover {
-  background: var(--color-accent-primary, #E8E4DD);
-  border-color: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-accent-primary, #e8e4dd);
+  border-color: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
 }
 
 /* Menu Button — Mobile */
@@ -240,7 +240,7 @@
   height: 44px;
   background: transparent;
   border: none;
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   cursor: pointer;
 }
 
@@ -258,7 +258,7 @@
   position: fixed;
   inset: 0;
   z-index: calc(var(--z-sticky, 200) - 1);
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   opacity: 0;
   visibility: hidden;
   transition: all var(--duration-slow, 400ms) var(--ease-out);
@@ -312,20 +312,20 @@
 .mobileNavNumber {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .mobileNavLabel {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-4xl, 2.5rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   transition: color var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .mobileNavLink:hover .mobileNavLabel,
 .mobileNavLink.active .mobileNavLabel {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 /* Mobile Menu Footer */
@@ -347,8 +347,8 @@
   gap: var(--space-3, 0.75rem);
   background: none;
   border: none;
-  color: var(--color-text-primary, #F5F5F3);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-primary, #f5f5f3);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   cursor: pointer;
 }
@@ -356,25 +356,25 @@
 .mobileLogout {
   background: none;
   border: none;
-  color: var(--color-text-muted, #6B6B6F);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-muted, #6b6b6f);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   cursor: pointer;
   transition: color var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .mobileLogout:hover {
-  color: var(--color-error, #F87171);
+  color: var(--color-error, #f87171);
 }
 
 .mobileLoginButton {
   width: 100%;
   padding: var(--space-4, 1rem);
-  background: var(--color-accent-primary, #E8E4DD);
+  background: var(--color-accent-primary, #e8e4dd);
   border: none;
   border-radius: var(--radius-sm, 2px);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
@@ -382,5 +382,5 @@
 }
 
 .mobileLoginButton:hover {
-  background: var(--color-accent-hover, #F5F2ED);
+  background: var(--color-accent-hover, #f5f2ed);
 }

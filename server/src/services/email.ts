@@ -1,40 +1,44 @@
-import nodemailer from 'nodemailer'
-import type { Transporter } from 'nodemailer'
+import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 
-let transporter: Transporter | null = null
+let transporter: Transporter | null = null;
 
-const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
-const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value)
+const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
+const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value);
 
 function getTransporter(): Transporter {
   if (!transporter) {
     if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
-      console.log('Email: mode développement (streamTransport)')
+      console.log('Email: mode développement (streamTransport)');
       transporter = nodemailer.createTransport({
         streamTransport: true,
-        newline: 'unix'
-      })
+        newline: 'unix',
+      });
     } else {
-      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com'
-      const smtpPort = parseInt(process.env.SMTP_PORT || '587')
-      const smtpUser = process.env.SMTP_USER
-      const smtpPass = process.env.SMTP_PASS
+      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+      const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+      const smtpUser = process.env.SMTP_USER;
+      const smtpPass = process.env.SMTP_PASS;
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('Email: Configuration SMTP')
-        console.log(`  Host: ${smtpHost}`)
-        console.log(`  Port: ${smtpPort}`)
-        console.log(`  User: ${smtpUser ? smtpUser.substring(0, 3) + '***' : 'NON DÉFINI'}`)
-        console.log(`  Pass: ${smtpPass ? (smtpPass.length > 0 ? '***' + smtpPass.substring(smtpPass.length - 2) : 'VIDE') : 'NON DÉFINI'}`)
+        console.log('Email: Configuration SMTP');
+        console.log(`  Host: ${smtpHost}`);
+        console.log(`  Port: ${smtpPort}`);
+        console.log(`  User: ${smtpUser ? smtpUser.substring(0, 3) + '***' : 'NON DÉFINI'}`);
+        console.log(
+          `  Pass: ${smtpPass ? (smtpPass.length > 0 ? '***' + smtpPass.substring(smtpPass.length - 2) : 'VIDE') : 'NON DÉFINI'}`
+        );
       }
 
       if (!smtpUser || !smtpPass) {
-        console.warn('⚠️ SMTP_USER ou SMTP_PASS non défini. Les emails seront simulés (pas envoyés réellement).')
-        console.warn('   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env')
+        console.warn(
+          '⚠️ SMTP_USER ou SMTP_PASS non défini. Les emails seront simulés (pas envoyés réellement).'
+        );
+        console.warn('   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env');
         transporter = nodemailer.createTransport({
           streamTransport: true,
-          newline: 'unix'
-        })
+          newline: 'unix',
+        });
       } else {
         transporter = nodemailer.createTransport({
           host: smtpHost,
@@ -42,22 +46,22 @@ function getTransporter(): Transporter {
           secure: process.env.SMTP_SECURE === 'true',
           auth: {
             user: smtpUser,
-            pass: smtpPass
-          }
-        })
+            pass: smtpPass,
+          },
+        });
       }
     }
   }
-  return transporter
+  return transporter;
 }
 
-const SHOP_NAME = process.env.SHOP_NAME || 'Boulevard TCG'
-const SHOP_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const SHOP_EMAIL = process.env.SHOP_EMAIL || 'contact@boulevardtcg.com'
-const SHOP_LOGO = `${SHOP_URL}/logo.png`
+const SHOP_NAME = process.env.SHOP_NAME || 'Boulevard TCG';
+const SHOP_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const SHOP_EMAIL = process.env.SHOP_EMAIL || 'contact@boulevardtcg.com';
+const SHOP_LOGO = `${SHOP_URL}/logo.png`;
 
-const EMAIL_FROM = process.env.EMAIL_FROM || SHOP_EMAIL
-const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || 'contact@boulevardtcg.com'
+const EMAIL_FROM = process.env.EMAIL_FROM || SHOP_EMAIL;
+const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || 'contact@boulevardtcg.com';
 
 const emailStyles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5; }
@@ -83,50 +87,52 @@ const emailStyles = `
   .footer a { color: #60a5fa; text-decoration: none; }
   .address-box { background-color: #f9fafb; border-radius: 8px; padding: 15px; margin: 10px 0; }
   .tracking-box { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
-`
+`;
 
 interface OrderItemForEmail {
-  productName: string
-  variantName?: string | null
-  imageUrl?: string | null
-  quantity: number
-  unitPriceCents: number
-  totalPriceCents: number
+  productName: string;
+  variantName?: string | null;
+  imageUrl?: string | null;
+  quantity: number;
+  unitPriceCents: number;
+  totalPriceCents: number;
 }
 
 interface OrderDataForEmail {
-  orderNumber: string
-  totalCents: number
-  currency?: string
-  items: OrderItemForEmail[]
+  orderNumber: string;
+  totalCents: number;
+  currency?: string;
+  items: OrderItemForEmail[];
   shippingAddress?: {
-    name?: string
+    name?: string;
     address?: {
-      line1?: string
-      line2?: string
-      city?: string
-      postal_code?: string
-      country?: string
-    }
-  } | null
+      line1?: string;
+      line2?: string;
+      city?: string;
+      postal_code?: string;
+      country?: string;
+    };
+  } | null;
   billingAddress?: {
-    name?: string
-    email?: string
-  } | null
-  promoCode?: string
-  promoDiscount?: number
-  trackingNumber?: string
-  trackingUrl?: string
-  orderTrackingUrl?: string
-  carrier?: string
+    name?: string;
+    email?: string;
+  } | null;
+  promoCode?: string;
+  promoDiscount?: number;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  orderTrackingUrl?: string;
+  carrier?: string;
 }
 
 function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2).replace('.', ',') + ' €'
+  return (cents / 100).toFixed(2).replace('.', ',') + ' €';
 }
 
 function generateItemsTable(items: OrderItemForEmail[]): string {
-  const rows = items.map(item => `
+  const rows = items
+    .map(
+      (item) => `
     <tr>
       <td>
         ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.productName}">` : ''}
@@ -139,7 +145,9 @@ function generateItemsTable(items: OrderItemForEmail[]): string {
       <td style="text-align: right;">${formatPrice(item.unitPriceCents)}</td>
       <td style="text-align: right;">${formatPrice(item.totalPriceCents)}</td>
     </tr>
-  `).join('')
+  `
+    )
+    .join('');
 
   return `
     <table class="items-table">
@@ -156,12 +164,12 @@ function generateItemsTable(items: OrderItemForEmail[]): string {
         ${rows}
       </tbody>
     </table>
-  `
+  `;
 }
 
 function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
-  const subtotal = order.items.reduce((sum, item) => sum + item.totalPriceCents, 0)
-  const discount = order.promoDiscount || 0
+  const subtotal = order.items.reduce((sum, item) => sum + item.totalPriceCents, 0);
+  const discount = order.promoDiscount || 0;
 
   return `
 <!DOCTYPE html>
@@ -197,12 +205,16 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
           <td style="text-align: right; padding: 8px;"><strong>Sous-total:</strong></td>
           <td style="text-align: right; padding: 8px; width: 100px;">${formatPrice(subtotal)}</td>
         </tr>
-        ${discount > 0 ? `
+        ${
+          discount > 0
+            ? `
         <tr>
           <td style="text-align: right; padding: 8px; color: #10b981;"><strong>Reduction${order.promoCode ? ` (${order.promoCode})` : ''}:</strong></td>
           <td style="text-align: right; padding: 8px; color: #10b981; width: 100px;">-${formatPrice(discount)}</td>
         </tr>
-        ` : ''}
+        `
+            : ''
+        }
         <tr>
           <td style="text-align: right; padding: 8px;"><strong>Livraison:</strong></td>
           <td style="text-align: right; padding: 8px; width: 100px;">${subtotal >= 5000 ? 'Gratuite' : 'A calculer'}</td>
@@ -213,7 +225,9 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
         </tr>
       </table>
       
-      ${order.shippingAddress ? `
+      ${
+        order.shippingAddress
+          ? `
       <h3 style="color: #1f2937; margin-top: 30px;">Adresse de livraison</h3>
       <div class="address-box">
         ${order.shippingAddress.name ? `<strong>${order.shippingAddress.name}</strong><br>` : ''}
@@ -222,7 +236,9 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
         ${order.shippingAddress.address?.postal_code || ''} ${order.shippingAddress.address?.city || ''}<br>
         ${order.shippingAddress.address?.country || ''}
       </div>
-      ` : ''}
+      `
+          : ''
+      }
       
       <div style="text-align: center; margin: 30px 0;">
         <a href="${SHOP_URL}/commandes" class="btn">Voir ma commande</a>
@@ -244,27 +260,27 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
   </div>
 </body>
 </html>
-`
+`;
 }
 
 // Fonction pour obtenir le nom lisible du transporteur
 function getCarrierDisplayName(carrier?: string | null): string {
-  if (!carrier) return 'Transporteur'
+  if (!carrier) return 'Transporteur';
   const carrierMap: Record<string, string> = {
-    'COLISSIMO': 'Colissimo (La Poste)',
-    'CHRONOPOST': 'Chronopost',
-    'MONDIAL_RELAY': 'Mondial Relay',
-    'UPS': 'UPS',
-    'DHL': 'DHL',
-    'FEDEX': 'FedEx',
-    'OTHER': 'Transporteur'
-  }
-  return carrierMap[carrier] || carrier
+    COLISSIMO: 'Colissimo (La Poste)',
+    CHRONOPOST: 'Chronopost',
+    MONDIAL_RELAY: 'Mondial Relay',
+    UPS: 'UPS',
+    DHL: 'DHL',
+    FEDEX: 'FedEx',
+    OTHER: 'Transporteur',
+  };
+  return carrierMap[carrier] || carrier;
 }
 
 function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: string): string {
-  const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`
-  const carrierName = getCarrierDisplayName(order.carrier)
+  const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`;
+  const carrierName = getCarrierDisplayName(order.carrier);
 
   return `
 <!DOCTYPE html>
@@ -286,7 +302,9 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
       
       <p style="font-size: 16px; line-height: 1.6;">Nous avons le plaisir de vous informer que votre commande <strong style="color: #1f2937;">${order.orderNumber}</strong> a été expédiée et est en route vers vous.</p>
       
-      ${order.trackingNumber ? `
+      ${
+        order.trackingNumber
+          ? `
       <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
         <h2 style="margin: 0 0 15px 0; color: #92400e; font-size: 20px;">📍 Informations de suivi</h2>
         <div style="background: white; border-radius: 8px; padding: 20px; margin: 15px 0;">
@@ -295,29 +313,41 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
           <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">Numéro de suivi</p>
           <p style="margin: 0; font-size: 24px; font-weight: bold; color: #f59e0b; letter-spacing: 1px; font-family: 'Courier New', monospace;">${order.trackingNumber}</p>
         </div>
-        ${order.trackingUrl ? `
+        ${
+          order.trackingUrl
+            ? `
         <a href="${order.trackingUrl}" class="btn" style="background: #f59e0b; color: white; padding: 14px 28px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block; margin-top: 15px;">
           🔍 Suivre mon colis en temps réel
         </a>
-        ` : ''}
-        ${order.orderTrackingUrl ? `
+        `
+            : ''
+        }
+        ${
+          order.orderTrackingUrl
+            ? `
         <p style="margin: 15px 0 0 0;">
           <a href="${order.orderTrackingUrl}" style="color: #92400e; text-decoration: underline;">Ou suivre depuis votre espace client</a>
         </p>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-      ` : `
+      `
+          : `
       <div class="tracking-box" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center;">
         <p style="margin: 0; color: #92400e; font-size: 16px;">Le numéro de suivi sera disponible sous peu. Vous recevrez un email dès qu'il sera prêt.</p>
       </div>
-      `}
+      `
+      }
       
       <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
         <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 18px;">📋 Contenu de votre colis</h3>
         ${generateItemsTable(order.items)}
       </div>
       
-      ${order.shippingAddress ? `
+      ${
+        order.shippingAddress
+          ? `
       <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
         <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">📍 Adresse de livraison</h3>
         <div class="address-box" style="background: #f9fafb; padding: 15px; border-radius: 8px;">
@@ -328,7 +358,9 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
           ${order.shippingAddress.address?.country || ''}
         </div>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
       
       <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 8px;">
         <p style="margin: 0; color: #1e40af; font-size: 15px; line-height: 1.6;">
@@ -337,13 +369,17 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
         </p>
       </div>
       
-      ${order.trackingNumber && order.trackingUrl ? `
+      ${
+        order.trackingNumber && order.trackingUrl
+          ? `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${order.trackingUrl}" class="btn" style="background: #f59e0b; color: white; padding: 14px 28px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block;">
           🔍 Suivre mon colis
         </a>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
     
     <div class="footer">
@@ -357,11 +393,11 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
   </div>
 </body>
 </html>
-`
+`;
 }
 
 function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
-  const trackingCtaUrl = order.orderTrackingUrl || `${SHOP_URL}/commandes`
+  const trackingCtaUrl = order.orderTrackingUrl || `${SHOP_URL}/commandes`;
   return `
 <!DOCTYPE html>
 <html>
@@ -408,117 +444,132 @@ function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: s
   </div>
 </body>
 </html>
-`
+`;
 }
 
-export async function sendOrderConfirmationEmail(order: OrderDataForEmail, customerEmail: string): Promise<boolean> {
+export async function sendOrderConfirmationEmail(
+  order: OrderDataForEmail,
+  customerEmail: string
+): Promise<boolean> {
   try {
-    const transport = getTransporter()
-    const html = orderConfirmationTemplate(order, customerEmail)
+    const transport = getTransporter();
+    const html = orderConfirmationTemplate(order, customerEmail);
 
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `✅ Confirmation de commande ${order.orderNumber} - ${SHOP_NAME}`,
-      html
-    })
+      html,
+    });
 
     // Vérifier si l'email a vraiment été envoyé ou juste simulé
-    const isStreamTransport = !info.messageId && !info.response
+    const isStreamTransport = !info.messageId && !info.response;
     if (isStreamTransport) {
-      console.log(`⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`)
-      console.log(`   Destinataire: ${customerEmail}`)
-      console.log(`   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env`)
+      console.log(
+        `⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`
+      );
+      console.log(`   Destinataire: ${customerEmail}`);
+      console.log(`   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env`);
     } else {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ Email: confirmation envoyée (${order.orderNumber})`)
-        console.log(`   MessageId: ${info.messageId || 'N/A'}`)
-        console.log(`   Destinataire: ${customerEmail}`)
+        console.log(`✅ Email: confirmation envoyée (${order.orderNumber})`);
+        console.log(`   MessageId: ${info.messageId || 'N/A'}`);
+        console.log(`   Destinataire: ${customerEmail}`);
       } else {
-        console.log('Email: confirmation envoyée', { messageId: info.messageId })
+        console.log('Email: confirmation envoyée', { messageId: info.messageId });
       }
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Email: erreur envoi confirmation', error)
-    return false
+    console.error('Email: erreur envoi confirmation', error);
+    return false;
   }
 }
 
-export async function sendShippingNotificationEmail(order: OrderDataForEmail, customerEmail: string): Promise<boolean> {
+export async function sendShippingNotificationEmail(
+  order: OrderDataForEmail,
+  customerEmail: string
+): Promise<boolean> {
   try {
-    const transport = getTransporter()
-    const html = shippingNotificationTemplate(order, customerEmail)
+    const transport = getTransporter();
+    const html = shippingNotificationTemplate(order, customerEmail);
 
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `📦 Votre commande ${order.orderNumber} a ete expediee ! - ${SHOP_NAME}`,
-      html
-    })
+      html,
+    });
 
     // Vérifier si l'email a vraiment été envoyé ou juste simulé
-    const isStreamTransport = !info.messageId && !info.response
+    const isStreamTransport = !info.messageId && !info.response;
     if (isStreamTransport) {
-      console.log(`⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`)
-      console.log(`   Destinataire: ${customerEmail}`)
+      console.log(
+        `⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`
+      );
+      console.log(`   Destinataire: ${customerEmail}`);
     } else {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ Email: notification expédition envoyée (${order.orderNumber})`)
-        console.log(`   MessageId: ${info.messageId || 'N/A'}`)
-        console.log(`   Destinataire: ${customerEmail}`)
+        console.log(`✅ Email: notification expédition envoyée (${order.orderNumber})`);
+        console.log(`   MessageId: ${info.messageId || 'N/A'}`);
+        console.log(`   Destinataire: ${customerEmail}`);
       } else {
-        console.log('Email: notification expédition envoyée', { messageId: info.messageId })
+        console.log('Email: notification expédition envoyée', { messageId: info.messageId });
       }
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Email: erreur envoi expédition', error)
-    return false
+    console.error('Email: erreur envoi expédition', error);
+    return false;
   }
 }
 
-export async function sendDeliveryConfirmationEmail(order: OrderDataForEmail, customerEmail: string): Promise<boolean> {
+export async function sendDeliveryConfirmationEmail(
+  order: OrderDataForEmail,
+  customerEmail: string
+): Promise<boolean> {
   try {
-    const transport = getTransporter()
-    const html = deliveryConfirmationTemplate(order, customerEmail)
+    const transport = getTransporter();
+    const html = deliveryConfirmationTemplate(order, customerEmail);
 
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `✅ Votre commande ${order.orderNumber} a ete livree ! - ${SHOP_NAME}`,
-      html
-    })
+      html,
+    });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Email: livraison envoyée (${order.orderNumber})`)
+      console.log(`Email: livraison envoyée (${order.orderNumber})`);
     } else {
-      console.log('Email: livraison envoyée', { messageId: info.messageId })
+      console.log('Email: livraison envoyée', { messageId: info.messageId });
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Email: erreur envoi livraison', error)
-    return false
+    console.error('Email: erreur envoi livraison', error);
+    return false;
   }
 }
 
 type ContactPayload = {
-  name: string
-  email: string
-  subject: string
-  message: string
-  ip?: string
-  userAgent?: string
-  createdAt?: Date
-}
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  ip?: string;
+  userAgent?: string;
+  createdAt?: Date;
+};
 
 function contactEmailTemplate(payload: ContactPayload): string {
-  const createdAt = payload.createdAt ? payload.createdAt.toLocaleString('fr-FR') : new Date().toLocaleString('fr-FR')
-  const ip = payload.ip || '—'
-  const ua = payload.userAgent || '—'
+  const createdAt = payload.createdAt
+    ? payload.createdAt.toLocaleString('fr-FR')
+    : new Date().toLocaleString('fr-FR');
+  const ip = payload.ip || '—';
+  const ua = payload.userAgent || '—';
 
   return `
 <!DOCTYPE html>
@@ -558,7 +609,7 @@ function contactEmailTemplate(payload: ContactPayload): string {
   </div>
 </body>
 </html>
-`
+`;
 }
 
 function contactAutoReplyTemplate(payload: { name: string; subject: string }): string {
@@ -598,58 +649,61 @@ function contactAutoReplyTemplate(payload: { name: string; subject: string }): s
   </div>
 </body>
 </html>
-`
+`;
 }
 
 export async function sendContactEmail(payload: ContactPayload): Promise<boolean> {
   try {
-    const transport = getTransporter()
-    const html = contactEmailTemplate(payload)
+    const transport = getTransporter();
+    const html = contactEmailTemplate(payload);
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
       to: CONTACT_TO_EMAIL,
       replyTo: sanitizeEmailAddress(payload.email),
       subject: sanitizeHeaderValue(`[Contact – Boulevard] ${payload.subject}`),
       html,
-    })
+    });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Email: contact envoyé')
+      console.log('Email: contact envoyé');
     } else {
-      console.log('Email: contact envoyé', { messageId: info.messageId })
+      console.log('Email: contact envoyé', { messageId: info.messageId });
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Email: erreur envoi contact', error)
-    return false
+    console.error('Email: erreur envoi contact', error);
+    return false;
   }
 }
 
-export async function sendContactAutoReply(payload: { name: string; email: string; subject: string }): Promise<boolean> {
+export async function sendContactAutoReply(payload: {
+  name: string;
+  email: string;
+  subject: string;
+}): Promise<boolean> {
   try {
-    const transport = getTransporter()
-    const html = contactAutoReplyTemplate({ name: payload.name, subject: payload.subject })
+    const transport = getTransporter();
+    const html = contactAutoReplyTemplate({ name: payload.name, subject: payload.subject });
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
       to: sanitizeEmailAddress(payload.email),
       replyTo: CONTACT_TO_EMAIL,
       subject: sanitizeHeaderValue(`✅ Nous avons bien reçu votre message - ${SHOP_NAME}`),
       html,
-    })
+    });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Email: accusé réception contact envoyé')
+      console.log('Email: accusé réception contact envoyé');
     } else {
-      console.log('Email: accusé réception contact envoyé', { messageId: info.messageId })
+      console.log('Email: accusé réception contact envoyé', { messageId: info.messageId });
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Email: erreur envoi accusé réception contact', error)
-    return false
+    console.error('Email: erreur envoi accusé réception contact', error);
+    return false;
   }
 }
 
-export type { OrderDataForEmail, OrderItemForEmail }
-
+export type { OrderDataForEmail, OrderItemForEmail };

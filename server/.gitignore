@@ -2,6 +2,8 @@ node_modules
 # Keep environment variables out of version control
 .env
 
+logs
+
 /src/generated/prisma
 
 # SQLite (ancien système - à supprimer après migration)
@@ -17,3 +19,5 @@ prisma/dev.db*
 
 # But keep Prisma migration SQL files under version control
 !prisma/migrations/**/migration.sql
+
+*.iml

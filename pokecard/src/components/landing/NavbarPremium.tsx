@@ -39,7 +39,7 @@ export default function NavbarPremium() {
     <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
       <div className={styles.container}>
         {/* Logo */}
-        <button 
+        <button
           className={styles.logo}
           onClick={() => navigate('/')}
           aria-label="Retour à l'accueil"
@@ -72,9 +72,7 @@ export default function NavbarPremium() {
           >
             <CartIcon size={20} />
             {cartCount > 0 && (
-              <span className={styles.cartBadge}>
-                {cartCount > 9 ? '9+' : cartCount}
-              </span>
+              <span className={styles.cartBadge}>{cartCount > 9 ? '9+' : cartCount}</span>
             )}
           </button>
 
@@ -89,19 +87,12 @@ export default function NavbarPremium() {
                 <UserIcon size={20} />
                 <span className={styles.userName}>{user.firstName || user.username}</span>
               </button>
-              <button
-                onClick={logout}
-                className={styles.iconButton}
-                aria-label="Se déconnecter"
-              >
+              <button onClick={logout} className={styles.iconButton} aria-label="Se déconnecter">
                 <LogOutIcon size={18} />
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => navigate('/login')}
-              className={styles.loginButton}
-            >
+            <button onClick={() => navigate('/login')} className={styles.loginButton}>
               Connexion
             </button>
           )}
@@ -138,10 +129,7 @@ export default function NavbarPremium() {
           <div className={styles.mobileMenuFooter}>
             {isAuthenticated && user ? (
               <div className={styles.mobileUserInfo}>
-                <button
-                  onClick={() => navigate('/profile')}
-                  className={styles.mobileUserButton}
-                >
+                <button onClick={() => navigate('/profile')} className={styles.mobileUserButton}>
                   <UserIcon size={18} />
                   <span>Mon compte</span>
                 </button>
@@ -150,10 +138,7 @@ export default function NavbarPremium() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className={styles.mobileLoginButton}
-              >
+              <button onClick={() => navigate('/login')} className={styles.mobileLoginButton}>
                 Connexion
               </button>
             )}

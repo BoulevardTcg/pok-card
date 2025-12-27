@@ -5,7 +5,7 @@
 }
 
 :global(.dark) .section {
-  background: #0C1321;
+  background: #0c1321;
 }
 
 .container {
@@ -23,7 +23,7 @@
   font-size: clamp(1.875rem, 4vw, 3rem);
   font-family: var(--font-serif);
   font-weight: 700;
-  color: #0C1321;
+  color: #0c1321;
   margin-bottom: 1rem;
   transition: color 0.3s ease;
 }
@@ -48,7 +48,7 @@
 .divider {
   width: 96px;
   height: 2px;
-  background: #D7B56D;
+  background: #d7b56d;
   margin: 0 auto;
 }
 
@@ -66,7 +66,7 @@
 }
 
 :global(.dark) .faqItem {
-  border-color: #2E3542;
+  border-color: #2e3542;
 }
 
 .faqItem:hover {
@@ -76,7 +76,7 @@
 .faqButton {
   width: 100%;
   padding: 1.25rem 1.5rem;
-  background: #0C1321;
+  background: #0c1321;
   color: white;
   display: flex;
   align-items: center;
@@ -101,7 +101,7 @@
 
 .faqIcon {
   font-size: 0.75rem;
-  color: #D7B56D;
+  color: #d7b56d;
   transition: transform 0.3s ease;
   flex-shrink: 0;
 }
@@ -132,7 +132,6 @@
 }
 
 :global(.dark) .faqAnswerContent {
-  background: #0C1321;
+  background: #0c1321;
   color: #d1d5db;
 }
-

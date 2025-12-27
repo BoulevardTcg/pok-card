@@ -42,7 +42,8 @@
 }
 
 @keyframes constructionPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -63,7 +64,7 @@
   font-family: var(--font-body);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-warning, #FBBF24);
+  color: var(--color-warning, #fbbf24);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide, 0.02em);
 }
@@ -72,7 +73,7 @@
   font-family: var(--font-body);
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   margin: 0;
   text-align: justify;
 }
@@ -83,7 +84,7 @@
     text-align: center;
     align-items: center;
   }
-  
+
   .constructionText {
     text-align: center;
   }
@@ -131,7 +132,9 @@
 }
 
 @keyframes loadingDot {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     opacity: 0.3;
     transform: scale(0.8);
   }

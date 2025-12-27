@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      front: ${{ steps.filter.outputs.front }}
+      back: ${{ steps.filter.outputs.back }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            front:
+              - 'pokecard/**'
+            back:
+              - 'server/**'
+            workflow:
+              - '.github/workflows/**'
+
+  front:
+    name: Front (lint/build/test)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.front == 'true' || needs.changes.outputs.workflow == 'true' }}
+    defaults:
+      run:
+        working-directory: pokecard
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: pokecard/package-lock.json
+
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Test
+        run: npm test --if-present
+
+      - name: Build
+        run: npm run build
+
+  back:
+    name: Back (lint/build/test)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.back == 'true' || needs.changes.outputs.workflow == 'true' }}
+    defaults:
+      run:
+        working-directory: server
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Prisma migrate (test DB)
+        run: npx prisma migrate deploy
+
+      - name: Seed test DB
+        run: npx prisma db seed
+        env:
+          JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+          JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Test
+        run: npm test --if-present
+        env:
+          JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+          JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+          ORDER_TRACKING_SECRET: test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
+          STRIPE_SECRET_KEY: sk_test_mock_key
+          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+          ALLOWED_REDIRECT_DOMAINS: http://localhost:5173
+          FRONTEND_URL: http://localhost:5173
+
+      - name: Build
+        run: npm run build --if-present
+        env:
+          JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+          JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+

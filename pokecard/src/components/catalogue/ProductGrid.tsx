@@ -10,7 +10,12 @@ interface ProductGridProps {
   totalPages: number;
 }
 
-export default function ProductGrid({ products, onPageChange, currentPage, totalPages }: ProductGridProps) {
+export default function ProductGrid({
+  products,
+  onPageChange,
+  currentPage,
+  totalPages,
+}: ProductGridProps) {
   const [sortBy, setSortBy] = useState('featured');
 
   const sortedProducts = useMemo(() => {
@@ -21,7 +26,9 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
       case 'price-desc':
         return sorted.sort((a, b) => (b.minPriceCents || 0) - (a.minPriceCents || 0));
       case 'newest':
-        return sorted.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+        return sorted.sort(
+          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        );
       case 'rating':
         // Placeholder - pas de rating pour l'instant
         return sorted;
@@ -35,7 +42,8 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
       {/* Barre de tri */}
       <div className={styles.toolbar}>
         <p className={styles.count}>
-          {products.length} produit{products.length > 1 ? 's' : ''} trouvé{products.length > 1 ? 's' : ''}
+          {products.length} produit{products.length > 1 ? 's' : ''} trouvé
+          {products.length > 1 ? 's' : ''}
         </p>
         <div className={styles.sortContainer}>
           <label className={styles.sortLabel}>Trier par :</label>
@@ -78,7 +86,11 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
           </button>
           {[...Array(totalPages)].map((_, i) => {
             const page = i + 1;
-            if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
+            if (
+              page === 1 ||
+              page === totalPages ||
+              (page >= currentPage - 1 && page <= currentPage + 1)
+            ) {
               return (
                 <button
                   key={page}
@@ -89,7 +101,11 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
                 </button>
               );
             } else if (page === currentPage - 2 || page === currentPage + 2) {
-              return <span key={page} className={styles.ellipsis}>...</span>;
+              return (
+                <span key={page} className={styles.ellipsis}>
+                  ...
+                </span>
+              );
             }
             return null;
           })}
@@ -105,4 +121,3 @@ export default function ProductGrid({ products, onPageChange, currentPage, total
     </div>
   );
 }
-

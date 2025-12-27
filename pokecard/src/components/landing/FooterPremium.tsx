@@ -32,7 +32,7 @@ export default function FooterPremium() {
         <div className={styles.mainContent}>
           {/* Brand Section */}
           <div className={styles.brand}>
-            <button 
+            <button
               className={styles.logo}
               onClick={() => navigate('/')}
               aria-label="Retour à l'accueil"
@@ -40,9 +40,7 @@ export default function FooterPremium() {
               <span className={styles.logoMark}>B</span>
               <span className={styles.logoText}>Boulevard</span>
             </button>
-            <p className={styles.tagline}>
-              La maison de vente pour collectionneurs exigeants.
-            </p>
+            <p className={styles.tagline}>La maison de vente pour collectionneurs exigeants.</p>
             <div className={styles.socialSection}>
               <span className={styles.socialLabel}>Suivez-nous</span>
               <div className={styles.socialLinks}>
@@ -71,10 +69,7 @@ export default function FooterPremium() {
             <ul className={styles.navLinks}>
               {NAV_LINKS.map((link) => (
                 <li key={link.path}>
-                  <button
-                    onClick={() => navigate(link.path)}
-                    className={styles.navLink}
-                  >
+                  <button onClick={() => navigate(link.path)} className={styles.navLink}>
                     {link.label}
                   </button>
                 </li>
@@ -88,10 +83,7 @@ export default function FooterPremium() {
             <ul className={styles.navLinks}>
               {LEGAL_LINKS.map((link) => (
                 <li key={link.path}>
-                  <button
-                    onClick={() => navigate(link.path)}
-                    className={styles.navLink}
-                  >
+                  <button onClick={() => navigate(link.path)} className={styles.navLink}>
                     {link.label}
                   </button>
                 </li>
@@ -105,19 +97,14 @@ export default function FooterPremium() {
           <span className={styles.copyright}>
             © {currentYear} BoulevardTCG. Tous droits réservés.
           </span>
-          
+
           <div className={styles.legalLinks}>
             {LEGAL_LINKS.map((link, index) => (
               <span key={link.path}>
-                <button
-                  onClick={() => navigate(link.path)}
-                  className={styles.legalLink}
-                >
+                <button onClick={() => navigate(link.path)} className={styles.legalLink}>
                   {link.label}
                 </button>
-                {index < LEGAL_LINKS.length - 1 && (
-                  <span className={styles.legalSeparator}>·</span>
-                )}
+                {index < LEGAL_LINKS.length - 1 && <span className={styles.legalSeparator}>·</span>}
               </span>
             ))}
           </div>

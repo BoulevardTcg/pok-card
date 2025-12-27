@@ -19,13 +19,16 @@ export function ProtectionsPage() {
   async function loadProducts() {
     setLoading(true);
     try {
-      const response = await listProducts({
+      const response = (await listProducts({
         page,
         limit: 12,
         category: 'Accessoires', // Filtrer uniquement les accessoires/protections
-        search: search || undefined
-      }) as { products: ProductType[]; pagination: { page: number; total: number; pages: number } };
-      
+        search: search || undefined,
+      })) as {
+        products: ProductType[];
+        pagination: { page: number; total: number; pages: number };
+      };
+
       setProducts(response.products);
       setTotalPages(response.pagination.pages);
     } catch (error) {
@@ -46,11 +49,13 @@ export function ProtectionsPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>Protections</h1>
         <p className={styles.subtitle}>
-          Protégez vos cartes et items avec notre sélection de protections premium : sleeves, étuis, binders et plus encore
+          Protégez vos cartes et items avec notre sélection de protections premium : sleeves, étuis,
+          binders et plus encore
         </p>
         {!loading && products.length > 0 && (
           <p style={{ marginTop: '1rem', color: '#94a3b8', fontSize: '0.9rem' }}>
-            {products.length} produit{products.length > 1 ? 's' : ''} affiché{products.length > 1 ? 's' : ''}
+            {products.length} produit{products.length > 1 ? 's' : ''} affiché
+            {products.length > 1 ? 's' : ''}
             {totalPages > 1 && ` (Page ${page} sur ${totalPages})`}
           </p>
         )}
@@ -83,7 +88,7 @@ export function ProtectionsPage() {
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Effacer
@@ -94,18 +99,21 @@ export function ProtectionsPage() {
       </div>
 
       {search && (
-        <div style={{
-          padding: '1rem',
-          background: '#1e293b',
-          border: '1px solid #334155',
-          borderRadius: '8px',
-          marginBottom: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div
+          style={{
+            padding: '1rem',
+            background: '#1e293b',
+            border: '1px solid #334155',
+            borderRadius: '8px',
+            marginBottom: '1rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <span style={{ color: '#e2e8f0' }}>
-            🔍 Recherche active: "<strong>{search}</strong>" - {products.length} résultat{products.length > 1 ? 's' : ''}
+            🔍 Recherche active: "<strong>{search}</strong>" - {products.length} résultat
+            {products.length > 1 ? 's' : ''}
           </span>
           <button
             onClick={() => {
@@ -118,7 +126,7 @@ export function ProtectionsPage() {
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             Effacer la recherche
@@ -143,26 +151,23 @@ export function ProtectionsPage() {
                     <div className={styles.outOfStockBanner}>Rupture de stock</div>
                   )}
                 </div>
-                
+
                 <div className={styles.productInfo}>
                   <div className={styles.categoryHeader}>
-                    <span 
-                      className={styles.categoryName}
-                      style={{ color: '#06b6d4' }}
-                    >
+                    <span className={styles.categoryName} style={{ color: '#06b6d4' }}>
                       {product.category}
                     </span>
                   </div>
-                  
+
                   <h3 className={styles.productName}>{product.name}</h3>
                   {product.description && (
                     <p className={styles.productDescription}>
-                      {product.description.length > 100 
-                        ? product.description.substring(0, 100) + '...' 
+                      {product.description.length > 100
+                        ? product.description.substring(0, 100) + '...'
                         : product.description}
                     </p>
                   )}
-                  
+
                   <div className={styles.priceContainer}>
                     {product.minPriceCents !== null && (
                       <span className={styles.price}>
@@ -170,8 +175,8 @@ export function ProtectionsPage() {
                       </span>
                     )}
                   </div>
-                  
-                  <button 
+
+                  <button
                     className={styles.viewProductButton}
                     onClick={(e) => {
                       e.preventDefault();
@@ -180,7 +185,7 @@ export function ProtectionsPage() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         navigate(`/produit/${product.slug}`);
                       } else {
-                        alert('Ce produit n\'a pas de slug. Veuillez contacter le support.');
+                        alert("Ce produit n'a pas de slug. Veuillez contacter le support.");
                       }
                     }}
                     disabled={product.outOfStock || !product.slug}
@@ -201,7 +206,7 @@ export function ProtectionsPage() {
           {totalPages > 1 && (
             <div className={styles.pagination}>
               <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className={styles.pageButton}
               >
@@ -211,7 +216,7 @@ export function ProtectionsPage() {
                 Page {page} sur {totalPages}
               </span>
               <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className={styles.pageButton}
               >
@@ -224,4 +229,3 @@ export function ProtectionsPage() {
     </div>
   );
 }
-

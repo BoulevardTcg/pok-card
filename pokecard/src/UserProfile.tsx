@@ -1,44 +1,44 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from './authContext'
-import { Package, Heart, Shield } from 'lucide-react'
-import { TwoFactorSettings } from './components/TwoFactorSettings'
-import styles from './UserProfile.module.css'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './authContext';
+import { Package, Shield } from 'lucide-react';
+import { TwoFactorSettings } from './components/TwoFactorSettings';
+import styles from './UserProfile.module.css';
 
 interface ProfileData {
-  firstName?: string
-  lastName?: string
-  bio?: string
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
 }
 
 interface ExtendedProfileData {
-  phone?: string
-  address?: string
-  city?: string
-  postalCode?: string
-  country?: string
-  birthDate?: string
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  birthDate?: string;
 }
 
 const UserProfile: React.FC = () => {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  const [profileData, setProfileData] = useState<ProfileData>({})
-  const [extendedProfileData, setExtendedProfileData] = useState<ExtendedProfileData>({})
-  const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [isEditingExtended, setIsEditingExtended] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profileData, setProfileData] = useState<ProfileData>({});
+  const [extendedProfileData, setExtendedProfileData] = useState<ExtendedProfileData>({});
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isEditingExtended, setIsEditingExtended] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user) {
       setProfileData({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        bio: user.bio || ''
-      })
-      
+        bio: user.bio || '',
+      });
+
       if (user.profile) {
         setExtendedProfileData({
           phone: user.profile.phone || '',
@@ -46,87 +46,87 @@ const UserProfile: React.FC = () => {
           city: user.profile.city || '',
           postalCode: user.profile.postalCode || '',
           country: user.profile.country || '',
-          birthDate: user.profile.birthDate || ''
-        })
+          birthDate: user.profile.birthDate || '',
+        });
       }
     }
-  }, [user])
+  }, [user]);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setProfileData(prev => ({
+    const { name, value } = e.target;
+    setProfileData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleExtendedProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setExtendedProfileData(prev => ({
+    const { name, value } = e.target;
+    setExtendedProfileData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const updateProfile = async () => {
-    setIsLoading(true)
-    setError('')
-    setMessage('')
+    setIsLoading(true);
+    setError('');
+    setMessage('');
 
     try {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('accessToken');
       const response = await fetch('http://localhost:8080/api/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(profileData)
-      })
+        body: JSON.stringify(profileData),
+      });
 
       if (response.ok) {
-        setMessage('Profil mis à jour avec succès !')
-        setIsEditingProfile(false)
+        setMessage('Profil mis à jour avec succès !');
+        setIsEditingProfile(false);
       } else {
-        const data = await response.json()
-        setError(data.error || 'Erreur lors de la mise à jour')
+        const data = await response.json();
+        setError(data.error || 'Erreur lors de la mise à jour');
       }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+    } catch (err: Error) {
+      setError('Erreur de connexion au serveur: ' + err.message || 'Erreur inattendue');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const updateExtendedProfile = async () => {
-    setIsLoading(true)
-    setError('')
-    setMessage('')
+    setIsLoading(true);
+    setError('');
+    setMessage('');
 
     try {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('accessToken');
       const response = await fetch('http://localhost:8080/api/users/profile/extended', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(extendedProfileData)
-      })
+        body: JSON.stringify(extendedProfileData),
+      });
 
       if (response.ok) {
-        setMessage('Profil étendu mis à jour avec succès !')
-        setIsEditingExtended(false)
+        setMessage('Profil étendu mis à jour avec succès !');
+        setIsEditingExtended(false);
       } else {
-        const data = await response.json()
-        setError(data.error || 'Erreur lors de la mise à jour')
+        const data = await response.json();
+        setError(data.error || 'Erreur lors de la mise à jour');
       }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+    } catch (err: Error) {
+      setError('Erreur de connexion au serveur: ' + err.message || 'Erreur inattendue');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (!user) {
     return (
@@ -138,7 +138,7 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -150,17 +150,9 @@ const UserProfile: React.FC = () => {
             <p>Gérez vos informations personnelles</p>
           </div>
 
-          {message && (
-            <div className={styles.successMessage}>
-              {message}
-            </div>
-          )}
+          {message && <div className={styles.successMessage}>{message}</div>}
 
-          {error && (
-            <div className={styles.errorMessage}>
-              {error}
-            </div>
-          )}
+          {error && <div className={styles.errorMessage}>{error}</div>}
 
           {/* Informations de base */}
           <div className={styles.profileSection}>
@@ -212,11 +204,7 @@ const UserProfile: React.FC = () => {
                     placeholder="Parlez-nous de vous..."
                   />
                 </div>
-                <button
-                  onClick={updateProfile}
-                  disabled={isLoading}
-                  className={styles.saveButton}
-                >
+                <button onClick={updateProfile} disabled={isLoading} className={styles.saveButton}>
                   {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
                 </button>
               </div>
@@ -224,11 +212,15 @@ const UserProfile: React.FC = () => {
               <div className={styles.profileInfo}>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Prénom:</span>
-                  <span className={styles.infoValue}>{profileData.firstName || 'Non renseigné'}</span>
+                  <span className={styles.infoValue}>
+                    {profileData.firstName || 'Non renseigné'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Nom:</span>
-                  <span className={styles.infoValue}>{profileData.lastName || 'Non renseigné'}</span>
+                  <span className={styles.infoValue}>
+                    {profileData.lastName || 'Non renseigné'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Bio:</span>
@@ -337,31 +329,40 @@ const UserProfile: React.FC = () => {
               <div className={styles.profileInfo}>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Téléphone:</span>
-                  <span className={styles.infoValue}>{extendedProfileData.phone || 'Non renseigné'}</span>
+                  <span className={styles.infoValue}>
+                    {extendedProfileData.phone || 'Non renseigné'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Adresse:</span>
-                  <span className={styles.infoValue}>{extendedProfileData.address || 'Non renseignée'}</span>
+                  <span className={styles.infoValue}>
+                    {extendedProfileData.address || 'Non renseignée'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Ville:</span>
-                  <span className={styles.infoValue}>{extendedProfileData.city || 'Non renseignée'}</span>
+                  <span className={styles.infoValue}>
+                    {extendedProfileData.city || 'Non renseignée'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Code postal:</span>
-                  <span className={styles.infoValue}>{extendedProfileData.postalCode || 'Non renseigné'}</span>
+                  <span className={styles.infoValue}>
+                    {extendedProfileData.postalCode || 'Non renseigné'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Pays:</span>
-                  <span className={styles.infoValue}>{extendedProfileData.country || 'Non renseigné'}</span>
+                  <span className={styles.infoValue}>
+                    {extendedProfileData.country || 'Non renseigné'}
+                  </span>
                 </div>
                 <div className={styles.infoRow}>
                   <span className={styles.infoLabel}>Date de naissance:</span>
                   <span className={styles.infoValue}>
-                    {extendedProfileData.birthDate 
+                    {extendedProfileData.birthDate
                       ? new Date(extendedProfileData.birthDate).toLocaleDateString('fr-FR')
-                      : 'Non renseignée'
-                    }
+                      : 'Non renseignée'}
                   </span>
                 </div>
               </div>
@@ -371,7 +372,10 @@ const UserProfile: React.FC = () => {
           {/* Sécurité - 2FA */}
           <div className={styles.profileSection}>
             <div className={styles.sectionHeader}>
-              <h2><Shield size={20} style={{ marginRight: '0.5rem', display: 'inline' }} />Sécurité</h2>
+              <h2>
+                <Shield size={20} style={{ marginRight: '0.5rem', display: 'inline' }} />
+                Sécurité
+              </h2>
             </div>
             <TwoFactorSettings token={localStorage.getItem('accessToken') || ''} />
           </div>
@@ -379,10 +383,7 @@ const UserProfile: React.FC = () => {
           {/* Actions rapides */}
           <div className={styles.profileActions}>
             <div className={styles.quickLinks}>
-              <button
-                onClick={() => navigate('/orders')}
-                className={styles.quickLink}
-              >
+              <button onClick={() => navigate('/orders')} className={styles.quickLink}>
                 <Package size={18} />
                 Mes commandes
               </button>
@@ -394,7 +395,7 @@ const UserProfile: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserProfile
+export default UserProfile;

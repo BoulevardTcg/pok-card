@@ -31,19 +31,18 @@ interface FilterSidebarProps {
   callbacks: FilterCallbacks;
 }
 
-export default function FilterSidebar({
-  filters,
-  callbacks,
-}: FilterSidebarProps) {
-  const { category: selectedCategory, priceRange: selectedPriceRange, condition: selectedCondition } = filters;
+export default function FilterSidebar({ filters, callbacks }: FilterSidebarProps) {
+  const {
+    category: selectedCategory,
+    priceRange: selectedPriceRange,
+    condition: selectedCondition,
+  } = filters;
   const { onCategoryChange, onPriceRangeChange, onConditionChange, onReset } = callbacks;
   const [openSections, setOpenSections] = useState<string[]>(['categories', 'price']);
 
   const toggleSection = (section: string) => {
-    setOpenSections(prev =>
-      prev.includes(section)
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
+    setOpenSections((prev) =>
+      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
     );
   };
 
@@ -58,12 +57,11 @@ export default function FilterSidebar({
 
       {/* Catégories */}
       <div className={styles.section}>
-        <button
-          onClick={() => toggleSection('categories')}
-          className={styles.sectionButton}
-        >
+        <button onClick={() => toggleSection('categories')} className={styles.sectionButton}>
           <span className={styles.sectionTitle}>Catégories</span>
-          <span className={`${styles.chevron} ${openSections.includes('categories') ? styles.open : ''}`}>
+          <span
+            className={`${styles.chevron} ${openSections.includes('categories') ? styles.open : ''}`}
+          >
             ▼
           </span>
         </button>
@@ -88,12 +86,11 @@ export default function FilterSidebar({
 
       {/* Prix */}
       <div className={styles.section}>
-        <button
-          onClick={() => toggleSection('price')}
-          className={styles.sectionButton}
-        >
+        <button onClick={() => toggleSection('price')} className={styles.sectionButton}>
           <span className={styles.sectionTitle}>Prix</span>
-          <span className={`${styles.chevron} ${openSections.includes('price') ? styles.open : ''}`}>
+          <span
+            className={`${styles.chevron} ${openSections.includes('price') ? styles.open : ''}`}
+          >
             ▼
           </span>
         </button>
@@ -118,12 +115,11 @@ export default function FilterSidebar({
 
       {/* État */}
       <div className={styles.section}>
-        <button
-          onClick={() => toggleSection('condition')}
-          className={styles.sectionButton}
-        >
+        <button onClick={() => toggleSection('condition')} className={styles.sectionButton}>
           <span className={styles.sectionTitle}>État</span>
-          <span className={`${styles.chevron} ${openSections.includes('condition') ? styles.open : ''}`}>
+          <span
+            className={`${styles.chevron} ${openSections.includes('condition') ? styles.open : ''}`}
+          >
             ▼
           </span>
         </button>
@@ -148,4 +144,3 @@ export default function FilterSidebar({
     </div>
   );
 }
-

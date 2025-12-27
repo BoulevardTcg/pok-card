@@ -1,28 +1,28 @@
 /* Aggregates Pokemon holo CSS effects from pokemon-cards-css */
-@import url("./pokeholo-css/cards.css");
-@import url("./pokeholo-css/cards/base.css");
+@import url('./pokeholo-css/cards.css');
+@import url('./pokeholo-css/cards/base.css');
 
 /* Effect variants */
-@import url("./pokeholo-css/cards/regular-holo.css");
-@import url("./pokeholo-css/cards/reverse-holo.css");
-@import url("./pokeholo-css/cards/rainbow-holo.css");
-@import url("./pokeholo-css/cards/rainbow-alt.css");
-@import url("./pokeholo-css/cards/secret-rare.css");
-@import url("./pokeholo-css/cards/v-regular.css");
-@import url("./pokeholo-css/cards/v-max.css");
-@import url("./pokeholo-css/cards/v-star.css");
-@import url("./pokeholo-css/cards/radiant-holo.css");
-@import url("./pokeholo-css/cards/shiny-rare.css");
-@import url("./pokeholo-css/cards/shiny-v.css");
-@import url("./pokeholo-css/cards/shiny-vmax.css");
-@import url("./pokeholo-css/cards/v-full-art.css");
-@import url("./pokeholo-css/cards/trainer-gallery-holo.css");
-@import url("./pokeholo-css/cards/trainer-gallery-secret-rare.css");
-@import url("./pokeholo-css/cards/trainer-gallery-v-regular.css");
-@import url("./pokeholo-css/cards/trainer-gallery-v-max.css");
-@import url("./pokeholo-css/cards/amazing-rare.css");
-@import url("./pokeholo-css/cards/cosmos-holo.css");
-@import url("./pokeholo-css/cards/base2-cosmos.css");
+@import url('./pokeholo-css/cards/regular-holo.css');
+@import url('./pokeholo-css/cards/reverse-holo.css');
+@import url('./pokeholo-css/cards/rainbow-holo.css');
+@import url('./pokeholo-css/cards/rainbow-alt.css');
+@import url('./pokeholo-css/cards/secret-rare.css');
+@import url('./pokeholo-css/cards/v-regular.css');
+@import url('./pokeholo-css/cards/v-max.css');
+@import url('./pokeholo-css/cards/v-star.css');
+@import url('./pokeholo-css/cards/radiant-holo.css');
+@import url('./pokeholo-css/cards/shiny-rare.css');
+@import url('./pokeholo-css/cards/shiny-v.css');
+@import url('./pokeholo-css/cards/shiny-vmax.css');
+@import url('./pokeholo-css/cards/v-full-art.css');
+@import url('./pokeholo-css/cards/trainer-gallery-holo.css');
+@import url('./pokeholo-css/cards/trainer-gallery-secret-rare.css');
+@import url('./pokeholo-css/cards/trainer-gallery-v-regular.css');
+@import url('./pokeholo-css/cards/trainer-gallery-v-max.css');
+@import url('./pokeholo-css/cards/amazing-rare.css');
+@import url('./pokeholo-css/cards/cosmos-holo.css');
+@import url('./pokeholo-css/cards/base2-cosmos.css');
 
 /* Small adjustments to fit inside our grid cards */
 .holoCardWrapper {
@@ -59,9 +59,9 @@
 }
 
 /* Special Illustration: add extra illusion2 foil on top when data-illus2=true */
-.card[data-illus2="true"] .card__shine:before {
-  content: "";
-  background-image: url("/img/illusion2.png");
+.card[data-illus2='true'] .card__shine:before {
+  content: '';
+  background-image: url('/img/illusion2.png');
   background-size: 33%;
   background-position: center;
   mix-blend-mode: overlay;
@@ -70,18 +70,13 @@
 
 /* Support universel pour les foils personnalisés sur toutes les cartes */
 .card .card__shine:before {
-  content: "";
+  content: '';
   background-image: var(--foil, none);
   background-size: var(--imgsize, cover);
   background-position: center center;
-  filter: brightness(1.8) contrast(2.2) saturate(2.0);
+  filter: brightness(1.8) contrast(2.2) saturate(2);
   opacity: calc((var(--pointer-from-center, 0) + 0.8) * 1.5);
   background-blend-mode: screen;
   mix-blend-mode: overlay;
   pointer-events: none;
 }
-
-
-
-
-

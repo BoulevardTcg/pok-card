@@ -19,29 +19,29 @@
 :root {
   /* Mapping des anciennes variables vers les nouvelles */
   --bleu-nuit: var(--color-bg-primary);
-  --bleu-nuit-50: #F0F4F8;
-  --bleu-nuit-100: #D9E2EC;
-  --bleu-nuit-200: #BCCCDC;
-  --bleu-nuit-300: #9FB3C8;
-  --bleu-nuit-400: #829AB1;
-  --bleu-nuit-500: #627D98;
+  --bleu-nuit-50: #f0f4f8;
+  --bleu-nuit-100: #d9e2ec;
+  --bleu-nuit-200: #bcccdc;
+  --bleu-nuit-300: #9fb3c8;
+  --bleu-nuit-400: #829ab1;
+  --bleu-nuit-500: #627d98;
   --bleu-nuit-600: #486581;
-  --bleu-nuit-700: #334E68;
-  --bleu-nuit-800: #243B53;
-  --bleu-nuit-900: #102A43;
+  --bleu-nuit-700: #334e68;
+  --bleu-nuit-800: #243b53;
+  --bleu-nuit-900: #102a43;
   --bleu-nuit-950: var(--color-bg-primary);
 
   --dore: var(--color-accent-secondary);
-  --dore-50: #F9F6F0;
-  --dore-100: #F2EDE0;
-  --dore-200: #E5DBC1;
+  --dore-50: #f9f6f0;
+  --dore-100: #f2ede0;
+  --dore-200: #e5dbc1;
   --dore-300: var(--color-accent-secondary);
-  --dore-400: #C9A55A;
-  --dore-500: #B89547;
-  --dore-600: #A78534;
+  --dore-400: #c9a55a;
+  --dore-500: #b89547;
+  --dore-600: #a78534;
   --dore-700: #967521;
-  --dore-800: #85650E;
-  --dore-900: #74550B;
+  --dore-800: #85650e;
+  --dore-900: #74550b;
 
   --champagne: var(--color-accent-primary);
   --ardoise: var(--color-bg-subtle);
@@ -68,19 +68,19 @@
 
 /* Le mode clair peut être activé via une classe .light si nécessaire */
 .light {
-  --color-bg-primary: #FAFAFA;
-  --color-bg-elevated: #FFFFFF;
-  --color-bg-subtle: #F5F5F5;
-  --color-bg-hover: #EFEFEF;
-  
-  --color-surface-card: #FFFFFF;
-  --color-surface-modal: #FFFFFF;
-  
-  --color-text-primary: #0A0A0B;
-  --color-text-secondary: #52525B;
-  --color-text-muted: #A1A1A6;
-  --color-text-inverse: #F5F5F3;
-  
+  --color-bg-primary: #fafafa;
+  --color-bg-elevated: #ffffff;
+  --color-bg-subtle: #f5f5f5;
+  --color-bg-hover: #efefef;
+
+  --color-surface-card: #ffffff;
+  --color-surface-modal: #ffffff;
+
+  --color-text-primary: #0a0a0b;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #a1a1a6;
+  --color-text-inverse: #f5f5f3;
+
   --color-border-subtle: rgba(0, 0, 0, 0.06);
   --color-border-default: rgba(0, 0, 0, 0.1);
   --color-border-hover: rgba(0, 0, 0, 0.15);
@@ -113,7 +113,8 @@ img {
 }
 
 /* Remove default list styles */
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 
@@ -136,8 +137,18 @@ a {
 }
 
 /* Staggered animations */
-.stagger-1 { animation-delay: 0ms; }
-.stagger-2 { animation-delay: 100ms; }
-.stagger-3 { animation-delay: 200ms; }
-.stagger-4 { animation-delay: 300ms; }
-.stagger-5 { animation-delay: 400ms; }
+.stagger-1 {
+  animation-delay: 0ms;
+}
+.stagger-2 {
+  animation-delay: 100ms;
+}
+.stagger-3 {
+  animation-delay: 200ms;
+}
+.stagger-4 {
+  animation-delay: 300ms;
+}
+.stagger-5 {
+  animation-delay: 400ms;
+}

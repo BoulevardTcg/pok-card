@@ -8,7 +8,7 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   overflow: hidden;
 }
 
@@ -41,7 +41,8 @@
 }
 
 @keyframes orbFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
   33% {
@@ -72,7 +73,8 @@
   width: 100%;
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
-  padding: calc(var(--space-24, 6rem) + 80px) var(--container-padding, clamp(1.5rem, 5vw, 4rem)) var(--space-16, 4rem);
+  padding: calc(var(--space-24, 6rem) + 80px) var(--container-padding, clamp(1.5rem, 5vw, 4rem))
+    var(--space-16, 4rem);
 }
 
 @media (min-width: 1024px) {
@@ -114,25 +116,30 @@
   background: var(--color-bg-elevated, #141416);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-full, 9999px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .universeDot {
   width: 6px;
   height: 6px;
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
   animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Title */
@@ -143,29 +150,29 @@
 }
 
 .titleMain {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: var(--font-medium, 500);
   line-height: var(--leading-tight, 1.15);
   letter-spacing: var(--tracking-tight, -0.02em);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .titleAccent {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(1.5rem, 3.5vw, 2.25rem);
   font-weight: var(--font-normal, 400);
   font-style: italic;
-  color: var(--color-accent-primary, #E8E4DD);
+  color: var(--color-accent-primary, #e8e4dd);
   margin-top: var(--space-2, 0.5rem);
 }
 
 /* Description */
 .description {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-lg, 1.125rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   max-width: 520px;
   text-align: justify;
 }
@@ -191,9 +198,9 @@
   justify-content: center;
   gap: var(--space-3, 0.75rem);
   padding: var(--space-4, 1rem) var(--space-8, 2rem);
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
-  font-family: var(--font-body, "Inter", sans-serif);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
   letter-spacing: var(--tracking-wide, 0.02em);
@@ -205,7 +212,7 @@
 }
 
 .primaryCta:hover {
-  background: var(--color-accent-hover, #F5F2ED);
+  background: var(--color-accent-hover, #f5f2ed);
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(232, 228, 221, 0.15);
 }
@@ -224,8 +231,8 @@
   justify-content: center;
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
   background: transparent;
-  color: var(--color-text-secondary, #A1A1A6);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-secondary, #a1a1a6);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wide, 0.02em);
@@ -235,7 +242,7 @@
 }
 
 .secondaryCta:hover {
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 /* Card Indicators */
@@ -271,7 +278,7 @@
   left: 0;
   height: 100%;
   width: 0;
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
 }
 
@@ -280,8 +287,12 @@
 }
 
 @keyframes indicatorFill {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -306,8 +317,9 @@
 
 .cardWrapper {
   position: relative;
-  transition: transform var(--duration-slow, 400ms) var(--ease-out),
-              opacity var(--duration-base, 250ms) var(--ease-out);
+  transition:
+    transform var(--duration-slow, 400ms) var(--ease-out),
+    opacity var(--duration-base, 250ms) var(--ease-out);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -320,11 +332,7 @@
 .cardGlow {
   position: absolute;
   inset: -20%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(232, 228, 221, 0.1) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(ellipse at center, rgba(232, 228, 221, 0.1) 0%, transparent 60%);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -335,7 +343,7 @@
   aspect-ratio: 2.5 / 3.5;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.5),
     0 0 100px rgba(139, 115, 85, 0.1);
 }
@@ -365,7 +373,8 @@
 }
 
 @keyframes holoShimmer {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
     transform: translateX(-100%) rotate(25deg);
   }
@@ -390,25 +399,25 @@
 }
 
 .cardSet {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .cardName {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .cardSubtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 /* Scroll Indicator */
@@ -429,12 +438,12 @@
 }
 
 .scrollText {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   writing-mode: vertical-rl;
 }
 
@@ -453,13 +462,14 @@
   transform: translateX(-50%);
   width: 3px;
   height: 12px;
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
   animation: scrollBounce 2s ease-in-out infinite;
 }
 
 @keyframes scrollBounce {
-  0%, 100% {
+  0%,
+  100% {
     top: 0;
   }
   50% {

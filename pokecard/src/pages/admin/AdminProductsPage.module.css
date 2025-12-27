@@ -13,20 +13,22 @@
   justify-content: center;
   min-height: 400px;
   gap: var(--space-4, 1rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   border: 3px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
-  border-top-color: var(--color-accent-secondary, #8B7355);
+  border-top-color: var(--color-accent-secondary, #8b7355);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty {
@@ -37,7 +39,7 @@
   min-height: 400px;
   gap: var(--space-4, 1rem);
   text-align: center;
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .empty svg {
@@ -45,15 +47,15 @@
 }
 
 .empty h3 {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
 }
 
 .empty p {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   margin: 0;
 }
@@ -70,9 +72,9 @@
 }
 
 .pageCount {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   margin: 0;
 }
 
@@ -81,11 +83,11 @@
   align-items: center;
   gap: var(--space-2, 0.5rem);
   padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
-  background: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
   border: none;
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
@@ -93,7 +95,7 @@
 }
 
 .addButton:hover {
-  background: var(--color-accent-hover, #F5F2ED);
+  background: var(--color-accent-hover, #f5f2ed);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -116,19 +118,19 @@
   background: var(--color-bg-elevated, #141416);
   border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-md, 4px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   transition: border-color var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .searchInput input::placeholder {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .searchInput input:focus {
   outline: none;
-  border-color: var(--color-accent-secondary, #8B7355);
+  border-color: var(--color-accent-secondary, #8b7355);
 }
 
 .searchInput svg {
@@ -136,7 +138,7 @@
   left: var(--space-3, 0.75rem);
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -158,21 +160,21 @@
 .table th {
   padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   text-align: left;
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  color: var(--color-text-muted, #6B6B6F);
-  background: var(--color-bg-subtle, #1A1A1D);
+  color: var(--color-text-muted, #6b6b6f);
+  background: var(--color-bg-subtle, #1a1a1d);
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
 }
 
 .table td {
   padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   vertical-align: middle;
 }
@@ -182,7 +184,7 @@
 }
 
 .table tr:hover td {
-  background: var(--color-bg-hover, #1F1F23);
+  background: var(--color-bg-hover, #1f1f23);
 }
 
 /* Product Cell */
@@ -197,7 +199,7 @@
   height: 48px;
   object-fit: cover;
   border-radius: var(--radius-md, 4px);
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
 }
 
 .productImagePlaceholder {
@@ -206,9 +208,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border-radius: var(--radius-md, 4px);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .productImagePlaceholder svg {
@@ -224,23 +226,23 @@
 
 .productName {
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .productSlug {
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* Badges */
 .categoryBadge {
   display: inline-block;
   padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border-radius: var(--radius-full, 9999px);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .variantCount {
@@ -256,17 +258,17 @@
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-semibold, 600);
-  color: var(--color-success, #4ADE80);
+  color: var(--color-success, #4ade80);
 }
 
 .stockBadge.lowStock {
   background: rgba(251, 191, 36, 0.15);
-  color: var(--color-warning, #FBBF24);
+  color: var(--color-warning, #fbbf24);
 }
 
 .stockBadge.outOfStock {
   background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
-  color: var(--color-error, #F87171);
+  color: var(--color-error, #f87171);
 }
 
 /* Actions */
@@ -281,24 +283,24 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .actionButton:hover {
-  background: var(--color-bg-hover, #1F1F23);
+  background: var(--color-bg-hover, #1f1f23);
   border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .actionButton.danger:hover {
   background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
   border-color: rgba(248, 113, 113, 0.3);
-  color: var(--color-error, #F87171);
+  color: var(--color-error, #f87171);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -318,21 +320,21 @@
     align-items: stretch;
     gap: var(--space-4, 1rem);
   }
-  
+
   .searchInput {
     max-width: none;
   }
-  
+
   .table th,
   .table td {
     padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem);
   }
-  
+
   .table th:nth-child(2),
   .table td:nth-child(2) {
     display: none;
   }
-  
+
   .productImage,
   .productImagePlaceholder {
     width: 40px;

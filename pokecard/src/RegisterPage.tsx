@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from './authContext'
-import './RegisterPage.css'
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from './authContext';
+import './RegisterPage.css';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,62 +10,64 @@ const RegisterPage: React.FC = () => {
     password: '',
     confirmPassword: '',
     firstName: '',
-    lastName: ''
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    lastName: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { register } = useAuth()
-  const navigate = useNavigate()
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const validateForm = () => {
     if (formData.password !== formData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
-      return false
+      setError('Les mots de passe ne correspondent pas');
+      return false;
     }
 
     if (formData.password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères')
-      return false
+      setError('Le mot de passe doit contenir au moins 8 caractères');
+      return false;
     }
 
     if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      setError('Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre')
-      return false
+      setError('Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre');
+      return false;
     }
 
     if (formData.username.length < 3) {
-      setError('Le nom d\'utilisateur doit contenir au moins 3 caractères')
-      return false
+      setError("Le nom d'utilisateur doit contenir au moins 3 caractères");
+      return false;
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(formData.username)) {
-      setError('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores')
-      return false
+      setError(
+        "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores"
+      );
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError('');
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const result = await register({
@@ -73,23 +75,23 @@ const RegisterPage: React.FC = () => {
         username: formData.username,
         password: formData.password,
         firstName: formData.firstName || undefined,
-        lastName: formData.lastName || undefined
-      })
-      
+        lastName: formData.lastName || undefined,
+      });
+
       if (result.success) {
         // Rediriger vers la page de connexion avec un message de succès
-        navigate('/login', { 
-          state: { message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.' }
-        })
+        navigate('/login', {
+          state: { message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.' },
+        });
       } else {
-        setError(result.error || 'Erreur lors de l\'inscription')
+        setError(result.error || "Erreur lors de l'inscription");
       }
-    } catch (err) {
-      setError('Erreur inattendue')
+    } catch (err: any) {
+      setError('Erreur inattendue :' + err.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="register-container">
@@ -99,11 +101,7 @@ const RegisterPage: React.FC = () => {
           <p>Rejoignez la communauté BoulevardTCG</p>
         </div>
 
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-row">
@@ -214,11 +212,7 @@ const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="register-button"
-          >
+          <button type="submit" disabled={isLoading} className="register-button">
             {isLoading ? 'Création du compte...' : 'Créer mon compte'}
           </button>
         </form>
@@ -238,7 +232,7 @@ const RegisterPage: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;

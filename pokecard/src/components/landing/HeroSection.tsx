@@ -9,7 +9,7 @@ const HERO_PRODUCTS = [
   {
     id: 1,
     name: 'ETB Flammes Fantasmagoriques',
-    subtitle: 'Coffret Dresseur d\'Élite',
+    subtitle: "Coffret Dresseur d'Élite",
     set: 'ME02',
     universe: 'Pokémon',
     image: '/carte_accueil/card01.png',
@@ -61,14 +61,14 @@ export default function HeroSection() {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!productRef.current) return;
-      
+
       const rect = productRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      
+
       const x = (e.clientX - centerX) / rect.width;
       const y = (e.clientY - centerY) / rect.height;
-      
+
       setMousePosition({ x: x * 12, y: y * 12 });
     };
 
@@ -97,7 +97,7 @@ export default function HeroSection() {
             <span className={styles.universeDot} />
             <span>{currentProduct.universe}</span>
           </div>
-          
+
           <h1 className={styles.title}>
             <span className={styles.titleMain}>Découvrez.</span>
             <span className={styles.titleMain}>Collectionnez.</span>
@@ -105,16 +105,12 @@ export default function HeroSection() {
           </h1>
 
           <p className={styles.description}>
-            Boosters, displays, coffrets ETB et collections premium — 
-            Boulevard vous propose une sélection soignée de produits scellés 
-            pour tous les passionnés de TCG.
+            Boosters, displays, coffrets ETB et collections premium — Boulevard vous propose une
+            sélection soignée de produits scellés pour tous les passionnés de TCG.
           </p>
 
           <div className={styles.heroActions}>
-            <button
-              onClick={() => navigate('/produits')}
-              className={styles.primaryCta}
-            >
+            <button onClick={() => navigate('/produits')} className={styles.primaryCta}>
               <span>Explorer la boutique</span>
               <ArrowRightIcon size={18} />
             </button>
@@ -143,7 +139,7 @@ export default function HeroSection() {
 
         {/* Produit en vedette */}
         <div className={styles.heroVisual}>
-          <div 
+          <div
             ref={productRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
             onMouseEnter={() => setIsHovering(true)}
@@ -154,7 +150,7 @@ export default function HeroSection() {
           >
             {/* Glow effect */}
             <div className={styles.cardGlow} />
-            
+
             {/* Le produit */}
             <div className={styles.cardFrame}>
               <img
@@ -162,7 +158,7 @@ export default function HeroSection() {
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
               />
-              
+
               {/* Effet holographique */}
               <div className={styles.holoEffect} />
             </div>

@@ -7,7 +7,16 @@ import styles from './AdminDashboard.module.css';
 
 // Icônes SVG
 const CartIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M6 6h15l-1.5 9h-12z" />
     <circle cx="9" cy="20" r="1" />
     <circle cx="18" cy="20" r="1" />
@@ -16,7 +25,16 @@ const CartIcon = () => (
 );
 
 const UsersIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <circle cx="9" cy="7" r="4" />
     <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
     <circle cx="17" cy="7" r="3" />
@@ -25,7 +43,16 @@ const UsersIcon = () => (
 );
 
 const PackageIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M12 2L2 7l10 5 10-5-10-5z" />
     <path d="M2 17l10 5 10-5" />
     <path d="M2 12l10 5 10-5" />
@@ -33,14 +60,32 @@ const PackageIcon = () => (
 );
 
 const TrendingIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
     <polyline points="17 6 23 6 23 12" />
   </svg>
 );
 
 const BoxIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
     <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -48,7 +93,16 @@ const BoxIcon = () => (
 );
 
 const AlertIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
     <line x1="12" y1="9" x2="12" y2="13" />
     <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -56,7 +110,16 @@ const AlertIcon = () => (
 );
 
 const ArrowRightIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M5 12h14" />
     <path d="M12 5l7 7-7 7" />
   </svg>
@@ -107,11 +170,11 @@ export function AdminDashboard() {
 
       const [dashboardRes, productsRes] = await Promise.all([
         fetch(`${API_BASE}/admin/dashboard`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(`${API_BASE}/admin/products?limit=500`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+          headers: { Authorization: `Bearer ${token}` },
+        }),
       ]);
 
       if (!dashboardRes.ok) {
@@ -126,11 +189,14 @@ export function AdminDashboard() {
       if (productsRes.ok) {
         const productsData = await productsRes.json();
         const stock = (productsData.products || []).reduce((total: number, product: any) => {
-          return total + (product.variants || []).reduce((sum: number, v: any) => sum + (v.stock || 0), 0);
+          return (
+            total +
+            (product.variants || []).reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
+          );
         }, 0);
         setTotalStock(stock);
       }
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message);
     } finally {
@@ -145,7 +211,7 @@ export function AdminDashboard() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: 'numeric',
-      month: 'short'
+      month: 'short',
     });
   };
 
@@ -254,7 +320,8 @@ export function AdminDashboard() {
                   <div className={styles.alertContent}>
                     <AlertIcon />
                     <span>
-                      <strong>{stats.orders.pending}</strong> commande{stats.orders.pending > 1 ? 's' : ''} en attente de traitement
+                      <strong>{stats.orders.pending}</strong> commande
+                      {stats.orders.pending > 1 ? 's' : ''} en attente de traitement
                     </span>
                   </div>
                   <button onClick={() => navigate('/admin/orders')} className={styles.alertButton}>
@@ -267,10 +334,14 @@ export function AdminDashboard() {
                   <div className={styles.alertContent}>
                     <AlertIcon />
                     <span>
-                      <strong>{stats.products.lowStock}</strong> produit{stats.products.lowStock > 1 ? 's' : ''} avec stock faible
+                      <strong>{stats.products.lowStock}</strong> produit
+                      {stats.products.lowStock > 1 ? 's' : ''} avec stock faible
                     </span>
                   </div>
-                  <button onClick={() => navigate('/admin/inventory')} className={styles.alertButton}>
+                  <button
+                    onClick={() => navigate('/admin/inventory')}
+                    className={styles.alertButton}
+                  >
                     Gérer le stock <ArrowRightIcon />
                   </button>
                 </div>
@@ -301,13 +372,17 @@ export function AdminDashboard() {
                         <div key={order.id} className={styles.orderItem}>
                           <div className={styles.orderMain}>
                             <span className={styles.orderNumber}>{order.orderNumber}</span>
-                            <span className={styles.orderEmail}>{order.user?.email || 'Invité'}</span>
+                            <span className={styles.orderEmail}>
+                              {order.user?.email || 'Invité'}
+                            </span>
                           </div>
                           <div className={styles.orderMeta}>
                             <span className={`${styles.badge} ${status.className}`}>
                               {status.label}
                             </span>
-                            <span className={styles.orderTotal}>{formatPrice(order.totalCents)}€</span>
+                            <span className={styles.orderTotal}>
+                              {formatPrice(order.totalCents)}€
+                            </span>
                             <span className={styles.orderDate}>{formatDate(order.createdAt)}</span>
                           </div>
                         </div>
@@ -342,11 +417,11 @@ export function AdminDashboard() {
                           </span>
                         </div>
                         <div className={styles.productBar}>
-                          <div 
-                            className={styles.productBarFill} 
-                            style={{ 
-                              width: `${(item.totalSold / (topProducts[0]?.totalSold || 1)) * 100}%` 
-                            }} 
+                          <div
+                            className={styles.productBarFill}
+                            style={{
+                              width: `${(item.totalSold / (topProducts[0]?.totalSold || 1)) * 100}%`,
+                            }}
                           />
                         </div>
                       </div>

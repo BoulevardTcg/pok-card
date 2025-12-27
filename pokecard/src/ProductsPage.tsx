@@ -21,12 +21,12 @@ export function ProductsPage() {
 
     // Filtre par catégorie
     if (selectedCategory !== 'Toutes') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
+      filtered = filtered.filter((p) => p.category === selectedCategory);
     }
 
     // Filtre par prix
     if (selectedPriceRange !== 'all') {
-      filtered = filtered.filter(p => {
+      filtered = filtered.filter((p) => {
         if (p.minPriceCents === null) return false;
         const price = p.minPriceCents / 100;
         switch (selectedPriceRange) {
@@ -70,31 +70,34 @@ export function ProductsPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await listProducts({
+      const response = (await listProducts({
         limit: 200,
         category: selectedCategory === 'Toutes' ? undefined : selectedCategory,
-      }) as { products: ProductType[]; pagination: { page: number; total: number; pages: number } };
-      
+      })) as {
+        products: ProductType[];
+        pagination: { page: number; total: number; pages: number };
+      };
+
       console.log('📦 Produits reçus:', response.products?.length || 0);
-      
+
       if (!response || !response.products) {
-        console.error('❌ Réponse invalide de l\'API:', response);
+        console.error("❌ Réponse invalide de l'API:", response);
         setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
         setAllProducts([]);
         return;
       }
-      
+
       // Filtrer pour exclure les produits de la catégorie "Accessoires"
-      let filteredProducts = response.products.filter(p => p.category !== 'Accessoires');
-      
+      let filteredProducts = response.products.filter((p) => p.category !== 'Accessoires');
+
       console.log('✅ Produits filtrés:', filteredProducts.length);
-      
+
       // Si une catégorie spécifique est sélectionnée, ne pas mélanger pour garder l'ordre
       if (selectedCategory === 'Toutes') {
         // Mélanger les produits seulement si toutes les catégories sont affichées
         filteredProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
       }
-      
+
       setAllProducts(filteredProducts);
     } catch (error) {
       console.error('❌ Erreur lors du chargement des produits:', error);
@@ -120,8 +123,8 @@ export function ProductsPage() {
           <h1 className={styles.title}>Catalogue</h1>
           <div className={styles.divider}></div>
           <p className={styles.subtitle}>
-            Explorez notre sélection premium de cartes TCG, soigneusement sélectionnées 
-            pour leur qualité et leur rareté.
+            Explorez notre sélection premium de cartes TCG, soigneusement sélectionnées pour leur
+            qualité et leur rareté.
           </p>
         </div>
 

@@ -5,7 +5,7 @@
 
 .section {
   padding: var(--section-gap-md, 7.5rem) 0;
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
 }
 
 .container {
@@ -41,27 +41,27 @@
 }
 
 .overline {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 .title {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(var(--text-3xl, 2rem), 4vw, var(--text-4xl, 2.5rem));
   font-weight: var(--font-medium, 500);
   line-height: var(--leading-tight, 1.15);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .description {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   line-height: var(--leading-relaxed, 1.65);
-  color: var(--color-text-secondary, #A1A1A6);
+  color: var(--color-text-secondary, #a1a1a6);
   text-align: justify;
 }
 
@@ -73,8 +73,8 @@
   background: transparent;
   border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-sm, 2px);
-  color: var(--color-text-secondary, #A1A1A6);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-secondary, #a1a1a6);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   cursor: pointer;
@@ -83,8 +83,8 @@
 }
 
 .viewAllButton:hover {
-  border-color: var(--color-accent-primary, #E8E4DD);
-  color: var(--color-accent-primary, #E8E4DD);
+  border-color: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-accent-primary, #e8e4dd);
 }
 
 .viewAllButton svg {
@@ -107,8 +107,8 @@
   justify-content: center;
   min-height: 300px;
   gap: var(--space-4, 1rem);
-  color: var(--color-text-muted, #6B6B6F);
-  font-family: var(--font-body, "Inter", sans-serif);
+  color: var(--color-text-muted, #6b6b6f);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
 }
 
@@ -154,7 +154,11 @@
 .card:hover {
   border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
   transform: translateY(-4px);
-  box-shadow: var(--shadow-card-hover, 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(232, 228, 221, 0.05));
+  box-shadow: var(
+    --shadow-card-hover,
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(232, 228, 221, 0.05)
+  );
 }
 
 /* Card Image */
@@ -162,7 +166,7 @@
   position: relative;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: var(--color-bg-subtle, #1A1A1D);
+  background: var(--color-bg-subtle, #1a1a1d);
 }
 
 .cardImage {
@@ -180,11 +184,7 @@
 .cardImageOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 60%,
-    rgba(10, 10, 11, 0.8) 100%
-  );
+  background: linear-gradient(to bottom, transparent 60%, rgba(10, 10, 11, 0.8) 100%);
   pointer-events: none;
 }
 
@@ -194,26 +194,26 @@
   top: var(--space-3, 0.75rem);
   left: var(--space-3, 0.75rem);
   padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
-  background: var(--color-accent-secondary, #8B7355);
+  background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-sm, 2px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 10px;
   font-weight: var(--font-bold, 700);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  color: var(--color-bg-primary, #0A0A0B);
+  color: var(--color-bg-primary, #0a0a0b);
 }
 
 .badge.nouveauté {
-  background: var(--color-success, #4ADE80);
+  background: var(--color-success, #4ade80);
 }
 
 .badge.précommande {
-  background: var(--color-warning, #FBBF24);
+  background: var(--color-warning, #fbbf24);
 }
 
 .badge.investissement {
-  background: var(--color-accent-primary, #E8E4DD);
+  background: var(--color-accent-primary, #e8e4dd);
 }
 
 /* Grade Badge */
@@ -225,24 +225,24 @@
   flex-direction: column;
   align-items: center;
   padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-  background: var(--color-bg-primary, #0A0A0B);
+  background: var(--color-bg-primary, #0a0a0b);
   border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-md, 4px);
 }
 
 .gradeProvider {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 9px;
   font-weight: var(--font-bold, 700);
   letter-spacing: var(--tracking-wider, 0.05em);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .gradeValue {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-bold, 700);
-  color: var(--color-success, #4ADE80);
+  color: var(--color-success, #4ade80);
 }
 
 /* Stock Badge */
@@ -257,23 +257,28 @@
   background: rgba(10, 10, 11, 0.8);
   backdrop-filter: blur(4px);
   border-radius: var(--radius-full, 9999px);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-success, #4ADE80);
+  color: var(--color-success, #4ade80);
 }
 
 .stockDot {
   width: 6px;
   height: 6px;
-  background: var(--color-success, #4ADE80);
+  background: var(--color-success, #4ade80);
   border-radius: var(--radius-full, 9999px);
   animation: stockPulse 2s ease-in-out infinite;
 }
 
 @keyframes stockPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Card Content */
@@ -298,36 +303,36 @@
 }
 
 .cardUniverse {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
   font-weight: var(--font-medium, 500);
   letter-spacing: var(--tracking-wider, 0.05em);
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8B7355);
+  color: var(--color-accent-secondary, #8b7355);
 }
 
 .metaDot {
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .cardType {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .cardName {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
   line-height: var(--leading-snug, 1.3);
 }
 
 .cardSubtitle {
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 /* Card Pricing */
@@ -350,13 +355,13 @@
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--font-semibold, 600);
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-primary, #F5F5F3);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .originalPrice {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-sm, 0.875rem);
-  color: var(--color-text-muted, #6B6B6F);
+  color: var(--color-text-muted, #6b6b6f);
   text-decoration: line-through;
 }
 
@@ -364,7 +369,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1, 0.25rem);
-  font-family: var(--font-body, "Inter", sans-serif);
+  font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-success, #4ADE80);
+  color: var(--color-success, #4ade80);
 }

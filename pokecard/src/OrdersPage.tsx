@@ -33,7 +33,7 @@ const statusConfig = {
   SHIPPED: { label: 'Expédiée', icon: Truck, color: '#8b5cf6' },
   DELIVERED: { label: 'Livrée', icon: Package, color: '#10b981' },
   CANCELLED: { label: 'Annulée', icon: XCircle, color: '#ef4444' },
-  REFUNDED: { label: 'Remboursée', icon: XCircle, color: '#6b7280' }
+  REFUNDED: { label: 'Remboursée', icon: XCircle, color: '#6b7280' },
 };
 
 export function OrdersPage() {
@@ -60,7 +60,7 @@ export function OrdersPage() {
 
   async function loadOrders() {
     if (!token) {
-      setError('Token d\'authentification manquant');
+      setError("Token d'authentification manquant");
       setLoading(false);
       return;
     }
@@ -71,8 +71,8 @@ export function OrdersPage() {
 
       const response = await fetch(`${API_BASE}/users/orders`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -81,7 +81,7 @@ export function OrdersPage() {
 
       const data = await response.json();
       setOrders(data.orders || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
       setError(err.message || 'Erreur lors du chargement des commandes');
     } finally {
@@ -97,7 +97,7 @@ export function OrdersPage() {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -144,13 +144,8 @@ export function OrdersPage() {
           <div className={styles.emptyState}>
             <Package className={styles.emptyIcon} />
             <h2 className={styles.emptyTitle}>Aucune commande</h2>
-            <p className={styles.emptyText}>
-              Vous n'avez pas encore passé de commande
-            </p>
-            <button
-              onClick={() => navigate('/produits')}
-              className={styles.shopButton}
-            >
+            <p className={styles.emptyText}>Vous n'avez pas encore passé de commande</p>
+            <button onClick={() => navigate('/produits')} className={styles.shopButton}>
               Découvrir la boutique
             </button>
           </div>
@@ -164,17 +159,10 @@ export function OrdersPage() {
                 <div key={order.id} className={styles.orderCard}>
                   <div className={styles.orderHeader}>
                     <div className={styles.orderInfo}>
-                      <h3 className={styles.orderNumber}>
-                        Commande #{order.orderNumber}
-                      </h3>
-                      <p className={styles.orderDate}>
-                        Passée le {formatDate(order.createdAt)}
-                      </p>
+                      <h3 className={styles.orderNumber}>Commande #{order.orderNumber}</h3>
+                      <p className={styles.orderDate}>Passée le {formatDate(order.createdAt)}</p>
                     </div>
-                    <div
-                      className={styles.orderStatus}
-                      style={{ color: statusColor }}
-                    >
+                    <div className={styles.orderStatus} style={{ color: statusColor }}>
                       <StatusIcon className={styles.statusIcon} />
                       <span>{statusConfig[order.status].label}</span>
                     </div>
@@ -193,21 +181,13 @@ export function OrdersPage() {
                           <div className={styles.placeholderImage}>📦</div>
                         )}
                         <div className={styles.itemInfo}>
-                          <h4 className={styles.itemName}>
-                            {item.productName}
-                          </h4>
+                          <h4 className={styles.itemName}>{item.productName}</h4>
                           {item.variantName && (
-                            <p className={styles.itemVariant}>
-                              {item.variantName}
-                            </p>
+                            <p className={styles.itemVariant}>{item.variantName}</p>
                           )}
-                          <p className={styles.itemQuantity}>
-                            Quantité: {item.quantity}
-                          </p>
+                          <p className={styles.itemQuantity}>Quantité: {item.quantity}</p>
                         </div>
-                        <div className={styles.itemPrice}>
-                          {formatPrice(item.totalPriceCents)}€
-                        </div>
+                        <div className={styles.itemPrice}>{formatPrice(item.totalPriceCents)}€</div>
                       </div>
                     ))}
                   </div>
@@ -215,9 +195,7 @@ export function OrdersPage() {
                   <div className={styles.orderFooter}>
                     <div className={styles.orderTotal}>
                       <span className={styles.totalLabel}>Total:</span>
-                      <span className={styles.totalAmount}>
-                        {formatPrice(order.totalCents)}€
-                      </span>
+                      <span className={styles.totalAmount}>{formatPrice(order.totalCents)}€</span>
                     </div>
                     <button
                       onClick={() => navigate(`/orders/${order.id}`)}
@@ -236,5 +214,3 @@ export function OrdersPage() {
     </div>
   );
 }
-
-

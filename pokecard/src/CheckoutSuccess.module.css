@@ -192,15 +192,15 @@
   .successCard {
     padding: var(--space-8, 2rem) var(--space-6, 1.5rem);
   }
-  
+
   .title {
     font-size: var(--text-3xl, 2rem);
   }
-  
+
   .actions {
     flex-direction: column;
   }
-  
+
   .primaryButton,
   .secondaryButton {
     width: 100%;

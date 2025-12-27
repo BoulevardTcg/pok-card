@@ -7,14 +7,32 @@ import styles from './AdminUsersPage.module.css';
 
 // Icônes SVG
 const SearchIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <circle cx="11" cy="11" r="7" />
     <path d="M21 21l-4.35-4.35" />
   </svg>
 );
 
 const UsersIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="48"
+    height="48"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <circle cx="9" cy="7" r="4" />
     <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
     <circle cx="17" cy="7" r="3" />
@@ -56,24 +74,25 @@ export function AdminUsersPage() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/admin/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setUsers(data.users || []);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error('Erreur:', err);
     } finally {
       setLoading(false);
     }
   }
 
-  const filteredUsers = users.filter(u =>
-    u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (u) =>
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (authLoading || loading) {
@@ -93,7 +112,9 @@ export function AdminUsersPage() {
     <AdminLayout>
       {/* Header */}
       <div className={styles.pageHeader}>
-        <p className={styles.pageCount}>{users.length} utilisateur{users.length > 1 ? 's' : ''} au total</p>
+        <p className={styles.pageCount}>
+          {users.length} utilisateur{users.length > 1 ? 's' : ''} au total
+        </p>
       </div>
 
       {/* Search */}
@@ -138,9 +159,7 @@ export function AdminUsersPage() {
                       </div>
                       <div className={styles.userInfo}>
                         <span className={styles.userName}>
-                          {u.firstName && u.lastName
-                            ? `${u.firstName} ${u.lastName}`
-                            : u.username}
+                          {u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : u.username}
                         </span>
                         <span className={styles.userUsername}>@{u.username}</span>
                       </div>
@@ -170,7 +189,7 @@ export function AdminUsersPage() {
                       {new Date(u.createdAt).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'short',
-                        year: 'numeric'
+                        year: 'numeric',
                       })}
                     </span>
                   </td>

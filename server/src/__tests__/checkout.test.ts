@@ -1,69 +1,71 @@
-import request from 'supertest'
-import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals'
-import { createApp } from '../app.js'
-import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js'
-import { generateAccessToken } from '../utils/auth.js'
-import Stripe from 'stripe'
+import request from 'supertest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+import { createApp } from '../app.js';
+import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
+import { generateAccessToken } from '../utils/auth.js';
+import Stripe from 'stripe';
 
-const app = createApp()
+const app = createApp();
 
 // Mock Stripe pour les tests
-jest.mock('../config/stripe.js', () => ({
+vi.mock('../config/stripe.js', () => ({
   ensureStripeConfigured: () => {
     // Retourner un mock Stripe client
     return {
       checkout: {
         sessions: {
-          create: (jest.fn(() => Promise.resolve({
-            id: 'cs_test_123',
-            url: 'https://checkout.stripe.com/test',
-            metadata: {},
-          })) as any),
+          create: vi.fn(() =>
+            Promise.resolve({
+              id: 'cs_test_123',
+              url: 'https://checkout.stripe.com/test',
+              metadata: {},
+            })
+          ) as any,
         },
         webhooks: {
-          constructEvent: jest.fn(),
+          constructEvent: vi.fn(),
         },
       },
-    } as unknown as Stripe
+    } as unknown as Stripe;
   },
-}))
+}));
 
 describe('Checkout Routes', () => {
-  let testUser: any
-  let testUserToken: string
-  let testProduct: any
-  let testVariant: any
+  let testUser: any;
+  let testUserToken: string;
+  let testProduct: any;
+  let testVariant: any;
 
   beforeAll(async () => {
-    await cleanupDatabase()
-  })
+    await cleanupDatabase();
+  });
 
   afterAll(async () => {
-    await cleanupDatabase()
-    await prisma.$disconnect()
-  })
+    await cleanupDatabase();
+    await prisma.$disconnect();
+  });
 
   beforeEach(async () => {
-    await cleanupDatabase()
-    
+    await cleanupDatabase();
+
     testUser = await createTestUser({
       email: 'checkout@example.com',
       username: 'checkoutuser',
-    })
+    });
     testUserToken = generateAccessToken({
       userId: testUser.id,
       email: testUser.email,
       username: testUser.username,
       isAdmin: false,
-    })
+    });
 
     testProduct = await createTestProduct({
       name: 'Test Product for Checkout',
       priceCents: 3000,
       stock: 10,
-    })
-    testVariant = testProduct.variants[0]
-  })
+    });
+    testVariant = testProduct.variants[0];
+  });
 
   describe('POST /api/checkout/create-session', () => {
     it('devrait créer une session Stripe avec succès', async () => {
@@ -87,12 +89,12 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(201)
-      expect(response.body).toHaveProperty('sessionId')
-      expect(response.body).toHaveProperty('url')
-    })
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('sessionId');
+      expect(response.body).toHaveProperty('url');
+    });
 
     it('devrait créer une session même sans authentification (utilisateur anonyme)', async () => {
       const response = await request(app)
@@ -115,11 +117,11 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(201)
-      expect(response.body).toHaveProperty('sessionId')
-    })
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('sessionId');
+    });
 
     it('devrait rejeter un panier vide', async () => {
       const response = await request(app)
@@ -127,10 +129,10 @@ describe('Checkout Routes', () => {
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({
           items: [],
-        })
+        });
 
-      expect(response.status).toBe(400)
-    })
+      expect(response.status).toBe(400);
+    });
 
     it('devrait rejeter un produit inexistant', async () => {
       const response = await request(app)
@@ -151,11 +153,11 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(400)
-      expect(response.body.code).toBe('VARIANT_NOT_FOUND')
-    })
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('VARIANT_NOT_FOUND');
+    });
 
     it('devrait rejeter une quantité supérieure au stock', async () => {
       const response = await request(app)
@@ -176,13 +178,13 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(409)
-      expect(response.body.code).toBe('INSUFFICIENT_STOCK')
-    })
+      expect(response.status).toBe(409);
+      expect(response.body.code).toBe('INSUFFICIENT_STOCK');
+    });
 
-    it('devrait inclure le userId dans les métadonnées si l\'utilisateur est connecté', async () => {
+    it("devrait inclure le userId dans les métadonnées si l'utilisateur est connecté", async () => {
       // Cette vérification nécessiterait de mocker Stripe plus en profondeur
       // Pour l'instant, on vérifie juste que la requête réussit
       const response = await request(app)
@@ -203,10 +205,10 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(201)
-    })
+      expect(response.status).toBe(201);
+    });
 
     it('devrait rejeter un mode de livraison invalide', async () => {
       const response = await request(app)
@@ -227,11 +229,11 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(400)
-      expect(response.body.code).toBe('INVALID_SHIPPING_METHOD')
-    })
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('INVALID_SHIPPING_METHOD');
+    });
 
     it('devrait accepter un mode de livraison valide', async () => {
       const response = await request(app)
@@ -252,11 +254,11 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(201)
-      expect(response.body).toHaveProperty('sessionId')
-    })
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('sessionId');
+    });
 
     it('devrait exiger un mode de livraison', async () => {
       const response = await request(app)
@@ -276,30 +278,27 @@ describe('Checkout Routes', () => {
             city: 'Paris',
             country: 'France',
           },
-        })
+        });
 
-      expect(response.status).toBe(400)
-    })
-  })
+      expect(response.status).toBe(400);
+    });
+  });
 
   describe('Webhook Stripe', () => {
     // Note: Les tests de webhook nécessitent une configuration Stripe plus complexe
     // avec des signatures valides. Pour l'instant, on teste la structure de base.
-    
+
     it('devrait rejeter un webhook sans signature', async () => {
-      const response = await request(app)
-        .post('/api/checkout/webhook')
-        .send({})
+      const response = await request(app).post('/api/checkout/webhook').send({});
 
       // Le webhook devrait rejeter sans signature
-      expect([400, 500]).toContain(response.status)
-    })
+      expect([400, 500]).toContain(response.status);
+    });
 
     // Les tests complets de webhook nécessiteraient :
     // 1. Un secret Stripe valide
     // 2. La construction d'une signature valide
     // 3. Un mock de l'événement Stripe
     // Ceci est complexe et nécessite une configuration Stripe CLI ou des mocks avancés
-  })
-})
-
+  });
+});

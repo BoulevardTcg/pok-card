@@ -22,17 +22,19 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Vérifier l'authentification
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: product.slug ? `/produit/${product.slug}` : '/produits' } });
+      navigate('/login', {
+        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
+      });
       return;
     }
-    
+
     if (!product.outOfStock && product.variants && product.variants.length > 0) {
       // Sélectionner la première variante disponible (avec stock > 0)
-      const availableVariant = product.variants.find(v => v.stock > 0);
-      
+      const availableVariant = product.variants.find((v) => v.stock > 0);
+
       if (availableVariant) {
         addToCart(availableVariant, product);
       } else {
@@ -65,7 +67,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className={styles.placeholderImage}>Pas d'image</div>
         )}
         <div className={styles.imageOverlay}></div>
-        
+
         {/* Badge catégorie */}
         {product.category && (
           <div className={styles.badge}>
@@ -75,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Actions au survol */}
         <div className={styles.hoverActions}>
-          <button 
+          <button
             onClick={handleAddToCart}
             disabled={product.outOfStock}
             className={styles.addButton}
@@ -97,30 +99,25 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <h3 className={styles.name}>{product.name}</h3>
-        
+
         {product.description && (
           <p className={styles.description}>
-            {product.description.length > 60 
-              ? product.description.substring(0, 60) + '...' 
+            {product.description.length > 60
+              ? product.description.substring(0, 60) + '...'
               : product.description}
           </p>
         )}
 
         <div className={styles.priceContainer}>
           {product.minPriceCents !== null ? (
-            <span className={styles.price}>
-              {formatPrice(product.minPriceCents)}
-            </span>
+            <span className={styles.price}>{formatPrice(product.minPriceCents)}</span>
           ) : (
             <span className={styles.price}>Prix sur demande</span>
           )}
         </div>
 
-        {product.outOfStock && (
-          <div className={styles.outOfStock}>Rupture de stock</div>
-        )}
+        {product.outOfStock && <div className={styles.outOfStock}>Rupture de stock</div>}
       </div>
     </div>
   );
 }
-

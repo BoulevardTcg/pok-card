@@ -37,14 +37,9 @@ export default function HeroRotatingCard() {
   return (
     <div className={styles.cardWrapper}>
       <div className={`${styles.card} ${isFlipping ? styles.flipping : ''}`}>
-        <img 
-          src={card.image} 
-          alt={card.name}
-          className={styles.cardImage}
-        />
+        <img src={card.image} alt={card.name} className={styles.cardImage} />
         <div className={styles.cardShine} />
       </div>
     </div>
   );
 }
-

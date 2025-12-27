@@ -20,7 +20,14 @@ interface NavDropdownProps {
   onMouseLeave: () => void;
 }
 
-export function NavDropdown({ link, isActive, isOpen, onToggle, onMouseEnter, onMouseLeave }: NavDropdownProps) {
+export function NavDropdown({
+  link,
+  isActive,
+  isOpen,
+  onToggle,
+  onMouseEnter,
+  onMouseLeave,
+}: NavDropdownProps) {
   const navigate = useNavigate();
 
   const handleSubItemClick = (path: string) => {
@@ -39,13 +46,10 @@ export function NavDropdown({ link, isActive, isOpen, onToggle, onMouseEnter, on
         {link.label}
         <span className={styles.dropdownArrow}>▼</span>
       </button>
-      
+
       {isOpen && (
-        <div 
-          className={styles.dropdown}
-          onMouseLeave={onMouseLeave}
-        >
-          {link.submenu?.map(subItem => (
+        <div className={styles.dropdown} onMouseLeave={onMouseLeave}>
+          {link.submenu?.map((subItem) => (
             <button
               key={subItem.path}
               className={styles.dropdownItem}

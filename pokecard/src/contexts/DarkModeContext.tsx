@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 type DarkModeContextType = {
   isDark: boolean;
@@ -48,12 +48,3 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
     </DarkModeContext.Provider>
   );
 }
-
-export function useDarkMode() {
-  const context = useContext(DarkModeContext);
-  if (context === undefined) {
-    throw new Error('useDarkMode must be used within a DarkModeProvider');
-  }
-  return context;
-}
-

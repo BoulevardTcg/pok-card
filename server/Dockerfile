@@ -13,13 +13,13 @@ RUN npm ci
 # Copier le code source
 COPY . .
 
-RUN rm -rf dist
-
 # Build de l'application
 RUN npm run build
 
 # Production stage
-FROM node:24.12-alpine
+FROM node:24-slim
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

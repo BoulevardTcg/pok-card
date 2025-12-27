@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useState, type ReactNode, useEffect } from 'react';
 
 export interface ProductVariant {
   id: string;
@@ -44,6 +44,7 @@ interface CartContextType {
   getTotalCents: () => number;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const CartContext = createContext<CartContextType>({
   cart: [],
   addToCart: () => {},
@@ -66,36 +67,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function addToCart(variant: ProductVariant, product: Product) {
     if (variant.stock <= 0) return;
 
-    setCart(prev => {
-      const found = prev.find(item => item.variantId === variant.id);
+    setCart((prev) => {
+      const found = prev.find((item) => item.variantId === variant.id);
       if (found) {
         if (found.quantity >= variant.stock) return prev;
-        return prev.map(item =>
-          item.variantId === variant.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        return prev.map((item) =>
+          item.variantId === variant.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, {
-        variantId: variant.id,
-        productId: product.id,
-        productName: product.name,
-        variantName: variant.name,
-        imageUrl: product.image?.url ?? null,
-        priceCents: variant.priceCents,
-        stock: variant.stock,
-        quantity: 1
-      }];
+      return [
+        ...prev,
+        {
+          variantId: variant.id,
+          productId: product.id,
+          productName: product.name,
+          variantName: variant.name,
+          imageUrl: product.image?.url ?? null,
+          priceCents: variant.priceCents,
+          stock: variant.stock,
+          quantity: 1,
+        },
+      ];
     });
   }
 
   function removeFromCart(variantId: string) {
-    setCart(prev => prev.filter(item => item.variantId !== variantId));
+    setCart((prev) => prev.filter((item) => item.variantId !== variantId));
   }
 
   function updateQuantity(variantId: string, quantity: number) {
-    setCart(prev =>
-      prev.map(item => {
+    setCart((prev) =>
+      prev.map((item) => {
         if (item.variantId === variantId) {
           const maxQty = Math.min(item.stock, quantity);
           return { ...item, quantity: Math.max(1, maxQty) };
@@ -114,11 +116,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, getTotalCents }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, getTotalCents }}
+    >
       {children}
     </CartContext.Provider>
   );
 }
 
 // Export explicite des types pour compatibilité
-export type { Product, ProductVariant, CartItem }; 
+export type { Product, ProductVariant, CartItem };
