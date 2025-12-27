@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import type { Product } from '../../cartContext';
 import styles from './ProductGrid.module.css';
@@ -16,26 +16,8 @@ export default function ProductGrid({
   currentPage,
   totalPages,
 }: ProductGridProps) {
-  const [sortBy, setSortBy] = useState('featured');
-
-  const sortedProducts = useMemo(() => {
-    const sorted = [...products];
-    switch (sortBy) {
-      case 'price-asc':
-        return sorted.sort((a, b) => (a.minPriceCents || 0) - (b.minPriceCents || 0));
-      case 'price-desc':
-        return sorted.sort((a, b) => (b.minPriceCents || 0) - (a.minPriceCents || 0));
-      case 'newest':
-        return sorted.sort(
-          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
-        );
-      case 'rating':
-        // Placeholder - pas de rating pour l'instant
-        return sorted;
-      default:
-        return sorted;
-    }
-  }, [products, sortBy]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sortBy = searchParams.get('sort') || 'newest';
 
   return (
     <div className={styles.gridContainer}>
@@ -49,26 +31,28 @@ export default function ProductGrid({
           <label className={styles.sortLabel}>Trier par :</label>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set('sort', e.target.value);
+              setSearchParams(newParams);
+            }}
             className={styles.sortSelect}
           >
-            <option value="featured">En vedette</option>
-            <option value="price-asc">Prix croissant</option>
-            <option value="price-desc">Prix décroissant</option>
             <option value="newest">Plus récent</option>
-            <option value="rating">Meilleure note</option>
+            <option value="price-asc">Prix : croissant</option>
+            <option value="price-desc">Prix : décroissant</option>
           </select>
         </div>
       </div>
 
       {/* Grille de produits */}
-      {sortedProducts.length === 0 ? (
+      {products.length === 0 ? (
         <div className={styles.emptyState}>
           <p>Aucun produit trouvé.</p>
         </div>
       ) : (
         <div className={styles.grid}>
-          {sortedProducts.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

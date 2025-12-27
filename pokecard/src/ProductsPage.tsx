@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
@@ -6,6 +7,7 @@ import FilterSidebar from './components/catalogue/FilterSidebar';
 import ProductGrid from './components/catalogue/ProductGrid';
 
 export function ProductsPage() {
+  const [searchParams] = useSearchParams();
   const [allProducts, setAllProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,8 +16,9 @@ export function ProductsPage() {
   const [selectedCondition, setSelectedCondition] = useState<string>('Toutes');
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
+  const sortBy = searchParams.get('sort') || 'newest';
 
-  // Filtrer les produits selon les critères
+  // Filtrer et trier les produits selon les critères
   const filteredProducts = useMemo(() => {
     let filtered = [...allProducts];
 
@@ -44,8 +47,24 @@ export function ProductsPage() {
       });
     }
 
+    // Appliquer le tri
+    switch (sortBy) {
+      case 'price-asc':
+        filtered.sort((a, b) => (a.minPriceCents || 0) - (b.minPriceCents || 0));
+        break;
+      case 'price-desc':
+        filtered.sort((a, b) => (b.minPriceCents || 0) - (a.minPriceCents || 0));
+        break;
+      case 'newest':
+      default:
+        filtered.sort(
+          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        );
+        break;
+    }
+
     return filtered;
-  }, [allProducts, selectedCategory, selectedPriceRange, selectedCondition]);
+  }, [allProducts, selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
@@ -61,10 +80,10 @@ export function ProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
-  // Réinitialiser la page quand les filtres changent
+  // Réinitialiser la page quand les filtres ou le tri changent
   useEffect(() => {
     setPage(1);
-  }, [selectedCategory, selectedPriceRange, selectedCondition]);
+  }, [selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
 
   async function loadAllProducts() {
     setLoading(true);
