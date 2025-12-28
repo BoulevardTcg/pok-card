@@ -46,19 +46,43 @@ export default function NavbarPremium() {
   // Empêcher le scroll du body quand le menu mobile est ouvert
   useEffect(() => {
     if (isMenuOpen) {
+      // Sauvegarder la position de scroll actuelle
+      const scrollY = window.scrollY;
+      
+      // Bloquer le scroll de manière robuste
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.body.style.height = '100%';
+      
+      // Empêcher le scroll sur iOS
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.position = 'fixed';
+      document.documentElement.style.width = '100%';
+      document.documentElement.style.height = '100%';
+      
+      // Empêcher les gestes tactiles sur le body
+      document.body.style.touchAction = 'none';
+      
+      return () => {
+        // Restaurer le scroll
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+        document.body.style.touchAction = '';
+        
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.position = '';
+        document.documentElement.style.width = '';
+        document.documentElement.style.height = '';
+        
+        // Restaurer la position de scroll
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
   }, [isMenuOpen]);
 
   const navLinks = [
@@ -144,8 +168,16 @@ export default function NavbarPremium() {
       </div>
 
       {/* Menu mobile overlay */}
-      <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.open : ''}`}>
-        <div className={styles.mobileMenuContent}>
+      <div 
+        className={`${styles.mobileMenu} ${isMenuOpen ? styles.open : ''}`}
+        onClick={(e) => {
+          // Fermer le menu si on clique sur l'overlay (pas sur le contenu)
+          if (e.target === e.currentTarget) {
+            setIsMenuOpen(false);
+          }
+        }}
+      >
+        <div className={styles.mobileMenuContent} onClick={(e) => e.stopPropagation()}>
           <div className={styles.mobileNavLinks}>
             {navLinks.map((link, index) => (
               <button

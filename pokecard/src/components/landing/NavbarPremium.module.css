@@ -260,16 +260,26 @@
 .mobileMenu {
   position: fixed;
   inset: 0;
-  z-index: calc(var(--z-sticky, 200) - 1);
-  background: var(--color-bg-primary, #0a0a0b);
+  z-index: 9999; /* Au-dessus de tout */
+  background: #0a0a0b; /* Couleur opaque fixe, pas de transparence */
   opacity: 0;
   visibility: hidden;
-  transition: all var(--duration-slow, 400ms) var(--ease-out);
+  pointer-events: none;
+  overflow: hidden;
+  touch-action: none; /* Empêche tous les gestes tactiles */
+  -webkit-overflow-scrolling: none;
+  /* Empêche toute interaction avec le contenu derrière */
+  will-change: opacity, visibility;
+  transition: opacity var(--duration-slow, 400ms) var(--ease-out),
+              visibility var(--duration-slow, 400ms) var(--ease-out);
 }
 
 .mobileMenu.open {
-  opacity: 1;
+  opacity: 1; /* 100% opaque, aucune transparence */
   visibility: visible;
+  pointer-events: all; /* Active les interactions uniquement sur le menu */
+  /* Force l'opacité totale - aucun élément ne peut être visible derrière */
+  background: #0a0a0b;
 }
 
 .mobileMenuContent {
@@ -277,7 +287,13 @@
   flex-direction: column;
   justify-content: center;
   height: 100%;
+  width: 100%;
   padding: var(--space-24, 6rem) var(--container-padding, clamp(1.5rem, 5vw, 4rem));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y; /* Permet uniquement le scroll vertical dans le menu */
+  overscroll-behavior: contain; /* Empêche le scroll de se propager au contenu derrière */
 }
 
 .mobileNavLinks {
