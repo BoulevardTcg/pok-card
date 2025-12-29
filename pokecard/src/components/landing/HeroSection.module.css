@@ -318,7 +318,7 @@
 .cardWrapper {
   position: relative;
   transition:
-    transform var(--duration-slow, 400ms) var(--ease-out),
+    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     opacity var(--duration-base, 250ms) var(--ease-out);
   transform-style: preserve-3d;
   will-change: transform;
@@ -355,32 +355,25 @@
   transition: transform var(--duration-slow, 400ms) var(--ease-out);
 }
 
-/* Effet holographique */
+/* Reflet de lumière réaliste qui suit la rotation de la carte */
 .holoEffect {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    125deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.05) 75%,
-    transparent 100%
-  );
   mix-blend-mode: overlay;
   pointer-events: none;
-  animation: holoShimmer 6s ease-in-out infinite;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: background 0.1s ease-out;
+  /* Animation subtile de pulsation pour donner vie au reflet */
+  animation: lightPulse 4s ease-in-out infinite;
 }
 
-@keyframes holoShimmer {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: translateX(-100%) rotate(25deg);
+@keyframes lightPulse {
+  0%, 100% {
+    opacity: 0.85;
   }
   50% {
     opacity: 1;
-    transform: translateX(100%) rotate(25deg);
   }
 }
 

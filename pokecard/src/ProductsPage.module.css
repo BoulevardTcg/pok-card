@@ -59,6 +59,7 @@
 .sidebar {
   width: 100%;
   flex-shrink: 0;
+  position: relative;
 }
 
 .main {
