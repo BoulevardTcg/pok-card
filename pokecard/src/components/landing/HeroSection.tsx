@@ -8,14 +8,6 @@ import styles from './HeroSection.module.css';
 const HERO_PRODUCTS = [
   {
     id: 1,
-    name: 'ETB Flammes Fantasmagoriques',
-    subtitle: "Coffret Dresseur d'Élite",
-    set: 'ME02',
-    universe: 'Pokémon',
-    image: '/carte_accueil/card01.png',
-  },
-  {
-    id: 2,
     name: 'Display One Piece OP13',
     subtitle: 'Display 24 boosters',
     set: 'OP13',
@@ -23,22 +15,55 @@ const HERO_PRODUCTS = [
     image: '/carte_accueil/card02.png',
   },
   {
-    id: 3,
+    id: 2,
     name: 'UPC Flammes Fantasmagoriques',
     subtitle: 'Ultra Premium Collection',
     set: 'ME02',
     universe: 'Pokémon',
     image: '/carte_accueil/card03.png',
   },
+  {
+    id: 3,
+    name: 'Dracaufeu',
+    subtitle: 'Carte Pokémon',
+    set: 'ME02',
+    universe: 'Pokémon',
+    image: '/carte_accueil/dracaufeu.png',
+  },
+  {
+    id: 4,
+    name: 'Yasuo',
+    subtitle: 'Champion League of Legends',
+    set: 'LoR',
+    universe: 'League of Legends',
+    image: '/carte_accueil/yasuo.png',
+  },
+  {
+    id: 5,
+    name: 'Yone',
+    subtitle: 'Champion League of Legends',
+    set: 'LoR',
+    universe: 'League of Legends',
+    image: '/carte_accueil/yone.png',
+  },
+  {
+    id: 6,
+    name: 'Yu-Gi-Oh!',
+    subtitle: 'Carte de collection',
+    set: 'YG',
+    universe: 'Yu-Gi-Oh!',
+    image: '/carte_accueil/yugiho.png',
+  },
 ];
 
 export default function HeroSection() {
   const navigate = useNavigate();
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [autoPosition, setAutoPosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
   const productRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number>();
+  const timeRef = useRef(0);
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
 
@@ -55,32 +80,38 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // Effet de parallaxe subtil sur le produit — seulement quand la souris est au-dessus
+  // Animation automatique continue (mouvement 3D dynamique)
   useEffect(() => {
-    if (!isHovering) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!productRef.current) return;
-
-      const rect = productRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-
-      const x = (e.clientX - centerX) / rect.width;
-      const y = (e.clientY - centerY) / rect.height;
-
-      setMousePosition({ x: x * 12, y: y * 12 });
+    let lastX = 0;
+    let lastY = 0;
+    
+    const animate = () => {
+      timeRef.current += 0.015; // Plus rapide pour plus de dynamisme
+      
+      // Mouvement circulaire plus ample et dynamique
+      const x = Math.sin(timeRef.current) * 15; // Amplitude augmentée
+      const y = Math.cos(timeRef.current * 0.8) * 12; // Amplitude augmentée
+      
+      // Interpolation pour éviter les changements brusques
+      const smoothX = lastX + (x - lastX) * 0.2; // Plus réactif
+      const smoothY = lastY + (y - lastY) * 0.2; // Plus réactif
+      
+      lastX = smoothX;
+      lastY = smoothY;
+      
+      setAutoPosition({ x: smoothX, y: smoothY });
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isHovering]);
-
-  // Réinitialiser la position quand la souris quitte le produit
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    setMousePosition({ x: 0, y: 0 });
-  };
+    
+    animationFrameRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section className={styles.hero}>
@@ -142,10 +173,8 @@ export default function HeroSection() {
           <div
             ref={productRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={handleMouseLeave}
             style={{
-              transform: `perspective(1000px) rotateY(${mousePosition.x}deg) rotateX(${-mousePosition.y}deg)`,
+              transform: `perspective(1000px) rotateY(${autoPosition.x}deg) rotateX(${-autoPosition.y}deg)`,
             }}
           >
             {/* Glow effect */}
@@ -158,9 +187,6 @@ export default function HeroSection() {
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
               />
-
-              {/* Effet holographique */}
-              <div className={styles.holoEffect} />
             </div>
 
             {/* Info produit */}
