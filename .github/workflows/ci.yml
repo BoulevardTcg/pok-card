@@ -43,7 +43,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: pokecard/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install
         run: npm ci --ignore-scripts
