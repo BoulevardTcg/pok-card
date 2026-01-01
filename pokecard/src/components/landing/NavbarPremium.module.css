@@ -9,7 +9,9 @@
   right: 0;
   z-index: var(--z-sticky, 200);
   padding: var(--space-5, 1.25rem) 0;
-  background: transparent;
+  /* TEST: Fond opaque simple pour tester les performances */
+  background: #0a0a0b;
+  backdrop-filter: none;
   transition: all var(--duration-base, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
@@ -17,8 +19,9 @@
 
 .navbar.scrolled {
   padding: var(--space-3, 0.75rem) 0;
-  background: rgba(10, 10, 11, 0.95);
-  backdrop-filter: blur(12px);
+  /* TEST: Fond opaque simple pour tester les performances */
+  background: #0a0a0b;
+  backdrop-filter: none;
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
 }
 
@@ -28,14 +31,16 @@
 
 @media (max-width: 1023px) {
   .navbar {
-    background: rgba(10, 10, 11, 0.98);
-    backdrop-filter: blur(12px);
+    /* TEST: Fond opaque simple pour tester les performances */
+    background: #0a0a0b;
+    backdrop-filter: none;
     border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
     padding: var(--space-3, 0.75rem) 0;
   }
 
   .navbar.scrolled {
-    background: rgba(10, 10, 11, 0.98);
+    /* TEST: Fond opaque simple pour tester les performances */
+    background: #0a0a0b;
   }
 
   .container {
@@ -314,7 +319,8 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  /* TEST: Désactivation du blur pour tester les performances */
+  backdrop-filter: none;
   z-index: var(--z-modal, 400);
   animation: fadeIn var(--duration-base, 250ms) var(--ease-out);
 }

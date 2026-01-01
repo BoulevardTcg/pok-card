@@ -8,7 +8,8 @@ import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  // TEST: Désactivation temporaire de isScrolled pour tester les performances
+  const isScrolled = false;
   const [isMounted, setIsMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,29 +23,28 @@ export default function NavbarPremium() {
     return () => setIsMounted(false);
   }, []);
 
-  useEffect(() => {
-    let ticking = false;
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          // Seulement mettre à jour si le changement de scroll est significatif
-          // Cela évite les faux positifs lors des gestes tactiles sur la navbar
-          if (Math.abs(currentScrollY - lastScrollY) > 5 || currentScrollY <= 20) {
-            setIsScrolled(currentScrollY > 20);
-            lastScrollY = currentScrollY;
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // TEST: Désactivation temporaire du listener scroll pour tester les performances
+  // useEffect(() => {
+  //   let ticking = false;
+  //   let lastScrollY = window.scrollY;
+  //
+  //   const handleScroll = () => {
+  //     if (!ticking) {
+  //       window.requestAnimationFrame(() => {
+  //         const currentScrollY = window.scrollY;
+  //         if (Math.abs(currentScrollY - lastScrollY) > 5 || currentScrollY <= 20) {
+  //           setIsScrolled(currentScrollY > 20);
+  //           lastScrollY = currentScrollY;
+  //         }
+  //         ticking = false;
+  //       });
+  //       ticking = true;
+  //     }
+  //   };
+  //
+  //   window.addEventListener('scroll', handleScroll, { passive: true });
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, []);
 
   // Fermer le menu mobile lors du changement de route
   useEffect(() => {
