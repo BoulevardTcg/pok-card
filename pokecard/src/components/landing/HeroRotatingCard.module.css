@@ -15,12 +15,23 @@
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(215, 181, 109, 0.2);
-  transition: 
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Pas de transition sur transform pour éviter les conflits avec l'animation JS */
   cursor: pointer;
   transform-style: preserve-3d;
-  will-change: transform;
+}
+
+/* Sur mobile, désactiver will-change pour éviter les problèmes de performance */
+@media (max-width: 1023px) {
+  .card {
+    will-change: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card {
+    will-change: transform;
+  }
 }
 
 .card:hover {
@@ -54,7 +65,8 @@
 }
 
 @keyframes lightPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.85;
   }
   50% {

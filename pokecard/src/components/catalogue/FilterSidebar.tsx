@@ -57,7 +57,7 @@ export default function FilterSidebar({ filters, callbacks }: FilterSidebarProps
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
-      
+
       return () => {
         document.body.style.overflow = '';
         document.body.style.position = '';
@@ -101,125 +101,126 @@ export default function FilterSidebar({ filters, callbacks }: FilterSidebarProps
     selectedCategory !== 'Toutes' || selectedPriceRange !== 'all' || selectedCondition !== 'Toutes';
 
   // Contenu du drawer mobile (rendu via portal)
-  const mobileDrawerContent = isMobileOpen && isMounted ? (
-    <>
-      {/* Overlay */}
-      <div className={styles.mobileOverlay} onClick={handleClose} aria-hidden="true" />
+  const mobileDrawerContent =
+    isMobileOpen && isMounted ? (
+      <>
+        {/* Overlay */}
+        <div className={styles.mobileOverlay} onClick={handleClose} aria-hidden="true" />
 
-      {/* Drawer */}
-      <aside
-        className={styles.mobileDrawer}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Filtres de recherche"
-      >
-        <div className={styles.drawerContent}>
-        <div className={styles.header}>
-          <div className={styles.headerTop}>
-            <h2 className={styles.title}>Filtres</h2>
-            <button 
-              className={styles.mobileClose}
-              onClick={() => setIsMobileOpen(false)}
-              aria-label="Fermer les filtres"
-            >
-              ✕
-            </button>
-          </div>
-          <button onClick={handleReset} className={styles.resetButton}>
-            Réinitialiser
-          </button>
-        </div>
+        {/* Drawer */}
+        <aside
+          className={styles.mobileDrawer}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Filtres de recherche"
+        >
+          <div className={styles.drawerContent}>
+            <div className={styles.header}>
+              <div className={styles.headerTop}>
+                <h2 className={styles.title}>Filtres</h2>
+                <button
+                  className={styles.mobileClose}
+                  onClick={() => setIsMobileOpen(false)}
+                  aria-label="Fermer les filtres"
+                >
+                  ✕
+                </button>
+              </div>
+              <button onClick={handleReset} className={styles.resetButton}>
+                Réinitialiser
+              </button>
+            </div>
 
-      {/* Catégories */}
-      <div className={styles.section}>
-        <button onClick={() => toggleSection('categories')} className={styles.sectionButton}>
-          <span className={styles.sectionTitle}>Catégories</span>
-          <span
-            className={`${styles.chevron} ${openSections.includes('categories') ? styles.open : ''}`}
-          >
-            ▼
-          </span>
-        </button>
-        {openSections.includes('categories') && (
-          <div className={styles.options}>
-            {filterOptions.categories.map((category) => (
-              <label key={category} className={styles.option}>
-                <input
-                  type="radio"
-                  name="category"
-                  value={category}
-                  checked={selectedCategory === category}
-                  onChange={() => onCategoryChange(category)}
-                  className={styles.radio}
-                />
-                <span className={styles.optionLabel}>{category}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
+            {/* Catégories */}
+            <div className={styles.section}>
+              <button onClick={() => toggleSection('categories')} className={styles.sectionButton}>
+                <span className={styles.sectionTitle}>Catégories</span>
+                <span
+                  className={`${styles.chevron} ${openSections.includes('categories') ? styles.open : ''}`}
+                >
+                  ▼
+                </span>
+              </button>
+              {openSections.includes('categories') && (
+                <div className={styles.options}>
+                  {filterOptions.categories.map((category) => (
+                    <label key={category} className={styles.option}>
+                      <input
+                        type="radio"
+                        name="category"
+                        value={category}
+                        checked={selectedCategory === category}
+                        onChange={() => onCategoryChange(category)}
+                        className={styles.radio}
+                      />
+                      <span className={styles.optionLabel}>{category}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
-      {/* Prix */}
-      <div className={styles.section}>
-        <button onClick={() => toggleSection('price')} className={styles.sectionButton}>
-          <span className={styles.sectionTitle}>Prix</span>
-          <span
-            className={`${styles.chevron} ${openSections.includes('price') ? styles.open : ''}`}
-          >
-            ▼
-          </span>
-        </button>
-        {openSections.includes('price') && (
-          <div className={styles.options}>
-            {filterOptions.priceRanges.map((range) => (
-              <label key={range.value} className={styles.option}>
-                <input
-                  type="radio"
-                  name="price"
-                  value={range.value}
-                  checked={selectedPriceRange === range.value}
-                  onChange={() => onPriceRangeChange(range.value)}
-                  className={styles.radio}
-                />
-                <span className={styles.optionLabel}>{range.label}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
+            {/* Prix */}
+            <div className={styles.section}>
+              <button onClick={() => toggleSection('price')} className={styles.sectionButton}>
+                <span className={styles.sectionTitle}>Prix</span>
+                <span
+                  className={`${styles.chevron} ${openSections.includes('price') ? styles.open : ''}`}
+                >
+                  ▼
+                </span>
+              </button>
+              {openSections.includes('price') && (
+                <div className={styles.options}>
+                  {filterOptions.priceRanges.map((range) => (
+                    <label key={range.value} className={styles.option}>
+                      <input
+                        type="radio"
+                        name="price"
+                        value={range.value}
+                        checked={selectedPriceRange === range.value}
+                        onChange={() => onPriceRangeChange(range.value)}
+                        className={styles.radio}
+                      />
+                      <span className={styles.optionLabel}>{range.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
-      {/* État */}
-      <div className={styles.section}>
-        <button onClick={() => toggleSection('condition')} className={styles.sectionButton}>
-          <span className={styles.sectionTitle}>État</span>
-          <span
-            className={`${styles.chevron} ${openSections.includes('condition') ? styles.open : ''}`}
-          >
-            ▼
-          </span>
-        </button>
-        {openSections.includes('condition') && (
-          <div className={styles.options}>
-            {filterOptions.conditions.map((condition) => (
-              <label key={condition} className={styles.option}>
-                <input
-                  type="radio"
-                  name="condition"
-                  value={condition}
-                  checked={selectedCondition === condition}
-                  onChange={() => onConditionChange(condition)}
-                  className={styles.radio}
-                />
-                <span className={styles.optionLabel}>{condition}</span>
-              </label>
-            ))}
+            {/* État */}
+            <div className={styles.section}>
+              <button onClick={() => toggleSection('condition')} className={styles.sectionButton}>
+                <span className={styles.sectionTitle}>État</span>
+                <span
+                  className={`${styles.chevron} ${openSections.includes('condition') ? styles.open : ''}`}
+                >
+                  ▼
+                </span>
+              </button>
+              {openSections.includes('condition') && (
+                <div className={styles.options}>
+                  {filterOptions.conditions.map((condition) => (
+                    <label key={condition} className={styles.option}>
+                      <input
+                        type="radio"
+                        name="condition"
+                        value={condition}
+                        checked={selectedCondition === condition}
+                        onChange={() => onConditionChange(condition)}
+                        className={styles.radio}
+                      />
+                      <span className={styles.optionLabel}>{condition}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-        </div>
-      </aside>
-    </>
-  ) : null;
+        </aside>
+      </>
+    ) : null;
 
   return (
     <>

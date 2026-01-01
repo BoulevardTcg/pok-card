@@ -25,7 +25,7 @@ export default function NavbarPremium() {
   useEffect(() => {
     let ticking = false;
     let lastScrollY = window.scrollY;
-    
+
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -41,7 +41,7 @@ export default function NavbarPremium() {
         ticking = true;
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -56,23 +56,23 @@ export default function NavbarPremium() {
     if (isMenuOpen) {
       // Sauvegarder la position de scroll actuelle
       const scrollY = window.scrollY;
-      
+
       // Bloquer le scroll de manière robuste
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.height = '100%';
-      
+
       // Empêcher le scroll sur iOS
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.position = 'fixed';
       document.documentElement.style.width = '100%';
       document.documentElement.style.height = '100%';
-      
+
       // Empêcher les gestes tactiles sur le body
       document.body.style.touchAction = 'none';
-      
+
       return () => {
         // Restaurer le scroll
         document.body.style.overflow = '';
@@ -81,12 +81,12 @@ export default function NavbarPremium() {
         document.body.style.width = '';
         document.body.style.height = '';
         document.body.style.touchAction = '';
-        
+
         document.documentElement.style.overflow = '';
         document.documentElement.style.position = '';
         document.documentElement.style.width = '';
         document.documentElement.style.height = '';
-        
+
         // Restaurer la position de scroll
         window.scrollTo(0, scrollY);
       };
@@ -176,110 +176,114 @@ export default function NavbarPremium() {
       </div>
 
       {/* Menu mobile via portal */}
-      {isMounted && isMenuOpen && createPortal(
-        <div className={styles.mobileMenuOverlay} onClick={() => setIsMenuOpen(false)}>
-          <aside
-            className={styles.mobileMenu}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu de navigation"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header du menu mobile */}
-            <div className={styles.mobileMenuHeader}>
-              <button
-                className={styles.logo}
-                onClick={() => {
-                  navigate('/');
-                  setIsMenuOpen(false);
-                }}
-                aria-label="Retour à l'accueil"
-              >
-                <span className={styles.logoMark}>B</span>
-                <span className={styles.logoText}>Boulevard</span>
-              </button>
-              <button
-                className={styles.mobileMenuClose}
-                onClick={() => setIsMenuOpen(false)}
-                aria-label="Fermer le menu"
-              >
-                <CloseIcon size={24} />
-              </button>
-            </div>
-
-            {/* Navigation */}
-            <nav className={styles.mobileNavLinks}>
-              {navLinks.map((link, index) => (
+      {isMounted &&
+        isMenuOpen &&
+        createPortal(
+          <div className={styles.mobileMenuOverlay} onClick={() => setIsMenuOpen(false)}>
+            <aside
+              className={styles.mobileMenu}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu de navigation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header du menu mobile */}
+              <div className={styles.mobileMenuHeader}>
                 <button
-                  key={link.path}
+                  className={styles.logo}
                   onClick={() => {
-                    navigate(link.path);
+                    navigate('/');
                     setIsMenuOpen(false);
                   }}
-                  className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  aria-label="Retour à l'accueil"
                 >
-                  <span className={styles.mobileNavLabel}>{link.label}</span>
+                  <span className={styles.logoMark}>B</span>
+                  <span className={styles.logoText}>Boulevard</span>
                 </button>
-              ))}
-            </nav>
+                <button
+                  className={styles.mobileMenuClose}
+                  onClick={() => setIsMenuOpen(false)}
+                  aria-label="Fermer le menu"
+                >
+                  <CloseIcon size={24} />
+                </button>
+              </div>
 
-            {/* Footer avec actions */}
-            <div className={styles.mobileMenuFooter}>
-              {/* Panier */}
-              <button
-                onClick={() => {
-                  navigate('/panier');
-                  setIsMenuOpen(false);
-                }}
-                className={styles.mobileCartButton}
-              >
-                <CartIcon size={20} />
-                <span>Panier</span>
-                {cartCount > 0 && (
-                  <span className={styles.mobileCartBadge}>{cartCount > 9 ? '9+' : cartCount}</span>
+              {/* Navigation */}
+              <nav className={styles.mobileNavLinks}>
+                {navLinks.map((link, index) => (
+                  <button
+                    key={link.path}
+                    onClick={() => {
+                      navigate(link.path);
+                      setIsMenuOpen(false);
+                    }}
+                    className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <span className={styles.mobileNavLabel}>{link.label}</span>
+                  </button>
+                ))}
+              </nav>
+
+              {/* Footer avec actions */}
+              <div className={styles.mobileMenuFooter}>
+                {/* Panier */}
+                <button
+                  onClick={() => {
+                    navigate('/panier');
+                    setIsMenuOpen(false);
+                  }}
+                  className={styles.mobileCartButton}
+                >
+                  <CartIcon size={20} />
+                  <span>Panier</span>
+                  {cartCount > 0 && (
+                    <span className={styles.mobileCartBadge}>
+                      {cartCount > 9 ? '9+' : cartCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Compte */}
+                {isAuthenticated && user ? (
+                  <div className={styles.mobileUserInfo}>
+                    <button
+                      onClick={() => {
+                        navigate('/profile');
+                        setIsMenuOpen(false);
+                      }}
+                      className={styles.mobileUserButton}
+                    >
+                      <UserIcon size={18} />
+                      <span>{user.firstName || user.username}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className={styles.mobileLogout}
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMenuOpen(false);
+                    }}
+                    className={styles.mobileLoginButton}
+                  >
+                    Connexion
+                  </button>
                 )}
-              </button>
-
-              {/* Compte */}
-              {isAuthenticated && user ? (
-                <div className={styles.mobileUserInfo}>
-                  <button
-                    onClick={() => {
-                      navigate('/profile');
-                      setIsMenuOpen(false);
-                    }}
-                    className={styles.mobileUserButton}
-                  >
-                    <UserIcon size={18} />
-                    <span>{user.firstName || user.username}</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className={styles.mobileLogout}
-                  >
-                    Déconnexion
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    navigate('/login');
-                    setIsMenuOpen(false);
-                  }}
-                  className={styles.mobileLoginButton}
-                >
-                  Connexion
-                </button>
-              )}
-            </div>
-          </aside>
-        </div>,
-        document.body
-      )}
+              </div>
+            </aside>
+          </div>,
+          document.body
+        )}
     </nav>
   );
 }

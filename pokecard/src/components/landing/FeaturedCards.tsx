@@ -60,7 +60,12 @@ export default function FeaturedCards() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/products?limit=50`);
-      if (!response.ok) throw new Error('Erreur lors du chargement');
+      if (!response.ok) {
+        // Si le backend n'est pas disponible, ne pas afficher d'erreur
+        console.warn('Backend non disponible, affichage des produits désactivé');
+        setProducts([]);
+        return;
+      }
       const data = await response.json();
 
       // Filtrer pour n'avoir que les produits scellés (exclure Accessoires)
