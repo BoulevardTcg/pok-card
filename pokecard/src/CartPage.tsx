@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
+import { CartIcon } from './components/icons/Icons';
 import styles from './CartPage.module.css';
 import { createCheckoutSession, getVariantsStock, validatePromoCode } from './api';
 import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
@@ -211,7 +212,9 @@ export function CartPage() {
       <div className={styles.page}>
         <div className={styles.container}>
           <div className={styles.empty}>
-            <div className={styles.emptyIcon}>🛒</div>
+            <div className={styles.emptyIcon}>
+              <CartIcon size={64} />
+            </div>
             <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
             <p className={styles.emptyText}>Découvrez nos collections premium</p>
             <button onClick={() => navigate('/produits')} className={styles.emptyButton}>

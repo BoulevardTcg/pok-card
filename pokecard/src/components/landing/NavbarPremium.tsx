@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
@@ -8,11 +9,18 @@ import styles from './NavbarPremium.module.css';
 export default function NavbarPremium() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { cart } = useContext(CartContext);
   const { user, isAuthenticated, logout } = useAuth();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Gérer le montage pour le portal
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -167,50 +175,111 @@ export default function NavbarPremium() {
         </div>
       </div>
 
-      {/* Menu mobile overlay */}
-      <div 
-        className={`${styles.mobileMenu} ${isMenuOpen ? styles.open : ''}`}
-        onClick={(e) => {
-          // Fermer le menu si on clique sur l'overlay (pas sur le contenu)
-          if (e.target === e.currentTarget) {
-            setIsMenuOpen(false);
-          }
-        }}
-      >
-        <div className={styles.mobileMenuContent} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.mobileNavLinks}>
-            {navLinks.map((link, index) => (
+      {/* Menu mobile via portal */}
+      {isMounted && isMenuOpen && createPortal(
+        <div className={styles.mobileMenuOverlay} onClick={() => setIsMenuOpen(false)}>
+          <aside
+            className={styles.mobileMenu}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header du menu mobile */}
+            <div className={styles.mobileMenuHeader}>
               <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
-                style={{ animationDelay: `${index * 50}ms` }}
+                className={styles.logo}
+                onClick={() => {
+                  navigate('/');
+                  setIsMenuOpen(false);
+                }}
+                aria-label="Retour à l'accueil"
               >
-                <span className={styles.mobileNavNumber}>0{index + 1}</span>
-                <span className={styles.mobileNavLabel}>{link.label}</span>
+                <span className={styles.logoMark}>B</span>
+                <span className={styles.logoText}>Boulevard</span>
               </button>
-            ))}
-          </div>
+              <button
+                className={styles.mobileMenuClose}
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Fermer le menu"
+              >
+                <CloseIcon size={24} />
+              </button>
+            </div>
 
-          <div className={styles.mobileMenuFooter}>
-            {isAuthenticated && user ? (
-              <div className={styles.mobileUserInfo}>
-                <button onClick={() => navigate('/profile')} className={styles.mobileUserButton}>
-                  <UserIcon size={18} />
-                  <span>Mon compte</span>
+            {/* Navigation */}
+            <nav className={styles.mobileNavLinks}>
+              {navLinks.map((link, index) => (
+                <button
+                  key={link.path}
+                  onClick={() => {
+                    navigate(link.path);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <span className={styles.mobileNavLabel}>{link.label}</span>
                 </button>
-                <button onClick={logout} className={styles.mobileLogout}>
-                  Déconnexion
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => navigate('/login')} className={styles.mobileLoginButton}>
-                Connexion
+              ))}
+            </nav>
+
+            {/* Footer avec actions */}
+            <div className={styles.mobileMenuFooter}>
+              {/* Panier */}
+              <button
+                onClick={() => {
+                  navigate('/panier');
+                  setIsMenuOpen(false);
+                }}
+                className={styles.mobileCartButton}
+              >
+                <CartIcon size={20} />
+                <span>Panier</span>
+                {cartCount > 0 && (
+                  <span className={styles.mobileCartBadge}>{cartCount > 9 ? '9+' : cartCount}</span>
+                )}
               </button>
-            )}
-          </div>
-        </div>
-      </div>
+
+              {/* Compte */}
+              {isAuthenticated && user ? (
+                <div className={styles.mobileUserInfo}>
+                  <button
+                    onClick={() => {
+                      navigate('/profile');
+                      setIsMenuOpen(false);
+                    }}
+                    className={styles.mobileUserButton}
+                  >
+                    <UserIcon size={18} />
+                    <span>{user.firstName || user.username}</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className={styles.mobileLogout}
+                  >
+                    Déconnexion
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigate('/login');
+                    setIsMenuOpen(false);
+                  }}
+                  className={styles.mobileLoginButton}
+                >
+                  Connexion
+                </button>
+              )}
+            </div>
+          </aside>
+        </div>,
+        document.body
+      )}
     </nav>
   );
 }

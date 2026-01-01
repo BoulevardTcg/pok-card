@@ -66,9 +66,17 @@
 }
 
 .emptyIcon {
-  font-size: var(--text-6xl, 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: var(--space-6, 1.5rem);
-  opacity: 0.5;
+  color: var(--color-text-muted, #6b6b6f);
+  opacity: 0.6;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.emptyIcon svg {
+  stroke-width: 1.5;
 }
 
 .emptyTitle {
