@@ -8,7 +8,6 @@ import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,81 +15,24 @@ export default function NavbarPremium() {
   const { user, isAuthenticated, logout } = useAuth();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Gérer le montage pour le portal
   useEffect(() => {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
 
   useEffect(() => {
-    let ticking = false;
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          // Seulement mettre à jour si le changement de scroll est significatif
-          // Cela évite les faux positifs lors des gestes tactiles sur la navbar
-          if (Math.abs(currentScrollY - lastScrollY) > 5 || currentScrollY <= 20) {
-            setIsScrolled(currentScrollY > 20);
-            lastScrollY = currentScrollY;
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Fermer le menu mobile lors du changement de route
-  useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Empêcher le scroll du body quand le menu mobile est ouvert
   useEffect(() => {
     if (isMenuOpen) {
-      // Sauvegarder la position de scroll actuelle
-      const scrollY = window.scrollY;
-
-      // Bloquer le scroll de manière robuste
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-
-      // Empêcher le scroll sur iOS
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.position = 'fixed';
-      document.documentElement.style.width = '100%';
-      document.documentElement.style.height = '100%';
-
-      // Empêcher les gestes tactiles sur le body
-      document.body.style.touchAction = 'none';
-
-      return () => {
-        // Restaurer le scroll
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-        document.body.style.touchAction = '';
-
-        document.documentElement.style.overflow = '';
-        document.documentElement.style.position = '';
-        document.documentElement.style.width = '';
-        document.documentElement.style.height = '';
-
-        // Restaurer la position de scroll
-        window.scrollTo(0, scrollY);
-      };
+      document.body.classList.add('noScroll');
+    } else {
+      document.body.classList.remove('noScroll');
     }
+    return () => {
+      document.body.classList.remove('noScroll');
+    };
   }, [isMenuOpen]);
 
   const navLinks = [
@@ -101,10 +43,18 @@ export default function NavbarPremium() {
     { path: '/contact', label: 'Contact' },
   ];
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleNavClick = (path: string) => {
+    navigate(path);
+    closeMenu();
+  };
+
   return (
-    <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
+    <nav className={styles.navbar}>
       <div className={styles.container}>
-        {/* Logo */}
         <button
           className={styles.logo}
           onClick={() => navigate('/')}
@@ -114,7 +64,6 @@ export default function NavbarPremium() {
           <span className={styles.logoText}>Boulevard</span>
         </button>
 
-        {/* Navigation desktop */}
         <div className={styles.navLinks}>
           {navLinks.map((link) => (
             <button
@@ -128,9 +77,7 @@ export default function NavbarPremium() {
           ))}
         </div>
 
-        {/* Actions */}
         <div className={styles.actions}>
-          {/* Panier */}
           <button
             onClick={() => navigate('/panier')}
             className={styles.iconButton}
@@ -142,7 +89,6 @@ export default function NavbarPremium() {
             )}
           </button>
 
-          {/* Compte */}
           {isAuthenticated && user ? (
             <div className={styles.userMenu}>
               <button
@@ -163,7 +109,6 @@ export default function NavbarPremium() {
             </button>
           )}
 
-          {/* Menu mobile */}
           <button
             className={styles.menuButton}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -175,11 +120,10 @@ export default function NavbarPremium() {
         </div>
       </div>
 
-      {/* Menu mobile via portal */}
       {isMounted &&
         isMenuOpen &&
         createPortal(
-          <div className={styles.mobileMenuOverlay} onClick={() => setIsMenuOpen(false)}>
+          <div className={styles.mobileMenuOverlay} onClick={closeMenu}>
             <aside
               className={styles.mobileMenu}
               role="dialog"
@@ -187,14 +131,10 @@ export default function NavbarPremium() {
               aria-label="Menu de navigation"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header du menu mobile */}
               <div className={styles.mobileMenuHeader}>
                 <button
                   className={styles.logo}
-                  onClick={() => {
-                    navigate('/');
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={() => handleNavClick('/')}
                   aria-label="Retour à l'accueil"
                 >
                   <span className={styles.logoMark}>B</span>
@@ -202,38 +142,28 @@ export default function NavbarPremium() {
                 </button>
                 <button
                   className={styles.mobileMenuClose}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMenu}
                   aria-label="Fermer le menu"
                 >
                   <CloseIcon size={24} />
                 </button>
               </div>
 
-              {/* Navigation */}
               <nav className={styles.mobileNavLinks}>
-                {navLinks.map((link, index) => (
+                {navLinks.map((link) => (
                   <button
                     key={link.path}
-                    onClick={() => {
-                      navigate(link.path);
-                      setIsMenuOpen(false);
-                    }}
+                    onClick={() => handleNavClick(link.path)}
                     className={`${styles.mobileNavLink} ${location.pathname === link.path ? styles.active : ''}`}
-                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <span className={styles.mobileNavLabel}>{link.label}</span>
+                    {link.label}
                   </button>
                 ))}
               </nav>
 
-              {/* Footer avec actions */}
               <div className={styles.mobileMenuFooter}>
-                {/* Panier */}
                 <button
-                  onClick={() => {
-                    navigate('/panier');
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={() => handleNavClick('/panier')}
                   className={styles.mobileCartButton}
                 >
                   <CartIcon size={20} />
@@ -245,14 +175,10 @@ export default function NavbarPremium() {
                   )}
                 </button>
 
-                {/* Compte */}
                 {isAuthenticated && user ? (
                   <div className={styles.mobileUserInfo}>
                     <button
-                      onClick={() => {
-                        navigate('/profile');
-                        setIsMenuOpen(false);
-                      }}
+                      onClick={() => handleNavClick('/profile')}
                       className={styles.mobileUserButton}
                     >
                       <UserIcon size={18} />
@@ -261,7 +187,7 @@ export default function NavbarPremium() {
                     <button
                       onClick={() => {
                         logout();
-                        setIsMenuOpen(false);
+                        closeMenu();
                       }}
                       className={styles.mobileLogout}
                     >
@@ -270,10 +196,7 @@ export default function NavbarPremium() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => {
-                      navigate('/login');
-                      setIsMenuOpen(false);
-                    }}
+                    onClick={() => handleNavClick('/login')}
                     className={styles.mobileLoginButton}
                   >
                     Connexion
