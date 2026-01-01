@@ -68,6 +68,7 @@ test_front_mapping.html
 .idea/
 *.swp
 *.swo
+*.iml
 *~
 
 # ==== OS ====

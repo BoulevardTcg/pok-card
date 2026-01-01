@@ -8,21 +8,17 @@
   },
   "scripts": {
     "prepare": "husky",
-    "dev:front": "npm run dev --workspace pokecard",
-    "dev:back": "npm run dev --workspace server",
-    "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces",
-    "lint:fix": "npm run lint:fix --workspaces",
-    "format": "npm run format --workspaces"
+    "dev:front": "npm --prefix pokecard run dev",
+    "dev:back": "npm --prefix server run dev",
+    "build": "npm --prefix pokecard run build && npm --prefix server run build",
+    "lint": "npm --prefix pokecard run lint && npm --prefix server run lint",
+    "lint:fix": "npm --prefix pokecard run lint:fix && npm --prefix server run lint:fix",
+    "format": "npm --prefix pokecard run format && npm --prefix server run format"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VincentMorais/pok-card.git"
   },
-  "workspaces": [
-    "pokecard",
-    "server"
-  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -38,12 +34,12 @@
   },
   "lint-staged": {
     "pokecard/**/*.{ts,tsx,js,jsx,css,json}": [
-      "npm run format --workspace pokecard",
-      "npm run lint:fix --workspace pokecard"
+      "npm --prefix pokecard run format",
+      "npm --prefix pokecard run lint:fix"
     ],
     "server/**/*.{ts,js,json}": [
-      "npm run format --workspace server",
-      "npm run lint:fix --workspace server"
+      "npm --prefix server run format",
+      "npm --prefix server run lint:fix"
     ]
   }
 }
