@@ -176,13 +176,13 @@ export async function sendContactMessage(
 ): Promise<{ ok: true } | { ok: false; code?: string; error?: string }> {
   const token = localStorage.getItem('accessToken');
   const headers: Record<string, string> = {};
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
-  return fetchJson('/contact', { 
-    method: 'POST', 
+
+  return fetchJson('/contact', {
+    method: 'POST',
     body: JSON.stringify(payload),
     headers,
   });
