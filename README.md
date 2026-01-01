@@ -60,7 +60,7 @@ Le projet est volontairement pragmatique : une API REST Express + Prisma, et un 
 ## Structure du repo
 
 - `pokecard/` : frontend **React + Vite + TypeScript**
-- `pokecard/server/` : backend **Node + Express + Prisma**
+- `server/` : backend **Node + Express + Prisma**
 
 ## URLs en dev (par défaut)
 
@@ -108,13 +108,13 @@ Le projet est volontairement pragmatique : une API REST Express + Prisma, et un 
 
 ```bash
 npm --prefix pokecard install
-npm --prefix pokecard/server install
+npm --prefix server install
 ```
 
 ### 2) Configurer l’environnement (backend)
 
-Crée `pokecard/server/.env` (ne pas commiter).
-Tu peux partir de `pokecard/server/ENV_EXAMPLE.txt`.
+Crée `server/.env` (ne pas commiter).
+Tu peux partir de `server/ENV_EXAMPLE.txt`.
 
 Variables **courantes** (extraits, sans valeurs):
 
@@ -130,16 +130,16 @@ Variables **courantes** (extraits, sans valeurs):
 ### 3) Base de données (Prisma)
 
 ```bash
-npx --prefix pokecard/server prisma generate
-npx --prefix pokecard/server prisma db push
+npx --prefix server prisma generate
+npx --prefix server prisma db push
 # optionnel
-npm --prefix pokecard/server run seed
+npm --prefix server run seed
 ```
 
 ### 4) Lancer le backend
 
 ```bash
-npm --prefix pokecard/server run dev
+npm --prefix server run dev
 ```
 
 ### 5) Lancer le frontend
@@ -159,19 +159,19 @@ npm --prefix pokecard run preview
 npm --prefix pokecard run lint
 ```
 
-### Backend (`pokecard/server/`)
+### Backend (`server/`)
 
 ```bash
-npm --prefix pokecard/server run dev
-npm --prefix pokecard/server run build
-npm --prefix pokecard/server start
-npm --prefix pokecard/server test
-npm --prefix pokecard/server run seed
+npm --prefix server run dev
+npm --prefix server run build
+npm --prefix server start
+npm --prefix server test
+npm --prefix server run seed
 ```
 
 ## Tests
 
-Les tests backend sont sous `pokecard/server/src/__tests__/`.
+Les tests backend sont sous `server/src/__tests__/`.
 
 - Ils tournent en série (`--runInBand`) pour éviter les conflits DB.
 - Les tests exigent une DB dédiée (`TEST_DATABASE_URL`) pour éviter toute suppression accidentelle.
@@ -182,7 +182,7 @@ Les tests backend sont sous `pokecard/server/src/__tests__/`.
 - Script de scan basique:
 
 ```bash
-node pokecard/server/scripts/scan-secrets.mjs
+node server/scripts/scan-secrets.mjs
 ```
 
 - Endpoint contact protégé (honeypot + rate limit).
@@ -206,9 +206,20 @@ taskkill /PID <PID> /F
 ### Prisma / schema pas à jour
 
 ```bash
-npx --prefix pokecard/server prisma generate
-npx --prefix pokecard/server prisma db push
+npx --prefix server prisma generate
+npx --prefix server prisma db push
 ```
+
+## Monorepo sans workspaces (important)
+
+- Ne lancez pas `npm i` à la racine du repo. Installez dans chaque app:
+  - Frontend: `npm --prefix pokecard i` (ou `ci` en CI)
+  - Backend: `npm --prefix server i` (ou `ci` en CI)
+- Des scripts pratiques existent à la racine:
+  - `npm run dev:front`, `npm run dev:back`
+  - `npm run lint`, `npm run lint:fix`, `npm run format`, `npm run build`
+- Les hooks Git (pre-commit) restent à la racine et déclenchent le lint/format dans chaque dossier via `npm --prefix`.
+- La CI (GitHub Actions) installe déjà séparément dans `pokecard/` et `server/` avec `npm ci`.
 
 ### Contact / emails
 
