@@ -36,8 +36,25 @@
     rgba(139, 115, 85, 0.02) 50%,
     transparent 70%
   );
+  /* ⚡ OPTIMISATION: Désactiver blur sur mobile (très coûteux GPU) */
   filter: blur(60px);
   animation: orbFloat 20s ease-in-out infinite;
+}
+
+/* ⚡ OPTIMISATION MOBILE: Gradient sans blur pour performance */
+@media (max-width: 1023px) {
+  .gradientOrb {
+    filter: none;
+    opacity: 0.4; /* Réduire l'opacité pour compenser l'absence de blur */
+    background: radial-gradient(
+      circle,
+      rgba(139, 115, 85, 0.04) 0%,
+      rgba(139, 115, 85, 0.01) 50%,
+      transparent 70%
+    );
+    /* Désactiver l'animation sur mobile pour économiser les ressources */
+    animation: none;
+  }
 }
 
 @keyframes orbFloat {
@@ -329,29 +346,20 @@
   position: relative;
   transition: opacity var(--duration-base, 250ms) var(--ease-out);
   transform-style: preserve-3d;
-  /* Pas de transition sur transform pour éviter les conflits avec l'animation JS */
+  /* ⚡ OPTIMISATION: Pas de transition sur transform pour éviter les conflits avec l'animation JS */
+  /* ⚡ will-change géré dynamiquement via JS (ajouté/seulement pendant animation) */
   width: 100%;
   max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* Sur mobile, désactiver will-change pour éviter les problèmes de performance */
-@media (max-width: 1023px) {
-  .cardWrapper {
-    will-change: auto;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cardWrapper {
-    will-change: transform;
-  }
+  /* ⚡ Transform initial avec translate3d pour forcer l'accélération GPU */
+  transform: perspective(1000px) translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg);
 }
 
 .cardWrapper.transitioning {
   opacity: 0;
+  /* ⚡ OPTIMISATION: Transform forcé pendant la transition (override l'animation JS) */
   transform: perspective(1000px) rotateY(15deg) scale(0.95) !important;
 }
 
@@ -359,8 +367,16 @@
   position: absolute;
   inset: -20%;
   background: radial-gradient(ellipse at center, rgba(232, 228, 221, 0.1) 0%, transparent 60%);
+  /* ⚡ OPTIMISATION: Blur uniquement sur desktop (coûteux GPU) */
   filter: blur(40px);
   pointer-events: none;
+}
+
+/* ⚡ OPTIMISATION MOBILE: Désactiver glow (blur très coûteux) */
+@media (max-width: 1023px) {
+  .cardGlow {
+    display: none; /* Complètement désactivé sur mobile pour fluidité */
+  }
 }
 
 .cardFrame {
@@ -369,16 +385,20 @@
   aspect-ratio: 2.5 / 3.5;
   border-radius: 12px;
   overflow: hidden;
+  /* ⚡ OPTIMISATION: Box-shadow premium sur desktop */
   box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.5),
     0 0 100px rgba(139, 115, 85, 0.1);
   min-height: 260px; /* Hauteur minimale pour mobile */
 }
 
+/* ⚡ OPTIMISATION MOBILE: Box-shadow simplifié (moins de couches = meilleure performance GPU) */
 @media (max-width: 1023px) {
   .cardFrame {
     width: clamp(220px, 60vw, 300px);
     min-height: 308px; /* 220px * 1.4 (ratio 2.5/3.5) */
+    /* Une seule ombre simplifiée pour mobile */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   }
 }
 

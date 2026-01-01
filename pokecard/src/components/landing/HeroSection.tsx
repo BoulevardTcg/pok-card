@@ -59,12 +59,13 @@ const HERO_PRODUCTS = [
 export default function HeroSection() {
   const navigate = useNavigate();
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
-  const [autoPosition, setAutoPosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageKey, setImageKey] = useState(0); // Key pour forcer le rechargement
   const productRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef(0);
   const loadedImagesRef = useRef<Set<string>>(new Set());
+  const isMobileRef = useRef(window.innerWidth < 1024);
+  const animationPausedRef = useRef(false);
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
 
@@ -102,6 +103,8 @@ export default function HeroSection() {
   // Rotation automatique des produits
   useEffect(() => {
     const interval = setInterval(() => {
+      // ⚡ OPTIMISATION: Pauser l'animation 3D pendant la transition
+      animationPausedRef.current = true;
       setIsTransitioning(true);
       setTimeout(() => {
         const nextIndex = (currentProductIndex + 1) % HERO_PRODUCTS.length;
@@ -109,6 +112,8 @@ export default function HeroSection() {
         // Forcer le rechargement de l'image en changeant la key
         setImageKey((prev) => prev + 1);
         setIsTransitioning(false);
+        // Reprendre l'animation après la transition
+        animationPausedRef.current = false;
       }, 300);
     }, 5000);
 
@@ -116,19 +121,36 @@ export default function HeroSection() {
   }, [currentProductIndex]);
 
   // Animation automatique continue (mouvement 3D dynamique)
+  // ⚡ OPTIMISATION: Manipulation DOM directe (pas de setState) pour éviter les rerenders React
   useEffect(() => {
+    if (!productRef.current) return;
+
     let lastX = 0;
     let lastY = 0;
     let rafId: number;
+    let isActive = true;
 
     // Détecter si on est sur mobile et adapter les paramètres
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = isMobileRef.current;
     const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile pour meilleures performances
     const amplitude = isMobile ? 8 : 15; // Amplitude réduite sur mobile
     const amplitudeY = isMobile ? 6 : 12;
     const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile pour fluidité
 
+    // Optimisation: Ajouter will-change seulement pendant l'animation
+    if (!isMobile && productRef.current) {
+      productRef.current.style.willChange = 'transform';
+    }
+
     const animate = () => {
+      if (!isActive || !productRef.current || animationPausedRef.current) {
+        // Continuer la boucle même si paused (pour reprendre rapidement)
+        if (isActive) {
+          rafId = requestAnimationFrame(animate);
+        }
+        return;
+      }
+
       timeRef.current += speed;
 
       // Mouvement circulaire
@@ -142,7 +164,9 @@ export default function HeroSection() {
       lastX = smoothX;
       lastY = smoothY;
 
-      setAutoPosition({ x: smoothX, y: smoothY });
+      // ⚡ OPTIMISATION: Manipulation DOM directe au lieu de setState
+      // ⚡ Utilisation de translate3d pour forcer l'accélération GPU (meilleure performance)
+      productRef.current.style.transform = `perspective(1000px) translate3d(0, 0, 0) rotateY(${smoothX}deg) rotateX(${-smoothY}deg)`;
 
       rafId = requestAnimationFrame(animate);
     };
@@ -150,8 +174,13 @@ export default function HeroSection() {
     rafId = requestAnimationFrame(animate);
 
     return () => {
+      isActive = false;
       if (rafId) {
         cancelAnimationFrame(rafId);
+      }
+      // Nettoyer will-change quand l'animation s'arrête
+      if (productRef.current && !isMobile) {
+        productRef.current.style.willChange = 'auto';
       }
     };
   }, []);
@@ -197,12 +226,16 @@ export default function HeroSection() {
                 key={product.id}
                 className={`${styles.indicator} ${index === currentProductIndex ? styles.active : ''}`}
                 onClick={() => {
+                  // ⚡ OPTIMISATION: Pauser l'animation 3D pendant la transition
+                  animationPausedRef.current = true;
                   setIsTransitioning(true);
                   setTimeout(() => {
                     setCurrentProductIndex(index);
                     // Forcer le rechargement de l'image
                     setImageKey((prev) => prev + 1);
                     setIsTransitioning(false);
+                    // Reprendre l'animation après la transition
+                    animationPausedRef.current = false;
                   }, 300);
                 }}
                 aria-label={`Voir ${product.name}`}
@@ -218,9 +251,6 @@ export default function HeroSection() {
           <div
             ref={productRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
-            style={{
-              transform: `perspective(1000px) rotateY(${autoPosition.x}deg) rotateX(${-autoPosition.y}deg)`,
-            }}
           >
             {/* Glow effect */}
             <div className={styles.cardGlow} />
