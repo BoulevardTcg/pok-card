@@ -14,7 +14,7 @@ export default function FinalCTA() {
 
       <div className={styles.container}>
         <div className={styles.content}>
-          <span className={styles.overline}>Rejoignez l'aventure</span>
+          <span className={styles.overline}>Rejoignez l'aventurzeze</span>
 
           <h2 className={styles.title}>
             Produits scellés premium
