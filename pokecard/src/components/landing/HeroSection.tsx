@@ -61,54 +61,97 @@ export default function HeroSection() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [autoPosition, setAutoPosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [imageKey, setImageKey] = useState(0); // Key pour forcer le rechargement
   const productRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
   const timeRef = useRef(0);
+  const loadedImagesRef = useRef<Set<string>>(new Set());
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
+
+  // Précharger toutes les images pour éviter les problèmes d'affichage
+  useEffect(() => {
+    const preloadImages = async () => {
+      const promises = HERO_PRODUCTS.map((product) => {
+        return new Promise<void>((resolve) => {
+          // Vérifier si l'image est déjà chargée
+          if (loadedImagesRef.current.has(product.image)) {
+            resolve();
+            return;
+          }
+
+          const img = new Image();
+          img.onload = () => {
+            loadedImagesRef.current.add(product.image);
+            resolve();
+          };
+          img.onerror = () => {
+            console.warn('Erreur de préchargement:', product.image);
+            resolve(); // Continuer même en cas d'erreur
+          };
+          // Charger l'image normalement (sans timestamp pour le préchargement)
+          img.src = product.image;
+        });
+      });
+
+      await Promise.all(promises);
+    };
+
+    preloadImages();
+  }, []);
 
   // Rotation automatique des produits
   useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentProductIndex((prev) => (prev + 1) % HERO_PRODUCTS.length);
+        const nextIndex = (currentProductIndex + 1) % HERO_PRODUCTS.length;
+        setCurrentProductIndex(nextIndex);
+        // Forcer le rechargement de l'image en changeant la key
+        setImageKey((prev) => prev + 1);
         setIsTransitioning(false);
       }, 300);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [currentProductIndex]);
 
   // Animation automatique continue (mouvement 3D dynamique)
   useEffect(() => {
     let lastX = 0;
     let lastY = 0;
-    
+    let rafId: number;
+
+    // Détecter si on est sur mobile
+    const isMobile = window.innerWidth < 1024;
+    const amplitude = isMobile ? 8 : 15; // Amplitude réduite sur mobile
+    const amplitudeY = isMobile ? 6 : 12;
+    const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile
+    const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile
+
     const animate = () => {
-      timeRef.current += 0.015; // Plus rapide pour plus de dynamisme
-      
-      // Mouvement circulaire plus ample et dynamique
-      const x = Math.sin(timeRef.current) * 15; // Amplitude augmentée
-      const y = Math.cos(timeRef.current * 0.8) * 12; // Amplitude augmentée
-      
+      timeRef.current += speed;
+
+      // Mouvement circulaire
+      const x = Math.sin(timeRef.current) * amplitude;
+      const y = Math.cos(timeRef.current * 0.8) * amplitudeY;
+
       // Interpolation pour éviter les changements brusques
-      const smoothX = lastX + (x - lastX) * 0.2; // Plus réactif
-      const smoothY = lastY + (y - lastY) * 0.2; // Plus réactif
-      
+      const smoothX = lastX + (x - lastX) * smoothing;
+      const smoothY = lastY + (y - lastY) * smoothing;
+
       lastX = smoothX;
       lastY = smoothY;
-      
+
       setAutoPosition({ x: smoothX, y: smoothY });
-      
-      animationFrameRef.current = requestAnimationFrame(animate);
+
+      rafId = requestAnimationFrame(animate);
     };
-    
-    animationFrameRef.current = requestAnimationFrame(animate);
-    
+
+    rafId = requestAnimationFrame(animate);
+
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
       }
     };
   }, []);
@@ -157,6 +200,8 @@ export default function HeroSection() {
                   setIsTransitioning(true);
                   setTimeout(() => {
                     setCurrentProductIndex(index);
+                    // Forcer le rechargement de l'image
+                    setImageKey((prev) => prev + 1);
                     setIsTransitioning(false);
                   }, 300);
                 }}
@@ -183,9 +228,23 @@ export default function HeroSection() {
             {/* Le produit */}
             <div className={styles.cardFrame}>
               <img
+                key={`${currentProduct.id}-${imageKey}`}
                 src={currentProduct.image}
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
+                loading="eager"
+                onError={(e) => {
+                  console.warn("Erreur de chargement de l'image:", currentProduct.image);
+                  // Essayer de recharger avec un timestamp
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes('?')) {
+                    target.src = `${currentProduct.image}?retry=${Date.now()}`;
+                  }
+                }}
+                onLoad={() => {
+                  // Image chargée avec succès
+                  loadedImagesRef.current.add(currentProduct.image);
+                }}
               />
             </div>
 
