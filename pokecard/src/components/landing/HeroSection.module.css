@@ -40,6 +40,20 @@
   animation: orbFloat 20s ease-in-out infinite;
 }
 
+@media (max-width: 1023px) {
+  .gradientOrb {
+    filter: none;
+    opacity: 0.4;
+    background: radial-gradient(
+      circle,
+      rgba(139, 115, 85, 0.04) 0%,
+      rgba(139, 115, 85, 0.01) 50%,
+      transparent 70%
+    );
+    animation: none;
+  }
+}
+
 @keyframes orbFloat {
   0%,
   100% {
@@ -225,26 +239,6 @@
   transform: translateX(4px);
 }
 
-.secondaryCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  background: transparent;
-  color: var(--color-text-secondary, #a1a1a6);
-  font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-medium, 500);
-  letter-spacing: var(--tracking-wide, 0.02em);
-  border: none;
-  cursor: pointer;
-  transition: color var(--duration-fast, 150ms) var(--ease-out);
-}
-
-.secondaryCta:hover {
-  color: var(--color-text-primary, #f5f5f3);
-}
-
 /* Card Indicators */
 .cardIndicators {
   display: flex;
@@ -306,14 +300,14 @@
   justify-content: center;
   order: 1;
   padding: var(--space-8, 2rem) 0;
-  min-height: 400px; /* Hauteur minimale pour mobile */
+  min-height: 400px;
   width: 100%;
-  overflow: visible; /* Assurer que rien n'est coupé */
+  overflow: visible;
 }
 
 @media (max-width: 1023px) {
   .heroVisual {
-    min-height: 450px; /* Plus d'espace pour la carte et les infos */
+    min-height: 450px;
     padding: var(--space-6, 1.5rem) 0;
   }
 }
@@ -329,25 +323,12 @@
   position: relative;
   transition: opacity var(--duration-base, 250ms) var(--ease-out);
   transform-style: preserve-3d;
-  /* Pas de transition sur transform pour éviter les conflits avec l'animation JS */
   width: 100%;
   max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* Sur mobile, désactiver will-change pour éviter les problèmes de performance */
-@media (max-width: 1023px) {
-  .cardWrapper {
-    will-change: auto;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cardWrapper {
-    will-change: transform;
-  }
+  transform: perspective(1000px) translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg);
 }
 
 .cardWrapper.transitioning {
@@ -363,6 +344,12 @@
   pointer-events: none;
 }
 
+@media (max-width: 1023px) {
+  .cardGlow {
+    display: none;
+  }
+}
+
 .cardFrame {
   position: relative;
   width: clamp(260px, 35vw, 380px);
@@ -372,13 +359,14 @@
   box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.5),
     0 0 100px rgba(139, 115, 85, 0.1);
-  min-height: 260px; /* Hauteur minimale pour mobile */
+  min-height: 260px;
 }
 
 @media (max-width: 1023px) {
   .cardFrame {
     width: clamp(220px, 60vw, 300px);
-    min-height: 308px; /* 220px * 1.4 (ratio 2.5/3.5) */
+    min-height: 308px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -389,10 +377,9 @@
   display: block;
   position: relative;
   z-index: 1;
-  background: var(--color-bg-elevated, #141416); /* Fallback pendant le chargement */
+  background: var(--color-bg-elevated, #141416);
 }
 
-/* Assurer la visibilité sur mobile */
 @media (max-width: 1023px) {
   .cardImage {
     min-width: 220px;
@@ -401,40 +388,6 @@
 
   .cardFrame {
     background: transparent;
-  }
-}
-
-.cardImagePlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted, #6b6b6f);
-  font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-sm, 0.875rem);
-}
-
-/* Reflet de lumière réaliste qui suit la rotation de la carte */
-.holoEffect {
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: background 0.1s ease-out;
-  /* Animation subtile de pulsation pour donner vie au reflet */
-  animation: lightPulse 4s ease-in-out infinite;
-}
-
-@keyframes lightPulse {
-  0%,
-  100% {
-    opacity: 0.85;
-  }
-  50% {
-    opacity: 1;
   }
 }
 
