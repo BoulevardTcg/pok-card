@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Home } from './Home';
 import { Concours } from './Concours';
 import { ProductDetail } from './ProductDetail';
@@ -23,7 +23,6 @@ import { AuthProvider } from './authContext';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import UserProfile from './UserProfile';
-import NavbarPremium from './components/landing/NavbarPremium';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
@@ -39,7 +38,6 @@ import { AdminPromoFormPage } from './pages/admin/AdminPromoFormPage';
 
 // Composant principal de l'application
 function AppContent() {
-  const location = useLocation();
   const lastScroll = useRef(window.scrollY);
 
   useEffect(() => {
@@ -51,14 +49,8 @@ function AppContent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Ne pas afficher la navbar sur la page d'accueil (elle a déjà NavbarPremium)
-  const isHomePage = location.pathname === '/';
-
   return (
     <div className={styles.appBg}>
-      {/* Navbar Premium pour les autres pages */}
-      {!isHomePage && <NavbarPremium />}
-
       <main className={styles.main}>
         <Routes>
           <Route path="/" element={<Home />} />
