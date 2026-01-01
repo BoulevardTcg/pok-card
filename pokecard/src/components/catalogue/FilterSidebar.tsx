@@ -115,11 +115,8 @@ export default function FilterSidebar({ filters, callbacks }: FilterSidebarProps
       >
         <div className={styles.drawerContent}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Filtres</h2>
-          <div className={styles.headerActions}>
-            <button onClick={handleReset} className={styles.resetButton}>
-              Réinitialiser
-            </button>
+          <div className={styles.headerTop}>
+            <h2 className={styles.title}>Filtres</h2>
             <button 
               className={styles.mobileClose}
               onClick={() => setIsMobileOpen(false)}
@@ -128,6 +125,9 @@ export default function FilterSidebar({ filters, callbacks }: FilterSidebarProps
               ✕
             </button>
           </div>
+          <button onClick={handleReset} className={styles.resetButton}>
+            Réinitialiser
+          </button>
         </div>
 
       {/* Catégories */}
