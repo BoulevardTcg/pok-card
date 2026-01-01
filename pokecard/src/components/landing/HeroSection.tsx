@@ -62,7 +62,6 @@ export default function HeroSection() {
   const [autoPosition, setAutoPosition] = useState({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const productRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
   const timeRef = useRef(0);
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
@@ -84,31 +83,39 @@ export default function HeroSection() {
   useEffect(() => {
     let lastX = 0;
     let lastY = 0;
-    
+    let rafId: number;
+
+    // Détecter si on est sur mobile et adapter les paramètres
+    const isMobile = window.innerWidth < 1024;
+    const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile pour meilleures performances
+    const amplitude = isMobile ? 8 : 15; // Amplitude réduite sur mobile
+    const amplitudeY = isMobile ? 6 : 12;
+    const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile pour fluidité
+
     const animate = () => {
-      timeRef.current += 0.015; // Plus rapide pour plus de dynamisme
-      
-      // Mouvement circulaire plus ample et dynamique
-      const x = Math.sin(timeRef.current) * 15; // Amplitude augmentée
-      const y = Math.cos(timeRef.current * 0.8) * 12; // Amplitude augmentée
-      
+      timeRef.current += speed;
+
+      // Mouvement circulaire
+      const x = Math.sin(timeRef.current) * amplitude;
+      const y = Math.cos(timeRef.current * 0.8) * amplitudeY;
+
       // Interpolation pour éviter les changements brusques
-      const smoothX = lastX + (x - lastX) * 0.2; // Plus réactif
-      const smoothY = lastY + (y - lastY) * 0.2; // Plus réactif
-      
+      const smoothX = lastX + (x - lastX) * smoothing;
+      const smoothY = lastY + (y - lastY) * smoothing;
+
       lastX = smoothX;
       lastY = smoothY;
-      
+
       setAutoPosition({ x: smoothX, y: smoothY });
-      
-      animationFrameRef.current = requestAnimationFrame(animate);
+
+      rafId = requestAnimationFrame(animate);
     };
-    
-    animationFrameRef.current = requestAnimationFrame(animate);
-    
+
+    rafId = requestAnimationFrame(animate);
+
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
       }
     };
   }, []);
