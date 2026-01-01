@@ -121,12 +121,12 @@ export default function HeroSection() {
     let lastY = 0;
     let rafId: number;
 
-    // Détecter si on est sur mobile
+    // Détecter si on est sur mobile et adapter les paramètres
     const isMobile = window.innerWidth < 1024;
+    const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile pour meilleures performances
     const amplitude = isMobile ? 8 : 15; // Amplitude réduite sur mobile
     const amplitudeY = isMobile ? 6 : 12;
-    const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile
-    const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile
+    const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile pour fluidité
 
     const animate = () => {
       timeRef.current += speed;

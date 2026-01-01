@@ -41,6 +41,7 @@ function getProductType(product: Product): string {
 
 // Vérifie si le produit est récent (moins de 30 jours)
 function isNewProduct(product: Product): boolean {
+  if (!product.createdAt) return false;
   const createdDate = new Date(product.createdAt);
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -82,7 +83,9 @@ export default function FeaturedCards() {
 
       // Trier par date de création (les plus récents en premier) et prendre les 4 premiers
       const sortedProducts = sealedProducts.sort((a: Product, b: Product) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
       });
 
       setProducts(sortedProducts.slice(0, 4));
