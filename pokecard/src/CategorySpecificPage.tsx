@@ -415,18 +415,6 @@ export function CategorySpecificPage() {
     return mappedCategories.includes(apiProduct.category);
   });
 
-  // Debug: afficher les résultats du filtrage
-  if (category === 'displays') {
-    console.log('🔍 Debug Displays:');
-    console.log('- Produits API chargés:', apiProducts.length);
-    console.log('- Produits API après filtrage:', filteredApiProducts.length);
-    console.log(
-      '- Produits API filtrés:',
-      filteredApiProducts.map((p) => `${p.name} (${p.category})`)
-    );
-    console.log('- Produits statiques filtrés:', filteredStaticProducts.length);
-  }
-
   // Combiner les produits statiques et API
   const allCombinedProducts = [
     ...filteredStaticProducts.map((p) => ({ type: 'static' as const, data: p })),

@@ -8,7 +8,6 @@ import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isScrolled = false;
   const [isMounted, setIsMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -54,7 +53,7 @@ export default function NavbarPremium() {
   };
 
   return (
-    <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
+    <nav className={styles.navbar}>
       <div className={styles.container}>
         <button
           className={styles.logo}
