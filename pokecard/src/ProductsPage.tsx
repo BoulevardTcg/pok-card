@@ -97,6 +97,8 @@ export function ProductsPage() {
         pagination: { page: number; total: number; pages: number };
       };
 
+      console.log('📦 Produits reçus:', response.products?.length || 0);
+
       if (!response || !response.products) {
         console.error("❌ Réponse invalide de l'API:", response);
         setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
@@ -106,6 +108,8 @@ export function ProductsPage() {
 
       // Filtrer pour exclure les produits de la catégorie "Accessoires"
       let filteredProducts = response.products.filter((p) => p.category !== 'Accessoires');
+
+      console.log('✅ Produits filtrés:', filteredProducts.length);
 
       // Si une catégorie spécifique est sélectionnée, ne pas mélanger pour garder l'ordre
       if (selectedCategory === 'Toutes') {

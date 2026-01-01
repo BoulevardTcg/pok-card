@@ -1,0 +1,140 @@
+.section {
+  padding: 5rem 0 7rem;
+  background: #0c1321;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #d1d5db;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  font-family: var(--font-sans);
+}
+
+.divider {
+  width: 96px;
+  height: 2px;
+  background: #d7b56d;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(215, 181, 109, 0.2);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(215, 181, 109, 0.4);
+  transform: translateY(-4px);
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.star {
+  font-size: 1.25rem;
+  color: #d7b56d;
+}
+
+.content {
+  color: #d1d5db;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  font-family: var(--font-sans);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  position: relative;
+}
+
+.avatarInner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, #e8dcc3, #d7b56d);
+  border: 2px solid #d7b56d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(215, 181, 109, 0.3);
+}
+
+.avatarInitials {
+  color: #0c1321;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+}
+
+.avatarGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(215, 181, 109, 0.2);
+  filter: blur(16px);
+  z-index: -1;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.authorName {
+  color: white;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+.authorRole {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

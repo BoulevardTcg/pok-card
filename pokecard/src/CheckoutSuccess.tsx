@@ -48,6 +48,9 @@ export function CheckoutSuccess() {
       if (response.ok && data.success) {
         setOrderNumber(data.orderNumber);
         setOrderCreated(true);
+        console.log(
+          `✅ Commande ${data.alreadyCreated ? 'existante' : 'créée'}: ${data.orderNumber}`
+        );
       } else {
         // Ne pas afficher d'erreur si le paiement n'est pas encore complété
         if (data.code !== 'PAYMENT_NOT_COMPLETED') {
