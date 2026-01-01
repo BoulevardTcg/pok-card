@@ -60,91 +60,63 @@ export default function HeroSection() {
   const navigate = useNavigate();
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [imageKey, setImageKey] = useState(0); // Key pour forcer le rechargement
   const productRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef(0);
-  const loadedImagesRef = useRef<Set<string>>(new Set());
-  const isMobileRef = useRef(window.innerWidth < 1024);
   const animationPausedRef = useRef(false);
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
 
-  // Précharger toutes les images pour éviter les problèmes d'affichage
   useEffect(() => {
-    const preloadImages = async () => {
-      const promises = HERO_PRODUCTS.map((product) => {
-        return new Promise<void>((resolve) => {
-          // Vérifier si l'image est déjà chargée
-          if (loadedImagesRef.current.has(product.image)) {
-            resolve();
-            return;
-          }
-
-          const img = new Image();
-          img.onload = () => {
-            loadedImagesRef.current.add(product.image);
-            resolve();
-          };
-          img.onerror = () => {
-            console.warn('Erreur de préchargement:', product.image);
-            resolve(); // Continuer même en cas d'erreur
-          };
-          // Charger l'image normalement (sans timestamp pour le préchargement)
-          img.src = product.image;
-        });
+    const promises = HERO_PRODUCTS.map((product) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = product.image;
       });
-
-      await Promise.all(promises);
-    };
-
-    preloadImages();
+    });
+    Promise.all(promises);
   }, []);
 
-  // Rotation automatique des produits
+  const handleProductChange = (nextIndex: number) => {
+    animationPausedRef.current = true;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentProductIndex(nextIndex);
+      setIsTransitioning(false);
+      animationPausedRef.current = false;
+    }, 300);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
-      // ⚡ OPTIMISATION: Pauser l'animation 3D pendant la transition
-      animationPausedRef.current = true;
-      setIsTransitioning(true);
-      setTimeout(() => {
-        const nextIndex = (currentProductIndex + 1) % HERO_PRODUCTS.length;
-        setCurrentProductIndex(nextIndex);
-        // Forcer le rechargement de l'image en changeant la key
-        setImageKey((prev) => prev + 1);
-        setIsTransitioning(false);
-        // Reprendre l'animation après la transition
-        animationPausedRef.current = false;
-      }, 300);
+      const nextIndex = (currentProductIndex + 1) % HERO_PRODUCTS.length;
+      handleProductChange(nextIndex);
     }, 5000);
 
     return () => clearInterval(interval);
   }, [currentProductIndex]);
 
-  // Animation automatique continue (mouvement 3D dynamique)
-  // ⚡ OPTIMISATION: Manipulation DOM directe (pas de setState) pour éviter les rerenders React
   useEffect(() => {
     if (!productRef.current) return;
+
+    const isMobile = window.innerWidth < 1024;
+    const speed = isMobile ? 0.008 : 0.015;
+    const amplitude = isMobile ? 8 : 15;
+    const amplitudeY = isMobile ? 6 : 12;
+    const smoothing = isMobile ? 0.3 : 0.2;
 
     let lastX = 0;
     let lastY = 0;
     let rafId: number;
     let isActive = true;
 
-    // Détecter si on est sur mobile et adapter les paramètres
-    const isMobile = isMobileRef.current;
-    const speed = isMobile ? 0.008 : 0.015; // Plus lent sur mobile pour meilleures performances
-    const amplitude = isMobile ? 8 : 15; // Amplitude réduite sur mobile
-    const amplitudeY = isMobile ? 6 : 12;
-    const smoothing = isMobile ? 0.3 : 0.2; // Plus de lissage sur mobile pour fluidité
-
-    // Optimisation: Ajouter will-change seulement pendant l'animation
-    if (!isMobile && productRef.current) {
+    if (!isMobile) {
       productRef.current.style.willChange = 'transform';
     }
 
     const animate = () => {
       if (!isActive || !productRef.current || animationPausedRef.current) {
-        // Continuer la boucle même si paused (pour reprendre rapidement)
         if (isActive) {
           rafId = requestAnimationFrame(animate);
         }
@@ -152,20 +124,14 @@ export default function HeroSection() {
       }
 
       timeRef.current += speed;
-
-      // Mouvement circulaire
       const x = Math.sin(timeRef.current) * amplitude;
       const y = Math.cos(timeRef.current * 0.8) * amplitudeY;
-
-      // Interpolation pour éviter les changements brusques
       const smoothX = lastX + (x - lastX) * smoothing;
       const smoothY = lastY + (y - lastY) * smoothing;
 
       lastX = smoothX;
       lastY = smoothY;
 
-      // ⚡ OPTIMISATION: Manipulation DOM directe au lieu de setState
-      // ⚡ Utilisation de translate3d pour forcer l'accélération GPU (meilleure performance)
       productRef.current.style.transform = `perspective(1000px) translate3d(0, 0, 0) rotateY(${smoothX}deg) rotateX(${-smoothY}deg)`;
 
       rafId = requestAnimationFrame(animate);
@@ -178,7 +144,6 @@ export default function HeroSection() {
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
-      // Nettoyer will-change quand l'animation s'arrête
       if (productRef.current && !isMobile) {
         productRef.current.style.willChange = 'auto';
       }
@@ -225,19 +190,7 @@ export default function HeroSection() {
               <button
                 key={product.id}
                 className={`${styles.indicator} ${index === currentProductIndex ? styles.active : ''}`}
-                onClick={() => {
-                  // ⚡ OPTIMISATION: Pauser l'animation 3D pendant la transition
-                  animationPausedRef.current = true;
-                  setIsTransitioning(true);
-                  setTimeout(() => {
-                    setCurrentProductIndex(index);
-                    // Forcer le rechargement de l'image
-                    setImageKey((prev) => prev + 1);
-                    setIsTransitioning(false);
-                    // Reprendre l'animation après la transition
-                    animationPausedRef.current = false;
-                  }, 300);
-                }}
+                onClick={() => handleProductChange(index)}
                 aria-label={`Voir ${product.name}`}
               >
                 <span className={styles.indicatorProgress} />
@@ -255,26 +208,12 @@ export default function HeroSection() {
             {/* Glow effect */}
             <div className={styles.cardGlow} />
 
-            {/* Le produit */}
             <div className={styles.cardFrame}>
               <img
-                key={`${currentProduct.id}-${imageKey}`}
                 src={currentProduct.image}
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
                 loading="eager"
-                onError={(e) => {
-                  console.warn("Erreur de chargement de l'image:", currentProduct.image);
-                  // Essayer de recharger avec un timestamp
-                  const target = e.target as HTMLImageElement;
-                  if (!target.src.includes('?')) {
-                    target.src = `${currentProduct.image}?retry=${Date.now()}`;
-                  }
-                }}
-                onLoad={() => {
-                  // Image chargée avec succès
-                  loadedImagesRef.current.add(currentProduct.image);
-                }}
               />
             </div>
 
