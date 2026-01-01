@@ -312,43 +312,42 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   MOBILE MENU — Refonte complète
+   MOBILE MENU — Design moderne full-screen
    ───────────────────────────────────────────────────────────────── */
 
 .mobileMenuOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  /* TEST: Désactivation du blur pour tester les performances */
-  backdrop-filter: none;
+  background: var(--color-bg-primary, #0a0a0b);
   z-index: var(--z-modal, 400);
-  animation: fadeIn var(--duration-base, 250ms) var(--ease-out);
+  animation: fadeIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mobileMenu {
   position: fixed;
-  top: 0;
+  bottom: 0;
+  left: 0;
   right: 0;
-  height: 100vh;
-  width: 85%;
-  max-width: 360px;
+  max-height: 90vh;
   background: var(--color-bg-elevated, #141416);
-  border-left: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   z-index: calc(var(--z-modal, 400) + 1);
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  animation: slideInRight var(--duration-base, 250ms) var(--ease-out) forwards;
+  transform: translateY(100%);
+  animation: slideUp 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   overflow: hidden;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
 }
 
 .mobileMenuHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4, 1rem);
+  padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem) var(--space-4, 1rem);
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
-  background: var(--color-bg-primary, #0a0a0b);
 }
 
 .mobileMenuClose {
@@ -357,18 +356,19 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: var(--color-bg-elevated, #141416);
-  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
-  border-radius: var(--radius-md, 4px);
-  color: var(--color-text-primary, #f5f5f3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileMenuClose:hover {
+.mobileMenuClose:hover,
+.mobileMenuClose:focus {
   background: var(--color-bg-hover, #1f1f23);
-  border-color: var(--color-border-default, rgba(255, 255, 255, 0.1));
-  transform: scale(1.05);
+  color: var(--color-text-primary, #f5f5f3);
+  transform: rotate(90deg);
 }
 
 @keyframes fadeIn {
@@ -380,12 +380,12 @@
   }
 }
 
-@keyframes slideInRight {
+@keyframes slideUp {
   from {
-    transform: translateX(100%);
+    transform: translateY(100%);
   }
   to {
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -393,16 +393,18 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: var(--space-4, 1rem);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   overflow-y: auto;
   gap: var(--space-1, 0.25rem);
+  min-height: 0;
 }
 
 .mobileNavLink {
+  position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  padding: var(--space-4, 1rem);
+  padding: var(--space-5, 1.25rem) var(--space-4, 1rem);
   background: none;
   border: none;
   border-radius: var(--radius-md, 4px);
@@ -412,13 +414,12 @@
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-medium, 500);
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
-  opacity: 0;
-  transform: translateX(20px);
-  animation: slideInMobile var(--duration-base, 250ms) var(--ease-out) forwards;
+  letter-spacing: var(--tracking-wide, 0.02em);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileNavLink:hover {
+.mobileNavLink:hover,
+.mobileNavLink:focus {
   background: var(--color-bg-hover, #1f1f23);
   color: var(--color-text-primary, #f5f5f3);
 }
@@ -426,25 +427,21 @@
 .mobileNavLink.active {
   background: var(--color-bg-hover, #1f1f23);
   color: var(--color-text-primary, #f5f5f3);
-  border-left: 3px solid var(--color-accent-primary, #e8e4dd);
 }
 
-.mobileNavLabel {
-  font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-base, 1rem);
-  font-weight: var(--font-medium, 500);
-}
-
-@keyframes slideInMobile {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.mobileNavLink.active::after {
+  content: '';
+  position: absolute;
+  right: var(--space-4, 1rem);
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent-primary, #e8e4dd);
+  border-radius: var(--radius-full, 9999px);
 }
 
 /* Mobile Menu Footer */
 .mobileMenuFooter {
-  padding: var(--space-4, 1rem);
+  padding: var(--space-5, 1.25rem);
   border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   background: var(--color-bg-primary, #0a0a0b);
   display: flex;
@@ -455,9 +452,9 @@
 .mobileCartButton {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 0.75rem);
+  gap: var(--space-4, 1rem);
   width: 100%;
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   background: var(--color-bg-elevated, #141416);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
@@ -465,12 +462,14 @@
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-wide, 0.02em);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
-.mobileCartButton:hover {
+.mobileCartButton:hover,
+.mobileCartButton:focus {
   background: var(--color-bg-hover, #1f1f23);
   border-color: var(--color-border-default, rgba(255, 255, 255, 0.1));
 }
@@ -480,8 +479,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: 22px;
+  height: 22px;
   padding: 0 6px;
   background: var(--color-accent-primary, #e8e4dd);
   color: var(--color-bg-primary, #0a0a0b);
@@ -494,44 +493,48 @@
 .mobileUserInfo {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
+  gap: var(--space-3, 0.75rem);
 }
 
 .mobileUserButton {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 0.75rem);
+  gap: var(--space-4, 1rem);
   width: 100%;
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   background: var(--color-bg-elevated, #141416);
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
   color: var(--color-text-primary, #f5f5f3);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
+  font-weight: var(--font-medium, 500);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileUserButton:hover {
+.mobileUserButton:hover,
+.mobileUserButton:focus {
   background: var(--color-bg-hover, #1f1f23);
   border-color: var(--color-border-default, rgba(255, 255, 255, 0.1));
 }
 
 .mobileLogout {
   width: 100%;
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  padding: var(--space-4, 1rem);
   background: none;
   border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md, 4px);
   color: var(--color-text-muted, #6b6b6f);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileLogout:hover {
+.mobileLogout:hover,
+.mobileLogout:focus {
   color: var(--color-error, #f87171);
   border-color: var(--color-error, #f87171);
   background: rgba(248, 113, 113, 0.1);
@@ -539,7 +542,7 @@
 
 .mobileLoginButton {
   width: 100%;
-  padding: var(--space-4, 1rem);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
   background: var(--color-accent-primary, #e8e4dd);
   border: none;
   border-radius: var(--radius-md, 4px);
@@ -547,12 +550,19 @@
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
+  letter-spacing: var(--tracking-wide, 0.02em);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobileLoginButton:hover {
+.mobileLoginButton:hover,
+.mobileLoginButton:focus {
   background: var(--color-accent-hover, #f5f2ed);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(232, 228, 221, 0.2);
+  box-shadow: 0 4px 16px rgba(232, 228, 221, 0.2);
+}
+
+/* Classe globale pour bloquer le scroll (CSS simple uniquement) */
+:global(body.noScroll) {
+  overflow: hidden;
 }
