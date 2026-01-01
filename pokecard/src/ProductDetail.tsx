@@ -190,8 +190,8 @@ export function ProductDetail() {
       setSubmitSuccess(true);
       setShowReviewForm(false);
       setNewReview({ rating: 5, title: '', comment: '' });
-    } catch (err: Error) {
-      setSubmitError(err.message || "Erreur lors de l'envoi de l'avis");
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : "Erreur lors de l'envoi de l'avis");
     }
   }
 
@@ -258,7 +258,6 @@ export function ProductDetail() {
   };
 
   // Badges subtils
-  const isNewProduct = false; // TODO: Add createdAt to Product type if needed
   const isPreorder = selectedVariant && selectedVariant.stock === 0 && !product?.outOfStock;
 
   // Caractéristiques discrètes (basées sur catégorie/nom)
@@ -526,10 +525,9 @@ export function ProductDetail() {
             <div className={styles.infoPanel}>
               <header className={styles.productHeader}>
                 {/* Badges subtils */}
-                {(isNewProduct || isPreorder) && (
+                {isPreorder && (
                   <div className={styles.badgesContainer}>
-                    {isNewProduct && <span className={styles.badge}>Nouveau</span>}
-                    {isPreorder && <span className={styles.badge}>Précommande</span>}
+                    <span className={styles.badge}>Précommande</span>
                   </div>
                 )}
 
