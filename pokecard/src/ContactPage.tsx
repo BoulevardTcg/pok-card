@@ -55,9 +55,10 @@ export function ContactPage() {
       setFormData((prev) => ({
         ...prev,
         email: user.email || prev.email,
-        name: user.firstName && user.lastName 
-          ? `${user.firstName} ${user.lastName}`.trim()
-          : user.username || user.firstName || prev.name,
+        name:
+          user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`.trim()
+            : user.username || user.firstName || prev.name,
       }));
     }
   }, [isAuthenticated, user]);
@@ -68,7 +69,7 @@ export function ContactPage() {
       ...prev,
       [name]: value,
     }));
-    
+
     // Effacer l'erreur du champ modifié
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
@@ -76,12 +77,12 @@ export function ContactPage() {
         [name]: undefined,
       }));
     }
-    
+
     // Validation en temps réel pour l'email
     if (name === 'email' && value && !validateEmail(value)) {
       setErrors((prev) => ({
         ...prev,
-        email: 'Format d\'email invalide',
+        email: "Format d'email invalide",
       }));
     } else if (name === 'email' && validateEmail(value)) {
       setErrors((prev) => ({
@@ -103,9 +104,9 @@ export function ContactPage() {
 
     // Validation de l'email (obligatoire)
     if (!formData.email.trim()) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = "L'email est requis";
     } else if (!validateEmail(formData.email.trim())) {
-      newErrors.email = 'Format d\'email invalide';
+      newErrors.email = "Format d'email invalide";
     }
 
     // Validation du sujet
@@ -133,7 +134,9 @@ export function ContactPage() {
 
     // Vérifier que l'utilisateur est connecté
     if (!isAuthenticated) {
-      setErrorMessage('Vous devez être connecté pour envoyer un message. Redirection vers la page de connexion...');
+      setErrorMessage(
+        'Vous devez être connecté pour envoyer un message. Redirection vers la page de connexion...'
+      );
       setTimeout(() => {
         navigate('/login', { state: { from: '/contact' } });
       }, 2000);
@@ -164,7 +167,7 @@ export function ContactPage() {
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error: any) {
       console.error(error);
-      
+
       // Gérer les erreurs de validation du backend
       if (error?.response?.data?.code === 'VALIDATION_ERROR' && error?.response?.data?.details) {
         const backendErrors: FormErrors = {};
@@ -176,10 +179,12 @@ export function ContactPage() {
         setErrors(backendErrors);
         setErrorMessage('Veuillez corriger les erreurs dans le formulaire');
       } else {
-        setErrorMessage(error?.response?.data?.error || 'Erreur lors de l\'envoi. Veuillez réessayer.');
+        setErrorMessage(
+          error?.response?.data?.error || "Erreur lors de l'envoi. Veuillez réessayer."
+        );
         setSubmitStatus('error');
       }
-      
+
       setTimeout(() => {
         setSubmitStatus('idle');
         setErrorMessage('');
@@ -285,7 +290,8 @@ export function ContactPage() {
             {(submitStatus === 'error' || errorMessage) && (
               <div className={`${styles.statusMessage} ${styles.error}`}>
                 <span>
-                  {errorMessage || 'Erreur lors de l\'envoi. Veuillez réessayer ou nous contacter directement.'}
+                  {errorMessage ||
+                    "Erreur lors de l'envoi. Veuillez réessayer ou nous contacter directement."}
                 </span>
               </div>
             )}
@@ -409,11 +415,13 @@ export function ContactPage() {
                 )}
               </div>
 
-              <button 
-                type="submit" 
-                disabled={isSubmitting || !isAuthenticated} 
+              <button
+                type="submit"
+                disabled={isSubmitting || !isAuthenticated}
                 className={styles.submitButton}
-                title={!isAuthenticated ? 'Vous devez être connecté pour envoyer un message' : undefined}
+                title={
+                  !isAuthenticated ? 'Vous devez être connecté pour envoyer un message' : undefined
+                }
               >
                 {isSubmitting ? (
                   <>
