@@ -47,6 +47,7 @@ jobs:
 
       - name: Install
         run: npm ci --ignore-scripts
+        working-directory: .
 
       - name: Lint
         run: npm run lint --if-present
