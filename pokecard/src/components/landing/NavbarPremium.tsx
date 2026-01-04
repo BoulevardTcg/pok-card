@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
-import { CartIcon, UserIcon, MenuIcon, CloseIcon, LogOutIcon } from '../icons/Icons';
+import { CartIcon, UserIcon, MenuIcon, CloseIcon, LogOutIcon, DashboardIcon } from '../icons/Icons';
 import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
@@ -91,6 +91,16 @@ export default function NavbarPremium() {
 
           {isAuthenticated && user ? (
             <div className={styles.userMenu}>
+              {user.isAdmin && (
+                <button
+                  onClick={() => navigate('/admin/dashboard')}
+                  className={styles.adminButton}
+                  aria-label="Dashboard Admin"
+                  title="Dashboard Admin"
+                >
+                  <DashboardIcon size={18} />
+                </button>
+              )}
               <button
                 onClick={() => navigate('/profile')}
                 className={styles.userButton}
@@ -177,6 +187,15 @@ export default function NavbarPremium() {
 
                 {isAuthenticated && user ? (
                   <div className={styles.mobileUserInfo}>
+                    {user.isAdmin && (
+                      <button
+                        onClick={() => handleNavClick('/admin/dashboard')}
+                        className={styles.mobileAdminButton}
+                      >
+                        <DashboardIcon size={18} />
+                        <span>Dashboard Admin</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => handleNavClick('/profile')}
                       className={styles.mobileUserButton}
