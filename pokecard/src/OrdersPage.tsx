@@ -145,7 +145,7 @@ export function OrdersPage() {
             <Package className={styles.emptyIcon} />
             <h2 className={styles.emptyTitle}>Aucune commande</h2>
             <p className={styles.emptyText}>Vous n'avez pas encore passé de commande</p>
-            <button onClick={() => navigate('/produits')} className={styles.shopButton}>
+            <button onClick={() => navigate('/')} className={styles.shopButton}>
               Découvrir la boutique
             </button>
           </div>

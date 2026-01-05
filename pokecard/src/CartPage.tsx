@@ -217,7 +217,7 @@ export function CartPage() {
             </div>
             <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
             <p className={styles.emptyText}>Découvrez nos collections premium</p>
-            <button onClick={() => navigate('/produits')} className={styles.emptyButton}>
+            <button onClick={() => navigate('/')} className={styles.emptyButton}>
               Explorer le catalogue
               <span className={styles.arrow}>→</span>
             </button>
@@ -539,7 +539,7 @@ export function CartPage() {
                 <span className={styles.arrow}>→</span>
               </button>
 
-              <button className={styles.continueButton} onClick={() => navigate('/produits')}>
+              <button className={styles.continueButton} onClick={() => navigate('/')}>
                 Continuer les achats
               </button>
 

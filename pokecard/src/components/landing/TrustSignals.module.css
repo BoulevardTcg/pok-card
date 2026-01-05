@@ -10,6 +10,18 @@
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
 }
 
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-8, 2rem) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--space-6, 1.5rem) 0;
+  }
+}
+
 .container {
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
@@ -20,6 +32,12 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-8, 2rem);
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    gap: var(--space-6, 1.5rem);
+  }
 }
 
 @media (min-width: 768px) {

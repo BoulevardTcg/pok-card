@@ -80,5 +80,5 @@ export async function navigateToProduct(
   }
 
   // Fallback : recherche par URL
-  navigate(`/produits?search=${encodeURIComponent(productName)}`);
+  navigate(`/?search=${encodeURIComponent(productName)}`);
 }

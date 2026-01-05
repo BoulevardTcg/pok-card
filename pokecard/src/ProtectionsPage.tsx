@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './ProductsPage.module.css';
+import styles from './ProtectionsPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
 

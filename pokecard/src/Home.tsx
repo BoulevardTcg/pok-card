@@ -5,6 +5,7 @@
 
 import NavbarPremium from './components/landing/NavbarPremium';
 import HeroSection from './components/landing/HeroSection';
+import ShopSection from './components/landing/ShopSection';
 import TrustSignals from './components/landing/TrustSignals';
 import FeaturedCards from './components/landing/FeaturedCards';
 import NewReleases from './components/landing/NewReleases';
@@ -19,6 +20,9 @@ export function Home() {
       <main>
         {/* Hero — Accroche émotionnelle + rotation de cartes */}
         <HeroSection />
+
+        {/* Shop — Section boutique avec tous les produits */}
+        <ShopSection />
 
         {/* Trust — Chiffres clés pour rassurer */}
         <TrustSignals />

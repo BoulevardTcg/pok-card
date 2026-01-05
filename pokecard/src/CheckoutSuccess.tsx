@@ -115,7 +115,7 @@ export function CheckoutSuccess() {
           )}
           <button
             className={orderCreated ? styles.secondaryButton : styles.primaryButton}
-            onClick={() => navigate('/produits')}
+            onClick={() => navigate('/')}
           >
             Continuer mes achats
           </button>

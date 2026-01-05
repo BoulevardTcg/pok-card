@@ -245,7 +245,7 @@ export default function NewReleases() {
 
         {/* View all CTA */}
         <div className={styles.viewAllWrapper}>
-          <button onClick={() => navigate('/produits')} className={styles.viewAllButton}>
+          <button onClick={() => navigate('/')} className={styles.viewAllButton}>
             <span>Voir tous les produits</span>
             <ArrowRightIcon size={16} />
           </button>

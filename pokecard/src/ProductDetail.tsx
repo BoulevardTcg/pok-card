@@ -322,7 +322,7 @@ export function ProductDetail() {
         <div className={styles.errorState} role="alert">
           <p className={styles.errorText}>{error || 'Produit introuvable'}</p>
           <button
-            onClick={() => navigate('/produits')}
+            onClick={() => navigate('/')}
             className={styles.backLink}
             aria-label="Retour à la liste des produits"
           >

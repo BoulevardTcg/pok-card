@@ -1,0 +1,159 @@
+/* ===================================================================
+   PRODUCT BADGES — Système de badges pour états produits
+   Compatible dark & light mode
+   =================================================================== */
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE BASE
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 0.25rem);
+  padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-full, 9999px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-semibold, 600);
+  letter-spacing: var(--tracking-wide, 0.02em);
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE NOUVEAU — Vert émeraude doux et attirant
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.new {
+  background: var(--color-badge-new-bg, rgba(16, 185, 129, 0.15));
+  color: var(--color-badge-new, #10b981);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.light .productBadge.new {
+  background: var(--color-badge-new-bg);
+  color: var(--color-badge-new-text);
+  border-color: var(--color-badge-new);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE PRÉCOMMANDE — Lavande doux et élégant
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.preorder {
+  background: var(--color-badge-preorder-bg, rgba(167, 139, 250, 0.15));
+  color: var(--color-badge-preorder, #a78bfa);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+}
+
+.light .productBadge.preorder {
+  background: var(--color-badge-preorder-bg);
+  color: var(--color-badge-preorder-text);
+  border-color: var(--color-badge-preorder);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE PROMO — Saumon doux et chaleureux
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.promo {
+  background: var(--color-badge-promo-bg, rgba(251, 113, 133, 0.15));
+  color: var(--color-badge-promo, #fb7185);
+  border: 1px solid rgba(251, 113, 133, 0.25);
+}
+
+.light .productBadge.promo {
+  background: var(--color-badge-promo-bg);
+  color: var(--color-badge-promo-text);
+  border-color: var(--color-badge-promo);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE STOCK FAIBLE — Pêche doux et rassurant
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.lowstock {
+  background: var(--color-badge-lowstock-bg, rgba(251, 191, 36, 0.15));
+  color: var(--color-badge-lowstock, #fbbf24);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.light .productBadge.lowstock {
+  background: var(--color-badge-lowstock-bg);
+  color: var(--color-badge-lowstock-text);
+  border-color: var(--color-badge-lowstock);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGE RUPTURE — Gris-ardoise élégant et discret
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.outofstock {
+  background: var(--color-badge-outofstock-bg, rgba(156, 163, 175, 0.15));
+  color: var(--color-badge-outofstock, #9ca3af);
+  border: 1px solid rgba(156, 163, 175, 0.25);
+  font-weight: var(--font-semibold, 600);
+}
+
+.light .productBadge.outofstock {
+  background: var(--color-badge-outofstock-bg);
+  color: var(--color-badge-outofstock-text);
+  border-color: var(--color-badge-outofstock);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   POSITIONNEMENT ABSOLU (pour cards produits)
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.absolute {
+  position: absolute;
+  top: var(--space-3, 0.75rem);
+  left: var(--space-3, 0.75rem);
+  z-index: 2;
+}
+
+.productBadge.absoluteTopRight {
+  position: absolute;
+  top: var(--space-3, 0.75rem);
+  right: var(--space-3, 0.75rem);
+  left: auto;
+  z-index: 2;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────────────────────── */
+
+.productBadge.pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+.productBadge.new.pulse {
+  animation: badgePulseNew 2s ease-in-out infinite;
+}
+
+@keyframes badgePulseNew {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(16, 185, 129, 0.35);
+  }
+}

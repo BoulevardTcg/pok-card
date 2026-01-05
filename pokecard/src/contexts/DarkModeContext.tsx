@@ -1,11 +1,5 @@
-import { createContext, useEffect, useState } from 'react';
-
-type DarkModeContextType = {
-  isDark: boolean;
-  toggleDarkMode: () => void;
-};
-
-const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
+import { useEffect, useState } from 'react';
+import { DarkModeContext } from './darkModeContext';
 
 export function DarkModeProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
@@ -26,12 +20,14 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (mounted) {
-      // Appliquer la classe dark au document
+      // Appliquer la classe dark ou light au document
       if (isDark) {
         document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
         localStorage.setItem('darkMode', 'true');
       } else {
         document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
         localStorage.setItem('darkMode', 'false');
       }
     }

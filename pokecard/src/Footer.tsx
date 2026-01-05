@@ -75,7 +75,7 @@ const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/produits')} className={styles.footerLink}>
+                <button onClick={() => navigate('/')} className={styles.footerLink}>
                   Boutique
                 </button>
               </li>

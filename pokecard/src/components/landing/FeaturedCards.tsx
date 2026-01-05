@@ -128,7 +128,7 @@ export default function FeaturedCards() {
             </p>
           </div>
 
-          <button onClick={() => navigate('/produits')} className={styles.viewAllButton}>
+          <button onClick={() => navigate('/')} className={styles.viewAllButton}>
             <span>Voir tout le catalogue</span>
             <ArrowUpRightIcon size={16} />
           </button>

@@ -61,7 +61,7 @@ export default function OffersSection() {
 
         {/* CTA */}
         <div className={styles.cta}>
-          <button onClick={() => navigate('/produits')} className={styles.ctaButton}>
+          <button onClick={() => navigate('/')} className={styles.ctaButton}>
             Découvrir nos services
             <span className={styles.ctaArrow}>→</span>
           </button>

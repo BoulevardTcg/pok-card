@@ -93,7 +93,7 @@ export default function LatestProductsCarousel() {
               Découvrez nos dernières arrivées, sélectionnées avec soin pour votre collection
             </p>
           </div>
-          <button onClick={() => navigate('/produits')} className={styles.seeAllButton}>
+          <button onClick={() => navigate('/')} className={styles.seeAllButton}>
             Voir tout
             <span className={styles.arrow}>→</span>
           </button>

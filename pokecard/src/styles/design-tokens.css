@@ -162,6 +162,110 @@
 }
 
 /* ===================================================================
+   LIGHT MODE — Palette moderne et punchy pour e-commerce TCG
+   =================================================================== */
+
+.light {
+  /* ─────────────────────────────────────────────────────────────────
+     FONDS — Papier premium chaleureux
+     ───────────────────────────────────────────────────────────────── */
+
+  --color-bg-primary: #faf8f3; /* Papier ivoire chaud — base principale */
+  --color-bg-elevated: #ffffff; /* Blanc pur pour surfaces */
+  --color-bg-subtle: #f5f2eb; /* Ivoire plus foncé pour zones subtiles */
+  --color-bg-hover: #f0ede5; /* Hover state doux */
+
+  /* Surfaces */
+  --color-surface-card: #ffffff; /* Cards blanches sur fond ivoire */
+  --color-surface-modal: #ffffff;
+  --color-surface-overlay: rgba(250, 248, 243, 0.95);
+
+  /* ─────────────────────────────────────────────────────────────────
+     CTA PRINCIPAL — Teal/turquoise doux et attirant
+     ───────────────────────────────────────────────────────────────── */
+
+  --color-cta-primary: #4d827a; /* Teal/turquoise foncé — confiance & modernité */
+  --color-cta-primary-hover: #3d6b64; /* Hover plus foncé */
+  --color-cta-primary-active: #2d544e; /* Active state */
+  --color-cta-primary-light: rgba(77, 130, 122, 0.15); /* Fond léger pour badges CTA */
+  --color-cta-primary-muted: rgba(77, 130, 122, 0.1); /* Fond très léger */
+
+  /* Accents — Réutilisation des accents existants mais adaptés */
+  --color-accent-primary: #4d827a; /* Même que CTA pour cohérence */
+  --color-accent-secondary: #5d9a92; /* Teal moyen pour accents secondaires */
+  --color-accent-gold: #d4af37; /* Or subtil uniquement pour détails (séparateurs, highlights) */
+  --color-accent-hover: #3d6b64; /* Hover accent */
+
+  /* ─────────────────────────────────────────────────────────────────
+     TEXTE — Sombre mais doux (pas noir pur)
+     ───────────────────────────────────────────────────────────────── */
+
+  --color-text-primary: #1a1625; /* Presque noir mais chaleureux */
+  --color-text-secondary: #4b5563; /* Gris moyen pour texte secondaire */
+  --color-text-muted: #6b7280; /* Gris clair pour texte muted */
+  --color-text-inverse: #ffffff; /* Blanc pour texte sur CTA */
+
+  /* ─────────────────────────────────────────────────────────────────
+     BADGES PRODUITS — Palette douce et premium, harmonieuse avec blanc
+     ───────────────────────────────────────────────────────────────── */
+
+  /* Nouveau — Vert émeraude doux et attirant */
+  --color-badge-new: #10b981; /* Vert émeraude doux — fraîcheur, nouveauté, premium */
+  --color-badge-new-bg: rgba(16, 185, 129, 0.12);
+  --color-badge-new-text: #059669; /* Vert plus foncé pour contraste */
+
+  /* Précommande — Lavande doux et élégant */
+  --color-badge-preorder: #a78bfa; /* Lavande pastel — exclusivité, élégance */
+  --color-badge-preorder-bg: rgba(167, 139, 250, 0.12);
+  --color-badge-preorder-text: #7c3aed; /* Violet plus foncé pour contraste */
+
+  /* Promo — Saumon doux et chaleureux */
+  --color-badge-promo: #fb7185; /* Saumon pastel — chaleur, opportunité */
+  --color-badge-promo-bg: rgba(251, 113, 133, 0.12);
+  --color-badge-promo-text: #e11d48; /* Rose plus foncé pour contraste */
+
+  /* Stock faible — Pêche doux et rassurant */
+  --color-badge-lowstock: #fbbf24; /* Pêche doux — alerte douce, pas alarmante */
+  --color-badge-lowstock-bg: rgba(251, 191, 36, 0.12);
+  --color-badge-lowstock-text: #d97706; /* Orange plus foncé pour contraste */
+
+  /* Rupture — Gris-ardoise élégant et discret */
+  --color-badge-outofstock: #9ca3af; /* Gris-ardoise doux — élégant, pas agressif */
+  --color-badge-outofstock-bg: rgba(156, 163, 175, 0.12);
+  --color-badge-outofstock-text: #6b7280; /* Gris plus foncé pour contraste */
+
+  /* ─────────────────────────────────────────────────────────────────
+     ÉTATS — Success, Warning, Error adaptés au light
+     ───────────────────────────────────────────────────────────────── */
+
+  --color-success: #10b981; /* Vert moderne */
+  --color-success-muted: rgba(16, 185, 129, 0.1);
+  --color-warning: #f59e0b; /* Amber */
+  --color-error: #dc2626; /* Rouge (même que rupture) */
+  --color-error-muted: rgba(220, 38, 38, 0.1);
+
+  /* ─────────────────────────────────────────────────────────────────
+     BORDURES — Subtiles et douces
+     ───────────────────────────────────────────────────────────────── */
+
+  --color-border-subtle: rgba(0, 0, 0, 0.06); /* Très subtil */
+  --color-border-default: rgba(0, 0, 0, 0.1); /* Standard */
+  --color-border-hover: rgba(0, 0, 0, 0.15); /* Hover */
+  --color-border-accent: rgba(77, 130, 122, 0.2); /* Accent teal */
+
+  /* ─────────────────────────────────────────────────────────────────
+     OMBRES — Adaptées au light mode
+     ───────────────────────────────────────────────────────────────── */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 40px rgba(77, 130, 122, 0.15); /* Glow teal */
+  --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.12), 0 0 60px rgba(77, 130, 122, 0.08);
+}
+
+/* ===================================================================
    RESET & BASE — Minimaliste
    =================================================================== */
 
@@ -330,6 +434,24 @@ button {
   transform: translateY(-1px);
 }
 
+/* Light mode buttons */
+.light .btn-primary {
+  background-color: var(--color-cta-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 4px 12px rgba(77, 130, 122, 0.25);
+}
+
+.light .btn-primary:hover {
+  background-color: var(--color-cta-primary-hover);
+  box-shadow: 0 6px 20px rgba(77, 130, 122, 0.35);
+  transform: translateY(-2px);
+}
+
+.light .btn-primary:active {
+  background-color: var(--color-cta-primary-active);
+  transform: translateY(0);
+}
+
 /* Bouton secondaire */
 .btn-secondary {
   display: inline-flex;
@@ -352,6 +474,18 @@ button {
 .btn-secondary:hover {
   border-color: var(--color-accent-primary);
   color: var(--color-accent-primary);
+}
+
+/* Light mode secondary button */
+.light .btn-secondary {
+  border-color: var(--color-cta-primary);
+  color: var(--color-cta-primary);
+}
+
+.light .btn-secondary:hover {
+  background-color: var(--color-cta-primary-muted);
+  border-color: var(--color-cta-primary-hover);
+  color: var(--color-cta-primary-hover);
 }
 
 /* Bouton ghost */
@@ -442,6 +576,11 @@ button {
   color: var(--color-text-primary);
 }
 
+.light ::selection {
+  background-color: rgba(77, 130, 122, 0.2);
+  color: var(--color-cta-primary);
+}
+
 /* Scrollbar personnalisée */
 ::-webkit-scrollbar {
   width: 8px;
@@ -458,5 +597,18 @@ button {
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Light mode scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: var(--color-bg-subtle);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-hover);
 }

@@ -5,7 +5,6 @@ import { Concours } from './Concours';
 import { ProductDetail } from './ProductDetail';
 import { CartPage } from './CartPage';
 import { CardsPage } from './CardsPage';
-import { ProductsPage } from './ProductsPage';
 import { CategorySpecificPage } from './CategorySpecificPage';
 import { AccessoiresPage } from './AccessoiresPage';
 import { ProtectionsPage } from './ProtectionsPage';
@@ -66,8 +65,6 @@ function AppContent() {
           <Route path="/accessoires" element={<AccessoiresPage />} />
           <Route path="/accessoires/:category" element={<CategorySpecificPage />} />
 
-          <Route path="/produits" element={<ProductsPage />} />
-          <Route path="/produits/:category" element={<CategorySpecificPage />} />
           <Route path="/protections" element={<ProtectionsPage />} />
 
           <Route path="/concours" element={<Concours />} />

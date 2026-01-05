@@ -3,7 +3,9 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
+import { useDarkMode } from '../../hooks/useDarkMode';
 import { CartIcon, UserIcon, MenuIcon, CloseIcon, LogOutIcon, DashboardIcon } from '../icons/Icons';
+import { DarkModeToggle } from '../DarkModeToggle';
 import styles from './NavbarPremium.module.css';
 
 export default function NavbarPremium() {
@@ -13,6 +15,7 @@ export default function NavbarPremium() {
   const location = useLocation();
   const { cart } = useContext(CartContext);
   const { user, isAuthenticated, logout } = useAuth();
+  const { isDark } = useDarkMode();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
@@ -37,7 +40,6 @@ export default function NavbarPremium() {
 
   const navLinks = [
     { path: '/', label: 'Accueil' },
-    { path: '/produits', label: 'Collection' },
     { path: '/trade', label: 'Cartes' },
     { path: '/actualites', label: 'News' },
     { path: '/contact', label: 'Contact' },
@@ -78,6 +80,8 @@ export default function NavbarPremium() {
         </div>
 
         <div className={styles.actions}>
+          <DarkModeToggle />
+
           <button
             onClick={() => navigate('/panier')}
             className={styles.iconButton}
@@ -172,6 +176,11 @@ export default function NavbarPremium() {
               </nav>
 
               <div className={styles.mobileMenuFooter}>
+                <div className={styles.mobileDarkModeToggle}>
+                  <DarkModeToggle />
+                  <span>Mode {isDark ? 'sombre' : 'clair'}</span>
+                </div>
+
                 <button
                   onClick={() => handleNavClick('/panier')}
                   className={styles.mobileCartButton}

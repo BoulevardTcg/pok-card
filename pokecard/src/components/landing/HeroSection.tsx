@@ -169,7 +169,7 @@ export default function HeroSection() {
           <h1 className={styles.title}>
             <span className={styles.titleMain}>Découvrez.</span>
             <span className={styles.titleMain}>Collectionnez.</span>
-            <span className={styles.titleAccent}>Vivez votre passion.</span>
+            <span className={styles.titleAccent}>Play your cards.</span>
           </h1>
 
           <p className={styles.description}>
@@ -178,7 +178,7 @@ export default function HeroSection() {
           </p>
 
           <div className={styles.heroActions}>
-            <button onClick={() => navigate('/produits')} className={styles.primaryCta}>
+            <button onClick={() => navigate('/')} className={styles.primaryCta}>
               <span>Explorer la boutique</span>
               <ArrowRightIcon size={18} />
             </button>

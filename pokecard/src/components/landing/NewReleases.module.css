@@ -7,6 +7,18 @@
   background: var(--color-bg-elevated, #141416);
 }
 
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-12, 3rem) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--space-8, 2rem) 0;
+  }
+}
+
 .container {
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
@@ -19,6 +31,18 @@
 
 .header {
   margin-bottom: var(--space-8, 2rem);
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin-bottom: var(--space-6, 1.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    margin-bottom: var(--space-4, 1rem);
+  }
 }
 
 .headerContent {
@@ -53,6 +77,19 @@
   text-align: justify;
 }
 
+@media (max-width: 768px) {
+  .description {
+    font-size: var(--text-sm, 0.875rem);
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .description {
+    font-size: var(--text-xs, 0.75rem);
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────
    TABS
    ───────────────────────────────────────────────────────────────── */
@@ -66,6 +103,21 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    margin-bottom: var(--space-6, 1.5rem);
+    padding-bottom: var(--space-3, 0.75rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    margin-bottom: var(--space-4, 1rem);
+    gap: var(--space-1, 0.25rem);
+  }
 }
 
 .tabs::-webkit-scrollbar {
@@ -165,6 +217,14 @@
   border-radius: var(--radius-lg, 8px);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+@media (max-width: 480px) {
+  .releaseCard {
+    flex-direction: column;
+    gap: var(--space-3, 0.75rem);
+    padding: var(--space-3, 0.75rem);
+  }
 }
 
 .releaseCard:hover {

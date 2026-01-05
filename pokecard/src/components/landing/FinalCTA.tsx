@@ -28,7 +28,7 @@ export default function FinalCTA() {
           </p>
 
           <div className={styles.actions}>
-            <button onClick={() => navigate('/produits')} className={styles.primaryButton}>
+            <button onClick={() => navigate('/')} className={styles.primaryButton}>
               <span>Découvrir la boutique</span>
               <ArrowRightIcon size={18} />
             </button>

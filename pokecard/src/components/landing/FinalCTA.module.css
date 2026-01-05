@@ -8,6 +8,18 @@
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-16, 4rem) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--space-12, 3rem) 0;
+  }
+}
+
 .backgroundImage {
   position: absolute;
   inset: 0;
@@ -72,6 +84,21 @@
   text-align: justify;
 }
 
+@media (max-width: 768px) {
+  .description {
+    font-size: var(--text-base, 1rem);
+    margin-bottom: var(--space-8, 2rem);
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .description {
+    font-size: var(--text-sm, 0.875rem);
+    margin-bottom: var(--space-6, 1.5rem);
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────
    ACTIONS
    ───────────────────────────────────────────────────────────────── */
@@ -110,6 +137,14 @@
   border-radius: var(--radius-sm, 2px);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+@media (max-width: 480px) {
+  .primaryButton {
+    padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+    font-size: var(--text-xs, 0.75rem);
+    width: 100%;
+  }
 }
 
 .primaryButton:hover {
