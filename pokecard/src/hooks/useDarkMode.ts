@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DarkModeContext } from '../contexts/darkModeContext';
+import { DarkModeContext } from '../contexts/darkModeTypes';
 
 /**
  * Hook pour utiliser le contexte dark mode
