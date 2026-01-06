@@ -321,29 +321,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8, 2rem);
-}
-
-.setImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform var(--duration-slow, 400ms) var(--ease-out);
-}
-
-.setCard:hover .setImage {
-  transform: scale(1.05);
+  padding: var(--space-6, 1.5rem);
 }
 
 .setSymbol {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
-  transition: transform var(--duration-slow, 400ms) var(--ease-out);
+  opacity: 0.7;
+  transition: all var(--duration-slow, 400ms) var(--ease-out);
+  filter: grayscale(20%);
 }
 
 .setCard:hover .setSymbol {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
 .placeholderImage {

@@ -1,0 +1,39 @@
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 390px) {
+  .gridRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.listContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+}
+
+@media (min-width: 769px) {
+  .gridContainer,
+  .listContainer {
+    display: none;
+  }
+}

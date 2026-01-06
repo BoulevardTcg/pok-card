@@ -135,7 +135,7 @@
   font-weight: var(--font-medium, 500);
   color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 0.3s ease;
 }
 
 .tab:hover {
@@ -344,7 +344,7 @@
   background: var(--color-bg-primary, #0a0a0b);
   border-radius: var(--radius-full, 9999px);
   color: var(--color-text-secondary, #a1a1a6);
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 0.3s ease;
 }
 
 .releaseCard:hover .releaseAction {
@@ -375,7 +375,7 @@
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 0.3s ease;
 }
 
 .viewAllButton:hover {
@@ -384,7 +384,7 @@
 }
 
 .viewAllButton svg {
-  transition: transform var(--duration-fast, 150ms) var(--ease-out);
+  transition: transform 0.3s ease;
 }
 
 .viewAllButton:hover svg {

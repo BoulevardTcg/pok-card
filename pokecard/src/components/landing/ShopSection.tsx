@@ -5,6 +5,10 @@ import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
 import { SearchIcon } from '../icons/Icons';
+import { CatalogViewToggle } from './CatalogViewToggle';
+import { ShopSectionMobile } from './ShopSectionMobile';
+import { FilterBottomSheet } from './FilterBottomSheet';
+import { useCatalogView } from '../../hooks/useCatalogView';
 import type { Product } from '../../cartContext';
 import styles from './ShopSection.module.css';
 
@@ -72,6 +76,21 @@ export default function ShopSection() {
   const [sortBy, setSortBy] = useState<string>('popular');
   const [viewMode, setViewMode] = useState<'comfort' | 'compact' | 'list' | 'wide'>('comfort');
   const [quickFilter, setQuickFilter] = useState<string>('all');
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const hasActiveFilters = selectedCategory !== 'Toutes' || quickFilter !== 'all';
+  const { mode: catalogViewMode, setMode: setCatalogViewMode } = useCatalogView(
+    searchQuery,
+    hasActiveFilters
+  );
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 769);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Charger tous les produits
   useEffect(() => {
@@ -264,7 +283,7 @@ export default function ShopSection() {
           {/* Barre de filtres */}
           <div className={styles.filtersBar}>
             <div className={styles.filtersRow}>
-              {/* Recherche — Sans label */}
+              {/* Recherche */}
               <div className={styles.filterGroup}>
                 <div className={styles.searchWrapper}>
                   <SearchIcon size={16} className={styles.searchIcon} />
@@ -285,235 +304,252 @@ export default function ShopSection() {
                 </div>
               </div>
 
-              {/* Filtre catégorie — Sans label */}
-              <div className={styles.filterGroup}>
-                <select
-                  id="category-filter"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className={styles.filterSelect}
-                  aria-label="Filtrer par catégorie"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Mobile: Bouton filtres */}
+              {isMobile ? (
+                <>
+                  <button
+                    className={styles.filterButton}
+                    onClick={() => setIsFilterSheetOpen(true)}
+                    aria-label="Ouvrir les filtres"
+                  >
+                    Filtres
+                  </button>
+                  <div className={styles.viewToggleMobile}>
+                    <CatalogViewToggle mode={catalogViewMode} onChange={setCatalogViewMode} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Desktop: Filtres inline */}
+                  <div className={styles.filterGroup}>
+                    <select
+                      id="category-filter"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className={styles.filterSelect}
+                      aria-label="Filtrer par catégorie"
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Tri — Sans label */}
-              <div className={styles.filterGroup}>
-                <select
-                  id="sort-filter"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className={styles.filterSelect}
-                  aria-label="Trier les produits"
-                >
-                  <option value="popular">Populaires</option>
-                  <option value="price-asc">Prix croissant</option>
-                  <option value="price-desc">Prix décroissant</option>
-                  <option value="newest">Nouveautés</option>
-                </select>
-              </div>
+                  <div className={styles.filterGroup}>
+                    <select
+                      id="sort-filter"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className={styles.filterSelect}
+                      aria-label="Trier les produits"
+                    >
+                      <option value="popular">Populaires</option>
+                      <option value="price-asc">Prix croissant</option>
+                      <option value="price-desc">Prix décroissant</option>
+                      <option value="newest">Nouveautés</option>
+                    </select>
+                  </div>
 
-              {/* Sélecteur de vue — Sans label */}
-              <div className={styles.filterGroup}>
-                <div className={styles.viewToggle} aria-label="Changer la vue">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('comfort')}
-                    className={`${styles.viewButton} ${viewMode === 'comfort' ? styles.viewButtonActive : ''}`}
-                    aria-label="Vue confortable"
-                    aria-pressed={viewMode === 'comfort'}
-                    title="Vue confortable (2x2)"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="5"
-                        height="5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="12"
-                        y="3"
-                        width="5"
-                        height="5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="3"
-                        y="12"
-                        width="5"
-                        height="5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="12"
-                        y="12"
-                        width="5"
-                        height="5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('compact')}
-                    className={`${styles.viewButton} ${viewMode === 'compact' ? styles.viewButtonActive : ''}`}
-                    aria-label="Vue compacte"
-                    aria-pressed={viewMode === 'compact'}
-                    title="Vue compacte (3x3)"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="8"
-                        y="3"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="13"
-                        y="3"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="3"
-                        y="8"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="8"
-                        y="8"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="13"
-                        y="8"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="3"
-                        y="13"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="8"
-                        y="13"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="13"
-                        y="13"
-                        width="3"
-                        height="3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('list')}
-                    className={`${styles.viewButton} ${viewMode === 'list' ? styles.viewButtonActive : ''}`}
-                    aria-label="Vue liste"
-                    aria-pressed={viewMode === 'list'}
-                    title="Vue liste"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                      <line
-                        x1="3"
-                        y1="4"
-                        x2="17"
-                        y2="4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <line
-                        x1="3"
-                        y1="10"
-                        x2="17"
-                        y2="10"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <line
-                        x1="3"
-                        y1="16"
-                        x2="17"
-                        y2="16"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('wide')}
-                    className={`${styles.viewButton} ${viewMode === 'wide' ? styles.viewButtonActive : ''}`}
-                    aria-label="Vue large"
-                    aria-pressed={viewMode === 'wide'}
-                    title="Vue large (1 colonne)"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="14"
-                        height="6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        x="3"
-                        y="11"
-                        width="14"
-                        height="6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+                  {/* Sélecteur de vue desktop */}
+                  <div className={styles.filterGroup}>
+                    <div className={styles.viewToggle} aria-label="Changer la vue">
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('comfort')}
+                        className={`${styles.viewButton} ${viewMode === 'comfort' ? styles.viewButtonActive : ''}`}
+                        aria-label="Vue confortable"
+                        aria-pressed={viewMode === 'comfort'}
+                        title="Vue confortable (2x2)"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="5"
+                            height="5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="12"
+                            y="3"
+                            width="5"
+                            height="5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="3"
+                            y="12"
+                            width="5"
+                            height="5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="12"
+                            y="12"
+                            width="5"
+                            height="5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('compact')}
+                        className={`${styles.viewButton} ${viewMode === 'compact' ? styles.viewButtonActive : ''}`}
+                        aria-label="Vue compacte"
+                        aria-pressed={viewMode === 'compact'}
+                        title="Vue compacte (3x3)"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="8"
+                            y="3"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="13"
+                            y="3"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="3"
+                            y="8"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="8"
+                            y="8"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="13"
+                            y="8"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="3"
+                            y="13"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="8"
+                            y="13"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="13"
+                            y="13"
+                            width="3"
+                            height="3"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('list')}
+                        className={`${styles.viewButton} ${viewMode === 'list' ? styles.viewButtonActive : ''}`}
+                        aria-label="Vue liste"
+                        aria-pressed={viewMode === 'list'}
+                        title="Vue liste"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                          <line
+                            x1="3"
+                            y1="4"
+                            x2="17"
+                            y2="4"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          />
+                          <line
+                            x1="3"
+                            y1="10"
+                            x2="17"
+                            y2="10"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          />
+                          <line
+                            x1="3"
+                            y1="16"
+                            x2="17"
+                            y2="16"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('wide')}
+                        className={`${styles.viewButton} ${viewMode === 'wide' ? styles.viewButtonActive : ''}`}
+                        aria-label="Vue large"
+                        aria-pressed={viewMode === 'wide'}
+                        title="Vue large (1 colonne)"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="14"
+                            height="6"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                          <rect
+                            x="3"
+                            y="11"
+                            width="14"
+                            height="6"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -562,6 +598,16 @@ export default function ShopSection() {
                 </button>
               )}
             </div>
+          ) : isMobile ? (
+            <ShopSectionMobile
+              products={filteredProducts}
+              viewMode={catalogViewMode}
+              onProductClick={handleCardClick}
+              onAddToCart={handleAddToCart}
+              getRarityBadge={getRarityBadge}
+              isBestSeller={isBestSeller}
+              isFeatured={isFeatured}
+            />
           ) : (
             <div
               className={`${styles.productsGrid} ${
@@ -690,6 +736,15 @@ export default function ShopSection() {
           )}
         </div>
       </div>
+      <FilterBottomSheet
+        isOpen={isFilterSheetOpen}
+        onClose={() => setIsFilterSheetOpen(false)}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
     </section>
   );
 }

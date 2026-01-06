@@ -408,6 +408,7 @@
   .heroVisual {
     min-height: 450px;
     padding: var(--space-6, 1.5rem) 0;
+    margin-bottom: var(--space-6, 1.5rem);
   }
 }
 
@@ -415,6 +416,7 @@
   .heroVisual {
     min-height: 350px;
     padding: var(--space-4, 1rem) 0;
+    margin-bottom: var(--space-8, 2rem);
   }
 }
 

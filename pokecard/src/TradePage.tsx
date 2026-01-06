@@ -182,9 +182,7 @@ export function TradePage() {
                 onClick={() => navigate(`/trade/set/${set.id}`)}
               >
                 <div className={styles.setImageContainer}>
-                  {set.imagesLogo ? (
-                    <img src={set.imagesLogo} alt={set.name} className={styles.setImage} />
-                  ) : set.imagesSymbol ? (
+                  {set.imagesSymbol ? (
                     <img src={set.imagesSymbol} alt={set.name} className={styles.setSymbol} />
                   ) : (
                     <div className={styles.placeholderImage}>🎴</div>

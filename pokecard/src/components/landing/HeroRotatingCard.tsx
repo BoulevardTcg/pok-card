@@ -54,10 +54,10 @@ export default function HeroRotatingCard() {
 
     // Détecter si on est sur mobile et adapter les paramètres
     const isMobile = window.innerWidth < 1024;
-    const speed = isMobile ? 0.006 : 0.012; // Plus lent sur mobile pour meilleures performances
-    const amplitude = isMobile ? 10 : 18; // Amplitude réduite sur mobile
-    const amplitudeY = isMobile ? 8 : 14;
-    const smoothing = isMobile ? 0.25 : 0.18; // Plus de lissage sur mobile pour fluidité
+    const speed = isMobile ? 0.0045 : 0.009; // x1.5
+    const amplitude = isMobile ? 12 : 18; // + amplitude (x1.5)
+    const amplitudeY = isMobile ? 9 : 15;
+    const smoothing = isMobile ? 0.15 : 0.12; // lissage conservé
 
     const animate = () => {
       timeRef.current += speed;

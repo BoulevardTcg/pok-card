@@ -101,10 +101,10 @@ export default function HeroSection() {
     if (!productRef.current) return;
 
     const isMobile = window.innerWidth < 1024;
-    const speed = isMobile ? 0.022 : 0.015;
-    const amplitude = isMobile ? 22 : 15;
-    const amplitudeY = isMobile ? 18 : 12;
-    const smoothing = isMobile ? 0.15 : 0.2;
+    const speed = isMobile ? 0.012 : 0.009; // x1.5
+    const amplitude = isMobile ? 18 : 15; // + amplitude (x1.5)
+    const amplitudeY = isMobile ? 15 : 12;
+    const smoothing = isMobile ? 0.12 : 0.1; // lissage conservé
 
     let lastX = 0;
     let lastY = 0;

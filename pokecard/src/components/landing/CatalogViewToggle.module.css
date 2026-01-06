@@ -1,0 +1,51 @@
+.toggle {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md, 4px);
+  padding: 0.25rem;
+  height: 36px;
+}
+
+:global(.light) .toggle {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-subtle);
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 2px);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+}
+
+.button:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+.button.active {
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:global(.light) .button.active {
+  background: var(--color-cta-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+}
+
+@media (min-width: 769px) {
+  .toggle {
+    display: none;
+  }
+}
