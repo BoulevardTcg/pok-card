@@ -1,15 +1,17 @@
-
-
 services:
   # Frontend React
   pokecard-frontend:
-    build: ./pokecard
+    build:
+      context: ./pokecard
+      args:
+        # IMPORTANT: Vite remplace les variables VITE_* au moment du BUILD
+        # Cette variable doit être passée comme build arg, pas comme environment
+        VITE_API_URL: "http://localhost:8080/api"
     ports:
       - "3000:80"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://localhost:8080/api
     depends_on:
       - pokecard-backend
     volumes: []

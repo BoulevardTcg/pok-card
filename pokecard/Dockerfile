@@ -13,6 +13,9 @@ RUN npm ci
 COPY . .
 
 # Build de l'application
+# IMPORTANT: Les variables VITE_* doivent être passées comme ARG au build
+ARG VITE_API_URL=http://localhost:8080/api
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # Production stage
