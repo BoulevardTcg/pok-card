@@ -17,8 +17,11 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:8080',
-        description: 'Serveur de développement',
+        url: process.env.API_BASE_URL || process.env.FRONTEND_URL || 'http://localhost:8080',
+        description:
+          process.env.NODE_ENV === 'production'
+            ? 'Serveur de production'
+            : 'Serveur de développement',
       },
     ],
     tags: [

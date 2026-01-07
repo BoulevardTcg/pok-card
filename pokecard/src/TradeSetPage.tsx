@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { API_BASE } from './api';
 import HoloCard from './HoloCard';
 import { loadFoilMap } from './foilMap';
 import styles from './TradeSetPage.module.css';
@@ -25,7 +26,7 @@ export function TradeSetPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     Promise.all([
-      fetch(`http://localhost:8080/api/trade/sets/${encodeURIComponent(id)}/cards`)
+      fetch(`${API_BASE}/trade/sets/${encodeURIComponent(id)}/cards`)
         .then((r) => r.json())
 
         .then((data: any) => (Array.isArray(data) ? data : []))

@@ -10,6 +10,7 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
+import { API_BASE } from '../api';
 import styles from './TwoFactorSettings.module.css';
 
 interface TwoFactorSettingsProps {
@@ -36,7 +37,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
   async function checkStatus() {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/2fa/status', {
+      const response = await fetch(`${API_BASE}/2fa/status`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +59,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setActionLoading(true);
       setError(null);
 
-      const response = await fetch('http://localhost:8080/api/2fa/setup', {
+      const response = await fetch(`${API_BASE}/2fa/setup`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -74,8 +75,8 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setQrCode(data.qrCode);
       setSecret(data.secret);
       setSetupMode(true);
-    } catch (err: Error) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la configuration');
     } finally {
       setActionLoading(false);
     }
@@ -91,7 +92,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setActionLoading(true);
       setError(null);
 
-      const response = await fetch('http://localhost:8080/api/2fa/enable', {
+      const response = await fetch(`${API_BASE}/2fa/enable`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -113,8 +114,8 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setSuccess('Authentification à deux facteurs activée avec succès !');
 
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: Error) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la configuration');
     } finally {
       setActionLoading(false);
     }
@@ -130,7 +131,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setActionLoading(true);
       setError(null);
 
-      const response = await fetch('http://localhost:8080/api/2fa/disable', {
+      const response = await fetch(`${API_BASE}/2fa/disable`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -151,8 +152,8 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
       setSuccess('Authentification à deux facteurs désactivée');
 
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: Error) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la configuration');
     } finally {
       setActionLoading(false);
     }

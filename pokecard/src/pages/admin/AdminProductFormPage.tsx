@@ -455,7 +455,7 @@ export function AdminProductFormPage() {
                             <img
                               src={
                                 image.url.startsWith('/')
-                                  ? `http://localhost:8080${image.url}`
+                                  ? `${API_BASE.replace('/api', '')}${image.url}`
                                   : image.url
                               }
                               alt={image.altText || `Image ${index + 1}`}

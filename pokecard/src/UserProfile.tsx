@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
+import { API_BASE } from './api';
 import { Package, Shield } from 'lucide-react';
 import { TwoFactorSettings } from './components/TwoFactorSettings';
 import styles from './UserProfile.module.css';
@@ -75,7 +76,7 @@ const UserProfile: React.FC = () => {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8080/api/users/profile', {
+      const response = await fetch(`${API_BASE}/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ const UserProfile: React.FC = () => {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8080/api/users/profile/extended', {
+      const response = await fetch(`${API_BASE}/users/profile/extended`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
