@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listProducts } from '../../api';
+import { listProducts, getImageUrl } from '../../api';
 import type { Product as ProductType } from '../../cartContext';
 import styles from './LatestProductsCarousel.module.css';
 
@@ -125,7 +125,7 @@ export default function LatestProductsCarousel() {
                   <div className={styles.imageContainer}>
                     {product.images && product.images.length > 0 ? (
                       <img
-                        src={product.images[0].url}
+                        src={getImageUrl(product.images[0].url)}
                         alt={product.images[0].altText || product.name}
                         className={styles.productImage}
                       />

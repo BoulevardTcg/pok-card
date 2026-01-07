@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HoloCard from './HoloCard';
 import { loadFoilMap } from './foilMap';
+import { API_BASE } from './api';
 import styles from './TradeSetPage.module.css';
 
 function getCardImageUrl(card: any, quality: 'low' | 'high' = 'high') {
@@ -25,7 +26,7 @@ export function TradeSetPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     Promise.all([
-      fetch(`http://localhost:8080/api/trade/sets/${encodeURIComponent(id)}/cards`)
+      fetch(`${API_BASE}/trade/sets/${encodeURIComponent(id)}/cards`)
         .then((r) => r.json())
 
         .then((data: any) => (Array.isArray(data) ? data : []))
@@ -169,12 +170,12 @@ export function TradeSetPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className={styles.cardsGrid}
           >
-            {filteredCards.map((card, index) => (
+            {filteredCards.map((card) => (
               <motion.div
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.05 * index }}
+                transition={{ duration: 0.3 }}
                 className={styles.cardWrapper}
               >
                 <div className={styles.cardContainer}>

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
+import { getImageUrl } from '../../api';
 import type { Product } from '../../cartContext';
 import styles from './ProductCard.module.css';
 
@@ -59,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className={styles.imageContainer}>
         {product.image ? (
           <img
-            src={product.image.url}
+            src={getImageUrl(product.image.url)}
             alt={product.image.altText || product.name}
             className={styles.image}
           />

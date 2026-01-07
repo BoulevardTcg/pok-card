@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
-import { API_BASE } from '../../api';
+import { API_BASE, getImageUrl } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import styles from './AdminInventoryPage.module.css';
 
@@ -193,7 +193,7 @@ export function AdminInventoryPage() {
                     <div className={styles.productCell}>
                       {variant.product.images[0] ? (
                         <img
-                          src={variant.product.images[0].url}
+                          src={getImageUrl(variant.product.images[0].url)}
                           alt={variant.product.name}
                           className={styles.productImage}
                         />

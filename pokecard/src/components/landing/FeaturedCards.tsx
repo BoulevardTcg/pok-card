@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ArrowUpRightIcon } from '../icons/Icons';
-import { API_BASE } from '../../api';
+import { API_BASE, getImageUrl } from '../../api';
 import type { Product } from '../../cartContext';
 import styles from './FeaturedCards.module.css';
 
@@ -151,7 +151,9 @@ export default function FeaturedCards() {
               const price = getLowestPrice(product);
               const productType = getProductType(product);
               const universe = getUniverse(product);
-              const imageUrl = product.images?.[0]?.url || '/img/products/placeholder.png';
+              const imageUrl = getImageUrl(
+                product.images?.[0]?.url || '/img/products/placeholder.png'
+              );
 
               return (
                 <article

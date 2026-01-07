@@ -1,4 +1,35 @@
+// URL de base de l'API (avec /api)
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api';
+
+// URL de base du serveur (sans /api) - pour construire des URLs complètes
+export const API_URL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
+  : 'http://localhost:8080';
+
+/**
+ * Normalise une URL d'image pour qu'elle fonctionne en développement et en production.
+ * Si l'URL est relative (commence par /), elle est convertie en URL absolue avec API_URL.
+ * Si l'URL est déjà absolue (http:// ou https://), elle est retournée telle quelle.
+ * @param imageUrl - URL de l'image (relative ou absolue)
+ * @returns URL absolue de l'image
+ */
+export function getImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return '/img/products/placeholder.png';
+
+  // Si l'URL est déjà absolue, la retourner telle quelle
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // Si l'URL est relative et ne commence pas par /img/ (ressources statiques du frontend),
+  // préfixer avec API_URL pour pointer vers le backend
+  if (imageUrl.startsWith('/') && !imageUrl.startsWith('/img/')) {
+    return `${API_URL}${imageUrl}`;
+  }
+
+  // Sinon (URL relative vers ressources statiques), retourner telle quelle
+  return imageUrl;
+}
 
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: customHeaders, ...restInit } = init || {};

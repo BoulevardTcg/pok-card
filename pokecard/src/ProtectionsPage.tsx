@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
-import { listProducts } from './api';
+import { listProducts, getImageUrl } from './api';
 import type { Product as ProductType } from './cartContext';
 
 export function ProtectionsPage() {
@@ -143,7 +143,10 @@ export function ProtectionsPage() {
               <div key={product.id} className={styles.productCard}>
                 <div className={styles.productImage}>
                   {product.image ? (
-                    <img src={product.image.url} alt={product.image.altText || product.name} />
+                    <img
+                      src={getImageUrl(product.image.url)}
+                      alt={product.image.altText || product.name}
+                    />
                   ) : (
                     <div className={styles.placeholderImage}>Pas d'image</div>
                   )}
