@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { API_BASE } from '../api';
 
 /**
  * Composant React pour lancer un paiement Stripe Checkout
@@ -18,8 +19,6 @@ interface CheckoutButtonProps {
   disabled?: boolean;
   children?: React.ReactNode;
 }
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api';
 const STRIPE_PUBLISHABLE_KEY =
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
 

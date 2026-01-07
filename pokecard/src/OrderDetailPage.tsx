@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
-import { API_BASE } from './api';
+import { API_BASE, getImageUrl } from './api';
 import styles from './OrderDetailPage.module.css';
 import {
   Package,
@@ -276,7 +276,11 @@ export function OrderDetailPage() {
               {order.items.map((item) => (
                 <div key={item.id} className={styles.item}>
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.productName} className={styles.itemImage} />
+                    <img
+                      src={getImageUrl(item.imageUrl)}
+                      alt={item.productName}
+                      className={styles.itemImage}
+                    />
                   ) : (
                     <div className={styles.placeholderImage}>📦</div>
                   )}

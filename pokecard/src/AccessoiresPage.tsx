@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './AccessoiresPage.module.css';
-import { listProducts } from './api';
+import { listProducts, getImageUrl } from './api';
 import type { Product as ProductType } from './cartContext';
 import { navigateToProduct } from './utils/productMatching.ts';
 
@@ -512,7 +512,7 @@ export function AccessoiresPage() {
                       <div className={styles.accessoireImage}>
                         {product.images && product.images.length > 0 ? (
                           <img
-                            src={product.images[0].url}
+                            src={getImageUrl(product.images[0].url)}
                             alt={product.images[0].altText || product.name}
                           />
                         ) : (

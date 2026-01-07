@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../authContext';
-import { API_BASE } from '../../api';
+import { API_BASE, API_URL } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { ArrowLeft, Plus, X, Save, Upload, Link } from 'lucide-react';
 import styles from './AdminProductFormPage.module.css';
@@ -453,11 +453,7 @@ export function AdminProductFormPage() {
                         ) : (
                           <>
                             <img
-                              src={
-                                image.url.startsWith('/')
-                                  ? `http://localhost:8080${image.url}`
-                                  : image.url
-                              }
+                              src={image.url.startsWith('/') ? `${API_URL}${image.url}` : image.url}
                               alt={image.altText || `Image ${index + 1}`}
                               className={styles.previewImage}
                             />

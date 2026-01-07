@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
-import { API_BASE } from './api';
+import { API_BASE, getImageUrl } from './api';
 import styles from './OrdersPage.module.css';
 import { Package, Truck, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
 
@@ -173,7 +173,7 @@ export function OrdersPage() {
                       <div key={item.id} className={styles.orderItem}>
                         {item.imageUrl ? (
                           <img
-                            src={item.imageUrl}
+                            src={getImageUrl(item.imageUrl)}
                             alt={item.productName}
                             className={styles.itemImage}
                           />

@@ -4,7 +4,7 @@ import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
 import { CartIcon } from './components/icons/Icons';
 import styles from './CartPage.module.css';
-import { createCheckoutSession, getVariantsStock, validatePromoCode } from './api';
+import { createCheckoutSession, getVariantsStock, validatePromoCode, getImageUrl } from './api';
 import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
 import type { CartItem } from './cartContext';
 
@@ -267,7 +267,11 @@ export function CartPage() {
                   {/* Image */}
                   <div className={styles.imageContainer}>
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.productName} className={styles.image} />
+                      <img
+                        src={getImageUrl(item.imageUrl)}
+                        alt={item.productName}
+                        className={styles.image}
+                      />
                     ) : (
                       <div className={styles.placeholderImage}>Pas d'image</div>
                     )}

@@ -3,7 +3,14 @@ import { useContext, useEffect, useState } from 'react';
 import { CartContext, type Product as ProductType } from './cartContext';
 import { useAuth } from './authContext';
 import styles from './ProductDetail.module.css';
-import { getProduct, getProductReviews, createReview, canReviewProduct, listProducts } from './api';
+import {
+  getProduct,
+  getProductReviews,
+  createReview,
+  canReviewProduct,
+  listProducts,
+  getImageUrl,
+} from './api';
 import { ArrowRightIcon } from './components/icons/Icons';
 
 interface Review {
@@ -373,7 +380,7 @@ export function ProductDetail() {
               >
                 {product.images && product.images.length > 0 ? (
                   <img
-                    src={product.images[selectedImage].url}
+                    src={getImageUrl(product.images[selectedImage].url)}
                     alt={
                       product.images[selectedImage].altText ||
                       `${product.name} - Image ${selectedImage + 1} sur ${product.images.length}`
@@ -439,7 +446,7 @@ export function ProductDetail() {
                         tabIndex={0}
                       >
                         <img
-                          src={image.url}
+                          src={getImageUrl(image.url)}
                           alt={image.altText || `${product.name} - vue ${index + 1}`}
                           loading="lazy"
                           decoding="async"
@@ -462,8 +469,9 @@ export function ProductDetail() {
                 </h2>
                 <div className={styles.similarGrid} role="list">
                   {similarProducts.map((similarProduct) => {
-                    const imageUrl =
-                      similarProduct.images?.[0]?.url || '/img/products/placeholder.png';
+                    const imageUrl = getImageUrl(
+                      similarProduct.images?.[0]?.url || '/img/products/placeholder.png'
+                    );
                     const price = similarProduct.minPriceCents || 0;
 
                     return (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightIcon } from '../icons/Icons';
-import { API_BASE } from '../../api';
+import { API_BASE, getImageUrl } from '../../api';
 import styles from './NewReleases.module.css';
 
 type Universe = 'all' | 'pokemon' | 'onepiece' | 'yugioh';
@@ -191,7 +191,9 @@ export default function NewReleases() {
               const inStock = isInStock(product);
               const price = getLowestPrice(product);
               const productType = getProductType(product);
-              const imageUrl = product.images?.[0]?.url || '/img/products/placeholder.png';
+              const imageUrl = getImageUrl(
+                product.images?.[0]?.url || '/img/products/placeholder.png'
+              );
 
               return (
                 <article

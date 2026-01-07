@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { API_BASE } from './api';
@@ -46,15 +46,34 @@ export function TradePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredSets = sets.filter((set) => {
-    const matchesSearch =
-      set.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (set.series && set.series.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesSeries = selectedSeries === 'all' || set.series === selectedSeries;
-    return matchesSearch && matchesSeries;
-  });
+  // Normaliser la chaîne pour la recherche (supprimer les accents et mettre en minuscule)
+  const normalizeString = (str: string) => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  };
 
-  const allSeries = Array.from(new Set(sets.map((set) => set.series).filter(Boolean)));
+  const filteredSets = useMemo(() => {
+    if (!searchQuery && selectedSeries === 'all') {
+      return sets;
+    }
+
+    const normalizedQuery = normalizeString(searchQuery);
+
+    return sets.filter((set) => {
+      const matchesSearch =
+        !normalizedQuery ||
+        normalizeString(set.name).includes(normalizedQuery) ||
+        (set.series && normalizeString(set.series).includes(normalizedQuery));
+      const matchesSeries = selectedSeries === 'all' || set.series === selectedSeries;
+      return matchesSearch && matchesSeries;
+    });
+  }, [sets, searchQuery, selectedSeries]);
+
+  const allSeries = useMemo(() => {
+    return Array.from(new Set(sets.map((set) => set.series).filter(Boolean)));
+  }, [sets]);
 
   if (loading) {
     return (
@@ -165,18 +184,12 @@ export function TradePage() {
             <p className={styles.emptyText}>Essayez de modifier vos critères de recherche</p>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className={styles.setsGrid}
-          >
-            {filteredSets.map((set, index) => (
+          <div className={styles.setsGrid}>
+            {filteredSets.map((set) => (
               <motion.div
                 key={set.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 * index }}
+                initial={false}
+                animate={{ opacity: 1 }}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
                 className={styles.setCard}
                 onClick={() => navigate(`/trade/set/${set.id}`)}
@@ -206,7 +219,7 @@ export function TradePage() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
