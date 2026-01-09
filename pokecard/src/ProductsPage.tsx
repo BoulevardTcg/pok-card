@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
@@ -8,15 +8,16 @@ import ProductGrid from './components/catalogue/ProductGrid';
 
 export function ProductsPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [allProducts, setAllProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Toutes');
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>('all');
-  const [selectedCondition, setSelectedCondition] = useState<string>('Toutes');
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
   const sortBy = searchParams.get('sort') || 'newest';
+  const searchQuery = searchParams.get('search') || '';
 
   // Filtrer et trier les produits selon les critères
   const filteredProducts = useMemo(() => {
@@ -64,7 +65,7 @@ export function ProductsPage() {
     }
 
     return filtered;
-  }, [allProducts, selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
+  }, [allProducts, selectedCategory, selectedPriceRange, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
@@ -74,16 +75,16 @@ export function ProductsPage() {
     return filteredProducts.slice(startIndex, endIndex);
   }, [filteredProducts, page, productsPerPage]);
 
-  // Charger les produits au montage et quand la catégorie change
+  // Charger les produits au montage et quand la catégorie ou la recherche change
   useEffect(() => {
     loadAllProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
 
-  // Réinitialiser la page quand les filtres ou le tri changent
+  // Réinitialiser la page quand les filtres, le tri ou la recherche changent
   useEffect(() => {
     setPage(1);
-  }, [selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
+  }, [selectedCategory, selectedPriceRange, sortBy, searchQuery]);
 
   async function loadAllProducts() {
     setLoading(true);
@@ -92,6 +93,7 @@ export function ProductsPage() {
       const response = (await listProducts({
         limit: 200,
         category: selectedCategory === 'Toutes' ? undefined : selectedCategory,
+        search: searchQuery || undefined,
       })) as {
         products: ProductType[];
         pagination: { page: number; total: number; pages: number };
@@ -130,7 +132,6 @@ export function ProductsPage() {
   const handleReset = () => {
     setSelectedCategory('Toutes');
     setSelectedPriceRange('all');
-    setSelectedCondition('Toutes');
     setPage(1);
   };
 
@@ -139,12 +140,27 @@ export function ProductsPage() {
       <div className={styles.container}>
         {/* En-tête */}
         <div className={styles.header}>
-          <h1 className={styles.title}>Catalogue</h1>
+          <h1 className={styles.title}>
+            {searchQuery ? `Résultats pour "${searchQuery}"` : 'Catalogue'}
+          </h1>
           <div className={styles.divider}></div>
           <p className={styles.subtitle}>
-            Explorez notre sélection premium de cartes TCG, soigneusement sélectionnées pour leur
-            qualité et leur rareté.
+            {searchQuery
+              ? `${allProducts.length} produit${allProducts.length > 1 ? 's' : ''} trouvé${allProducts.length > 1 ? 's' : ''}`
+              : 'Explorez notre sélection premium de cartes TCG, soigneusement sélectionnées pour leur qualité et leur rareté.'}
           </p>
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSelectedCategory('Toutes');
+                setSelectedPriceRange('all');
+                navigate('/produits');
+              }}
+              className={styles.clearSearchButton}
+            >
+              Effacer la recherche
+            </button>
+          )}
         </div>
 
         {/* Contenu principal */}
@@ -155,12 +171,12 @@ export function ProductsPage() {
               filters={{
                 category: selectedCategory,
                 priceRange: selectedPriceRange,
-                condition: selectedCondition,
+                condition: 'Toutes', // Pas de filtre condition implémenté pour l'instant
               }}
               callbacks={{
                 onCategoryChange: setSelectedCategory,
                 onPriceRangeChange: setSelectedPriceRange,
-                onConditionChange: setSelectedCondition,
+                onConditionChange: () => {}, // Pas de filtre condition implémenté
                 onReset: handleReset,
               }}
             />
@@ -179,7 +195,23 @@ export function ProductsPage() {
               </div>
             ) : allProducts.length === 0 ? (
               <div className={styles.emptyState}>
-                <p>Aucun produit disponible pour le moment.</p>
+                <p>
+                  {searchQuery
+                    ? `Aucun produit trouvé pour "${searchQuery}". Essayez avec d'autres mots-clés.`
+                    : 'Aucun produit disponible pour le moment.'}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('Toutes');
+                      setSelectedPriceRange('all');
+                      navigate('/produits');
+                    }}
+                    className={styles.clearSearchButton}
+                  >
+                    Voir tous les produits
+                  </button>
+                )}
               </div>
             ) : (
               <ProductGrid

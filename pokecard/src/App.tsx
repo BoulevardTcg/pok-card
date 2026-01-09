@@ -23,7 +23,7 @@ import { AuthProvider } from './authContext';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import UserProfile from './UserProfile';
-import NavbarPremium from './components/landing/NavbarPremium';
+import NavbarGlass from './components/navbar/NavbarGlass';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
@@ -51,13 +51,15 @@ function AppContent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Ne pas afficher la navbar sur la page d'accueil (elle a déjà NavbarPremium)
+  // Ne pas afficher la navbar sur la page d'accueil (elle a déjà NavbarGlass dans Home.tsx)
+  // Ne pas afficher la navbar sur les pages admin (elles ont leur propre AdminLayout)
   const isHomePage = location.pathname === '/';
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <div className={styles.appBg}>
-      {/* Navbar Premium pour les autres pages */}
-      {!isHomePage && <NavbarPremium />}
+      {/* Navbar Glass pour toutes les pages sauf l'accueil et les pages admin */}
+      {!isHomePage && !isAdminPage && <NavbarGlass />}
 
       <main className={styles.main}>
         <Routes>

@@ -3,7 +3,7 @@
    Design équilibré : Premium + Passion Collectionneur
    =================================================================== */
 
-import NavbarPremium from './components/landing/NavbarPremium';
+import NavbarGlass from './components/navbar/NavbarGlass';
 import HeroSection from './components/landing/HeroSection';
 import TrustSignals from './components/landing/TrustSignals';
 import FeaturedCards from './components/landing/FeaturedCards';
@@ -15,7 +15,7 @@ import FooterPremium from './components/landing/FooterPremium';
 export function Home() {
   return (
     <>
-      <NavbarPremium />
+      <NavbarGlass />
       <main>
         {/* Hero — Accroche émotionnelle + rotation de cartes */}
         <HeroSection />
