@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
 import { listProducts, getImageUrl } from './api';
+import { NotifyModal } from './components/NotifyModal';
 import type { Product as ProductType } from './cartContext';
 
 export function ProtectionsPage() {
@@ -11,6 +12,15 @@ export function ProtectionsPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [notifyModal, setNotifyModal] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
 
   useEffect(() => {
     loadProducts();
@@ -150,9 +160,7 @@ export function ProtectionsPage() {
                   ) : (
                     <div className={styles.placeholderImage}>Pas d'image</div>
                   )}
-                  {product.outOfStock && (
-                    <div className={styles.outOfStockBanner}>Rupture de stock</div>
-                  )}
+                  {product.outOfStock && <div className={styles.outOfStockBanner}>Me prévenir</div>}
                 </div>
 
                 <div className={styles.productInfo}>
@@ -179,22 +187,39 @@ export function ProtectionsPage() {
                     )}
                   </div>
 
-                  <button
-                    className={styles.viewProductButton}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (product.slug) {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        navigate(`/produit/${product.slug}`);
-                      } else {
-                        alert("Ce produit n'a pas de slug. Veuillez contacter le support.");
-                      }
-                    }}
-                    disabled={product.outOfStock || !product.slug}
-                  >
-                    {product.outOfStock ? 'Rupture de stock' : 'Voir le produit'}
-                  </button>
+                  {product.outOfStock ? (
+                    <button
+                      className={styles.notifyButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setNotifyModal({
+                          isOpen: true,
+                          productId: product.id,
+                          productName: product.name,
+                        });
+                      }}
+                    >
+                      Me prévenir
+                    </button>
+                  ) : (
+                    <button
+                      className={styles.viewProductButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (product.slug) {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          navigate(`/produit/${product.slug}`);
+                        } else {
+                          alert("Ce produit n'a pas de slug. Veuillez contacter le support.");
+                        }
+                      }}
+                      disabled={!product.slug}
+                    >
+                      Voir le produit
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -229,6 +254,14 @@ export function ProtectionsPage() {
           )}
         </>
       )}
+
+      {/* Notify Modal */}
+      <NotifyModal
+        isOpen={notifyModal.isOpen}
+        onClose={() => setNotifyModal({ ...notifyModal, isOpen: false })}
+        productId={notifyModal.productId}
+        productName={notifyModal.productName}
+      />
     </div>
   );
 }

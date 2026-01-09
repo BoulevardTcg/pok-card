@@ -373,3 +373,55 @@
   font-size: var(--text-xs, 0.75rem);
   color: var(--color-success, #4ade80);
 }
+
+/* Add to Cart Button */
+.addToCartButton {
+  width: 100%;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  margin-top: var(--space-3, 0.75rem);
+  background: linear-gradient(135deg, #d7b56d, #c9a55a);
+  color: #0c1321;
+  border: none;
+  border-radius: var(--radius-sm, 2px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.addToCartButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c9a55a, #b8954a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(215, 181, 109, 0.3);
+}
+
+.addToCartButton:disabled {
+  background: var(--color-bg-subtle, #1a1a1d);
+  color: var(--color-text-muted, #6b6b6f);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Notify Button */
+.notifyButton {
+  width: 100%;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  margin-top: var(--space-3, 0.75rem);
+  background: rgba(139, 115, 85, 0.2);
+  color: #8b7355;
+  border: 1px solid rgba(139, 115, 85, 0.4);
+  border-radius: var(--radius-sm, 2px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.notifyButton:hover {
+  background: rgba(139, 115, 85, 0.3);
+  border-color: rgba(139, 115, 85, 0.6);
+  color: #a68a6a;
+  transform: translateY(-1px);
+}

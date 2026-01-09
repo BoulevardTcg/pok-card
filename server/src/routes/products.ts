@@ -1,4 +1,5 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { body, validationResult } from 'express-validator';
 import { PrismaClient, type Product, type ProductImage, type ProductVariant } from '@prisma/client';
 
 const router = Router();
@@ -188,5 +189,95 @@ router.get('/:slug', async (req, res) => {
     });
   }
 });
+
+// Endpoint pour enregistrer une notification de stock
+router.post(
+  '/notify-stock',
+  [
+    body('email').isEmail().withMessage('Email invalide'),
+    body('productId').isString().notEmpty().withMessage('ID produit requis'),
+    body('variantId').optional({ values: 'falsy' }).isString().withMessage('ID variante invalide'),
+  ],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        console.error('❌ Erreurs de validation:', errors.array());
+        return res.status(400).json({
+          error: errors.array()[0].msg,
+          details: errors.array(),
+        });
+      }
+
+      const { email, productId, variantId } = req.body;
+
+      console.log('📧 Notification de stock demandée:', { email, productId, variantId });
+
+      // Vérifier que le produit existe
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+      });
+
+      if (!product) {
+        return res.status(404).json({ error: 'Produit non trouvé' });
+      }
+
+      // Vérifier si une notification existe déjà
+      const existing = await prisma.stockNotification.findFirst({
+        where: {
+          email,
+          productId,
+          variantId: variantId || null,
+        },
+      });
+
+      if (existing) {
+        return res.status(200).json({
+          message: 'Vous êtes déjà inscrit pour être notifié de ce produit',
+          alreadyExists: true,
+        });
+      }
+
+      // Créer la notification
+      await prisma.stockNotification.create({
+        data: {
+          email,
+          productId,
+          variantId: variantId || null,
+        },
+      });
+
+      res.status(201).json({
+        message:
+          'Votre demande a été enregistrée. Vous recevrez un email dès que le produit sera disponible.',
+      });
+    } catch (error: any) {
+      console.error("❌ Erreur lors de l'enregistrement de la notification:", error);
+      console.error('Stack:', error.stack);
+      console.error('Message:', error.message);
+      console.error('Code:', error.code);
+
+      // Vérifier si c'est une erreur de table manquante
+      if (
+        error.code === 'P2001' ||
+        error.message?.includes('does not exist') ||
+        error.message?.includes('Unknown model')
+      ) {
+        return res.status(503).json({
+          error:
+            "La fonctionnalité de notification n'est pas encore disponible. La migration de base de données doit être appliquée.",
+          code: 'MIGRATION_REQUIRED',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+      }
+
+      res.status(500).json({
+        error: "Erreur lors de l'enregistrement",
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+);
 
 export default router;

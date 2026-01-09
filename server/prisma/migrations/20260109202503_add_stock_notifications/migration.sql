@@ -1,0 +1,2 @@
+-- This migration was created by mistake and is empty
+-- The actual migration is 20260101192245_add_stock_notifications

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './AccessoiresPage.module.css';
 import { listProducts, getImageUrl } from './api';
+import { NotifyModal } from './components/NotifyModal';
 import type { Product as ProductType } from './cartContext';
 import { navigateToProduct } from './utils/productMatching.ts';
 
@@ -181,6 +182,15 @@ export function AccessoiresPage() {
   const [showPopularOnly, setShowPopularOnly] = useState(false);
   const [apiProducts, setApiProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notifyModal, setNotifyModal] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
 
   // Charger les produits depuis l'API
   useEffect(() => {
@@ -562,18 +572,37 @@ export function AccessoiresPage() {
                           </span>
                         </div>
 
-                        <button
-                          className={styles.viewAccessoireButton}
-                          onClick={() => {
-                            if (product.slug) {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              navigate(`/produit/${product.slug}`);
-                            }
-                          }}
-                          disabled={!product.slug || isOutOfStock}
-                        >
-                          {isOutOfStock ? 'Rupture de stock' : 'Voir le produit'}
-                        </button>
+                        {isOutOfStock ? (
+                          <button
+                            className={styles.notifyButton}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Pour les accessoires, on utilise l'ID du produit API s'il existe
+                              const productId = product.id || `accessoire-${accessoire.id}`;
+                              setNotifyModal({
+                                isOpen: true,
+                                productId:
+                                  typeof productId === 'string' ? productId : String(productId),
+                                productName: product.name,
+                              });
+                            }}
+                          >
+                            Me prévenir
+                          </button>
+                        ) : (
+                          <button
+                            className={styles.viewAccessoireButton}
+                            onClick={() => {
+                              if (product.slug) {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                navigate(`/produit/${product.slug}`);
+                              }
+                            }}
+                            disabled={!product.slug}
+                          >
+                            Voir le produit
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -587,6 +616,14 @@ export function AccessoiresPage() {
           )}
         </>
       )}
+
+      {/* Notify Modal */}
+      <NotifyModal
+        isOpen={notifyModal.isOpen}
+        onClose={() => setNotifyModal({ ...notifyModal, isOpen: false })}
+        productId={notifyModal.productId}
+        productName={notifyModal.productName}
+      />
     </div>
   );
 }

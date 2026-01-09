@@ -26,10 +26,10 @@ model User {
   isVerified Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  
+
   // 2FA (Two-Factor Authentication)
-  twoFactorEnabled Boolean  @default(false)
-  twoFactorSecret  String?  // Secret TOTP encodé
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String? // Secret TOTP encodé
 
   // Relations
   profile             UserProfile?
@@ -81,18 +81,18 @@ model Favorite {
 }
 
 model Order {
-  id                String             @id @default(cuid())
+  id                String            @id @default(cuid())
   userId            String?
-  orderNumber       String             @unique
-  status            OrderStatus        @default(PENDING)
-  fulfillmentStatus FulfillmentStatus  @default(PAID)
+  orderNumber       String            @unique
+  status            OrderStatus       @default(PENDING)
+  fulfillmentStatus FulfillmentStatus @default(PAID)
   carrier           Carrier?
   trackingNumber    String?
   trackingUrl       String?
   shippedAt         DateTime?
   deliveredAt       DateTime?
   totalCents        Int
-  currency          String             @default("EUR")
+  currency          String            @default("EUR")
   paymentMethod     String?
   shippingMethod    String?
   shippingCost      Int?
@@ -100,8 +100,8 @@ model Order {
   billingAddress    Json?
   items             OrderItem[]
   events            OrderEvent[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   // Relations
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -110,12 +110,12 @@ model Order {
 }
 
 model OrderEvent {
-  id        String          @id @default(cuid())
+  id        String         @id @default(cuid())
   orderId   String
   type      OrderEventType
   message   String?
   createdBy String?
-  createdAt DateTime        @default(now())
+  createdAt DateTime       @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -302,6 +302,21 @@ model UserCollection {
   @@unique([userId, cardId])
   @@index([userId])
   @@map("user_collections")
+}
+
+model StockNotification {
+  id         String    @id @default(cuid())
+  email      String
+  productId  String
+  variantId  String?
+  notified   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  notifiedAt DateTime?
+
+  @@unique([email, productId, variantId])
+  @@index([productId])
+  @@index([email])
+  @@map("stock_notifications")
 }
 
 enum OrderStatus {

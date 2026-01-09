@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
+import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import styles from './ProductCard.module.css';
 
@@ -14,6 +15,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { isAuthenticated } = useAuth();
+  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -84,7 +86,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             className={styles.addButton}
             aria-label={`Ajouter ${product.name} au panier`}
           >
-            🛒 Ajouter
+            Ajouter
           </button>
         </div>
       </div>
@@ -117,8 +119,26 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {product.outOfStock && <div className={styles.outOfStock}>Rupture de stock</div>}
+        {product.outOfStock && (
+          <button
+            className={styles.notifyButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              setNotifyModalOpen(true);
+            }}
+          >
+            Me prévenir
+          </button>
+        )}
       </div>
+
+      {/* Notify Modal */}
+      <NotifyModal
+        isOpen={notifyModalOpen}
+        onClose={() => setNotifyModalOpen(false)}
+        productId={product.id}
+        productName={product.name}
+      />
     </div>
   );
 }
