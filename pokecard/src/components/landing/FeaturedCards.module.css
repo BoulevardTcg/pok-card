@@ -374,26 +374,30 @@
   color: var(--color-success, #4ade80);
 }
 
-/* Add to Cart Button */
+/* ─────────────────────────────────────────────────────────────────
+   ADD TO CART BUTTON - Style cohérent avec les CTA du site
+   ───────────────────────────────────────────────────────────────── */
+
 .addToCartButton {
   width: 100%;
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
   margin-top: var(--space-3, 0.75rem);
-  background: linear-gradient(135deg, #d7b56d, #c9a55a);
-  color: #0c1321;
+  background: var(--color-accent-primary, #e8e4dd);
+  color: var(--color-bg-primary, #0a0a0b);
   border: none;
   border-radius: var(--radius-sm, 2px);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
+  letter-spacing: var(--tracking-wide, 0.02em);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c9a55a, #b8954a);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(215, 181, 109, 0.3);
+  background: var(--color-accent-hover, #f5f2ed);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 228, 221, 0.2);
 }
 
 .addToCartButton:disabled {
@@ -403,25 +407,28 @@
   opacity: 0.6;
 }
 
-/* Notify Button */
+/* ─────────────────────────────────────────────────────────────────
+   NOTIFY BUTTON - Style secondaire distinct
+   ───────────────────────────────────────────────────────────────── */
+
 .notifyButton {
   width: 100%;
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
   margin-top: var(--space-3, 0.75rem);
-  background: rgba(139, 115, 85, 0.2);
-  color: #8b7355;
-  border: 1px solid rgba(139, 115, 85, 0.4);
+  background: transparent;
+  color: var(--color-text-secondary, #a1a1a6);
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-sm, 2px);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-semibold, 600);
+  font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-wide, 0.02em);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .notifyButton:hover {
-  background: rgba(139, 115, 85, 0.3);
-  border-color: rgba(139, 115, 85, 0.6);
-  color: #a68a6a;
-  transform: translateY(-1px);
+  background: var(--color-bg-subtle, #1a1a1d);
+  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
+  color: var(--color-text-primary, #f5f5f3);
 }

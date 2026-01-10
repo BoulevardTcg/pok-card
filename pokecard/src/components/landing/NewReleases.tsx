@@ -245,31 +245,29 @@ export default function NewReleases() {
                       <span className={styles.releasePrice}>
                         {price > 0 ? `${formatPrice(price)} €` : 'Prix sur demande'}
                       </span>
+                      {inStock ? (
+                        <button
+                          className={styles.addToCartButton}
+                          onClick={(e) => handleAddToCart(e, product)}
+                        >
+                          Ajouter
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.notifyButton}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNotifyModal({
+                              isOpen: true,
+                              productId: product.id,
+                              productName: product.name,
+                            });
+                          }}
+                        >
+                          Me prévenir
+                        </button>
+                      )}
                     </div>
-
-                    {/* Add to Cart Button */}
-                    {inStock ? (
-                      <button
-                        className={styles.addToCartButton}
-                        onClick={(e) => handleAddToCart(e, product)}
-                      >
-                        Ajouter au panier
-                      </button>
-                    ) : (
-                      <button
-                        className={styles.notifyButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setNotifyModal({
-                            isOpen: true,
-                            productId: product.id,
-                            productName: product.name,
-                          });
-                        }}
-                      >
-                        Me prévenir
-                      </button>
-                    )}
                   </div>
                 </article>
               );
