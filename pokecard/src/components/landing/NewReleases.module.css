@@ -154,195 +154,340 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RELEASE CARD - Layout vertical avec proportions uniformes
+   RELEASE CARD - Design moderne et élégant
    ───────────────────────────────────────────────────────────────── */
 
 .releaseCard {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-subtle, #1a1a1d);
-  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
-  border-radius: var(--radius-lg, 12px);
+  background: linear-gradient(165deg, #1a1a1d 0%, #141416 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: all var(--duration-base, 250ms) var(--ease-out);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Effet de brillance sur la bordure */
+.releaseCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%,
+    rgba(139, 115, 85, 0.2) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .releaseCard:hover {
-  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(139, 115, 85, 0.1);
+}
+
+.releaseCard:hover::before {
+  opacity: 1;
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RELEASE IMAGE - Proportions fixes avec aspect-ratio
+   RELEASE IMAGE - Design moderne avec overlay
    ───────────────────────────────────────────────────────────────── */
 
 .releaseImageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  background: var(--color-bg-primary, #0a0a0b);
+  aspect-ratio: 4 / 3;
+  background: radial-gradient(ellipse at center, #1f1f23 0%, #0a0a0b 100%);
   overflow: hidden;
+}
+
+/* Effet de lumière sur l'image */
+.releaseImageWrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(20, 20, 22, 0.8) 100%);
+  pointer-events: none;
 }
 
 .releaseImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 1rem;
-  transition: transform var(--duration-base, 250ms) var(--ease-out);
+  padding: 1.5rem;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
 }
 
 .releaseCard:hover .releaseImage {
-  transform: scale(1.05);
+  transform: scale(1.08) translateY(-4px);
 }
 
-/* Status Badges */
+/* Status Badges - Redesign */
 .statusBadges {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 1rem;
+  left: 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  z-index: 1;
+  gap: 0.5rem;
+  z-index: 2;
 }
 
 .newBadge,
 .preorderBadge {
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
+  backdrop-filter: blur(8px);
 }
 
 .newBadge {
-  background: var(--color-success, #4ade80);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: rgba(74, 222, 128, 0.9);
+  color: #0a0a0b;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
 }
 
 .preorderBadge {
-  background: var(--color-warning, #fbbf24);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: rgba(251, 191, 36, 0.9);
+  color: #0a0a0b;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RELEASE CONTENT
+   RELEASE CONTENT - Structure moderne
    ───────────────────────────────────────────────────────────────── */
 
 .releaseContent {
+  position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  padding: 1rem;
-  gap: 0.75rem;
+  padding: 1.25rem;
+  gap: 1rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(139, 115, 85, 0.03) 100%);
 }
 
 .releaseInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
+  gap: 0.5rem;
 }
 
 .releaseType {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-accent-secondary, #8b7355);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+}
+
+.releaseType::before {
+  content: '';
+  width: 8px;
+  height: 2px;
+  background: var(--color-accent-secondary, #8b7355);
+  border-radius: 1px;
 }
 
 .releaseName {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   color: var(--color-text-primary, #f5f5f3);
-  line-height: 1.3;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.releaseCard:hover .releaseName {
+  color: var(--color-accent-primary, #e8e4dd);
 }
 
 .releaseDate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted, #6b6b6f);
-  margin-top: auto;
+}
+
+.releaseDate::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.5;
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RELEASE FOOTER - Prix et bouton
+   RELEASE FOOTER - Prix et action alignés
    ───────────────────────────────────────────────────────────────── */
 
 .releaseFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+  gap: 1rem;
+  padding-top: 1rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .releasePrice {
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--color-text-primary, #f5f5f3);
+  letter-spacing: -0.02em;
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   BUTTONS - Compacts pour les cartes
+   BUTTONS - Design UX/UI Premium
    ───────────────────────────────────────────────────────────────── */
 
 .addToCartButton {
-  padding: 0.5rem 1rem;
-  background: var(--color-accent-primary, #e8e4dd);
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #e8e4dd 0%, #d4cfc6 100%);
   color: var(--color-bg-primary, #0a0a0b);
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(232, 228, 221, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Effet shimmer au hover */
+.addToCartButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.addToCartButton:hover::before {
+  left: 100%;
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: var(--color-accent-hover, #f5f2ed);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #f5f2ed 0%, #e8e4dd 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 8px 24px rgba(232, 228, 221, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.addToCartButton:active:not(:disabled) {
+  transform: translateY(-1px) scale(0.98);
 }
 
 .addToCartButton:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* Notify Button - Style distinct et attractif */
 .notifyButton {
-  padding: 0.5rem 1rem;
-  background: transparent;
-  color: var(--color-text-secondary, #a1a1a6);
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
-  border-radius: 6px;
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  background: rgba(139, 115, 85, 0.1);
+  color: var(--color-accent-secondary, #c9b896);
+  border: 1px solid rgba(139, 115, 85, 0.3);
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Effet glow pulsant */
+.notifyButton::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 115, 85, 0.3),
+    transparent,
+    rgba(139, 115, 85, 0.3)
+  );
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
 .notifyButton:hover {
-  background: var(--color-bg-primary, #0a0a0b);
-  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
-  color: var(--color-text-primary, #f5f5f3);
+  background: rgba(139, 115, 85, 0.2);
+  border-color: var(--color-accent-secondary, #8b7355);
+  color: var(--color-accent-primary, #e8e4dd);
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 20px rgba(139, 115, 85, 0.25),
+    0 0 20px rgba(139, 115, 85, 0.15);
+}
+
+.notifyButton:hover::after {
+  opacity: 1;
+  animation: glowPulseNotify 2s ease-in-out infinite;
+}
+
+@keyframes glowPulseNotify {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -393,27 +538,55 @@
     padding: 3rem 0;
   }
 
+  .releaseCard {
+    border-radius: 12px;
+  }
+
+  .releaseImageWrapper {
+    aspect-ratio: 1 / 1;
+  }
+
+  .releaseImage {
+    padding: 1rem;
+  }
+
+  .statusBadges {
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .newBadge,
+  .preorderBadge {
+    padding: 4px 10px;
+    font-size: 9px;
+  }
+
   .releaseContent {
-    padding: 0.75rem;
-    gap: 0.5rem;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .releaseType {
+    font-size: 0.65rem;
   }
 
   .releaseName {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
 
   .releasePrice {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .releaseFooter {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
     align-items: stretch;
   }
 
   .releaseFooter .releasePrice {
     text-align: center;
+    font-size: 1.1rem;
   }
 
   .addToCartButton,
@@ -421,25 +594,35 @@
     width: 100%;
     text-align: center;
     justify-content: center;
+    padding: 1rem;
+    font-size: 0.85rem;
   }
 }
 
 @media (min-width: 640px) and (max-width: 899px) {
   .releaseContent {
-    padding: 0.875rem;
+    padding: 1rem;
   }
 
   .releaseName {
-    font-size: 0.95rem;
+    font-size: 1rem;
+  }
+
+  .releasePrice {
+    font-size: 1.1rem;
   }
 }
 
 @media (min-width: 900px) {
   .releaseName {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .releaseContent {
-    padding: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .releasePrice {
+    font-size: 1.25rem;
   }
 }

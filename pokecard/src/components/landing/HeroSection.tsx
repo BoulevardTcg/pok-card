@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRightIcon } from '../icons/Icons';
 import styles from './HeroSection.module.css';
@@ -67,6 +67,18 @@ export default function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
+
+  // Particules mémorisées pour éviter le recalcul à chaque re-render
+  const particles = useMemo(
+    () =>
+      [...Array(20)].map((_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${8 + Math.random() * 12}s`,
+      })),
+    []
+  );
 
   // Configuration spring pour animations hero
   const SPRING_HERO = {
@@ -137,20 +149,18 @@ export default function HeroSection() {
   useEffect(() => {
     if (!productRef.current) return;
 
-    const isMobile = window.innerWidth < 1024;
-    const speed = isMobile ? 0.022 : 0.015;
-    const amplitude = isMobile ? 22 : 15;
-    const amplitudeY = isMobile ? 18 : 12;
-    const smoothing = isMobile ? 0.15 : 0.2;
+    // Paramètres uniformes sur toutes les plateformes (vitesse lente comme sur desktop)
+    const speed = 0.015;
+    const amplitude = 15;
+    const amplitudeY = 12;
+    const smoothing = 0.2;
 
     let lastX = 0;
     let lastY = 0;
     let rafId: number;
     let isActive = true;
 
-    if (!isMobile) {
-      productRef.current.style.willChange = 'transform';
-    }
+    productRef.current.style.willChange = 'transform';
 
     const animate = () => {
       if (!isActive || !productRef.current || animationPausedRef.current) {
@@ -181,7 +191,7 @@ export default function HeroSection() {
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
-      if (productRef.current && !isMobile) {
+      if (productRef.current) {
         productRef.current.style.willChange = 'auto';
       }
     };
@@ -193,6 +203,20 @@ export default function HeroSection() {
       <div className={styles.heroBackground}>
         <div className={styles.gradientOrb} />
         <div className={styles.noiseOverlay} />
+        {/* Particules flottantes (indépendantes des changements de carte) */}
+        <div className={styles.particles}>
+          {particles.map((p) => (
+            <span
+              key={p.id}
+              className={styles.particle}
+              style={{
+                left: p.left,
+                animationDelay: p.animationDelay,
+                animationDuration: p.animationDuration,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className={styles.heroContainer}>
@@ -254,13 +278,19 @@ export default function HeroSection() {
         </motion.div>
 
         {/* Produit en vedette */}
-        <div className={styles.heroVisual}>
+        <motion.div
+          className={styles.heroVisual}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <div
             ref={productRef}
             className={`${styles.cardWrapper} ${isTransitioning ? styles.transitioning : ''}`}
           >
-            {/* Glow effect */}
+            {/* Glow effect pulsant */}
             <div className={styles.cardGlow} />
+            <div className={styles.cardGlowPulse} />
 
             <div className={styles.cardFrame}>
               <img
@@ -269,6 +299,8 @@ export default function HeroSection() {
                 className={styles.cardImage}
                 loading="eager"
               />
+              {/* Effet shimmer */}
+              <div className={styles.cardShimmer} />
             </div>
 
             {/* Info produit */}
@@ -278,15 +310,15 @@ export default function HeroSection() {
               <span className={styles.cardSubtitle}>{currentProduct.subtitle}</span>
             </div>
           </div>
+        </motion.div>
+      </div>
 
-          {/* Indicateur scroll */}
-          <div className={styles.scrollIndicator}>
-            <span className={styles.scrollText}>Défiler</span>
-            <div className={styles.scrollLine}>
-              <div className={styles.scrollDot} />
-            </div>
-          </div>
+      {/* Indicateur scroll - centré en bas de la section */}
+      <div className={styles.scrollIndicator}>
+        <div className={styles.scrollLine}>
+          <div className={styles.scrollDot} />
         </div>
+        <span className={styles.scrollText}>Défiler</span>
       </div>
     </section>
   );
