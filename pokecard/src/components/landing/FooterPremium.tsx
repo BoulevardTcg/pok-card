@@ -40,7 +40,7 @@ export default function FooterPremium() {
               <span className={styles.logoMark}>B</span>
               <span className={styles.logoText}>Boulevard</span>
             </button>
-            <p className={styles.tagline}>La maison de vente pour collectionneurs exigeants.</p>
+            <p className={styles.tagline}>Play your cards.</p>
             <div className={styles.socialSection}>
               <span className={styles.socialLabel}>Suivez-nous</span>
               <div className={styles.socialLinks}>

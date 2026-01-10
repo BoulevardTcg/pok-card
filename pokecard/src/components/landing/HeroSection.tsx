@@ -240,7 +240,7 @@ export default function HeroSection() {
               Collectionnez.
             </motion.span>
             <motion.span className={styles.titleAccent} variants={itemVariants}>
-              Vivez votre passion.
+              Play your cards.
             </motion.span>
           </h1>
 
