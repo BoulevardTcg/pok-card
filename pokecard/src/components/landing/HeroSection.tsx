@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRightIcon } from '../icons/Icons';
 import styles from './HeroSection.module.css';
 
-// Produits scellés en rotation — représentant différents univers
+// Produits scellés en rotation représentant différents univers
 // Les images de cartes 3D sont utilisées pour l'effet visuel
 const HERO_PRODUCTS = [
   {
@@ -245,8 +245,8 @@ export default function HeroSection() {
           </h1>
 
           <motion.p className={styles.description} variants={itemVariants}>
-            Boosters, displays, coffrets ETB et collections premium — Boulevard vous propose une
-            sélection soignée de produits scellés pour tous les passionnés de TCG.
+            Boosters, displays, coffrets ETB et collections premium. Boulevard propose une sélection
+            de produits scellés pour tous les passionnés de TCG.
           </motion.p>
 
           <motion.div className={styles.heroActions} variants={itemVariants}>

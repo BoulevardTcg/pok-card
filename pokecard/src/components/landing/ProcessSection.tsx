@@ -7,21 +7,19 @@ const PROCESS_STEPS = [
     number: '01',
     title: 'Sélection',
     description:
-      'Parcourez notre catalogue et choisissez parmi des milliers de produits scellés : boosters, displays, coffrets ETB et collections premium.',
+      'Choisissez parmi nos produits scellés : boosters, displays, coffrets ETB et collections premium.',
     icon: ShieldCheckIcon,
   },
   {
     number: '02',
     title: 'Commande sécurisée',
-    description:
-      'Paiement 100% sécurisé, confirmation immédiate et suivi de commande en temps réel. Votre commande est traité avec soin.',
+    description: 'Paiement sécurisé, confirmation immédiate et suivi de commande en temps réel.',
     icon: CertificateIcon,
   },
   {
     number: '03',
     title: 'Livraison sécurisée',
-    description:
-      'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre collection arrive dans un état parfait.',
+    description: 'Emballage protecteur, assurance complète et suivi en temps réel.',
     icon: PackageIcon,
   },
 ];
@@ -106,10 +104,7 @@ export default function ProcessSection() {
         {/* Header */}
         <div className={styles.header}>
           <span className={styles.overline}>Notre processus</span>
-          <h2 className={styles.title}>
-            De la sélection
-            <br />à votre collection
-          </h2>
+          <h2 className={styles.title}>Comment ça marche</h2>
         </div>
 
         {/* Process Steps */}

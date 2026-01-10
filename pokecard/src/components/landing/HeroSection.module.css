@@ -401,9 +401,25 @@
   .indicator {
     width: 32px;
     height: 4px;
-    padding: 20px 8px;
-    margin: -20px -8px;
-    background-clip: content-box;
+    /* Zone tactile agrandie sans effet visuel bizarre */
+    min-width: 44px;
+    min-height: 44px;
+    padding: 20px;
+    margin: -20px;
+    /* Pas de background-clip pour éviter l'effet lumineux */
+    background: var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* La barre réelle à l'intérieur */
+  .indicator::after {
+    content: '';
+    width: 32px;
+    height: 4px;
+    background: inherit;
+    border-radius: var(--radius-full, 9999px);
   }
 }
 
@@ -423,14 +439,20 @@
   width: 0;
   background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
+  /* S'assurer qu'il n'y a pas d'effet lumineux */
+  box-shadow: none;
+  outline: none;
 }
 
 /* ─── MOBILE: Progress bar positionnée correctement ─── */
 @media (max-width: 767px) {
   .indicatorProgress {
-    top: 50%;
-    transform: translateY(-50%);
-    height: 4px;
+    top: 0;
+    transform: none;
+    height: 100%;
+    /* Pas d'effet lumineux */
+    box-shadow: none;
+    filter: none;
   }
 }
 

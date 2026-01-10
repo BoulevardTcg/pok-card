@@ -198,9 +198,7 @@ export default function FeaturedCards() {
           <div className={styles.headerContent}>
             <span className={styles.overline}>À la une</span>
             <h2 className={styles.title}>Produits phares</h2>
-            <p className={styles.description}>
-              Notre sélection de produits scellés pour tous les passionnés.
-            </p>
+            <p className={styles.description}>Nos meilleurs produits scellés.</p>
           </div>
 
           <div className={styles.headerActions}>

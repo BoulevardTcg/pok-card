@@ -14,16 +14,12 @@ export default function FinalCTA() {
 
       <div className={styles.container}>
         <div className={styles.content}>
-          <span className={styles.overline}>Rejoignez l'aventure</span>
+          <span className={styles.overline}>Prêt à commencer</span>
 
-          <h2 className={styles.title}>
-            Produits scellés premium
-            <br />
-            pour tous les passionnés.
-          </h2>
+          <h2 className={styles.title}>Produits scellés pour tous les passionnés</h2>
 
           <p className={styles.description}>
-            Boosters, displays, coffrets ETB et collections premium. Produits authentiques,
+            Boosters, displays, coffrets ETB et collections premium. Produits authentiques et
             livraison sécurisée.
           </p>
 
