@@ -10,16 +10,37 @@
   border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
 }
 
+/* ─── MOBILE: Padding réduit ─── */
+@media (max-width: 767px) {
+  .section {
+    padding: 1.5rem 0;
+  }
+}
+
 .container {
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
   padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
 }
 
+/* ─── MOBILE: Container optimisé ─── */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-8, 2rem);
+}
+
+/* ─── MOBILE: Grid compact ─── */
+@media (max-width: 767px) {
+  .statsGrid {
+    gap: 1rem 0.5rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -35,6 +56,13 @@
   align-items: center;
   text-align: center;
   gap: var(--space-2, 0.5rem);
+}
+
+/* ─── MOBILE: Items compacts ─── */
+@media (max-width: 767px) {
+  .statItem {
+    gap: 0.25rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -63,10 +91,25 @@
   line-height: var(--leading-none, 1);
 }
 
+/* ─── MOBILE: Valeurs plus petites ─── */
+@media (max-width: 767px) {
+  .statValue {
+    font-size: 1.5rem;
+  }
+}
+
 .statLabel {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   color: var(--color-text-muted, #6b6b6f);
   letter-spacing: var(--tracking-wide, 0.02em);
+}
+
+/* ─── MOBILE: Labels plus petits ─── */
+@media (max-width: 767px) {
+  .statLabel {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
 }

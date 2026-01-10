@@ -8,10 +8,24 @@
   overflow: hidden;
 }
 
+/* ─── MOBILE: Padding optimisé ─── */
+@media (max-width: 767px) {
+  .section {
+    padding: 2.5rem 0;
+  }
+}
+
 .container {
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
   padding: 0 clamp(1rem, 5vw, 4rem);
+}
+
+/* ─── MOBILE: Container ─── */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 1rem;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -40,6 +54,13 @@
   max-width: 500px;
 }
 
+/* ─── MOBILE: Header content ─── */
+@media (max-width: 767px) {
+  .headerContent {
+    gap: 0.25rem;
+  }
+}
+
 .overline {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.75rem;
@@ -57,11 +78,26 @@
   color: var(--color-text-primary, #f5f5f3);
 }
 
+/* ─── MOBILE: Titre ─── */
+@media (max-width: 767px) {
+  .title {
+    font-size: 1.5rem;
+  }
+}
+
 .description {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--color-text-secondary, #a1a1a6);
+}
+
+/* ─── MOBILE: Description ─── */
+@media (max-width: 767px) {
+  .description {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
 }
 
 /* Header Actions */
@@ -171,6 +207,111 @@
 
 .carouselWrapper {
   position: relative;
+}
+
+/* ─── SWIPE HINT (Mobile only) ─── */
+.swipeHint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0 1rem;
+  color: var(--color-text-muted, #6b6b6f);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  animation: swipeHintPulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 767px) {
+  .swipeHint {
+    display: flex;
+  }
+}
+
+.swipeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: swipeIconMove 1.5s ease-in-out infinite;
+}
+
+@keyframes swipeIconMove {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes swipeHintPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ─── FADE INDICATOR (Right edge) ─── */
+.fadeRight {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 60px; /* Above pagination */
+  width: 60px;
+  background: linear-gradient(90deg, transparent, var(--color-bg-primary, #0a0a0b));
+  pointer-events: none;
+  z-index: 2;
+}
+
+@media (max-width: 767px) {
+  .fadeRight {
+    display: block;
+    width: 40px;
+  }
+}
+
+/* ─── PAGINATION DOTS (Mobile only) ─── */
+.paginationDots {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0 0;
+}
+
+@media (max-width: 767px) {
+  .paginationDots {
+    display: flex;
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border-default, rgba(255, 255, 255, 0.15));
+  transition: all 0.3s ease;
+}
+
+.dotActive {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--color-accent-primary, #e8e4dd);
+}
+
+.dotMore {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #6b6b6f);
+  margin-left: 0.25rem;
   margin: 0 -1rem;
 }
 

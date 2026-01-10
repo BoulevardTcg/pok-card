@@ -7,10 +7,24 @@
   background: var(--color-bg-elevated, #141416);
 }
 
+/* ─── MOBILE: Padding optimisé ─── */
+@media (max-width: 767px) {
+  .section {
+    padding: 3rem 0;
+  }
+}
+
 .container {
   max-width: var(--container-max, 1400px);
   margin: 0 auto;
   padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
+}
+
+/* ─── MOBILE: Container ─── */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 1.25rem;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -23,6 +37,14 @@
   gap: var(--space-4, 1rem);
   margin-bottom: var(--space-16, 4rem);
   max-width: 600px;
+}
+
+/* ─── MOBILE: Header compact ─── */
+@media (max-width: 767px) {
+  .header {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
 }
 
 .overline {
@@ -221,4 +243,29 @@
   color: var(--color-text-secondary, #a1a1a6);
   max-width: 480px;
   text-align: justify;
+}
+
+/* ─── MOBILE: Description lisible ─── */
+@media (max-width: 767px) {
+  .stepDescription {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+}
+
+/* ─── MOBILE: Steps optimisées ─── */
+@media (max-width: 767px) {
+  .steps {
+    gap: 1.5rem;
+  }
+
+  .stepIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .stepTitle {
+    font-size: 1.25rem;
+  }
 }
