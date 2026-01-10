@@ -162,12 +162,9 @@ export default function NewReleases() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <span className={styles.overline}>Pour les chasseurs</span>
+            <span className={styles.overline}>Nouveautés</span>
             <h2 className={styles.title}>Dernières sorties</h2>
-            <p className={styles.description}>
-              Boosters fraîchement sortis, précommandes ouvertes — tout ce qu'il faut pour le
-              frisson de l'ouverture.
-            </p>
+            <p className={styles.description}>Les dernières sorties et précommandes disponibles.</p>
           </div>
         </div>
 
