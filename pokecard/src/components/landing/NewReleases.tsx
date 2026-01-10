@@ -114,7 +114,7 @@ export default function NewReleases() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
-      setProducts(sortedProducts.slice(0, 8)); // Prendre les 8 plus récents
+      setProducts(sortedProducts.slice(0, 9)); // Prendre les 9 plus récents pour un grid 3x3
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -154,8 +154,7 @@ export default function NewReleases() {
             <span className={styles.overline}>Pour les chasseurs</span>
             <h2 className={styles.title}>Dernières sorties</h2>
             <p className={styles.description}>
-              Boosters fraîchement sortis, précommandes ouvertes — tout ce qu'il faut pour le
-              frisson de l'ouverture.
+              Les derniers boosters disponibles et les précommandes ouvertes.
             </p>
           </div>
         </div>

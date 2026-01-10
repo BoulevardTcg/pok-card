@@ -123,8 +123,7 @@ export default function FeaturedCards() {
             <span className={styles.overline}>À la une</span>
             <h2 className={styles.title}>Produits phares</h2>
             <p className={styles.description}>
-              Boosters, displays, coffrets ETB et collections premium — notre sélection de produits
-              scellés pour tous les passionnés.
+              Notre sélection de produits scellés pour tous les passionnés.
             </p>
           </div>
 
