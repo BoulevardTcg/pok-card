@@ -23,8 +23,7 @@ export default function FinalCTA() {
           </h2>
 
           <p className={styles.description}>
-            Boosters, displays, coffrets ETB et collections premium. Produits authentiques,
-            livraison sécurisée.
+            Produits scellés authentiques avec livraison sécurisée.
           </p>
 
           <div className={styles.actions}>

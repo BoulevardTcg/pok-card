@@ -7,21 +7,20 @@ const PROCESS_STEPS = [
     number: '01',
     title: 'Sélection',
     description:
-      'Parcourez notre catalogue et choisissez parmi des milliers de produits scellés : boosters, displays, coffrets ETB et collections premium.',
+      'Choisissez vos produits parmi notre catalogue de boosters, displays et coffrets scellés.',
     icon: ShieldCheckIcon,
   },
   {
     number: '02',
     title: 'Commande sécurisée',
     description:
-      'Paiement 100% sécurisé, confirmation immédiate et suivi de commande en temps réel. Votre commande est traité avec soin.',
+      'Paiement sécurisé avec confirmation immédiate et suivi de commande en temps réel.',
     icon: CertificateIcon,
   },
   {
     number: '03',
     title: 'Livraison sécurisée',
-    description:
-      'Emballage protecteur premium, assurance complète et suivi en temps réel. Votre collection arrive dans un état parfait.',
+    description: 'Emballage protecteur et suivi en temps réel pour une réception en parfait état.',
     icon: PackageIcon,
   },
 ];
