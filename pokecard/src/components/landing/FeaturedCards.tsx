@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { ArrowUpRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
-import type { Product } from '../../cartContext';
+import { CartContext, type Product } from '../../cartContext';
+import { useAuth } from '../../authContext';
+import { NotifyModal } from '../NotifyModal';
 import styles from './FeaturedCards.module.css';
 
 // Détermine l'univers à partir de la catégorie du produit
@@ -50,19 +52,67 @@ function isNewProduct(product: Product): boolean {
 
 export default function FeaturedCards() {
   const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
+  const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notifyModal, setNotifyModal] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+    variantId?: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
+
+  // Carousel state
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  // Check scroll position
+  const checkScrollButtons = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (carousel) {
+      carousel.addEventListener('scroll', checkScrollButtons);
+      // Initial check
+      checkScrollButtons();
+      return () => carousel.removeEventListener('scroll', checkScrollButtons);
+    }
+  }, [products]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const cardWidth = carouselRef.current.querySelector('article')?.offsetWidth || 300;
+      const gap = 24; // gap between cards
+      const scrollAmount = (cardWidth + gap) * 2; // Scroll 2 cards at a time
+
+      carouselRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   async function loadProducts() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/products?limit=50`);
       if (!response.ok) {
-        // Si le backend n'est pas disponible, ne pas afficher d'erreur
         console.warn('Backend non disponible, affichage des produits désactivé');
         setProducts([]);
         return;
@@ -81,14 +131,14 @@ export default function FeaturedCards() {
         );
       });
 
-      // Trier par date de création (les plus récents en premier) et prendre les 4 premiers
+      // Trier par date de création et prendre les 12 premiers pour le carrousel
       const sortedProducts = sealedProducts.sort((a: Product, b: Product) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return dateB - dateA;
       });
 
-      setProducts(sortedProducts.slice(0, 4));
+      setProducts(sortedProducts.slice(0, 12));
     } catch (error) {
       console.error('Erreur lors du chargement des produits:', error);
       setProducts([]);
@@ -114,6 +164,25 @@ export default function FeaturedCards() {
     return product.variants.some((v) => v.stock > 0);
   };
 
+  // Gérer l'ajout au panier
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
+      });
+      return;
+    }
+
+    if (!product.outOfStock && product.variants && product.variants.length > 0) {
+      const availableVariant = product.variants.find((v) => v.stock > 0);
+      if (availableVariant) {
+        addToCart(availableVariant, product);
+      }
+    }
+  };
+
   return (
     <section className={styles.section}>
       <div className={styles.container}>
@@ -123,20 +192,60 @@ export default function FeaturedCards() {
             <span className={styles.overline}>À la une</span>
             <h2 className={styles.title}>Produits phares</h2>
             <p className={styles.description}>
-              Boosters, displays, coffrets ETB et collections premium — notre sélection de produits
-              scellés pour tous les passionnés.
+              Notre sélection de produits scellés pour tous les passionnés.
             </p>
           </div>
 
-          <button onClick={() => navigate('/produits')} className={styles.viewAllButton}>
-            <span>Voir tout le catalogue</span>
-            <ArrowUpRightIcon size={16} />
-          </button>
+          <div className={styles.headerActions}>
+            {/* Navigation Arrows */}
+            <div className={styles.carouselNav}>
+              <button
+                className={`${styles.navButton} ${!canScrollLeft ? styles.disabled : ''}`}
+                onClick={() => scroll('left')}
+                disabled={!canScrollLeft}
+                aria-label="Produits précédents"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                className={`${styles.navButton} ${!canScrollRight ? styles.disabled : ''}`}
+                onClick={() => scroll('right')}
+                disabled={!canScrollRight}
+                aria-label="Produits suivants"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+
+            <button onClick={() => navigate('/produits')} className={styles.viewAllButton}>
+              <span>Voir tout</span>
+              <ArrowUpRightIcon size={16} />
+            </button>
+          </div>
         </div>
 
-        {/* Items Grid */}
+        {/* Carousel */}
         {loading ? (
           <div className={styles.loadingWrapper}>
+            <div className={styles.spinner} />
             <p>Chargement des produits...</p>
           </div>
         ) : products.length === 0 ? (
@@ -144,89 +253,102 @@ export default function FeaturedCards() {
             <p>Aucun produit disponible pour le moment.</p>
           </div>
         ) : (
-          <div className={styles.itemsGrid}>
-            {products.map((product) => {
-              const isNew = isNewProduct(product);
-              const inStock = isInStock(product);
-              const price = getLowestPrice(product);
-              const productType = getProductType(product);
-              const universe = getUniverse(product);
-              const imageUrl = getImageUrl(
-                product.images?.[0]?.url || '/img/products/placeholder.png'
-              );
+          <div className={styles.carouselWrapper}>
+            <div ref={carouselRef} className={styles.carousel}>
+              {products.map((product) => {
+                const isNew = isNewProduct(product);
+                const inStock = isInStock(product);
+                const price = getLowestPrice(product);
+                const productType = getProductType(product);
+                const universe = getUniverse(product);
+                const imageUrl = getImageUrl(
+                  product.images?.[0]?.url || '/img/products/placeholder.png'
+                );
 
-              return (
-                <article
-                  key={product.id}
-                  className={styles.card}
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    navigate(`/produit/${product.slug}`);
-                  }}
-                >
-                  {/* Image */}
-                  <div className={styles.cardImageWrapper}>
-                    <img
-                      src={imageUrl}
-                      alt={product.name}
-                      className={styles.cardImage}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
-                      }}
-                    />
-                    <div className={styles.cardImageOverlay} />
+                return (
+                  <article
+                    key={product.id}
+                    className={styles.card}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigate(`/produit/${product.slug}`);
+                    }}
+                  >
+                    {/* Image */}
+                    <div className={styles.cardImageWrapper}>
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className={styles.cardImage}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
+                        }}
+                      />
 
-                    {/* Badge */}
-                    {isNew && (
-                      <div className={`${styles.badge} ${styles.nouveauté}`}>Nouveauté</div>
-                    )}
+                      {/* Badge */}
+                      {isNew && <div className={styles.badge}>Nouveau</div>}
 
-                    {/* Stock indicator */}
-                    {inStock && (
-                      <div className={styles.stockBadge}>
-                        <span className={styles.stockDot} />
-                        En stock
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className={styles.cardContent}>
-                    {/* Info */}
-                    <div className={styles.cardInfo}>
-                      <div className={styles.cardMeta}>
-                        <span className={styles.cardUniverse}>{universe}</span>
-                        {productType && (
-                          <>
-                            <span className={styles.metaDot}>·</span>
-                            <span className={styles.cardType}>{productType}</span>
-                          </>
-                        )}
-                      </div>
-                      <h3 className={styles.cardName}>{product.name}</h3>
-                      <span className={styles.cardSubtitle}>
-                        {product.description
-                          ? product.description.length > 60
-                            ? product.description.substring(0, 60) + '...'
-                            : product.description
-                          : productType}
-                      </span>
+                      {/* Stock indicator */}
+                      {inStock && (
+                        <div className={styles.stockBadge}>
+                          <span className={styles.stockDot} />
+                          En stock
+                        </div>
+                      )}
                     </div>
 
-                    {/* Price */}
-                    <div className={styles.cardPricing}>
-                      <div className={styles.priceRow}>
+                    {/* Content */}
+                    <div className={styles.cardContent}>
+                      <div className={styles.cardInfo}>
+                        <span className={styles.cardMeta}>
+                          {universe} · {productType}
+                        </span>
+                        <h3 className={styles.cardName}>{product.name}</h3>
+                      </div>
+
+                      <div className={styles.cardFooter}>
                         <span className={styles.priceValue}>
                           {price ? `${formatPrice(price)} €` : 'Prix sur demande'}
                         </span>
+                        {inStock && !product.outOfStock ? (
+                          <button
+                            className={styles.addToCartButton}
+                            onClick={(e) => handleAddToCart(e, product)}
+                          >
+                            Ajouter
+                          </button>
+                        ) : (
+                          <button
+                            className={styles.notifyButton}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setNotifyModal({
+                                isOpen: true,
+                                productId: product.id,
+                                productName: product.name,
+                              });
+                            }}
+                          >
+                            Me prévenir
+                          </button>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
+                  </article>
+                );
+              })}
+            </div>
           </div>
         )}
+
+        {/* Notify Modal */}
+        <NotifyModal
+          isOpen={notifyModal.isOpen}
+          onClose={() => setNotifyModal({ ...notifyModal, isOpen: false })}
+          productId={notifyModal.productId}
+          productName={notifyModal.productName}
+          variantId={notifyModal.variantId}
+        />
       </div>
     </section>
   );

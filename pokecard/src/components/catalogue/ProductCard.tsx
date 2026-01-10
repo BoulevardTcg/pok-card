@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
+import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import { getProductType, productTypeLabels } from '../../utils/filters';
 import styles from './ProductCard.module.css';
@@ -68,6 +69,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { isAuthenticated } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -275,9 +277,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Actions */}
       <div className={styles.actions}>
-        {stockStatus.status === 'coming-soon' ? (
-          <button className={styles.notifyButton} onClick={handleCardClick}>
-            Me notifier
+        {stockStatus.status === 'coming-soon' || stockStatus.status === 'out-of-stock' ? (
+          <button
+            className={styles.notifyButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              setNotifyModalOpen(true);
+            }}
+          >
+            Me prévenir
           </button>
         ) : (
           <button
@@ -290,6 +298,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
         )}
       </div>
+
+      {/* Notify Modal */}
+      <NotifyModal
+        isOpen={notifyModalOpen}
+        onClose={() => setNotifyModalOpen(false)}
+        productId={product.id}
+        productName={product.name}
+      />
     </div>
   );
 }

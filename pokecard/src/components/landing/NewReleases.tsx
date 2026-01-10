@@ -1,33 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
+import { CartContext, type Product } from '../../cartContext';
+import { useAuth } from '../../authContext';
+import { NotifyModal } from '../NotifyModal';
 import styles from './NewReleases.module.css';
 
 type Universe = 'all' | 'pokemon' | 'onepiece' | 'yugioh';
-
-interface ProductVariant {
-  id: string;
-  name: string;
-  priceCents: number;
-  stock: number;
-}
-
-interface ProductImage {
-  url: string;
-  altText?: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  category: string;
-  description?: string;
-  variants: ProductVariant[];
-  images: ProductImage[];
-  createdAt: string;
-}
 
 const UNIVERSE_LABELS: Record<Universe, string> = {
   all: 'Tous',
@@ -78,9 +58,21 @@ function isNewProduct(product: Product): boolean {
 
 export default function NewReleases() {
   const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
+  const { isAuthenticated } = useAuth();
   const [activeUniverse, setActiveUniverse] = useState<Universe>('all');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notifyModal, setNotifyModal] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+    variantId?: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
 
   useEffect(() => {
     loadProducts();
@@ -99,7 +91,7 @@ export default function NewReleases() {
       const data = await response.json();
 
       // Filtrer pour n'avoir que les produits TCG (exclure Accessoires)
-      const tcgProducts = (data.products || []).filter((p: Product) => {
+      const tcgProducts = (data.products || []).filter((p: any) => {
         const category = p.category?.toLowerCase() || '';
         return (
           category === 'pokémon' ||
@@ -110,11 +102,11 @@ export default function NewReleases() {
       });
 
       // Trier par date de création (les plus récents en premier)
-      const sortedProducts = tcgProducts.sort((a: Product, b: Product) => {
+      const sortedProducts = tcgProducts.sort((a: any, b: any) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
-      setProducts(sortedProducts.slice(0, 8)); // Prendre les 8 plus récents
+      setProducts(sortedProducts.slice(0, 9)); // Prendre les 9 plus récents (3x3)
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -143,6 +135,25 @@ export default function NewReleases() {
   // Vérifier si en stock
   const isInStock = (product: Product): boolean => {
     return product.variants.some((v) => v.stock > 0);
+  };
+
+  // Gérer l'ajout au panier
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
+      });
+      return;
+    }
+
+    if (!product.outOfStock && product.variants && product.variants.length > 0) {
+      const availableVariant = product.variants.find((v) => v.stock > 0);
+      if (availableVariant) {
+        addToCart(availableVariant, product);
+      }
+    }
   };
 
   return (
@@ -217,7 +228,7 @@ export default function NewReleases() {
                     {/* Status badges */}
                     <div className={styles.statusBadges}>
                       {isNew && <span className={styles.newBadge}>Nouveau</span>}
-                      {!inStock && <span className={styles.preorderBadge}>Rupture</span>}
+                      {!inStock && <span className={styles.preorderBadge}>Me prévenir</span>}
                     </div>
                   </div>
 
@@ -234,9 +245,28 @@ export default function NewReleases() {
                       <span className={styles.releasePrice}>
                         {price > 0 ? `${formatPrice(price)} €` : 'Prix sur demande'}
                       </span>
-                      <span className={styles.releaseAction}>
-                        <ArrowRightIcon size={16} />
-                      </span>
+                      {inStock ? (
+                        <button
+                          className={styles.addToCartButton}
+                          onClick={(e) => handleAddToCart(e, product)}
+                        >
+                          Ajouter
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.notifyButton}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNotifyModal({
+                              isOpen: true,
+                              productId: product.id,
+                              productName: product.name,
+                            });
+                          }}
+                        >
+                          Me prévenir
+                        </button>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -252,6 +282,15 @@ export default function NewReleases() {
             <ArrowRightIcon size={16} />
           </button>
         </div>
+
+        {/* Notify Modal */}
+        <NotifyModal
+          isOpen={notifyModal.isOpen}
+          onClose={() => setNotifyModal({ ...notifyModal, isOpen: false })}
+          productId={notifyModal.productId}
+          productName={notifyModal.productName}
+          variantId={notifyModal.variantId}
+        />
       </div>
     </section>
   );
