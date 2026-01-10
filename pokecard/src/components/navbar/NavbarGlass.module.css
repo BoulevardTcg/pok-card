@@ -479,29 +479,31 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   BOUTON MENU MOBILE
+   BOUTON MENU MOBILE - Style cohérent avec iconButton
    ───────────────────────────────────────────────────────────────── */
 
 .mobileMenuButton {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  /* Même taille que iconButton pour alignement */
+  width: 36px;
+  height: 36px;
+  /* Pas de bordure pour un look plus clean */
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
   border-radius: 50%;
-  color: var(--color-text-primary, #f5f5f3);
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   outline: none;
-  transition:
-    all 0.2s ease,
-    outline-offset 0.2s ease;
+  transition: all 0.2s ease;
+  /* Aligner verticalement */
+  flex-shrink: 0;
 }
 
 .mobileMenuButton:hover {
+  color: var(--color-text-primary, #f5f5f3);
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .mobileMenuButton:focus-visible {
@@ -510,7 +512,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   MENU MOBILE (Bottom Sheet)
+   MENU MOBILE (Bottom Sheet) - Optimisé UX
    ───────────────────────────────────────────────────────────────── */
 
 .mobileMenuWrapper {
@@ -545,33 +547,38 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   pointer-events: auto;
+  /* Safe area for notched phones */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* Handle bar */
+/* Handle bar - Zone tactile agrandie */
 .mobileMenuHandle {
-  width: 40px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  margin: 0.75rem auto;
+  width: 48px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 3px;
+  margin: 1rem auto 0.5rem;
   cursor: pointer;
   transition: background 0.2s ease;
+  /* Zone tactile élargie */
+  padding: 10px 20px;
+  background-clip: content-box;
 }
 
 .mobileMenuHandle:hover {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Header mobile menu */
+/* Header mobile menu - Plus compact et clair */
 .mobileMenuHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -590,8 +597,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
@@ -611,11 +618,11 @@
   outline-offset: 2px;
 }
 
-/* Recherche mobile */
+/* Recherche mobile - Optimisée */
 .mobileSearchWrapper {
   position: relative;
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -628,10 +635,12 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
+  /* Zone tactile minimum 48px */
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   transition: all 0.2s ease;
   width: 100%;
 }
@@ -668,11 +677,11 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Navigation mobile */
+/* Navigation mobile - Optimisée zones tactiles */
 .mobileNavLinks {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
   gap: 0.25rem;
   flex: 1;
   overflow-y: auto;
@@ -684,13 +693,15 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 1rem 1.25rem;
+  /* Zone tactile minimum 48px */
+  min-height: 52px;
+  padding: 0.875rem 1rem;
   background: none;
   border: none;
   border-radius: 12px;
   color: var(--color-text-secondary, #a1a1a6);
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 1rem;
+  font-size: 1.0625rem;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
@@ -705,25 +716,28 @@
 }
 
 .mobileNavLinkActive {
-  background: rgba(232, 228, 221, 0.1);
+  background: rgba(232, 228, 221, 0.12);
   color: var(--color-text-primary, #f5f5f3);
 }
 
 .mobileActiveIndicator {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   background: var(--color-accent-primary, #e8e4dd);
   border-radius: 50%;
+  box-shadow: 0 0 8px rgba(232, 228, 221, 0.5);
 }
 
-/* Actions mobile */
+/* Actions mobile - CTA proéminents */
 .mobileActions {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.5rem;
+  gap: 0.625rem;
+  padding: 1rem 1.25rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 10, 11, 0.5);
+  background: rgba(10, 10, 11, 0.6);
+  /* Safe area padding */
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
 }
 
 .mobileActionButton {
@@ -731,10 +745,12 @@
   align-items: center;
   gap: 0.875rem;
   width: 100%;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  /* Zone tactile minimum 52px */
+  min-height: 52px;
+  padding: 0.875rem 1.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
   color: var(--color-text-primary, #f5f5f3);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 1rem;
@@ -749,8 +765,8 @@
 
 .mobileActionButton:hover,
 .mobileActionButton:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .mobileCartBadge {
@@ -758,31 +774,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 8px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 10px;
   background: var(--color-accent-primary, #e8e4dd);
   color: var(--color-bg-primary, #0a0a0b);
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   border-radius: 9999px;
 }
 
+/* CTA principal - Connexion tape-à-l'œil */
 .mobileLoginButton {
-  background: var(--color-accent-primary, #e8e4dd);
-  border-color: var(--color-accent-primary, #e8e4dd);
+  background: linear-gradient(135deg, #e8e4dd 0%, #d4cfc6 100%);
+  border-color: transparent;
   color: var(--color-bg-primary, #0a0a0b);
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(232, 228, 221, 0.25);
 }
 
 .mobileLoginButton:hover,
 .mobileLoginButton:focus-visible {
-  background: var(--color-accent-hover, #f5f2ed);
-  border-color: var(--color-accent-hover, #f5f2ed);
+  background: linear-gradient(135deg, #f5f2ed 0%, #e8e4dd 100%);
+  border-color: transparent;
+  box-shadow: 0 6px 24px rgba(232, 228, 221, 0.35);
 }
 
 .mobileLogoutButton {
   color: var(--color-text-muted, #6b6b6f);
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .mobileLogoutButton:hover,
@@ -793,7 +815,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RESPONSIVE (Mobile)
+   RESPONSIVE (Tablet & Mobile)
    ───────────────────────────────────────────────────────────────── */
 
 @media (max-width: 1023px) {
@@ -803,7 +825,8 @@
 
   .pill {
     height: 48px;
-    border-radius: 12px;
+    /* Garder les bords arrondis pill comme sur desktop */
+    border-radius: 9999px;
   }
 
   .container {
@@ -852,6 +875,49 @@
   /* Afficher bouton menu mobile */
   .mobileMenuButton {
     display: flex;
+  }
+}
+
+/* ─── MOBILE SMALL: Optimisations spécifiques ─── */
+@media (max-width: 767px) {
+  .navbar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .pill {
+    height: 52px;
+    /* Garder les bords arrondis pill comme sur desktop */
+    border-radius: 9999px;
+    background: rgba(20, 20, 20, 0.75);
+  }
+
+  .container {
+    gap: 0.5rem;
+    padding: 0 0.625rem;
+  }
+
+  .logo {
+    gap: 0.5rem;
+  }
+
+  .logoText {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  /* Zones tactiles harmonisées */
+  .iconButton,
+  .mobileMenuButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cartBadge {
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
   }
 }
 

@@ -8,6 +8,13 @@
   overflow: hidden;
 }
 
+/* ─── MOBILE: Padding réduit drastiquement ─── */
+@media (max-width: 767px) {
+  .section {
+    padding: 3.5rem 0;
+  }
+}
+
 .backgroundImage {
   position: absolute;
   inset: 0;
@@ -35,6 +42,13 @@
   padding: 0 var(--container-padding, clamp(1.5rem, 5vw, 4rem));
 }
 
+/* ─── MOBILE: Container ─── */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -54,6 +68,13 @@
   margin-bottom: var(--space-4, 1rem);
 }
 
+/* ─── MOBILE: Overline ─── */
+@media (max-width: 767px) {
+  .overline {
+    margin-bottom: 0.5rem;
+  }
+}
+
 .title {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
@@ -63,6 +84,14 @@
   margin-bottom: var(--space-6, 1.5rem);
 }
 
+/* ─── MOBILE: Titre optimisé ─── */
+@media (max-width: 767px) {
+  .title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+}
+
 .description {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-lg, 1.125rem);
@@ -70,6 +99,16 @@
   color: var(--color-text-secondary, #a1a1a6);
   margin-bottom: var(--space-10, 2.5rem);
   text-align: justify;
+}
+
+/* ─── MOBILE: Description lisible ─── */
+@media (max-width: 767px) {
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -112,6 +151,19 @@
   transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
+/* ─── MOBILE: CTA proéminent pleine largeur ─── */
+@media (max-width: 767px) {
+  .primaryButton {
+    width: 100%;
+    min-height: 52px;
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(232, 228, 221, 0.25);
+  }
+}
+
 .primaryButton:hover {
   background: var(--color-accent-hover, #f5f2ed);
   transform: translateY(-2px);
@@ -143,6 +195,16 @@
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
+/* ─── MOBILE: Bouton secondaire optimisé ─── */
+@media (max-width: 767px) {
+  .secondaryButton {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+  }
+}
+
 .secondaryButton:hover {
   border-color: var(--color-text-secondary, #a1a1a6);
   color: var(--color-text-primary, #f5f5f3);
@@ -162,11 +224,14 @@
   border-radius: var(--radius-lg, 8px);
 }
 
-@media (max-width: 640px) {
+/* ─── MOBILE: Trust badges en ligne horizontale ─── */
+@media (max-width: 767px) {
   .trustBadges {
-    flex-direction: column;
-    gap: var(--space-4, 1rem);
-    padding: var(--space-5, 1.25rem);
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0.5rem;
+    padding: 1rem;
+    width: 100%;
   }
 
   .trustDivider {
@@ -181,11 +246,25 @@
   gap: var(--space-1, 0.25rem);
 }
 
+/* ─── MOBILE: Badge compact ─── */
+@media (max-width: 767px) {
+  .trustBadge {
+    gap: 0;
+  }
+}
+
 .badgeValue {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-bold, 700);
   color: var(--color-accent-primary, #e8e4dd);
+}
+
+/* ─── MOBILE: Valeur plus petite ─── */
+@media (max-width: 767px) {
+  .badgeValue {
+    font-size: 1rem;
+  }
 }
 
 .badgeLabel {
@@ -196,8 +275,23 @@
   letter-spacing: var(--tracking-wide, 0.02em);
 }
 
+/* ─── MOBILE: Label plus petit ─── */
+@media (max-width: 767px) {
+  .badgeLabel {
+    font-size: 0.65rem;
+    text-align: center;
+  }
+}
+
 .trustDivider {
   width: 1px;
   height: 40px;
   background: var(--color-border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+/* ─── MOBILE: Actions margin réduit ─── */
+@media (max-width: 767px) {
+  .actions {
+    margin-bottom: 1.5rem;
+  }
 }

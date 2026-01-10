@@ -71,17 +71,24 @@ export default function FeaturedCards() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     loadProducts();
   }, []);
 
-  // Check scroll position
+  // Check scroll position and update active index
   const checkScrollButtons = () => {
     if (carouselRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+
+      // Calculate active index for pagination dots
+      const cardWidth = carouselRef.current.querySelector('article')?.offsetWidth || 200;
+      const gap = 16;
+      const newIndex = Math.round(scrollLeft / (cardWidth + gap));
+      setActiveIndex(Math.min(newIndex, products.length - 1));
     }
   };
 
@@ -254,6 +261,24 @@ export default function FeaturedCards() {
           </div>
         ) : (
           <div className={styles.carouselWrapper}>
+            {/* Swipe hint pour mobile */}
+            <div className={styles.swipeHint}>
+              <span className={styles.swipeIcon}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M14 5l7 7-7 7" />
+                  <path d="M3 12h18" />
+                </svg>
+              </span>
+              <span>Swiper pour voir plus</span>
+            </div>
+
             <div ref={carouselRef} className={styles.carousel}>
               {products.map((product) => {
                 const isNew = isNewProduct(product);
@@ -337,6 +362,22 @@ export default function FeaturedCards() {
                   </article>
                 );
               })}
+            </div>
+
+            {/* Fade indicator pour montrer qu'il y a plus */}
+            {canScrollRight && <div className={styles.fadeRight} />}
+
+            {/* Pagination dots pour mobile */}
+            <div className={styles.paginationDots}>
+              {products.slice(0, Math.min(6, products.length)).map((_, index) => (
+                <span
+                  key={index}
+                  className={`${styles.dot} ${index === Math.min(activeIndex, 5) ? styles.dotActive : ''}`}
+                />
+              ))}
+              {products.length > 6 && (
+                <span className={styles.dotMore}>+{products.length - 6}</span>
+              )}
             </div>
           </div>
         )}

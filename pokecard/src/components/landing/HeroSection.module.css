@@ -12,6 +12,14 @@
   overflow: hidden;
 }
 
+/* ─── MOBILE FIRST: Optimisation conversion ─── */
+@media (max-width: 767px) {
+  .hero {
+    min-height: auto;
+    padding-bottom: 2rem;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────
    BACKGROUND
    ───────────────────────────────────────────────────────────────── */
@@ -141,6 +149,21 @@
     var(--space-16, 4rem);
 }
 
+/* ─── MOBILE: Espacement optimisé pour voir le CTA rapidement ─── */
+@media (max-width: 767px) {
+  .heroContainer {
+    gap: 1.5rem;
+    padding: calc(70px + 1rem) 1.25rem 1.5rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .heroContainer {
+    gap: 2rem;
+    padding-top: calc(80px + 2rem);
+  }
+}
+
 @media (min-width: 1024px) {
   .heroContainer {
     grid-template-columns: 1fr 1fr;
@@ -161,6 +184,15 @@
   flex-direction: column;
   gap: var(--space-6, 1.5rem);
   order: 2;
+}
+
+/* ─── MOBILE: Espacement compact ─── */
+@media (max-width: 767px) {
+  .heroContent {
+    gap: 1rem;
+    text-align: center;
+    align-items: center;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -231,6 +263,23 @@
   margin-top: var(--space-2, 0.5rem);
 }
 
+/* ─── MOBILE: Titres optimisés ─── */
+@media (max-width: 767px) {
+  .title {
+    gap: 0;
+  }
+
+  .titleMain {
+    font-size: 2.25rem;
+    line-height: 1.1;
+  }
+
+  .titleAccent {
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+  }
+}
+
 /* Description */
 .description {
   font-family: var(--font-body, 'Inter', sans-serif);
@@ -239,6 +288,16 @@
   color: var(--color-text-secondary, #a1a1a6);
   max-width: 520px;
   text-align: justify;
+}
+
+/* ─── MOBILE: Description lisible ─── */
+@media (max-width: 767px) {
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+    max-width: 100%;
+  }
 }
 
 /* Actions */
@@ -253,6 +312,14 @@
   .heroActions {
     flex-direction: row;
     align-items: center;
+  }
+}
+
+/* ─── MOBILE: CTA proéminent ─── */
+@media (max-width: 767px) {
+  .heroActions {
+    padding-top: 0.75rem;
+    width: 100%;
   }
 }
 
@@ -273,6 +340,19 @@
   border-radius: var(--radius-sm, 2px);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+/* ─── MOBILE: CTA pleine largeur, zone tactile 48px+ ─── */
+@media (max-width: 767px) {
+  .primaryCta {
+    width: 100%;
+    min-height: 52px;
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(232, 228, 221, 0.25);
+  }
 }
 
 .primaryCta:hover {
@@ -296,6 +376,14 @@
   margin-top: var(--space-4, 1rem);
 }
 
+/* ─── MOBILE: Zone tactile agrandie ─── */
+@media (max-width: 767px) {
+  .cardIndicators {
+    margin-top: 0.5rem;
+    gap: 0.75rem;
+  }
+}
+
 .indicator {
   position: relative;
   width: 40px;
@@ -306,6 +394,17 @@
   cursor: pointer;
   overflow: hidden;
   transition: background var(--duration-fast, 150ms) var(--ease-out);
+}
+
+/* ─── MOBILE: Indicateurs plus grands et tactiles (44px minimum) ─── */
+@media (max-width: 767px) {
+  .indicator {
+    width: 32px;
+    height: 4px;
+    padding: 20px 8px;
+    margin: -20px -8px;
+    background-clip: content-box;
+  }
 }
 
 .indicator:hover {
@@ -324,6 +423,15 @@
   width: 0;
   background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
+}
+
+/* ─── MOBILE: Progress bar positionnée correctement ─── */
+@media (max-width: 767px) {
+  .indicatorProgress {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 4px;
+  }
 }
 
 .indicator.active .indicatorProgress {
@@ -355,9 +463,17 @@
   overflow: visible;
 }
 
-@media (max-width: 1023px) {
+/* ─── MOBILE: Carte compacte ─── */
+@media (max-width: 767px) {
   .heroVisual {
-    min-height: 450px;
+    min-height: 280px;
+    padding: 1rem 0 2rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .heroVisual {
+    min-height: 350px;
     padding: var(--space-6, 1.5rem) 0;
   }
 }
@@ -435,9 +551,18 @@
   min-height: 260px;
 }
 
-@media (max-width: 1023px) {
+/* ─── MOBILE: Carte plus petite pour laisser place au CTA ─── */
+@media (max-width: 767px) {
   .cardFrame {
-    width: clamp(220px, 60vw, 300px);
+    width: clamp(160px, 45vw, 200px);
+    min-height: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cardFrame {
+    width: clamp(220px, 40vw, 280px);
     min-height: 308px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   }
@@ -484,7 +609,19 @@
   }
 }
 
-@media (max-width: 1023px) {
+/* ─── MOBILE: Image adaptée ─── */
+@media (max-width: 767px) {
+  .cardImage {
+    min-width: 160px;
+    min-height: auto;
+  }
+
+  .cardFrame {
+    background: transparent;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
   .cardImage {
     min-width: 220px;
     min-height: 308px;
@@ -509,6 +646,13 @@
   white-space: nowrap;
 }
 
+/* ─── MOBILE: Info carte compacte ─── */
+@media (max-width: 767px) {
+  .cardInfo {
+    bottom: -2.5rem;
+  }
+}
+
 .cardSet {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-xs, 0.75rem);
@@ -529,6 +673,21 @@
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: var(--text-sm, 0.875rem);
   color: var(--color-accent-secondary, #8b7355);
+}
+
+/* ─── MOBILE: Textes carte réduits ─── */
+@media (max-width: 767px) {
+  .cardSet {
+    font-size: 0.65rem;
+  }
+
+  .cardName {
+    font-size: 1rem;
+  }
+
+  .cardSubtitle {
+    font-size: 0.75rem;
+  }
 }
 
 /* Scroll Indicator - Centré en bas de la section */
