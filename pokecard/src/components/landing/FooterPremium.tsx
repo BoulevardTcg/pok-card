@@ -3,7 +3,7 @@ import { InstagramIcon, TwitterIcon, MailIcon } from '../icons/Icons';
 import styles from './FooterPremium.module.css';
 
 const NAV_LINKS = [
-  { path: '/produits', label: 'Collection' },
+  { path: '/produits', label: 'Boutique' },
   { path: '/trade', label: 'Cartes' },
   { path: '/actualites', label: 'News' },
   { path: '/contact', label: 'Contact' },
