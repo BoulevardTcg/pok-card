@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRightIcon } from '../icons/Icons';
 import styles from './HeroSection.module.css';
 
@@ -63,8 +64,44 @@ export default function HeroSection() {
   const productRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef(0);
   const animationPausedRef = useRef(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
+
+  // Configuration spring pour animations hero
+  const SPRING_HERO = {
+    type: 'spring' as const,
+    stiffness: shouldReduceMotion ? 300 : 280,
+    damping: shouldReduceMotion ? 30 : 25,
+    mass: shouldReduceMotion ? 1 : 0.75,
+  };
+
+  // Variants pour le container avec stagger
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0.05 : 0.08,
+        delayChildren: shouldReduceMotion ? 0 : 0.1,
+      },
+    },
+  };
+
+  // Variants pour chaque item (H1 lignes, texte, boutons)
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 12,
+      filter: shouldReduceMotion ? 'blur(0px)' : 'blur(6px)',
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: SPRING_HERO,
+    },
+  };
 
   useEffect(() => {
     const promises = HERO_PRODUCTS.map((product) => {
@@ -159,33 +196,50 @@ export default function HeroSection() {
       </div>
 
       <div className={styles.heroContainer}>
-        {/* Contenu textuel */}
-        <div className={styles.heroContent}>
-          <div className={styles.universeBadge}>
+        {/* Contenu textuel avec animations stagger */}
+        <motion.div
+          className={styles.heroContent}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className={styles.universeBadge} variants={itemVariants}>
             <span className={styles.universeDot} />
             <span>{currentProduct.universe}</span>
-          </div>
+          </motion.div>
 
           <h1 className={styles.title}>
-            <span className={styles.titleMain}>Découvrez.</span>
-            <span className={styles.titleMain}>Collectionnez.</span>
-            <span className={styles.titleAccent}>Vivez votre passion.</span>
+            <motion.span className={styles.titleMain} variants={itemVariants}>
+              Découvrez.
+            </motion.span>
+            <motion.span className={styles.titleMain} variants={itemVariants}>
+              Collectionnez.
+            </motion.span>
+            <motion.span className={styles.titleAccent} variants={itemVariants}>
+              Vivez votre passion.
+            </motion.span>
           </h1>
 
-          <p className={styles.description}>
+          <motion.p className={styles.description} variants={itemVariants}>
             Boosters, displays, coffrets ETB et collections premium — Boulevard vous propose une
             sélection soignée de produits scellés pour tous les passionnés de TCG.
-          </p>
+          </motion.p>
 
-          <div className={styles.heroActions}>
-            <button onClick={() => navigate('/produits')} className={styles.primaryCta}>
+          <motion.div className={styles.heroActions} variants={itemVariants}>
+            <motion.button
+              onClick={() => navigate('/produits')}
+              className={styles.primaryCta}
+              whileHover={{ scale: shouldReduceMotion ? 1 : 1.02, y: shouldReduceMotion ? 0 : -1 }}
+              whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
+              transition={SPRING_HERO}
+            >
               <span>Explorer la boutique</span>
               <ArrowRightIcon size={18} />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Product indicators */}
-          <div className={styles.cardIndicators}>
+          <motion.div className={styles.cardIndicators} variants={itemVariants}>
             {HERO_PRODUCTS.map((product, index) => (
               <button
                 key={product.id}
@@ -196,8 +250,8 @@ export default function HeroSection() {
                 <span className={styles.indicatorProgress} />
               </button>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Produit en vedette */}
         <div className={styles.heroVisual}>

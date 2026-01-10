@@ -3,47 +3,99 @@ import { useSearchParams } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
-import FilterSidebar from './components/catalogue/FilterSidebar';
+import FilterBar from './components/catalogue/FilterBar';
 import ProductGrid from './components/catalogue/ProductGrid';
+import {
+  GameCategory,
+  ProductType as ProductTypeEnum,
+  filterByGameCategories,
+  filterByProductTypes,
+  parseCategoriesFromString,
+  parseTypesFromString,
+  categoriesToString,
+  typesToString,
+} from './utils/filters';
+
+// Fonction pour vérifier si un produit est nouveau (moins de 30 jours)
+function isNewProduct(product: ProductType): boolean {
+  if (!product.createdAt) return false;
+  const createdDate = new Date(product.createdAt);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return createdDate > thirtyDaysAgo;
+}
 
 export function ProductsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [allProducts, setAllProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Toutes');
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('all');
-  const [selectedCondition, setSelectedCondition] = useState<string>('Toutes');
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
-  const sortBy = searchParams.get('sort') || 'newest';
+
+  // Récupération des filtres depuis les query params avec valeurs par défaut
+  const sortBy = searchParams.get('sort') || 'popular';
+  const selectedGameCategories = useMemo(
+    () => parseCategoriesFromString(searchParams.get('categories')),
+    [searchParams]
+  );
+  const selectedProductTypes = useMemo(
+    () => parseTypesFromString(searchParams.get('types')),
+    [searchParams]
+  );
+
+  // État local indépendant pour la recherche du catalogue (non synchronisé avec la navbar)
+  // Initialisation uniquement si on arrive depuis la navbar avec un paramètre search
+  const [catalogSearchQuery, setCatalogSearchQuery] = useState<string>(() => {
+    // Si on arrive depuis la navbar avec ?search=..., initialiser avec cette valeur
+    // mais ensuite les deux seront indépendants
+    const initialSearch = searchParams.get('search') || '';
+    return initialSearch;
+  });
+
+  const [activeTab, setActiveTab] = useState<'Tous' | 'Produits phares' | 'Nouveauté'>('Tous');
+  const [viewMode, setViewMode] = useState<'grid-2x2' | 'grid-3col' | 'list' | 'list-compact'>(
+    'grid-2x2'
+  );
 
   // Filtrer et trier les produits selon les critères
   const filteredProducts = useMemo(() => {
     let filtered = [...allProducts];
 
-    // Filtre par catégorie
-    if (selectedCategory !== 'Toutes') {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
+    // Filtre par recherche du catalogue (OR entre les champs)
+    // Utilise l'état local indépendant de la navbar
+    if (catalogSearchQuery) {
+      const query = catalogSearchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description?.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query)
+      );
     }
 
-    // Filtre par prix
-    if (selectedPriceRange !== 'all') {
+    // Filtre par catégories de jeu (OR au sein de la même catégorie)
+    // Si plusieurs catégories sélectionnées, produit doit correspondre à l'une d'elles
+    if (selectedGameCategories.length > 0) {
+      filtered = filterByGameCategories(filtered, selectedGameCategories);
+    }
+
+    // Filtre par types de produits (OR au sein du même type)
+    // Si plusieurs types sélectionnés, produit doit correspondre à l'un d'eux
+    if (selectedProductTypes.length > 0) {
+      filtered = filterByProductTypes(filtered, selectedProductTypes);
+    }
+
+    // Filtre par onglet actif
+    if (activeTab === 'Nouveauté') {
+      filtered = filtered.filter((p) => isNewProduct(p));
+    } else if (activeTab === 'Produits phares') {
+      // Pour les produits phares, on peut utiliser une logique basée sur la popularité
+      // Ici, on considère les produits les plus récents comme "phares"
+      // Vous pouvez adapter cette logique selon vos besoins
       filtered = filtered.filter((p) => {
-        if (p.minPriceCents === null) return false;
-        const price = p.minPriceCents / 100;
-        switch (selectedPriceRange) {
-          case '0-50':
-            return price < 50;
-          case '50-100':
-            return price >= 50 && price < 100;
-          case '100-500':
-            return price >= 100 && price < 500;
-          case '500+':
-            return price >= 500;
-          default:
-            return true;
-        }
+        // Par exemple, les produits créés récemment ou avec des prix moyens/élevés
+        return isNewProduct(p) || (p.minPriceCents && p.minPriceCents > 5000);
       });
     }
 
@@ -56,7 +108,14 @@ export function ProductsPage() {
         filtered.sort((a, b) => (b.minPriceCents || 0) - (a.minPriceCents || 0));
         break;
       case 'newest':
+        filtered.sort(
+          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        );
+        break;
+      case 'popular':
       default:
+        // Tri par popularité : on peut utiliser la date de création (plus récent = plus populaire)
+        // ou toute autre logique de votre choix
         filtered.sort(
           (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
         );
@@ -64,7 +123,14 @@ export function ProductsPage() {
     }
 
     return filtered;
-  }, [allProducts, selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
+  }, [
+    allProducts,
+    selectedGameCategories,
+    selectedProductTypes,
+    sortBy,
+    catalogSearchQuery,
+    activeTab,
+  ]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
@@ -74,24 +140,35 @@ export function ProductsPage() {
     return filteredProducts.slice(startIndex, endIndex);
   }, [filteredProducts, page, productsPerPage]);
 
-  // Charger les produits au montage et quand la catégorie change
+  // Charger les produits au montage (chargement initial uniquement)
   useEffect(() => {
     loadAllProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory]);
+  }, []);
 
-  // Réinitialiser la page quand les filtres ou le tri changent
+  // Nettoyer le paramètre 'search' de l'URL si présent (pour éviter la synchronisation avec la navbar)
+  // Ceci est fait une seule fois au montage pour dé-synchroniser immédiatement les deux barres
+  useEffect(() => {
+    // Si on arrive avec ?search=... depuis la navbar, on garde la valeur dans catalogSearchQuery
+    // mais on supprime le paramètre de l'URL pour éviter toute synchronisation future
+    if (searchParams.has('search')) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('search');
+      setSearchParams(newParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Exécuté une seule fois au montage
+
+  // Réinitialiser la page quand les filtres, le tri ou la recherche changent
   useEffect(() => {
     setPage(1);
-  }, [selectedCategory, selectedPriceRange, selectedCondition, sortBy]);
+  }, [selectedGameCategories, selectedProductTypes, sortBy, catalogSearchQuery, activeTab]);
 
   async function loadAllProducts() {
     setLoading(true);
     setError(null);
     try {
       const response = (await listProducts({
-        limit: 200,
-        category: selectedCategory === 'Toutes' ? undefined : selectedCategory,
+        limit: 500, // Augmenter pour avoir tous les produits disponibles
       })) as {
         products: ProductType[];
         pagination: { page: number; total: number; pages: number };
@@ -107,16 +184,11 @@ export function ProductsPage() {
       }
 
       // Filtrer pour exclure les produits de la catégorie "Accessoires"
-      let filteredProducts = response.products.filter((p) => p.category !== 'Accessoires');
+      const filteredProducts = response.products.filter((p) => p.category !== 'Accessoires');
 
       console.log('✅ Produits filtrés:', filteredProducts.length);
 
-      // Si une catégorie spécifique est sélectionnée, ne pas mélanger pour garder l'ordre
-      if (selectedCategory === 'Toutes') {
-        // Mélanger les produits seulement si toutes les catégories sont affichées
-        filteredProducts = [...filteredProducts].sort(() => Math.random() - 0.5);
-      }
-
+      // Ne pas mélanger pour garder l'ordre (le filtrage se fait côté client)
       setAllProducts(filteredProducts);
     } catch (error) {
       console.error('❌ Erreur lors du chargement des produits:', error);
@@ -127,11 +199,60 @@ export function ProductsPage() {
     }
   }
 
-  const handleReset = () => {
-    setSelectedCategory('Toutes');
-    setSelectedPriceRange('all');
-    setSelectedCondition('Toutes');
-    setPage(1);
+  // Gestion de la recherche du catalogue : état local indépendant (ne modifie pas l'URL)
+  const handleCatalogSearchChange = (query: string) => {
+    // Mise à jour uniquement de l'état local, pas de l'URL
+    // Cela garantit que la navbar n'est pas affectée
+    setCatalogSearchQuery(query);
+
+    // Si la navbar avait mis un paramètre search dans l'URL, on le supprime
+    // pour éviter toute confusion, mais sans affecter la navbar elle-même
+    if (searchParams.has('search')) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('search');
+      // Utiliser replace: true pour ne pas créer d'entrée dans l'historique
+      setSearchParams(newParams, { replace: true });
+    }
+  };
+
+  const handleGameCategoriesChange = (categories: GameCategory[]) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (categories.length > 0) {
+      newParams.set('categories', categoriesToString(categories));
+    } else {
+      newParams.delete('categories');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleProductTypesChange = (types: ProductTypeEnum[]) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (types.length > 0) {
+      newParams.set('types', typesToString(types));
+    } else {
+      newParams.delete('types');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleSortChange = (sort: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('sort', sort);
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleResetFilters = () => {
+    // Réinitialiser l'état local de recherche du catalogue
+    setCatalogSearchQuery('');
+
+    const newParams = new URLSearchParams(searchParams);
+    // Garder seulement le tri et les onglets
+    // Supprimer search de l'URL si présent (mais sans affecter la navbar)
+    newParams.delete('search');
+    newParams.delete('categories');
+    newParams.delete('types');
+    setSearchParams(newParams, { replace: true });
+    setActiveTab('Tous');
   };
 
   return (
@@ -139,33 +260,32 @@ export function ProductsPage() {
       <div className={styles.container}>
         {/* En-tête */}
         <div className={styles.header}>
-          <h1 className={styles.title}>Catalogue</h1>
-          <div className={styles.divider}></div>
-          <p className={styles.subtitle}>
-            Explorez notre sélection premium de cartes TCG, soigneusement sélectionnées pour leur
-            qualité et leur rareté.
-          </p>
+          <div className={styles.titleContainer}>
+            <h1 className={styles.title}>Boutique</h1>
+          </div>
         </div>
+
+        {/* Zone de filtre */}
+        {!loading && !error && (
+          <FilterBar
+            searchQuery={catalogSearchQuery}
+            onSearchChange={handleCatalogSearchChange}
+            selectedGameCategories={selectedGameCategories}
+            onGameCategoriesChange={handleGameCategoriesChange}
+            selectedProductTypes={selectedProductTypes}
+            onProductTypesChange={handleProductTypesChange}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onResetFilters={handleResetFilters}
+          />
+        )}
 
         {/* Contenu principal */}
         <div className={styles.content}>
-          {/* Sidebar filtres */}
-          <aside className={styles.sidebar}>
-            <FilterSidebar
-              filters={{
-                category: selectedCategory,
-                priceRange: selectedPriceRange,
-                condition: selectedCondition,
-              }}
-              callbacks={{
-                onCategoryChange: setSelectedCategory,
-                onPriceRangeChange: setSelectedPriceRange,
-                onConditionChange: setSelectedCondition,
-                onReset: handleReset,
-              }}
-            />
-          </aside>
-
           {/* Grille de produits */}
           <main className={styles.main}>
             {loading ? (
@@ -177,9 +297,22 @@ export function ProductsPage() {
                   Réessayer
                 </button>
               </div>
-            ) : allProducts.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <div className={styles.emptyState}>
-                <p>Aucun produit disponible pour le moment.</p>
+                <p>
+                  {catalogSearchQuery ||
+                  selectedGameCategories.length > 0 ||
+                  selectedProductTypes.length > 0
+                    ? 'Aucun produit ne correspond à ces critères. Essayez de modifier vos filtres.'
+                    : 'Aucun produit disponible pour le moment.'}
+                </p>
+                {(catalogSearchQuery ||
+                  selectedGameCategories.length > 0 ||
+                  selectedProductTypes.length > 0) && (
+                  <button onClick={handleResetFilters} className={styles.clearSearchButton}>
+                    Réinitialiser les filtres
+                  </button>
+                )}
               </div>
             ) : (
               <ProductGrid

@@ -44,6 +44,35 @@
   color: var(--color-text-secondary);
   max-width: 600px;
   line-height: var(--leading-relaxed, 1.65);
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.clearSearchButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.clearSearchButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+}
+
+.clearSearchButton:focus-visible {
+  outline: 2px solid var(--color-accent-primary, #e8e4dd);
+  outline-offset: 2px;
 }
 
 /* ─────────────────────────────────────────────────────────────────

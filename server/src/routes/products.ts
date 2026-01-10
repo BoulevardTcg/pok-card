@@ -73,11 +73,11 @@ router.get('/', async (req, res) => {
       // Limiter la longueur de la recherche pour éviter les attaques
       const sanitizedSearch = String(search).slice(0, 100).trim();
       if (sanitizedSearch.length > 0) {
-        // SQLite ne supporte pas mode: 'insensitive', on utilise contains
+        // Recherche case-insensitive (insensible à la casse)
         // Prisma protège contre les injections SQL
         where.OR = [
-          { name: { contains: sanitizedSearch } },
-          { description: { contains: sanitizedSearch } },
+          { name: { contains: sanitizedSearch, mode: 'insensitive' } },
+          { description: { contains: sanitizedSearch, mode: 'insensitive' } },
         ];
       }
     }
