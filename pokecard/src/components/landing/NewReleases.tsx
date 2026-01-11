@@ -226,10 +226,11 @@ export default function NewReleases() {
                     />
 
                     {/* Status badges */}
-                    <div className={styles.statusBadges}>
-                      {isNew && <span className={styles.newBadge}>Nouveau</span>}
-                      {!inStock && <span className={styles.preorderBadge}>Me prévenir</span>}
-                    </div>
+                    {isNew && (
+                      <div className={styles.statusBadges}>
+                        <span className={styles.newBadge}>Nouveau</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className={styles.releaseContent}>

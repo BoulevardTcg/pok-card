@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { InstagramIcon, TwitterIcon, MailIcon } from '../icons/Icons';
+import { InstagramIcon, TwitterIcon, MailIcon, VintedIcon } from '../icons/Icons';
 import styles from './FooterPremium.module.css';
 
 const NAV_LINKS = [
@@ -18,6 +18,7 @@ const LEGAL_LINKS = [
 const SOCIAL_LINKS = [
   { href: 'https://instagram.com/boulevardtcg', icon: InstagramIcon, label: 'Instagram' },
   { href: 'https://twitter.com/boulevardtcg', icon: TwitterIcon, label: 'X (Twitter)' },
+  { href: 'https://www.vinted.fr/member/27229438', icon: VintedIcon, label: 'Vinted' },
   { href: 'mailto:contact@boulevardtcg.com', icon: MailIcon, label: 'Email' },
 ];
 

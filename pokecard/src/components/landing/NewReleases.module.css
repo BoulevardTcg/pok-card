@@ -293,19 +293,17 @@
 .newBadge,
 .preorderBadge {
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 4px;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  backdrop-filter: blur(8px);
 }
 
 .newBadge {
-  background: rgba(74, 222, 128, 0.9);
-  color: #0a0a0b;
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  color: #000;
 }
 
 .preorderBadge {

@@ -408,15 +408,15 @@
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  padding: 4px 10px;
-  background: var(--color-success, #4ade80);
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
   border-radius: 4px;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--color-bg-primary, #0a0a0b);
+  color: #000;
 }
 
 /* Stock Badge */

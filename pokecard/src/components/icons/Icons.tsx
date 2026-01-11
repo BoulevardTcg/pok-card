@@ -310,6 +310,24 @@ export function TwitterIcon({ size = 20, className = '' }: IconProps) {
   );
 }
 
+export function VintedIcon({ size = 20, className = '', strokeWidth = 1.5 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M5 4l7 16 7-16" />
+    </svg>
+  );
+}
+
 export function MailIcon({ size = 20, className = '', strokeWidth = 1.5 }: IconProps) {
   return (
     <svg
