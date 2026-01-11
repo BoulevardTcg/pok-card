@@ -705,20 +705,11 @@ export function CGVPage() {
             </p>
 
             <h3>13.2 Coordonnées du médiateur</h3>
-            <div className={styles.infoBox}>
-              <p>
-                <strong>Médiateur :</strong> [À COMPLÉTER - Nom du médiateur]
-              </p>
-              <p>
-                <strong>Adresse :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Site web :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Email :</strong> [À COMPLÉTER]
-              </p>
-            </div>
+            <p>
+              À ce jour, le Vendeur est en cours d'adhésion à un dispositif de médiation de la
+              consommation. Les coordonnées du médiateur seront communiquées au Client dès
+              finalisation de l'adhésion.
+            </p>
 
             <h3>13.3 Plateforme européenne de règlement en ligne des litiges</h3>
             <p>
