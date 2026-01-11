@@ -47,35 +47,48 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PROFILE CARD
+   PROFILE HEADER CARD
    ───────────────────────────────────────────────────────────────── */
 
-.profileCard {
+.profileHeaderCard {
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl, 12px);
-  padding: var(--space-12, 3rem);
-  box-shadow: var(--shadow-lg);
+  padding: var(--space-8, 2rem);
+  margin-bottom: var(--space-8, 2rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6, 1.5rem);
 }
 
-.profileHeader {
-  text-align: center;
-  margin-bottom: var(--space-12, 3rem);
-  padding-bottom: var(--space-8, 2rem);
-  border-bottom: 1px solid var(--color-border-subtle);
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent-secondary), var(--color-accent-gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-inverse);
+  flex-shrink: 0;
+  font-size: var(--text-3xl, 2rem);
 }
 
-.profileHeader h1 {
+.userInfo {
+  flex: 1;
+}
+
+.userName {
   font-family: var(--font-display);
-  font-size: var(--text-4xl, 2.5rem);
+  font-size: var(--text-2xl, 1.5rem);
   font-weight: var(--font-medium, 500);
   color: var(--color-text-primary);
-  margin-bottom: var(--space-2, 0.5rem);
+  margin-bottom: var(--space-1, 0.25rem);
 }
 
-.profileHeader p {
+.userEmail {
   font-family: var(--font-body);
-  font-size: var(--text-lg, 1.125rem);
+  font-size: var(--text-base, 1rem);
   color: var(--color-text-secondary);
 }
 
@@ -83,40 +96,41 @@
    MESSAGES
    ───────────────────────────────────────────────────────────────── */
 
-.successMessage {
+.successMessage,
+.errorMessage {
   background: var(--color-success-muted);
   border: 1px solid rgba(74, 222, 128, 0.3);
   color: var(--color-success);
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-radius: var(--radius-xl, 12px);
+  border-radius: var(--radius-lg, 8px);
   margin-bottom: var(--space-6, 1.5rem);
   text-align: center;
   font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
 }
 
 .errorMessage {
   background: var(--color-error-muted);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-color: rgba(248, 113, 113, 0.3);
   color: var(--color-error);
-  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-radius: var(--radius-xl, 12px);
-  margin-bottom: var(--space-6, 1.5rem);
-  text-align: center;
-  font-family: var(--font-body);
-  font-weight: var(--font-medium, 500);
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PROFILE SECTION
+   PROFILE SECTION CARD
    ───────────────────────────────────────────────────────────────── */
 
 .profileSection {
-  margin-bottom: var(--space-10, 2.5rem);
-  padding: var(--space-8, 2rem);
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-xl, 12px);
+  background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  padding: var(--space-8, 2rem);
+  margin-bottom: var(--space-6, 1.5rem);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.profileSection:hover {
+  border-color: var(--color-border-hover);
 }
 
 .sectionHeader {
@@ -128,30 +142,42 @@
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
-.sectionHeader h2 {
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+}
+
+.sectionTitle svg {
+  color: var(--color-accent-secondary);
+  flex-shrink: 0;
+}
+
+.sectionTitle h2 {
   font-family: var(--font-display);
-  font-size: var(--text-2xl, 1.5rem);
+  font-size: var(--text-xl, 1.25rem);
   font-weight: var(--font-medium, 500);
   color: var(--color-text-primary);
   margin: 0;
 }
 
 .editButton {
-  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
-  background: var(--color-accent-secondary);
-  color: var(--color-text-inverse);
-  border: none;
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg, 8px);
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-semibold, 600);
+  font-weight: var(--font-medium, 500);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
 }
 
 .editButton:hover {
-  background: var(--color-accent-gold);
-  transform: translateY(-2px);
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -160,33 +186,32 @@
 
 .profileInfo {
   display: grid;
-  gap: var(--space-4, 1rem);
+  gap: var(--space-3, 0.75rem);
 }
 
 .infoRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
-  background: var(--color-bg-elevated);
-  border-radius: var(--radius-lg, 8px);
-  border: 1px solid var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--space-4, 1rem);
+  padding: var(--space-3, 0.75rem) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.infoRow:last-child {
+  border-bottom: none;
 }
 
 .infoLabel {
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-semibold, 600);
+  font-weight: var(--font-medium, 500);
   color: var(--color-text-secondary);
 }
 
 .infoValue {
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-medium, 500);
   color: var(--color-text-primary);
-  text-align: right;
-  max-width: 60%;
   word-break: break-word;
 }
 
@@ -196,7 +221,7 @@
 
 .editForm {
   display: grid;
-  gap: var(--space-6, 1.5rem);
+  gap: var(--space-5, 1.25rem);
 }
 
 .formRow {
@@ -213,14 +238,14 @@
 .formGroup label {
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-semibold, 600);
+  font-weight: var(--font-medium, 500);
   color: var(--color-text-primary);
   margin-bottom: var(--space-2, 0.5rem);
 }
 
 .formInput {
-  padding: var(--space-3, 0.875rem) var(--space-4, 1rem);
-  background: var(--color-bg-elevated);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg, 8px);
   font-family: var(--font-body);
@@ -246,7 +271,7 @@
 }
 
 .saveButton {
-  padding: var(--space-3, 0.875rem) var(--space-8, 2rem);
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
   background: var(--color-accent-secondary);
   color: var(--color-text-inverse);
   border: none;
@@ -271,31 +296,67 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PROFILE ACTIONS
+   RGPD SECTION
    ───────────────────────────────────────────────────────────────── */
 
-.profileActions {
+.dangerZone {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: color-mix(in srgb, var(--color-error-muted) 8%, var(--color-bg-elevated));
+}
+
+.gdprActions {
   display: flex;
   flex-direction: column;
   gap: var(--space-4, 1rem);
-  margin-top: var(--space-12, 3rem);
-  padding-top: var(--space-8, 2rem);
-  border-top: 1px solid var(--color-border-subtle);
 }
 
-.quickLinks {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4, 1rem);
-  margin-bottom: var(--space-4, 1rem);
-}
-
-.quickLink {
+.gdprAction {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-2, 0.5rem);
-  padding: var(--space-3, 0.875rem) var(--space-6, 1.5rem);
+  justify-content: space-between;
+  padding: var(--space-5, 1.25rem);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg, 8px);
+  gap: var(--space-4, 1rem);
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.gdprAction:hover {
+  border-color: var(--color-border-hover);
+}
+
+.gdprActionInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+  flex: 1;
+}
+
+.gdprActionInfo svg {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.gdprActionInfo h3 {
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1, 0.25rem);
+}
+
+.gdprActionInfo p {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.exportButton {
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
   background: var(--color-accent-secondary);
   color: var(--color-text-inverse);
   border: none;
@@ -305,19 +366,84 @@
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
-  text-decoration: none;
+  white-space: nowrap;
 }
 
-.quickLink:hover {
+.exportButton:hover:not(:disabled) {
   background: var(--color-accent-gold);
   transform: translateY(-2px);
 }
 
-.logoutButton {
-  padding: var(--space-3, 0.875rem) var(--space-8, 2rem);
+.exportButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deleteButton {
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
   background: transparent;
   color: var(--color-error);
-  border: 2px solid var(--color-error);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+  white-space: nowrap;
+}
+
+.deleteButton:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ACTIONS
+   ───────────────────────────────────────────────────────────────── */
+
+.profileActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  margin-top: var(--space-8, 2rem);
+}
+
+.quickLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4, 1rem);
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+  text-decoration: none;
+}
+
+.quickLink:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-bg-subtle);
+  transform: translateY(-2px);
+}
+
+.logoutButton {
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: transparent;
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
   border-radius: var(--radius-lg, 8px);
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
@@ -329,7 +455,161 @@
 .logoutButton:hover {
   background: var(--color-error);
   color: white;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL
+   ───────────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-surface-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal, 400);
+  padding: var(--space-4, 1rem);
+}
+
+.modal {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl, 12px);
+  box-shadow: var(--shadow-xl);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  padding: var(--space-8, 2rem);
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+}
+
+.modalIcon {
+  color: var(--color-error);
+  flex-shrink: 0;
+}
+
+.modalHeader h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.modalBody {
+  padding: var(--space-8, 2rem);
+}
+
+.modalWarning {
+  font-family: var(--font-body);
+  font-size: var(--text-base, 1rem);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6, 1.5rem);
+  line-height: 1.6;
+}
+
+.modalList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-6, 1.5rem);
+  padding-left: var(--space-6, 1.5rem);
+}
+
+.modalList li {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2, 0.5rem);
+  position: relative;
+}
+
+.modalList li::before {
+  content: '•';
+  position: absolute;
+  left: calc(-1 * var(--space-6, 1.5rem));
+  color: var(--color-error);
+  font-weight: bold;
+}
+
+.modalNote {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-6, 1.5rem);
+  padding: var(--space-4, 1rem);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-lg, 8px);
+  line-height: 1.6;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 1.25rem);
+}
+
+.modalFooter {
+  padding: var(--space-6, 1.5rem) var(--space-8, 2rem);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  gap: var(--space-4, 1rem);
+  justify-content: flex-end;
+}
+
+.modalCancelButton {
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.modalCancelButton:hover:not(:disabled) {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-hover);
+}
+
+.modalCancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modalDeleteButton {
+  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  background: var(--color-error);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+.modalDeleteButton:hover:not(:disabled) {
+  background: #dc2626;
   transform: translateY(-2px);
+}
+
+.modalDeleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -345,8 +625,9 @@
     padding: 0 var(--space-4, 1rem);
   }
 
-  .profileCard {
-    padding: var(--space-8, 2rem) var(--space-6, 1.5rem);
+  .profileHeaderCard {
+    flex-direction: column;
+    text-align: center;
   }
 
   .formRow {
@@ -354,14 +635,12 @@
   }
 
   .infoRow {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
     gap: var(--space-2, 0.5rem);
   }
 
   .infoValue {
-    text-align: left;
-    max-width: 100%;
+    padding-left: 0;
   }
 
   .sectionHeader {
@@ -370,7 +649,31 @@
     align-items: flex-start;
   }
 
+  .gdprAction {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gdprActionInfo {
+    flex-direction: column;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .exportButton,
+  .deleteButton {
+    width: 100%;
+  }
+
   .quickLinks {
     grid-template-columns: 1fr;
+  }
+
+  .modalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .modalCancelButton,
+  .modalDeleteButton {
+    width: 100%;
   }
 }

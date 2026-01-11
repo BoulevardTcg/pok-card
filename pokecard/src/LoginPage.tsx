@@ -192,6 +192,11 @@ const LoginPage: React.FC = () => {
                   {showPassword ? '👁️' : '👁️‍🗨️'}
                 </button>
               </div>
+              <div className={styles.forgotPassword}>
+                <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+                  Mot de passe oublié ?
+                </Link>
+              </div>
             </div>
 
             <button type="submit" disabled={isLoading} className={styles.submitButton}>
