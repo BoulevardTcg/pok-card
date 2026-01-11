@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { DarkModeContext, type Theme, type DarkModeContextType } from './DarkModeContextDef';
+import { ThemeContext, type Theme, type ThemeContextType } from './ThemeContextDef';
 
-export type { Theme, DarkModeContextType } from './DarkModeContextDef';
+export type { Theme, ThemeContextType } from './ThemeContextDef';
 
 const STORAGE_KEY = 'boulevard-theme';
 
@@ -39,17 +39,22 @@ function applyTheme(theme: Theme) {
   document.documentElement.setAttribute('data-theme', theme);
 }
 
-export function DarkModeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => getInitialTheme());
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+}
+
+export function ThemeProvider({ children, defaultTheme }: ThemeProviderProps) {
+  const [theme, setThemeState] = useState<Theme>(() => defaultTheme ?? getInitialTheme());
   const [mounted, setMounted] = useState(false);
 
   // Appliquer le thème au montage côté client
   useEffect(() => {
     setMounted(true);
-    const initialTheme = getInitialTheme();
+    const initialTheme = defaultTheme ?? getInitialTheme();
     setThemeState(initialTheme);
     applyTheme(initialTheme);
-  }, []);
+  }, [defaultTheme]);
 
   // Écouter les changements de préférence système
   useEffect(() => {
@@ -86,19 +91,21 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const toggleDarkMode = useCallback(() => {
+  const toggleTheme = useCallback(() => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   }, [theme, setTheme]);
 
-  const value = useMemo<DarkModeContextType>(
+  const value = useMemo<ThemeContextType>(
     () => ({
-      isDark: theme === 'dark',
-      toggleDarkMode,
       theme,
       setTheme,
+      toggleTheme,
+      isDark: theme === 'dark',
     }),
-    [theme, toggleDarkMode, setTheme]
+    [theme, setTheme, toggleTheme]
   );
 
-  return <DarkModeContext.Provider value={value}>{children}</DarkModeContext.Provider>;
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
+
+export default ThemeProvider;

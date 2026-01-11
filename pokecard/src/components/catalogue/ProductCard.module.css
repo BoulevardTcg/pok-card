@@ -3,12 +3,12 @@
    =================================================================== */
 
 .card {
-  background: #ffffff;
+  background: var(--color-surface-card);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-default);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -16,7 +16,7 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .card.outOfStock {
@@ -32,7 +32,7 @@
   width: 100%;
   height: 280px;
   overflow: hidden;
-  background: #f3f4f6;
+  background: var(--color-bg-subtle);
   border-radius: 12px 12px 0 0;
 }
 
@@ -62,8 +62,8 @@
   justify-content: center;
   height: 100%;
   width: 100%;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  color: #9ca3af;
+  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-hover) 100%);
+  color: var(--color-text-muted);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 12px;
 }
@@ -71,7 +71,7 @@
 .placeholderImage p {
   margin-top: 8px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .tcgIcon {
@@ -121,8 +121,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -134,14 +134,14 @@
 }
 
 .wishlistButton:hover {
-  background: #fef2f2;
-  border-color: #ef4444;
+  background: var(--color-error-muted);
+  border-color: var(--color-error);
   transform: scale(1.1);
 }
 
 .wishlistButton.wishlisted {
-  background: #fee2e2;
-  border-color: #ef4444;
+  background: var(--color-error-muted);
+  border-color: var(--color-error);
 }
 
 .wishlistButton:active {
@@ -159,8 +159,8 @@
   transform: translate(-50%, -50%) scale(0.9);
   opacity: 0;
   padding: 8px 16px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
   border: none;
   border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
@@ -185,7 +185,7 @@
 }
 
 .quickViewButton:hover {
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--color-bg-primary);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -201,7 +201,7 @@
 
 .categoryLabel {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -212,7 +212,7 @@
 .productTitle {
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   line-height: 1.4;
   margin-bottom: 8px;
   display: -webkit-box;
@@ -240,7 +240,7 @@
 
 .metaItem {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-family: var(--font-body, 'Inter', sans-serif);
   display: flex;
   align-items: center;
@@ -258,7 +258,7 @@
 .price {
   font-size: 24px;
   font-weight: 700;
-  color: #0066ff;
+  color: var(--color-accent-secondary);
   margin-bottom: 4px;
   font-family: var(--font-body, 'Inter', sans-serif);
 }
@@ -278,20 +278,20 @@
 }
 
 .stockStatus.in-stock {
-  color: #10b981;
+  color: var(--color-success);
 }
 
 .stockStatus.low-stock {
-  color: #f59e0b;
+  color: var(--color-warning);
   font-weight: 600;
 }
 
 .stockStatus.out-of-stock {
-  color: #ef4444;
+  color: var(--color-error);
 }
 
 .stockStatus.coming-soon {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -309,8 +309,8 @@
 .addToCartButton {
   width: 100%;
   height: 44px;
-  background: var(--color-accent-primary, #e8e4dd);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -326,9 +326,9 @@
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: var(--color-accent-hover, #f5f2ed);
+  background: var(--color-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(232, 228, 221, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 .addToCartButton:active:not(:disabled) {
@@ -349,17 +349,17 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   NOTIFY BUTTON - Style secondaire distinct
+   NOTIFY BUTTON - Style outline adapté au thème
    ───────────────────────────────────────────────────────────────── */
 
 .notifyButton {
   width: 100%;
   height: 44px;
-  background: transparent;
-  color: var(--color-text-secondary, #a1a1a6);
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  color: var(--color-accent-primary);
+  border: 2px solid var(--color-accent-primary);
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 600;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
   letter-spacing: 0.02em;
@@ -372,10 +372,11 @@
 }
 
 .notifyButton:hover {
-  background: var(--color-bg-subtle, #1a1a1d);
-  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
-  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ─────────────────────────────────────────────────────────────────

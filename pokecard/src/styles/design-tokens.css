@@ -3,6 +3,10 @@
    Système de design pour investisseurs/collectionneurs haut de gamme
    =================================================================== */
 
+/* ─────────────────────────────────────────────────────────────────
+   THÈME — Variables de base (Dark par défaut)
+   ───────────────────────────────────────────────────────────────── */
+
 :root {
   /* ─────────────────────────────────────────────────────────────────
      COULEURS — Palette restreinte, sophistiquée
@@ -43,6 +47,12 @@
   --color-border-default: rgba(255, 255, 255, 0.1);
   --color-border-hover: rgba(255, 255, 255, 0.15);
   --color-border-accent: rgba(232, 228, 221, 0.3);
+
+  /* Glass effect (shared) */
+  --glass-bg: rgba(20, 20, 20, 0.55);
+  --glass-bg-solid: rgba(20, 20, 20, 0.98);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 
   /* ─────────────────────────────────────────────────────────────────
      TYPOGRAPHIE — Hiérarchie éditoriale
