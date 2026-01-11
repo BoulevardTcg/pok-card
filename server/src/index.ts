@@ -42,6 +42,10 @@ import { validateEnvOrThrow } from './config/validateEnv.js';
 
 const app = express();
 
+// Trust proxy - nécessaire pour Railway/Heroku/etc. (derrière un load balancer)
+// Permet à express-rate-limit de fonctionner correctement avec X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Fail-fast env (prod) / warn (dev)
 validateEnvOrThrow();
 
