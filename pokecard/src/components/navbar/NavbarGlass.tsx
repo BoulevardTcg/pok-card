@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { CartContext, type Product as ProductType } from '../../cartContext';
 import { useAuth } from '../../authContext';
+import { useDarkMode } from '../../contexts/useDarkMode';
 import { listProducts, getImageUrl } from '../../api';
 import { sanitizeInput } from '../../utils/security';
 import {
@@ -15,6 +16,8 @@ import {
   MenuIcon,
   CloseIcon,
 } from '../icons/Icons';
+import { SunIcon } from '../icons/SunIcon';
+import { MoonIcon } from '../icons/MoonIcon';
 import styles from './NavbarGlass.module.css';
 
 // Constantes de sécurité
@@ -48,6 +51,7 @@ export default function NavbarGlass() {
   const location = useLocation();
   const { cart } = useContext(CartContext);
   const { user, isAuthenticated, logout } = useAuth();
+  const { isDark, toggleDarkMode } = useDarkMode();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -478,6 +482,31 @@ export default function NavbarGlass() {
               </AnimatePresence>
             </div>
 
+            {/* Toggle thème (soleil/lune) */}
+            <motion.button
+              onClick={toggleDarkMode}
+              className={styles.themeToggle}
+              aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
+              aria-pressed={isDark}
+              variants={buttonVariants}
+              initial="rest"
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={isDark ? 'moon' : 'sun'}
+                  initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                  transition={shouldReduceMotion ? { duration: 0.15 } : { duration: 0.2 }}
+                  className={styles.themeIconWrapper}
+                >
+                  {isDark ? <MoonIcon size={16} /> : <SunIcon size={16} />}
+                </motion.span>
+              </AnimatePresence>
+            </motion.button>
+
             {/* Panier (toujours visible) */}
             <motion.button
               onClick={() => navigate('/panier')}
@@ -740,6 +769,19 @@ export default function NavbarGlass() {
 
                   {/* Actions mobile */}
                   <div className={styles.mobileActions}>
+                    {/* Toggle thème mobile */}
+                    <motion.button
+                      onClick={toggleDarkMode}
+                      className={styles.mobileActionButton}
+                      aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
+                      aria-pressed={isDark}
+                      whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
+                    >
+                      {isDark ? <MoonIcon size={20} /> : <SunIcon size={20} />}
+                      <span>{isDark ? 'Mode sombre' : 'Mode clair'}</span>
+                      <span className={styles.mobileThemeIndicator}>{isDark ? '🌙' : '☀️'}</span>
+                    </motion.button>
+
                     <motion.button
                       onClick={() => {
                         navigate('/panier');

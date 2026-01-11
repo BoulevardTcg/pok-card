@@ -24,15 +24,19 @@
   width: 100%;
   max-width: 1200px;
   height: 56px;
-  background: rgba(20, 20, 20, 0.55);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
   border-radius: 9999px;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
+    var(--glass-shadow),
     0 0 1px rgba(255, 255, 255, 0.05) inset;
   pointer-events: auto;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .container {
@@ -176,8 +180,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
   border-radius: 9999px;
   transition: all 0.2s ease;
   min-width: 200px;
@@ -185,9 +189,9 @@
 }
 
 .searchContainer.searchFocused {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 2px rgba(232, 228, 221, 0.1);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 0 0 2px var(--color-border-accent);
 }
 
 .searchContainer.searchContainerOpen {
@@ -244,13 +248,13 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: rgba(20, 20, 20, 0.98);
+  background: var(--glass-bg-solid);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
   border-top: none;
   border-radius: 0 0 12px 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
@@ -265,8 +269,8 @@
   padding: 0.875rem 1rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--color-text-primary, #f5f5f3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
   font-family: var(--font-body, 'Inter', sans-serif);
   text-align: left;
   cursor: pointer;
@@ -280,7 +284,7 @@
 
 .searchResultItem:hover,
 .searchResultItem:focus-visible {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-bg-hover);
   outline: none;
 }
 
@@ -290,7 +294,7 @@
   object-fit: cover;
   border-radius: 6px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-border-subtle);
 }
 
 .searchResultContent {
@@ -320,11 +324,11 @@
 .searchViewAll {
   width: 100%;
   padding: 0.875rem 1rem;
-  background: rgba(232, 228, 221, 0.1);
+  background: var(--color-bg-hover);
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--glass-border);
   border-radius: 0 0 12px 12px;
-  color: var(--color-text-primary, #f5f5f3);
+  color: var(--color-text-primary);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.875rem;
   font-weight: 500;
@@ -336,7 +340,7 @@
 
 .searchViewAll:hover,
 .searchViewAll:focus-visible {
-  background: rgba(232, 228, 221, 0.15);
+  background: var(--color-bg-subtle);
   outline: none;
 }
 
@@ -404,7 +408,7 @@
   background: transparent;
   border: none;
   border-radius: 50%;
-  color: var(--color-text-secondary, #a1a1a6);
+  color: var(--color-text-secondary);
   cursor: pointer;
   outline: none;
   transition:
@@ -413,13 +417,53 @@
 }
 
 .iconButton:hover {
-  color: var(--color-text-primary, #f5f5f3);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  background: var(--color-border-subtle);
 }
 
 .iconButton:focus-visible {
-  outline: 2px solid var(--color-accent-primary, #e8e4dd);
+  outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   THEME TOGGLE BUTTON
+   ───────────────────────────────────────────────────────────────── */
+
+.themeToggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition:
+    all 0.2s ease,
+    outline-offset 0.2s ease;
+  overflow: hidden;
+}
+
+.themeToggle:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+.themeIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cartBadge {
@@ -432,8 +476,8 @@
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  background: var(--color-accent-primary, #e8e4dd);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   font-family: var(--font-mono, monospace);
   font-size: 9px;
   font-weight: 600;
@@ -447,10 +491,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.875rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
   border-radius: 9999px;
-  color: var(--color-text-primary, #f5f5f3);
+  color: var(--color-text-primary);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -462,12 +506,12 @@
 }
 
 .userButton:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 .userButton:focus-visible {
-  outline: 2px solid var(--color-accent-primary, #e8e4dd);
+  outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
 }
 
@@ -525,7 +569,7 @@
 .mobileOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--color-surface-overlay);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   pointer-events: auto;
@@ -536,13 +580,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(20, 20, 20, 0.98);
+  background: var(--glass-bg-solid);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
   z-index: 301;
   padding: 0;
   display: flex;
@@ -553,13 +597,16 @@
   pointer-events: auto;
   /* Safe area for notched phones */
   padding-bottom: env(safe-area-inset-bottom, 0);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 /* Handle bar - Zone tactile agrandie */
 .mobileMenuHandle {
   width: 48px;
   height: 5px;
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-text-muted);
   border-radius: 3px;
   margin: 1rem auto 0.5rem;
   cursor: pointer;
@@ -570,7 +617,7 @@
 }
 
 .mobileMenuHandle:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--color-text-secondary);
 }
 
 /* Header mobile menu - Plus compact et clair */
@@ -579,7 +626,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .mobileLogoButton {
@@ -600,21 +647,21 @@
   width: 44px;
   height: 44px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-default);
   border-radius: 50%;
-  color: var(--color-text-primary, #f5f5f3);
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
 }
 
 .mobileCloseButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 .mobileCloseButton:focus-visible {
-  outline: 2px solid var(--color-accent-primary, #e8e4dd);
+  outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
 }
 
@@ -623,7 +670,7 @@
   position: relative;
   width: 100%;
   padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .mobileSearchForm {
@@ -638,8 +685,8 @@
   /* Zone tactile minimum 48px */
   min-height: 48px;
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
   border-radius: 12px;
   transition: all 0.2s ease;
   width: 100%;
@@ -647,9 +694,9 @@
 
 .mobileSearchContainer.searchFocused,
 .mobileSearchContainer.searchContainerOpen {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 2px rgba(232, 228, 221, 0.1);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 0 0 2px var(--color-border-accent);
 }
 
 .mobileSearchContainer.searchContainerOpen {
@@ -660,8 +707,8 @@
 .mobileSearchResults {
   width: 100%;
   margin-top: 0.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
   border-radius: 12px;
   overflow: hidden;
   max-height: 300px;
@@ -674,7 +721,7 @@
 
 .mobileSearchResults .searchViewAll {
   border-radius: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--color-border-default);
 }
 
 /* Navigation mobile - Optimisée zones tactiles */
@@ -699,7 +746,7 @@
   background: none;
   border: none;
   border-radius: 12px;
-  color: var(--color-text-secondary, #a1a1a6);
+  color: var(--color-text-secondary);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 1.0625rem;
   font-weight: 500;
@@ -711,21 +758,21 @@
 
 .mobileNavLink:hover,
 .mobileNavLink:focus-visible {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
 }
 
 .mobileNavLinkActive {
-  background: rgba(232, 228, 221, 0.12);
-  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-border-accent);
+  color: var(--color-text-primary);
 }
 
 .mobileActiveIndicator {
   width: 8px;
   height: 8px;
-  background: var(--color-accent-primary, #e8e4dd);
+  background: var(--color-accent-primary);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(232, 228, 221, 0.5);
+  box-shadow: 0 0 8px var(--color-border-accent);
 }
 
 /* Actions mobile - CTA proéminents */
@@ -734,8 +781,8 @@
   flex-direction: column;
   gap: 0.625rem;
   padding: 1rem 1.25rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 10, 11, 0.6);
+  border-top: 1px solid var(--glass-border);
+  background: var(--color-surface-overlay);
   /* Safe area padding */
   padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
 }
@@ -748,10 +795,10 @@
   /* Zone tactile minimum 52px */
   min-height: 52px;
   padding: 0.875rem 1.25rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
   border-radius: 14px;
-  color: var(--color-text-primary, #f5f5f3);
+  color: var(--color-text-primary);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 1rem;
   font-weight: 500;
@@ -765,8 +812,8 @@
 
 .mobileActionButton:hover,
 .mobileActionButton:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 .mobileCartBadge {
@@ -777,41 +824,47 @@
   min-width: 28px;
   height: 28px;
   padding: 0 10px;
-  background: var(--color-accent-primary, #e8e4dd);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   font-family: var(--font-mono, monospace);
   font-size: 12px;
   font-weight: 700;
   border-radius: 9999px;
 }
 
+/* Theme indicator for mobile */
+.mobileThemeIndicator {
+  margin-left: auto;
+  font-size: 1.25rem;
+}
+
 /* CTA principal - Connexion tape-à-l'œil */
 .mobileLoginButton {
-  background: linear-gradient(135deg, #e8e4dd 0%, #d4cfc6 100%);
+  background: var(--color-accent-primary);
   border-color: transparent;
-  color: var(--color-bg-primary, #0a0a0b);
+  color: var(--color-text-inverse);
   font-weight: 600;
-  box-shadow: 0 4px 16px rgba(232, 228, 221, 0.25);
+  box-shadow: var(--shadow-md);
 }
 
 .mobileLoginButton:hover,
 .mobileLoginButton:focus-visible {
-  background: linear-gradient(135deg, #f5f2ed 0%, #e8e4dd 100%);
+  background: var(--color-accent-hover);
   border-color: transparent;
-  box-shadow: 0 6px 24px rgba(232, 228, 221, 0.35);
+  box-shadow: var(--shadow-lg);
 }
 
 .mobileLogoutButton {
-  color: var(--color-text-muted, #6b6b6f);
+  color: var(--color-text-muted);
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-border-subtle);
 }
 
 .mobileLogoutButton:hover,
 .mobileLogoutButton:focus-visible {
-  background: rgba(248, 113, 113, 0.1);
-  border-color: rgba(248, 113, 113, 0.3);
-  color: var(--color-error, #f87171);
+  background: var(--color-error-muted);
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -888,7 +941,7 @@
     height: 52px;
     /* Garder les bords arrondis pill comme sur desktop */
     border-radius: 9999px;
-    background: rgba(20, 20, 20, 0.75);
+    background: var(--glass-bg);
   }
 
   .container {

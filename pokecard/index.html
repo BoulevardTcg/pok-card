@@ -1,10 +1,29 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BoulevardTCG - Le Boulevard Prestige du TCG</title>
+    
+    <!-- Script anti-flash : applique le thème AVANT le rendu -->
+    <script>
+      (function() {
+        var STORAGE_KEY = 'boulevard-theme';
+        var theme = 'dark'; // Thème par défaut
+        
+        try {
+          var stored = localStorage.getItem(STORAGE_KEY);
+          if (stored === 'dark' || stored === 'light') {
+            theme = stored;
+          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            theme = 'light';
+          }
+        } catch (e) {}
+        
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     
     <!-- Google Fonts - Typographie Luxe Parisien -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
