@@ -134,11 +134,7 @@ export function ProductsPage() {
 
     // Filtre par prix
     if (selectedPriceRange.min !== null || selectedPriceRange.max !== null) {
-      filtered = filterByPriceRange(
-        filtered,
-        selectedPriceRange.min,
-        selectedPriceRange.max
-      );
+      filtered = filterByPriceRange(filtered, selectedPriceRange.min, selectedPriceRange.max);
     }
 
     // Filtre par langue
@@ -180,9 +176,7 @@ export function ProductsPage() {
           }
 
           // Si même niveau de pertinence, trier par date (plus récent en premier)
-          return (
-            new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
-          );
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
         });
         break;
       case 'price-asc':
@@ -213,9 +207,7 @@ export function ProductsPage() {
             return aHasImage ? -1 : 1;
           }
 
-          return (
-            new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
-          );
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
         });
         break;
     }
@@ -398,9 +390,8 @@ export function ProductsPage() {
       <div className={styles.container}>
         {/* En-tête */}
         <div className={styles.header}>
-          <div className={styles.titleContainer}>
-            <h1 className={styles.title}>Boutique</h1>
-          </div>
+          <h1 className={styles.title}>Boutique</h1>
+          <div className={styles.divider}></div>
         </div>
 
         {/* Breadcrumb */}

@@ -5,6 +5,8 @@
 .filterBar {
   width: 100%;
   margin-bottom: var(--space-8, 2rem);
+  position: relative;
+  z-index: 100; /* Au-dessus du contenu mais sous la navbar */
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -40,6 +42,15 @@
   flex: 1;
   min-width: 200px;
   max-width: 400px;
+}
+
+/* Champ de recherche dans upperBar pour desktop */
+.searchContainerDesktop {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+  display: none; /* Caché par défaut sur mobile */
 }
 
 .searchIcon {
@@ -80,6 +91,11 @@
 .dropdownContainer {
   position: relative;
   flex-shrink: 0;
+}
+
+/* Cacher les dropdowns sur mobile quand un autre est ouvert */
+.dropdownHiddenMobile {
+  display: none; /* Caché par défaut sur mobile uniquement */
 }
 
 .dropdownButton {
@@ -125,7 +141,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 149; /* Juste en dessous du dropdownMenu */
+  z-index: 199; /* Juste en dessous du dropdownMenu */
   background: transparent;
 }
 
@@ -141,8 +157,9 @@
   border-radius: 8px;
   padding: var(--space-1, 0.25rem);
   box-shadow: var(--shadow-lg);
-  z-index: 150; /* Inférieur à la navbar mais au-dessus du contenu */
-  overflow: hidden;
+  z-index: 200; /* Au-dessus de tout sauf la navbar (z-index: 200 aussi mais navbar est fixed) */
+  overflow-y: auto; /* Permettre le scroll si le contenu dépasse */
+  max-height: 80vh; /* Limiter la hauteur pour éviter de sortir de l'écran */
 }
 
 .dropdownItem {
@@ -347,7 +364,7 @@
 }
 
 .chipLabel {
-  color: #f5f5f3;
+  color: var(--color-text-primary, #f5f5f3);
   white-space: nowrap;
 }
 
@@ -642,13 +659,137 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   SYSTÈME DE FILTRES REPLIABLES MOBILE
+   ───────────────────────────────────────────────────────────────── */
+
+/* Barre de recherche - Toujours visible */
+.searchBar {
+  width: 100%;
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+/* Bouton toggle filtre mobile */
+.filterToggleBtn {
+  display: none; /* Caché sur desktop */
+  width: 100%;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  margin-bottom: var(--space-3, 0.75rem);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--color-text-primary, #f5f5f3);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.filterToggleBtn:hover {
+  background: var(--color-bg-hover, #1f1f23);
+  border-color: var(--color-border-hover);
+}
+
+.filterToggleBtn:active {
+  transform: scale(0.98);
+}
+
+/* Badge avec nombre de filtres actifs */
+.filterCountBadge {
+  background: #d4af37; /* Or de la charte */
+  color: #000;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Icône chevron animée */
+.chevronToggle {
+  transition: transform 0.3s ease-in-out;
+  flex-shrink: 0;
+}
+
+.chevronRotated {
+  transform: rotate(180deg);
+}
+
+/* Container des filtres - Repliable sur mobile */
+.filtersGroup {
+  transition:
+    max-height 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+  position: relative;
+  z-index: 100;
+}
+
+.filtersGroup.filtersClosed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  overflow: hidden; /* Cacher le contenu quand fermé */
+  pointer-events: none; /* Désactiver les interactions quand fermé */
+}
+
+.filtersGroup.filtersOpen {
+  max-height: 2000px; /* Valeur élevée pour permettre tout le contenu */
+  opacity: 1;
+  margin-bottom: var(--space-4, 1rem);
+  overflow: visible; /* Permettre aux dropdowns de s'afficher */
+  pointer-events: auto; /* Réactiver les interactions */
+}
+
+/* ─────────────────────────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
+  /* Afficher le bouton toggle sur mobile */
+  .filterToggleBtn {
+    display: flex;
+  }
+
+  /* Afficher la barre de recherche mobile */
+  .searchBar {
+    display: block;
+  }
+
+  /* Cacher la recherche desktop dans upperBar sur mobile */
+  .searchContainerDesktop {
+    display: none !important;
+  }
+
+  /* Masquer les filtres par défaut sur mobile */
+  .filtersGroup {
+    display: block;
+  }
+
+  .filtersGroup.filtersClosed {
+    display: none;
+  }
+
+  .filtersGroup.filtersOpen {
+    display: block;
+  }
+
+  /* Ajuster la barre supérieure sur mobile */
   .upperBar {
     flex-direction: column;
     align-items: stretch;
+    overflow: visible; /* Permettre aux dropdowns de s'afficher */
+    position: relative;
+    z-index: 100;
   }
 
   .searchContainer {
@@ -657,11 +798,34 @@
 
   .dropdownContainer {
     width: 100%;
+    position: relative;
+    z-index: 100; /* Au-dessus du contenu */
+  }
+
+  /* Cacher les autres dropdowns sur mobile quand un est ouvert */
+  .dropdownHiddenMobile {
+    display: none !important;
   }
 
   .dropdownButton {
     width: 100%;
     justify-content: space-between;
+  }
+
+  /* Sur mobile, s'assurer que les dropdowns peuvent s'afficher au-dessus */
+  .dropdownMenu {
+    position: absolute; /* Garder absolute, mais s'assurer que le parent permet le débordement */
+    top: calc(100% + var(--space-1, 0.25rem));
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 70vh; /* Limiter la hauteur pour éviter de sortir de l'écran */
+    z-index: 999; /* Très élevé pour être au-dessus de tout */
+  }
+
+  /* Sur mobile, ajuster l'overlay pour couvrir tout l'écran */
+  .dropdownOverlay {
+    z-index: 998; /* Juste en dessous du dropdownMenu */
   }
 
   .tabsBar {
@@ -685,5 +849,53 @@
   .resetButton {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Desktop - Filtres toujours visibles */
+@media (min-width: 769px) {
+  /* Cacher le bouton toggle sur desktop */
+  .filterToggleBtn {
+    display: none !important;
+  }
+
+  /* Cacher la barre de recherche mobile sur desktop */
+  .searchBar {
+    display: none !important;
+  }
+
+  /* Afficher la recherche dans upperBar sur desktop */
+  .searchContainerDesktop {
+    display: block !important;
+  }
+
+  /* Toujours afficher les filtres sur desktop */
+  .filtersGroup {
+    display: block !important;
+    max-height: none !important;
+    opacity: 1 !important;
+    margin-bottom: var(--space-4, 1rem) !important;
+    overflow: visible !important; /* Permettre aux dropdowns de s'afficher */
+    pointer-events: auto !important;
+  }
+
+  /* Sur desktop, upperBar contient la recherche et les filtres */
+  .filtersGroup .upperBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3, 0.75rem);
+    overflow: visible; /* Permettre aux dropdowns de s'afficher */
+  }
+
+  /* Sur desktop, tous les dropdowns sont visibles */
+  .dropdownHiddenMobile {
+    display: block !important; /* Forcer l'affichage sur desktop */
+  }
+
+  /* S'assurer que le filterBar reste au-dessus du contenu */
+  .filterBar {
+    position: relative;
+    z-index: 100;
   }
 }

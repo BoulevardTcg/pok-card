@@ -92,7 +92,8 @@ export default function FilterBar({
   const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-  
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // État pour mobile
+
   // État local pour le slider de prix (en euros)
   const [customPriceRange, setCustomPriceRange] = useState<[number, number]>(() => {
     // Initialiser depuis selectedPriceRange si présent
@@ -103,20 +104,20 @@ export default function FilterBar({
     }
     return [0, 500];
   });
-  
+
   const [selectedPricePreset, setSelectedPricePreset] = useState<string>(() => {
     // Déterminer le preset actif depuis selectedPriceRange
     if (selectedPriceRange.min === null && selectedPriceRange.max === null) return 'all';
     const min = selectedPriceRange.min !== null ? selectedPriceRange.min : 0;
     const max = selectedPriceRange.max !== null ? selectedPriceRange.max : 50000;
-    
+
     if (min === 0 && max === 2000) return '0-20';
     if (min === 2000 && max === 5000) return '20-50';
     if (min === 5000 && max === 10000) return '50-100';
     if (min === 10000 && max === null) return '100+';
     return 'custom';
   });
-  
+
   // Synchroniser customPriceRange avec selectedPriceRange quand il change depuis l'extérieur
   useEffect(() => {
     if (selectedPriceRange.min === null && selectedPriceRange.max === null) {
@@ -125,10 +126,11 @@ export default function FilterBar({
       setCustomPriceRange([0, 500]);
       return;
     }
-    
+
     const minEuros = selectedPriceRange.min !== null ? Math.floor(selectedPriceRange.min / 100) : 0;
-    const maxEuros = selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
-    
+    const maxEuros =
+      selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
+
     // Vérifier si cela correspond à un preset
     if (selectedPriceRange.min === 0 && selectedPriceRange.max === 2000) {
       setSelectedPricePreset('0-20');
@@ -147,7 +149,6 @@ export default function FilterBar({
       setSelectedPricePreset('custom');
       setCustomPriceRange([minEuros, maxEuros]);
     }
-     
   }, [selectedPriceRange.min, selectedPriceRange.max]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +195,7 @@ export default function FilterBar({
   // Handlers pour le filtre Prix
   const handlePricePresetChange = (preset: string) => {
     setSelectedPricePreset(preset);
-    
+
     if (preset === 'all') {
       onPriceRangeChange({ min: null, max: null });
       setCustomPriceRange([0, 500]);
@@ -252,14 +253,22 @@ export default function FilterBar({
     setCustomPriceRange([0, 500]);
   };
 
-
   const hasActiveFilters =
     selectedGameCategories.length > 0 ||
     selectedProductTypes.length > 0 ||
     selectedAvailability.length > 0 ||
     selectedLanguages.length > 0 ||
-    (selectedPriceRange.min !== null || selectedPriceRange.max !== null) ||
+    selectedPriceRange.min !== null ||
+    selectedPriceRange.max !== null ||
     searchQuery;
+
+  // Calculer le nombre de filtres actifs (sans la recherche) pour le badge mobile
+  const activeFiltersCount =
+    (selectedGameCategories.length > 0 ? 1 : 0) +
+    (selectedProductTypes.length > 0 ? 1 : 0) +
+    (selectedAvailability.length > 0 ? 1 : 0) +
+    (selectedLanguages.length > 0 ? 1 : 0) +
+    (selectedPriceRange.min !== null || selectedPriceRange.max !== null ? 1 : 0);
 
   // Calculer le pourcentage pour le slider
   const minPercent = (customPriceRange[0] / 500) * 100;
@@ -267,9 +276,8 @@ export default function FilterBar({
 
   return (
     <div className={styles.filterBar}>
-      {/* Barre supérieure */}
-      <div className={styles.upperBar}>
-        {/* Champ de recherche */}
+      {/* Barre de recherche - TOUJOURS VISIBLE */}
+      <div className={styles.searchBar}>
         <div className={styles.searchContainer}>
           <SearchIcon size={18} className={styles.searchIcon} />
           <input
@@ -280,295 +288,343 @@ export default function FilterBar({
             className={styles.searchInput}
           />
         </div>
+      </div>
 
-        {/* Menu déroulant Catégories de jeu (multi-select) */}
-        <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdownButton}
-            onClick={() => {
-              setIsGameCategoryOpen(!isGameCategoryOpen);
-              setIsProductTypeOpen(false);
-              setIsAvailabilityOpen(false);
-              setIsPriceOpen(false);
-              setIsLanguageOpen(false);
-            }}
-          >
-            <span>
-              Catégorie{' '}
-              {selectedGameCategories.length > 0 ? `(${selectedGameCategories.length})` : ''}
-            </span>
-            <ChevronDownIcon size={16} className={styles.chevronIcon} />
-          </button>
-          {isGameCategoryOpen && (
-            <>
-              <div
-                className={styles.dropdownOverlay}
-                onClick={() => setIsGameCategoryOpen(false)}
-              />
-              <div className={styles.dropdownMenu}>
-                {gameCategories.map((category) => {
-                  const isSelected = selectedGameCategories.includes(category);
-                  return (
-                    <label key={category} className={styles.dropdownItemCheckbox}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleGameCategoryToggle(category)}
-                        className={styles.checkbox}
-                      />
-                      <span>{categoryLabels[category]}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
+      {/* Bouton toggle - MOBILE UNIQUEMENT */}
+      <button
+        className={styles.filterToggleBtn}
+        onClick={() => setIsFilterOpen(!isFilterOpen)}
+        aria-label={isFilterOpen ? 'Fermer les filtres' : 'Ouvrir les filtres'}
+      >
+        <span>Filtres</span>
+        {activeFiltersCount > 0 && (
+          <span className={styles.filterCountBadge}>{activeFiltersCount}</span>
+        )}
+        <ChevronDownIcon
+          size={18}
+          className={`${styles.chevronToggle} ${isFilterOpen ? styles.chevronRotated : ''}`}
+        />
+      </button>
 
-        {/* Menu déroulant Type de produit (multi-select) */}
-        <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdownButton}
-            onClick={() => {
-              setIsProductTypeOpen(!isProductTypeOpen);
-              setIsGameCategoryOpen(false);
-              setIsAvailabilityOpen(false);
-              setIsPriceOpen(false);
-              setIsLanguageOpen(false);
-            }}
-          >
-            <span>
-              Type {selectedProductTypes.length > 0 ? `(${selectedProductTypes.length})` : ''}
-            </span>
-            <ChevronDownIcon size={16} className={styles.chevronIcon} />
-          </button>
-          {isProductTypeOpen && (
-            <>
-              <div className={styles.dropdownOverlay} onClick={() => setIsProductTypeOpen(false)} />
-              <div className={styles.dropdownMenu}>
-                {productTypes.map((type) => {
-                  const isSelected = selectedProductTypes.includes(type);
-                  return (
-                    <label key={type} className={styles.dropdownItemCheckbox}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleProductTypeToggle(type)}
-                        className={styles.checkbox}
-                      />
-                      <span>{productTypeLabels[type]}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
+      {/* Container des filtres - Repliable sur mobile */}
+      <div
+        className={`${styles.filtersGroup} ${isFilterOpen ? styles.filtersOpen : styles.filtersClosed}`}
+      >
+        {/* Barre supérieure avec les filtres */}
+        <div className={styles.upperBar}>
+          {/* Barre de recherche - DANS upperBar pour desktop, masquée sur mobile */}
+          <div className={styles.searchContainerDesktop}>
+            <SearchIcon size={18} className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className={styles.searchInput}
+            />
+          </div>
 
-        {/* Menu déroulant Disponibilité (multi-select) */}
-        <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdownButton}
-            onClick={() => {
-              setIsAvailabilityOpen(!isAvailabilityOpen);
-              setIsGameCategoryOpen(false);
-              setIsProductTypeOpen(false);
-              setIsPriceOpen(false);
-              setIsLanguageOpen(false);
-            }}
+          {/* Menu déroulant Catégories de jeu (multi-select) */}
+          <div
+            className={`${styles.dropdownContainer} ${isAvailabilityOpen || isPriceOpen || isLanguageOpen || isProductTypeOpen ? styles.dropdownHiddenMobile : ''}`}
           >
-            <span>
-              Disponibilité{' '}
-              {selectedAvailability.length > 0 ? `(${selectedAvailability.length})` : ''}
-            </span>
-            <ChevronDownIcon size={16} className={styles.chevronIcon} />
-          </button>
-          {isAvailabilityOpen && (
-            <>
-              <div
-                className={styles.dropdownOverlay}
-                onClick={() => setIsAvailabilityOpen(false)}
-              />
-              <div className={styles.dropdownMenu}>
-                {availabilityOptions.map((availability) => {
-                  const isSelected = selectedAvailability.includes(availability);
-                  return (
-                    <label key={availability} className={styles.dropdownItemCheckbox}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleAvailabilityToggle(availability)}
-                        className={styles.checkbox}
-                      />
-                      <span>{availabilityLabels[availability]}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Menu déroulant Prix */}
-        <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdownButton}
-            onClick={() => {
-              setIsPriceOpen(!isPriceOpen);
-              setIsGameCategoryOpen(false);
-              setIsProductTypeOpen(false);
-              setIsAvailabilityOpen(false);
-              setIsLanguageOpen(false);
-            }}
-          >
-            <span>
-              Prix{' '}
-              {selectedPriceRange.min !== null || selectedPriceRange.max !== null ? '(1)' : ''}
-            </span>
-            <ChevronDownIcon size={16} className={styles.chevronIcon} />
-          </button>
-          {isPriceOpen && (
-            <>
-              <div className={styles.dropdownOverlay} onClick={() => setIsPriceOpen(false)} />
-              <div className={styles.dropdownMenu} style={{ minWidth: '280px', padding: '12px' }}>
-                {/* Presets */}
-                <div className={styles.pricePresets}>
-                  {pricePresets.map((preset) => (
-                    <label key={preset.value} className={styles.pricePresetOption}>
-                      <input
-                        type="radio"
-                        name="pricePreset"
-                        value={preset.value}
-                        checked={selectedPricePreset === preset.value}
-                        onChange={() => handlePricePresetChange(preset.value)}
-                      />
-                      <span>{preset.label}</span>
-                    </label>
-                  ))}
+            <button
+              className={styles.dropdownButton}
+              onClick={() => {
+                setIsGameCategoryOpen(!isGameCategoryOpen);
+                setIsProductTypeOpen(false);
+                setIsAvailabilityOpen(false);
+                setIsPriceOpen(false);
+                setIsLanguageOpen(false);
+              }}
+            >
+              <span>
+                Catégorie{' '}
+                {selectedGameCategories.length > 0 ? `(${selectedGameCategories.length})` : ''}
+              </span>
+              <ChevronDownIcon size={16} className={styles.chevronIcon} />
+            </button>
+            {isGameCategoryOpen && (
+              <>
+                <div
+                  className={styles.dropdownOverlay}
+                  onClick={() => setIsGameCategoryOpen(false)}
+                />
+                <div className={styles.dropdownMenu}>
+                  {gameCategories.map((category) => {
+                    const isSelected = selectedGameCategories.includes(category);
+                    return (
+                      <label key={category} className={styles.dropdownItemCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleGameCategoryToggle(category)}
+                          className={styles.checkbox}
+                        />
+                        <span>{categoryLabels[category]}</span>
+                      </label>
+                    );
+                  })}
                 </div>
+              </>
+            )}
+          </div>
 
-                {/* Divider */}
-                <div className={styles.divider} />
+          {/* Menu déroulant Type de produit (multi-select) */}
+          <div
+            className={`${styles.dropdownContainer} ${isAvailabilityOpen || isPriceOpen || isLanguageOpen || isGameCategoryOpen ? styles.dropdownHiddenMobile : ''}`}
+          >
+            <button
+              className={styles.dropdownButton}
+              onClick={() => {
+                setIsProductTypeOpen(!isProductTypeOpen);
+                setIsGameCategoryOpen(false);
+                setIsAvailabilityOpen(false);
+                setIsPriceOpen(false);
+                setIsLanguageOpen(false);
+              }}
+            >
+              <span>
+                Type {selectedProductTypes.length > 0 ? `(${selectedProductTypes.length})` : ''}
+              </span>
+              <ChevronDownIcon size={16} className={styles.chevronIcon} />
+            </button>
+            {isProductTypeOpen && (
+              <>
+                <div
+                  className={styles.dropdownOverlay}
+                  onClick={() => setIsProductTypeOpen(false)}
+                />
+                <div className={styles.dropdownMenu}>
+                  {productTypes.map((type) => {
+                    const isSelected = selectedProductTypes.includes(type);
+                    return (
+                      <label key={type} className={styles.dropdownItemCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleProductTypeToggle(type)}
+                          className={styles.checkbox}
+                        />
+                        <span>{productTypeLabels[type]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
 
-                {/* Custom Price Section */}
-                <div className={styles.customPriceSection}>
-                  <div className={styles.sectionTitle}>Prix personnalisé</div>
+          {/* Menu déroulant Disponibilité (multi-select) */}
+          <div
+            className={`${styles.dropdownContainer} ${isGameCategoryOpen || isPriceOpen || isLanguageOpen || isProductTypeOpen ? styles.dropdownHiddenMobile : ''}`}
+          >
+            <button
+              className={styles.dropdownButton}
+              onClick={() => {
+                setIsAvailabilityOpen(!isAvailabilityOpen);
+                setIsGameCategoryOpen(false);
+                setIsProductTypeOpen(false);
+                setIsPriceOpen(false);
+                setIsLanguageOpen(false);
+              }}
+            >
+              <span>
+                Disponibilité{' '}
+                {selectedAvailability.length > 0 ? `(${selectedAvailability.length})` : ''}
+              </span>
+              <ChevronDownIcon size={16} className={styles.chevronIcon} />
+            </button>
+            {isAvailabilityOpen && (
+              <>
+                <div
+                  className={styles.dropdownOverlay}
+                  onClick={() => setIsAvailabilityOpen(false)}
+                />
+                <div className={styles.dropdownMenu}>
+                  {availabilityOptions.map((availability) => {
+                    const isSelected = selectedAvailability.includes(availability);
+                    return (
+                      <label key={availability} className={styles.dropdownItemCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleAvailabilityToggle(availability)}
+                          className={styles.checkbox}
+                        />
+                        <span>{availabilityLabels[availability]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
 
-                  {/* Slider */}
-                  <div className={styles.priceRangeSlider}>
-                    <input
-                      type="range"
-                      min="0"
-                      max="500"
-                      step="5"
-                      value={customPriceRange[0]}
-                      onChange={(e) => handleMinPriceChange(e.target.value)}
-                      className={styles.sliderMin}
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max="500"
-                      step="5"
-                      value={customPriceRange[1]}
-                      onChange={(e) => handleMaxPriceChange(e.target.value)}
-                      className={styles.sliderMax}
-                    />
-                    <div className={styles.sliderTrack}>
-                      <div
-                        className={styles.sliderRange}
-                        style={{
-                          left: `${minPercent}%`,
-                          right: `${100 - maxPercent}%`,
-                        }}
-                      />
-                    </div>
+          {/* Menu déroulant Prix */}
+          <div
+            className={`${styles.dropdownContainer} ${isGameCategoryOpen || isProductTypeOpen || isAvailabilityOpen || isLanguageOpen ? styles.dropdownHiddenMobile : ''}`}
+          >
+            <button
+              className={styles.dropdownButton}
+              onClick={() => {
+                setIsPriceOpen(!isPriceOpen);
+                setIsGameCategoryOpen(false);
+                setIsProductTypeOpen(false);
+                setIsAvailabilityOpen(false);
+                setIsLanguageOpen(false);
+              }}
+            >
+              <span>
+                Prix{' '}
+                {selectedPriceRange.min !== null || selectedPriceRange.max !== null ? '(1)' : ''}
+              </span>
+              <ChevronDownIcon size={16} className={styles.chevronIcon} />
+            </button>
+            {isPriceOpen && (
+              <>
+                <div className={styles.dropdownOverlay} onClick={() => setIsPriceOpen(false)} />
+                <div className={styles.dropdownMenu} style={{ minWidth: '280px', padding: '12px' }}>
+                  {/* Presets */}
+                  <div className={styles.pricePresets}>
+                    {pricePresets.map((preset) => (
+                      <label key={preset.value} className={styles.pricePresetOption}>
+                        <input
+                          type="radio"
+                          name="pricePreset"
+                          value={preset.value}
+                          checked={selectedPricePreset === preset.value}
+                          onChange={() => handlePricePresetChange(preset.value)}
+                        />
+                        <span>{preset.label}</span>
+                      </label>
+                    ))}
                   </div>
 
-                  {/* Price Inputs */}
-                  <div className={styles.priceLabels}>
-                    <div className={styles.priceInput}>
-                      <label>Min</label>
-                      <div className={styles.priceInputWrapper}>
-                        <input
-                          type="number"
-                          min="0"
-                          max={customPriceRange[1]}
-                          value={customPriceRange[0]}
-                          onChange={(e) => handleMinPriceChange(e.target.value)}
+                  {/* Divider */}
+                  <div className={styles.divider} />
+
+                  {/* Custom Price Section */}
+                  <div className={styles.customPriceSection}>
+                    <div className={styles.sectionTitle}>Prix personnalisé</div>
+
+                    {/* Slider */}
+                    <div className={styles.priceRangeSlider}>
+                      <input
+                        type="range"
+                        min="0"
+                        max="500"
+                        step="5"
+                        value={customPriceRange[0]}
+                        onChange={(e) => handleMinPriceChange(e.target.value)}
+                        className={styles.sliderMin}
+                      />
+                      <input
+                        type="range"
+                        min="0"
+                        max="500"
+                        step="5"
+                        value={customPriceRange[1]}
+                        onChange={(e) => handleMaxPriceChange(e.target.value)}
+                        className={styles.sliderMax}
+                      />
+                      <div className={styles.sliderTrack}>
+                        <div
+                          className={styles.sliderRange}
+                          style={{
+                            left: `${minPercent}%`,
+                            right: `${100 - maxPercent}%`,
+                          }}
                         />
-                        <span>€</span>
                       </div>
                     </div>
 
-                    <span className={styles.separator}>-</span>
+                    {/* Price Inputs */}
+                    <div className={styles.priceLabels}>
+                      <div className={styles.priceInput}>
+                        <label>Min</label>
+                        <div className={styles.priceInputWrapper}>
+                          <input
+                            type="number"
+                            min="0"
+                            max={customPriceRange[1]}
+                            value={customPriceRange[0]}
+                            onChange={(e) => handleMinPriceChange(e.target.value)}
+                          />
+                          <span>€</span>
+                        </div>
+                      </div>
 
-                    <div className={styles.priceInput}>
-                      <label>Max</label>
-                      <div className={styles.priceInputWrapper}>
-                        <input
-                          type="number"
-                          min={customPriceRange[0]}
-                          max="500"
-                          value={customPriceRange[1]}
-                          onChange={(e) => handleMaxPriceChange(e.target.value)}
-                        />
-                        <span>€</span>
+                      <span className={styles.separator}>-</span>
+
+                      <div className={styles.priceInput}>
+                        <label>Max</label>
+                        <div className={styles.priceInputWrapper}>
+                          <input
+                            type="number"
+                            min={customPriceRange[0]}
+                            max="500"
+                            value={customPriceRange[1]}
+                            onChange={(e) => handleMaxPriceChange(e.target.value)}
+                          />
+                          <span>€</span>
+                        </div>
                       </div>
                     </div>
+
+                    <button className={styles.applyButton} onClick={applyCustomPrice}>
+                      Appliquer
+                    </button>
                   </div>
-
-                  <button className={styles.applyButton} onClick={applyCustomPrice}>
-                    Appliquer
-                  </button>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
 
-        {/* Menu déroulant Langue */}
-        <div className={styles.dropdownContainer}>
-          <button
-            className={styles.dropdownButton}
-            onClick={() => {
-              setIsLanguageOpen(!isLanguageOpen);
-              setIsGameCategoryOpen(false);
-              setIsProductTypeOpen(false);
-              setIsAvailabilityOpen(false);
-              setIsPriceOpen(false);
-            }}
+          {/* Menu déroulant Langue */}
+          <div
+            className={`${styles.dropdownContainer} ${isGameCategoryOpen || isProductTypeOpen || isAvailabilityOpen || isPriceOpen ? styles.dropdownHiddenMobile : ''}`}
           >
-            <span>
-              Langue{' '}
-              {selectedLanguages.length > 0 ? `(${selectedLanguages.length})` : ''}
-            </span>
-            <ChevronDownIcon size={16} className={styles.chevronIcon} />
-          </button>
-          {isLanguageOpen && (
-            <>
-              <div className={styles.dropdownOverlay} onClick={() => setIsLanguageOpen(false)} />
-              <div className={styles.dropdownMenu}>
-                {languageOptions.map((lang) => {
-                  const isSelected = selectedLanguages.includes(lang.value);
-                  return (
-                    <label key={lang.value} className={styles.dropdownItemCheckbox}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleLanguageToggle(lang.value)}
-                        className={styles.checkbox}
-                      />
-                      <span className={styles.languageLabel}>
-                        <span className={styles.flag}>{lang.flag}</span>
-                        <span>{lang.label}</span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
+            <button
+              className={styles.dropdownButton}
+              onClick={() => {
+                setIsLanguageOpen(!isLanguageOpen);
+                setIsGameCategoryOpen(false);
+                setIsProductTypeOpen(false);
+                setIsAvailabilityOpen(false);
+                setIsPriceOpen(false);
+              }}
+            >
+              <span>
+                Langue {selectedLanguages.length > 0 ? `(${selectedLanguages.length})` : ''}
+              </span>
+              <ChevronDownIcon size={16} className={styles.chevronIcon} />
+            </button>
+            {isLanguageOpen && (
+              <>
+                <div className={styles.dropdownOverlay} onClick={() => setIsLanguageOpen(false)} />
+                <div className={styles.dropdownMenu}>
+                  {languageOptions.map((lang) => {
+                    const isSelected = selectedLanguages.includes(lang.value);
+                    return (
+                      <label key={lang.value} className={styles.dropdownItemCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleLanguageToggle(lang.value)}
+                          className={styles.checkbox}
+                        />
+                        <span className={styles.languageLabel}>
+                          <span className={styles.flag}>{lang.flag}</span>
+                          <span>{lang.label}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -672,25 +728,13 @@ export default function FilterBar({
         </div>
       )}
 
-      {/* Barre inférieure avec onglets */}
+      {/* Barre inférieure avec onglet */}
       <div className={styles.tabsBar}>
         <button
           className={`${styles.tab} ${activeTab === 'Tous' ? styles.tabActive : ''}`}
           onClick={() => onTabChange('Tous')}
         >
           Tous
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'Produits phares' ? styles.tabActive : ''}`}
-          onClick={() => onTabChange('Produits phares')}
-        >
-          Produits phares
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'Nouveauté' ? styles.tabActive : ''}`}
-          onClick={() => onTabChange('Nouveauté')}
-        >
-          Nouveauté
         </button>
       </div>
     </div>
