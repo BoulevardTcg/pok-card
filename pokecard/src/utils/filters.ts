@@ -237,7 +237,7 @@ export function filterByPriceRange(
     if (minPriceCents !== null && productPrice < minPriceCents) {
       return false;
     }
-    
+
     // Vérifier le maximum (si défini)
     if (maxPriceCents !== null && productPrice > maxPriceCents) {
       return false;
@@ -263,7 +263,12 @@ export function filterByLanguages(products: Product[], selectedLanguages: string
         const langLower = lang.toLowerCase().trim();
         // Mapping des codes de langue
         if (langLower === 'fr') {
-          return variantLang === 'fr' || variantLang === 'français' || variantLang === 'french' || variantLang === 'francais';
+          return (
+            variantLang === 'fr' ||
+            variantLang === 'français' ||
+            variantLang === 'french' ||
+            variantLang === 'francais'
+          );
         }
         if (langLower === 'en') {
           return variantLang === 'en' || variantLang === 'anglais' || variantLang === 'english';
@@ -296,7 +301,10 @@ export function parsePriceRangeFromString(priceRangeStr: string | null): {
 /**
  * Convertit une plage de prix en string pour l'URL "min-max" (en euros)
  */
-export function priceRangeToString(minPriceCents: number | null, maxPriceCents: number | null): string {
+export function priceRangeToString(
+  minPriceCents: number | null,
+  maxPriceCents: number | null
+): string {
   if (minPriceCents === null && maxPriceCents === null) return '';
   const min = minPriceCents !== null ? Math.floor(minPriceCents / 100) : 0;
   const max = maxPriceCents !== null ? Math.floor(maxPriceCents / 100) : 500;
