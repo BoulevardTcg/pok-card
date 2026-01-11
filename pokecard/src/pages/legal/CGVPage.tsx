@@ -676,21 +676,14 @@ export function CGVPage() {
                 <strong>Email :</strong> contact@boulevardtcg.com
               </p>
               <p>
-                <strong>Téléphone :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Horaires :</strong> Du lundi au vendredi, 9h-18h
-              </p>
-              <p>
-                <strong>Délai de réponse :</strong> 48h ouvrées maximum
+                <strong>Délai de réponse :</strong> 48h à 72h
               </p>
             </div>
 
             <h3>12.2 Traitement des réclamations</h3>
             <p>
-              Toute réclamation doit être adressée par email ou via le formulaire de contact. Le
-              service client s'engage à accuser réception de la réclamation sous 48h et à apporter
-              une réponse dans un délai de 10 jours ouvrés.
+              Toute réclamation doit être adressée par email. Le service client s'engage à accuser
+              réception sous 48h à 72h et à apporter une réponse dans un délai de 10 jours ouvrés.
             </p>
 
             <h3>12.3 Recours préalable obligatoire</h3>
@@ -915,7 +908,7 @@ export function CGVPage() {
 
                 <h4>Étape 2 : Analyse</h4>
                 <p>
-                  Notre équipe analyse votre demande sous 48h ouvrées et vous propose une solution.
+                  Notre équipe analyse votre demande sous 48h à 72h et vous propose une solution.
                 </p>
 
                 <h4>Étape 3 : Résolution</h4>
@@ -937,7 +930,7 @@ export function CGVPage() {
 
                 <h4>Délais de traitement</h4>
                 <ul>
-                  <li>Réponse initiale : 48h ouvrées</li>
+                  <li>Réponse initiale : 48h à 72h</li>
                   <li>Traitement du dossier : 5-10 jours ouvrés</li>
                   <li>Remboursement : 14 jours maximum après réception du retour</li>
                 </ul>
