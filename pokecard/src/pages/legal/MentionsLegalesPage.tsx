@@ -38,7 +38,7 @@ export function MentionsLegalesPage() {
               <p>6 Rue Talma, 94400 Vitry-sur-Seine</p>
               <p>RCS : Créteil B 994 093 797</p>
               <p>Capital social : 3 000 €</p>
-              <p>Président : [À COMPLÉTER]</p>
+              <p>Président : Morais Vincent</p>
             </div>
           </section>
 
