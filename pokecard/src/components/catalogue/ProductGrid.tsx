@@ -1,8 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import ProductListItem from './ProductListItem';
 import ViewToggle from './ViewToggle';
+import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import type { ViewMode } from '../../hooks/useViewPreference';
 import styles from './ProductGrid.module.css';
@@ -46,6 +47,46 @@ export default function ProductGrid({
 }: ProductGridProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortBy = searchParams.get('sort') || 'newest';
+
+  // État de la modal "Me prévenir"
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
+
+  // Détecter si on est sur mobile
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 767;
+  });
+
+  // Forcer la vue grille sur mobile
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const handleResize = () => {
+      const mobile = mediaQuery.matches;
+      setIsMobile(mobile);
+      if (mobile && viewMode === 'list') {
+        onViewModeChange('grid');
+      }
+    };
+
+    // Vérifier au montage
+    handleResize();
+
+    // Écouter les changements de taille
+    mediaQuery.addEventListener('change', handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      mediaQuery.removeEventListener('change', handleResize);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [viewMode, onViewModeChange]);
 
   // Calculer les IDs des produits éligibles au badge "NOUVEAU"
   const newBadgeProductIds = useMemo(() => {
@@ -97,7 +138,7 @@ export default function ProductGrid({
         <div className={styles.emptyState}>
           <p>Aucun produit trouvé.</p>
         </div>
-      ) : viewMode === 'grid' ? (
+      ) : viewMode === 'grid' || isMobile ? (
         <div className={styles.grid} key="grid-view">
           {products.map((product, index) => (
             <div
@@ -105,7 +146,17 @@ export default function ProductGrid({
               className={styles.gridItem}
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <ProductCard product={product} showNewBadge={newBadgeProductIds.has(product.id)} />
+              <ProductCard
+                product={product}
+                showNewBadge={newBadgeProductIds.has(product.id)}
+                onNotifyClick={() =>
+                  setModalState({
+                    isOpen: true,
+                    productId: product.id,
+                    productName: product.name,
+                  })
+                }
+              />
             </div>
           ))}
         </div>
@@ -117,6 +168,13 @@ export default function ProductGrid({
               product={product}
               index={index}
               showNewBadge={newBadgeProductIds.has(product.id)}
+              onNotifyClick={() =>
+                setModalState({
+                  isOpen: true,
+                  productId: product.id,
+                  productName: product.name,
+                })
+              }
             />
           ))}
         </div>
@@ -166,6 +224,14 @@ export default function ProductGrid({
           </button>
         </div>
       )}
+
+      {/* Modal "Me prévenir" - rendue une seule fois au niveau parent */}
+      <NotifyModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ isOpen: false, productId: '', productName: '' })}
+        productId={modalState.productId}
+        productName={modalState.productName}
+      />
     </div>
   );
 }

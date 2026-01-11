@@ -1,16 +1,52 @@
 /* ===================================================================
-   VIEW TOGGLE — Sélecteur de mode d'affichage dark premium
+   VIEW TOGGLE — Sélecteur de mode d'affichage (style identique bouton Me prévenir)
    =================================================================== */
 
 .viewToggle {
+  position: relative;
   display: inline-flex;
-  background: var(--color-bg-elevated, #141416);
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  border: 2px solid var(--color-accent-primary);
   border-radius: 8px;
   padding: 4px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Effet glow pulsant */
+.viewToggle::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
+    transparent,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent)
+  );
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.viewToggle:hover::after {
+  opacity: 1;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .toggleButton {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -18,29 +54,30 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: var(--color-text-muted, #6b6b6f);
+  color: var(--color-accent-primary);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }
 
 .toggleButton:hover:not(.active) {
-  color: var(--color-text-secondary, #a1a1a6);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-inverse);
+  background: color-mix(in srgb, var(--color-accent-primary) 20%, transparent);
 }
 
 .toggleButton:focus-visible {
-  outline: 2px solid var(--color-accent-secondary, #d4af37);
+  outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
 }
 
 .toggleButton.active {
-  background: var(--color-bg-subtle, #1a1a1d);
-  color: var(--color-accent-secondary, #d4af37);
-  border: 1px solid var(--color-accent-secondary, rgba(212, 175, 55, 0.3));
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .toggleButton svg {
@@ -56,5 +93,12 @@
 @media (min-width: 640px) {
   .desktopOnly {
     display: inline;
+  }
+}
+
+/* Cacher le ViewToggle sur mobile */
+@media (max-width: 767px) {
+  .viewToggle {
+    display: none;
   }
 }
