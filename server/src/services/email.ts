@@ -40,6 +40,9 @@ function getTransporter(): Transporter {
           newline: 'unix',
         });
       } else {
+        console.log(
+          `📧 Email: Connexion SMTP ${smtpHost}:${smtpPort} (secure: ${process.env.SMTP_SECURE === 'true'})`
+        );
         transporter = nodemailer.createTransport({
           host: smtpHost,
           port: smtpPort,
@@ -48,6 +51,10 @@ function getTransporter(): Transporter {
             user: smtpUser,
             pass: smtpPass,
           },
+          // Timeouts pour éviter les blocages infinis
+          connectionTimeout: 10000, // 10 secondes pour établir la connexion
+          greetingTimeout: 10000, // 10 secondes pour le greeting SMTP
+          socketTimeout: 30000, // 30 secondes pour les opérations
         });
       }
     }
@@ -658,9 +665,14 @@ function contactAutoReplyTemplate(payload: { name: string; subject: string }): s
 }
 
 export async function sendContactEmail(payload: ContactPayload): Promise<boolean> {
+  console.log('📧 Email: Tentative envoi contact...', {
+    to: CONTACT_TO_EMAIL,
+    from: payload.email,
+  });
   try {
     const transport = getTransporter();
     const html = contactEmailTemplate(payload);
+    console.log('📧 Email: Envoi en cours via SMTP...');
     const info = await transport.sendMail({
       from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
       to: CONTACT_TO_EMAIL,
@@ -669,15 +681,15 @@ export async function sendContactEmail(payload: ContactPayload): Promise<boolean
       html,
     });
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Email: contact envoyé');
-    } else {
-      console.log('Email: contact envoyé', { messageId: info.messageId });
-    }
+    console.log('✅ Email: contact envoyé avec succès', { messageId: info.messageId });
 
     return true;
-  } catch (error) {
-    console.error('Email: erreur envoi contact', error);
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi contact', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+    });
     return false;
   }
 }
