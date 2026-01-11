@@ -46,7 +46,7 @@ export default function ProductGrid({
   onViewModeChange,
 }: ProductGridProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const sortBy = searchParams.get('sort') || 'newest';
+  const sortBy = searchParams.get('sort') || 'relevance';
 
   // État de la modal "Me prévenir"
   const [modalState, setModalState] = useState<{

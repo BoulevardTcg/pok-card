@@ -390,9 +390,8 @@ export function ProductsPage() {
       <div className={styles.container}>
         {/* En-tête */}
         <div className={styles.header}>
-          <div className={styles.titleContainer}>
-            <h1 className={styles.title}>Boutique</h1>
-          </div>
+          <h1 className={styles.title}>Boutique</h1>
+          <div className={styles.divider}></div>
         </div>
 
         {/* Breadcrumb */}
