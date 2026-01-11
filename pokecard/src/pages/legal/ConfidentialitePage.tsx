@@ -49,21 +49,9 @@ export function ConfidentialitePage() {
           <section className={styles.section}>
             <h2>2. Responsable du traitement</h2>
             <div className={styles.infoBox}>
-              <p>
-                <strong>Responsable :</strong> BoulevardTcg (SAS)
-              </p>
-              <p>
-                <strong>Adresse :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
-              </p>
-              <p>
-                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
-              </p>
-              <p>
-                <strong>Email :</strong> contact@boulevardtcg.com
-              </p>
-              <p>
-                <strong>DPO :</strong> Non désigné (entreprise de moins de 250 salariés)
-              </p>
+              <p>SAS BoulevardTcg</p>
+              <p>6 Rue Talma, 94400 Vitry-sur-Seine</p>
+              <p>Email : contact@boulevardtcg.com</p>
             </div>
           </section>
 
@@ -279,22 +267,9 @@ export function ConfidentialitePage() {
             </ul>
 
             <h3>Comment exercer vos droits ?</h3>
-            <p>Vous pouvez exercer vos droits de plusieurs façons :</p>
-            <ul>
-              <li>
-                <strong>Depuis votre compte :</strong> accédez à la section "Mon profil" pour
-                modifier, exporter ou supprimer vos données
-              </li>
-              <li>
-                <strong>Par email :</strong> envoyez votre demande à contact@boulevardtcg.com
-              </li>
-              <li>
-                <strong>Par courrier :</strong> BoulevardTcg, 6 Rue Talma, 94400 Vitry-sur-Seine
-              </li>
-            </ul>
             <p>
-              Nous répondons à votre demande dans un délai d'un mois. Ce délai peut être prolongé de
-              deux mois en cas de demande complexe.
+              Envoyez votre demande à <strong>contact@boulevardtcg.com</strong> ou depuis votre
+              espace client. Nous répondons sous 1 mois.
             </p>
 
             <h3>Réclamation auprès de la CNIL</h3>
@@ -434,15 +409,7 @@ export function ConfidentialitePage() {
               droits, vous pouvez nous contacter :
             </p>
             <div className={styles.infoBox}>
-              <p>
-                <strong>Email :</strong> contact@boulevardtcg.com
-              </p>
-              <p>
-                <strong>Objet :</strong> [RGPD] Votre demande
-              </p>
-              <p>
-                <strong>Adresse postale :</strong> BoulevardTcg, 6 Rue Talma, 94400 Vitry-sur-Seine
-              </p>
+              <p>Email : contact@boulevardtcg.com (objet : [RGPD])</p>
             </div>
           </section>
         </article>

@@ -34,36 +34,11 @@ export function MentionsLegalesPage() {
           <section className={styles.section}>
             <h2>1. Éditeur du site</h2>
             <div className={styles.infoBox}>
-              <p>
-                <strong>Nom commercial :</strong> Boulevard TCG
-              </p>
-              <p>
-                <strong>Raison sociale :</strong> BoulevardTcg
-              </p>
-              <p>
-                <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
-              </p>
-              <p>
-                <strong>Capital social :</strong> 3 000,00 €
-              </p>
-              <p>
-                <strong>Siège social :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
-              </p>
-              <p>
-                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
-              </p>
-              <p>
-                <strong>SIREN :</strong> 994 093 797
-              </p>
-              <p>
-                <strong>N° EUID :</strong> FR9401.994093797
-              </p>
-              <p>
-                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Date d'immatriculation :</strong> 05/12/2025
-              </p>
+              <p>SAS BoulevardTcg</p>
+              <p>6 Rue Talma, 94400 Vitry-sur-Seine</p>
+              <p>RCS : Créteil B 994 093 797</p>
+              <p>Capital social : 3 000 €</p>
+              <p>Président : [À COMPLÉTER]</p>
             </div>
           </section>
 
@@ -71,27 +46,14 @@ export function MentionsLegalesPage() {
           <section className={styles.section}>
             <h2>2. Contact</h2>
             <div className={styles.infoBox}>
-              <p>
-                <strong>Email :</strong> contact@boulevardtcg.com
-              </p>
-              <p>
-                <strong>Adresse postale :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
-              </p>
+              <p>Email : contact@boulevardtcg.com</p>
             </div>
           </section>
 
           {/* Directeur de publication */}
           <section className={styles.section}>
             <h2>3. Directeur de la publication</h2>
-            <p>Le directeur de la publication du site boulevardtcg.com est :</p>
-            <div className={styles.infoBox}>
-              <p>
-                <strong>Nom :</strong> [À COMPLÉTER - Nom et prénom du Président]
-              </p>
-              <p>
-                <strong>Qualité :</strong> Président de la SAS BoulevardTcg
-              </p>
-            </div>
+            <p>Le Président de la société.</p>
           </section>
 
           {/* Hébergeur */}

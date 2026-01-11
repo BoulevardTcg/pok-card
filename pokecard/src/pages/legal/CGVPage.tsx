@@ -202,43 +202,20 @@ export function CGVPage() {
             <h2>Article 3 – Identification du vendeur</h2>
 
             <div className={styles.infoBox}>
-              <p>
-                <strong>Raison sociale :</strong> BoulevardTcg
-              </p>
-              <p>
-                <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
-              </p>
-              <p>
-                <strong>Capital social :</strong> 3 000,00 €
-              </p>
-              <p>
-                <strong>Siège social :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
-              </p>
-              <p>
-                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
-              </p>
-              <p>
-                <strong>SIREN :</strong> 994 093 797
-              </p>
-              <p>
-                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Email :</strong> contact@boulevardtcg.com
-              </p>
-              <p>
-                <strong>Horaires SAV :</strong> Du lundi au vendredi, 9h-18h
-              </p>
+              <p>SAS BoulevardTcg</p>
+              <p>6 Rue Talma, 94400 Vitry-sur-Seine</p>
+              <p>RCS : Créteil B 994 093 797</p>
+              <p>Capital social : 3 000 €</p>
+              <p>Email : contact@boulevardtcg.com</p>
             </div>
 
             <div className={styles.infoBox}>
               <p>
-                <strong>Hébergeur du site :</strong>
+                <strong>Hébergeur :</strong> Railway Corp. – San Francisco, CA, USA –{' '}
+                <a href="https://railway.app" target="_blank" rel="noopener noreferrer">
+                  railway.app
+                </a>
               </p>
-              <p>Railway Corp.</p>
-              <p>548 Market St, PMB 68956</p>
-              <p>San Francisco, CA 94104, USA</p>
-              <p>https://railway.app</p>
             </div>
           </section>
 
