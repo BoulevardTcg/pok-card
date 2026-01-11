@@ -20,6 +20,7 @@ import tradeOffersRoutes from './routes/trade-offers.js';
 import adminRoutes from './routes/admin.js';
 import twoFactorRoutes from './routes/twoFactor.js';
 import contactRoutes from './routes/contact.js';
+import gdprRoutes from './routes/gdpr.js';
 
 // Import des middlewares de sécurité
 import {
@@ -157,6 +158,9 @@ app.use('/api/admin', adminRoutes);
 
 // Routes 2FA (Two-Factor Authentication)
 app.use('/api/2fa', twoFactorRoutes);
+
+// Routes RGPD (protection des données personnelles)
+app.use('/api/gdpr', gdprRoutes);
 
 // Contact (formulaire)
 app.use('/api/contact', contactRoutes);

@@ -582,7 +582,11 @@ router.post(
             ? new URL(successUrl.replace('{CHECKOUT_SESSION_ID}', 'test')).origin
             : cancelUrl
               ? new URL(cancelUrl).origin
-              : process.env.FRONTEND_URL || 'http://localhost:5173';
+              : (
+                  process.env.FRONTEND_PUBLIC_URL ||
+                  process.env.FRONTEND_URL ||
+                  'http://localhost:3000'
+                ).replace(/\/$/, '');
 
           // Si l'URL relative commence par /, l'ajouter directement à l'origine
           if (relativeUrl.startsWith('/')) {

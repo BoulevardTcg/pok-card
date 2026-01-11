@@ -29,6 +29,12 @@ const SECRET_PATTERNS = [
   { name: 'JWT_SECRET assignment', re: /\bJWT_SECRET\s*=\s*["']?[^"'\r\n]{20,}/g },
   { name: 'JWT_REFRESH_SECRET assignment', re: /\bJWT_REFRESH_SECRET\s*=\s*["']?[^"'\r\n]{20,}/g },
   { name: 'SMTP_PASS assignment', re: /\bSMTP_PASS\s*=\s*["']?[^"'\r\n]{6,}/g },
+  // Hardcoded passwords in code (not env files)
+  { name: 'Hardcoded password (Admin123)', re: /['"]Admin123!?['"]/g },
+  { name: 'Hardcoded password (Test123)', re: /['"]Test123!?['"]/g },
+  { name: 'bcrypt.hash with literal password', re: /bcrypt\.hash\s*\(\s*['"][^'"]+['"]\s*,/g },
+  { name: 'Hardcoded email password combo', re: /admin@[a-z]+\.com\s*\/\s*\w+/gi },
+  { name: 'Password in console.log', re: /console\.log\s*\([^)]*password[^)]*\)/gi },
 ]
 
 const isTextFile = (filePath) => {

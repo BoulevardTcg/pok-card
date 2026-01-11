@@ -79,8 +79,8 @@ describe('Checkout Routes', () => {
               quantity: 2,
             },
           ],
-          successUrl: 'http://localhost:5173/checkout/success',
-          cancelUrl: 'http://localhost:5173/panier',
+          successUrl: 'http://localhost:3000/checkout/success',
+          cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
           shipping: {
             fullName: 'Test User',
@@ -107,8 +107,8 @@ describe('Checkout Routes', () => {
             },
           ],
           customerEmail: 'anonymous@example.com',
-          successUrl: 'http://localhost:5173/checkout/success',
-          cancelUrl: 'http://localhost:5173/panier',
+          successUrl: 'http://localhost:3000/checkout/success',
+          cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
           shipping: {
             fullName: 'Test User',

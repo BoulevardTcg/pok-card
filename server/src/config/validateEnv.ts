@@ -37,7 +37,9 @@ export function validateEnvOrThrow() {
     { key: 'SMTP_PASS', requiredInProd: true },
 
     { key: 'SHOP_EMAIL', requiredInProd: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-    { key: 'FRONTEND_URL', requiredInProd: true },
+    // FRONTEND_PUBLIC_URL est l'URL publique pour les emails/redirects (prioritaire)
+    // FRONTEND_URL est conservé pour rétrocompatibilité
+    { key: 'FRONTEND_PUBLIC_URL', requiredInProd: true },
   ];
 
   const errors = requireEnv(checks);
