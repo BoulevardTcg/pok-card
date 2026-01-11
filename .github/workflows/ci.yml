@@ -108,6 +108,7 @@ jobs:
           JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
           CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
           CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+          SEED_ADMIN_PASSWORD: TestAdminPassword123
 
       - name: Lint
         run: npm run lint --if-present
