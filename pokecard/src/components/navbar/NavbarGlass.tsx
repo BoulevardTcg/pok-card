@@ -779,7 +779,6 @@ export default function NavbarGlass() {
                     >
                       {isDark ? <MoonIcon size={20} /> : <SunIcon size={20} />}
                       <span>{isDark ? 'Mode sombre' : 'Mode clair'}</span>
-                      <span className={styles.mobileThemeIndicator}>{isDark ? '🌙' : '☀️'}</span>
                     </motion.button>
 
                     <motion.button

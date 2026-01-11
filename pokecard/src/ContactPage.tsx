@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MailIcon,
-  ClockIcon,
-  GlobeIcon,
-  MessageIcon,
-  SendIcon,
-  CheckIcon,
-} from './components/icons/Icons';
+import { MailIcon, GlobeIcon, SendIcon, CheckIcon } from './components/icons/Icons';
 import styles from './ContactPage.module.css';
 import { sendContactMessage } from './api';
 import { useAuth } from './authContext';
@@ -226,34 +219,12 @@ export function ContactPage() {
 
               <div className={styles.infoItem}>
                 <div className={styles.infoIcon}>
-                  <ClockIcon size={20} strokeWidth={1.5} />
-                </div>
-                <div className={styles.infoContent}>
-                  <h3 className={styles.infoItemTitle}>Horaires</h3>
-                  <p className={styles.infoText}>Lundi - Vendredi : 9h - 18h</p>
-                  <small className={styles.infoSmall}>Samedi : 10h - 16h</small>
-                </div>
-              </div>
-
-              <div className={styles.infoItem}>
-                <div className={styles.infoIcon}>
                   <GlobeIcon size={20} strokeWidth={1.5} />
                 </div>
                 <div className={styles.infoContent}>
                   <h3 className={styles.infoItemTitle}>Support</h3>
-                  <p className={styles.infoText}>Support multilingue</p>
+                  <p className={styles.infoText}>Prise en charge multilingue</p>
                   <small className={styles.infoSmall}>Français, Anglais, Espagnol</small>
-                </div>
-              </div>
-
-              <div className={styles.infoItem}>
-                <div className={styles.infoIcon}>
-                  <MessageIcon size={20} strokeWidth={1.5} />
-                </div>
-                <div className={styles.infoContent}>
-                  <h3 className={styles.infoItemTitle}>Chat en direct</h3>
-                  <p className={styles.infoText}>Disponible 24h/24</p>
-                  <small className={styles.infoSmall}>Via notre application</small>
                 </div>
               </div>
             </div>
