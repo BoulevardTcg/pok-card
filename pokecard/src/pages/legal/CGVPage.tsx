@@ -93,39 +93,38 @@ export function CGVPage() {
 
           {/* Résumé des points clés */}
           <section className={styles.keyPoints}>
-            <h2>📋 Résumé des points clés</h2>
+            <h2>Résumé des points clés</h2>
             <ul>
               <li>
-                ✅ <strong>Délai de rétractation :</strong> 14 jours à compter de la réception
+                <strong>Délai de rétractation :</strong> 14 jours à compter de la réception
               </li>
               <li>
-                ✅ <strong>Produits scellés ouverts :</strong> Retour accepté avec décote selon
-                l'état
+                <strong>Produits scellés ouverts :</strong> Retour accepté avec décote selon l'état
               </li>
               <li>
-                ✅ <strong>Cartes à l'unité (singles) :</strong> État indiqué (NM/EX/LP/MP), photos
+                <strong>Cartes à l'unité (singles) :</strong> État indiqué (NM/EX/LP/MP), photos
                 disponibles
               </li>
               <li>
-                ✅ <strong>Boosters/produits aléatoires :</strong> Aucune garantie sur le contenu
+                <strong>Boosters/produits aléatoires :</strong> Aucune garantie sur le contenu
               </li>
               <li>
-                ✅ <strong>Précommandes :</strong> Date estimée, possibilité d'annulation gratuite
+                <strong>Précommandes :</strong> Date estimée, possibilité d'annulation gratuite
               </li>
               <li>
-                ✅ <strong>Livraison :</strong> France métropolitaine sous 2-5 jours ouvrés
+                <strong>Livraison :</strong> France métropolitaine sous 2-5 jours ouvrés
               </li>
               <li>
-                ✅ <strong>Paiement sécurisé :</strong> CB via Stripe (3D Secure)
+                <strong>Paiement sécurisé :</strong> CB via Stripe (3D Secure)
               </li>
               <li>
-                ✅ <strong>Garantie légale :</strong> 2 ans conformité + vices cachés
+                <strong>Garantie légale :</strong> 2 ans conformité + vices cachés
               </li>
               <li>
-                ✅ <strong>SAV :</strong> contact@boulevardtcg.com
+                <strong>SAV :</strong> contact@boulevardtcg.com
               </li>
               <li>
-                ✅ <strong>Médiation :</strong> Gratuite en cas de litige non résolu
+                <strong>Médiation :</strong> Gratuite en cas de litige non résolu
               </li>
             </ul>
           </section>
@@ -384,7 +383,7 @@ export function CGVPage() {
 
             <h3>6.3 Précommandes</h3>
             <div className={styles.warningBox}>
-              <h4>⚠️ Conditions spécifiques aux précommandes</h4>
+              <h4>Conditions spécifiques aux précommandes</h4>
               <ul>
                 <li>
                   <strong>Date de sortie estimée :</strong> La date indiquée est fournie par
@@ -571,7 +570,7 @@ export function CGVPage() {
             </p>
 
             <div className={styles.warningBox}>
-              <h4>⚠️ Cas particulier des produits scellés TCG</h4>
+              <h4>Cas particulier des produits scellés TCG</h4>
               <p>
                 L'ouverture d'un produit scellé (booster, display, coffret) constitue une
                 manipulation allant au-delà de ce qui est nécessaire pour vérifier la nature du

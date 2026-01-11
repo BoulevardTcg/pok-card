@@ -136,13 +136,28 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  gap: 0.25rem;
 }
 
 .keyPoints li {
-  padding: 0.5rem 0;
+  padding: 0.5rem 0 0.5rem 1.5rem;
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--text-secondary, #d0d0d0);
+  position: relative;
+}
+
+.keyPoints li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
 }
 
 .keyPoints li strong {
@@ -237,6 +252,9 @@
 .warningBox h4 {
   color: #f59e0b;
   margin: 0 0 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .warningBox ul {
