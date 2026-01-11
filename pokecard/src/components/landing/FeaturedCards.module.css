@@ -517,8 +517,8 @@
 .addToCartButton {
   position: relative;
   padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #e8e4dd 0%, #d4cfc6 100%);
-  color: var(--color-bg-primary, #0a0a0b);
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
@@ -527,41 +527,23 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
   white-space: nowrap;
-  overflow: hidden;
-  box-shadow:
-    0 2px 8px rgba(232, 228, 221, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-/* Effet shimmer au hover */
-.addToCartButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s ease;
-}
-
-.addToCartButton:hover::before {
-  left: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f5f2ed 0%, #e8e4dd 100%);
-  transform: translateY(-3px) scale(1.02);
-  box-shadow:
-    0 8px 24px rgba(232, 228, 221, 0.35),
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .addToCartButton:active:not(:disabled) {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:disabled {
@@ -570,13 +552,13 @@
   box-shadow: none;
 }
 
-/* Notify Button - Style distinct et attractif */
+/* Notify Button - Style outline attractif adapté au thème */
 .notifyButton {
   position: relative;
   padding: 0.75rem 1.25rem;
-  background: rgba(139, 115, 85, 0.1);
-  color: var(--color-accent-secondary, #c9b896);
-  border: 1px solid rgba(139, 115, 85, 0.3);
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  color: var(--color-accent-primary);
+  border: 2px solid var(--color-accent-primary);
   border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 0.8rem;
@@ -596,9 +578,9 @@
   border-radius: 10px;
   background: linear-gradient(
     135deg,
-    rgba(139, 115, 85, 0.3),
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
     transparent,
-    rgba(139, 115, 85, 0.3)
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent)
   );
   opacity: 0;
   z-index: -1;
@@ -606,13 +588,11 @@
 }
 
 .notifyButton:hover {
-  background: rgba(139, 115, 85, 0.2);
-  border-color: var(--color-accent-secondary, #8b7355);
-  color: var(--color-accent-primary, #e8e4dd);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   transform: translateY(-3px);
-  box-shadow:
-    0 8px 20px rgba(139, 115, 85, 0.25),
-    0 0 20px rgba(139, 115, 85, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .notifyButton:hover::after {
