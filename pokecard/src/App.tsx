@@ -38,6 +38,9 @@ import { AdminReviewsPage } from './pages/admin/AdminReviewsPage';
 import { AdminReportsPage } from './pages/admin/AdminReportsPage';
 import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
 import { AdminPromoFormPage } from './pages/admin/AdminPromoFormPage';
+import { CGVPage } from './pages/legal/CGVPage';
+import { MentionsLegalesPage } from './pages/legal/MentionsLegalesPage';
+import { ConfidentialitePage } from './pages/legal/ConfidentialitePage';
 
 // Composant principal de l'application
 function AppContent() {
@@ -82,6 +85,11 @@ function AppContent() {
           <Route path="/trade/set/:id" element={<TradeSetPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/actualites" element={<NewsPage />} />
+
+          {/* Routes légales */}
+          <Route path="/cgv" element={<CGVPage />} />
+          <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+          <Route path="/confidentialite" element={<ConfidentialitePage />} />
 
           {/* Routes d'authentification */}
           <Route path="/login" element={<LoginPage />} />

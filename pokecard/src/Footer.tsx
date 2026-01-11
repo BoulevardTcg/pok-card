@@ -97,16 +97,19 @@ const Footer: React.FC = () => {
             <h3 className={styles.footerSectionTitle}>Informations</h3>
             <ul className={styles.footerLinkList}>
               <li>
-                <button className={styles.footerLink}>Mentions légales</button>
+                <button onClick={() => navigate('/mentions-legales')} className={styles.footerLink}>
+                  Mentions légales
+                </button>
               </li>
               <li>
-                <button className={styles.footerLink}>Confidentialité</button>
+                <button onClick={() => navigate('/confidentialite')} className={styles.footerLink}>
+                  Confidentialité
+                </button>
               </li>
               <li>
-                <button className={styles.footerLink}>Cookies</button>
-              </li>
-              <li>
-                <button className={styles.footerLink}>CGV</button>
+                <button onClick={() => navigate('/cgv')} className={styles.footerLink}>
+                  CGV
+                </button>
               </li>
             </ul>
           </div>
