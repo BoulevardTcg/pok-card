@@ -1,10 +1,72 @@
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
+import { Resend } from 'resend';
 
 let transporter: Transporter | null = null;
+let resendClient: Resend | null = null;
+
+// Déterminer le provider d'email à utiliser
+const EMAIL_PROVIDER = process.env.RESEND_API_KEY ? 'resend' : 'smtp';
 
 const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
 const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value);
+
+// Initialiser Resend si la clé API est présente
+function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY non définie');
+    }
+    console.log('📧 Email: Utilisation de Resend');
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
+
+// Fonction générique pour envoyer un email (Resend ou SMTP)
+async function sendEmail(options: {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  html: string;
+}): Promise<{ success: boolean; messageId?: string }> {
+  if (EMAIL_PROVIDER === 'resend') {
+    try {
+      const resend = getResendClient();
+      const { data, error } = await resend.emails.send({
+        from: options.from,
+        to: options.to,
+        replyTo: options.replyTo,
+        subject: options.subject,
+        html: options.html,
+      });
+
+      if (error) {
+        console.error('❌ Resend error:', error);
+        return { success: false };
+      }
+
+      console.log('✅ Email envoyé via Resend', { id: data?.id });
+      return { success: true, messageId: data?.id };
+    } catch (error: any) {
+      console.error('❌ Resend exception:', error.message);
+      return { success: false };
+    }
+  } else {
+    // Fallback SMTP
+    const transport = getTransporter();
+    const info = await transport.sendMail({
+      from: options.from,
+      to: options.to,
+      replyTo: options.replyTo,
+      subject: options.subject,
+      html: options.html,
+    });
+    return { success: true, messageId: info.messageId };
+  }
+}
 
 function getTransporter(): Transporter {
   if (!transporter) {
@@ -463,38 +525,33 @@ export async function sendOrderConfirmationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
+  console.log('📧 Email: Envoi confirmation commande...', {
+    orderNumber: order.orderNumber,
+    to: customerEmail,
+  });
   try {
-    const transport = getTransporter();
     const html = orderConfirmationTemplate(order, customerEmail);
-
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `✅ Confirmation de commande ${order.orderNumber} - ${SHOP_NAME}`,
       html,
     });
 
-    // Vérifier si l'email a vraiment été envoyé ou juste simulé
-    const isStreamTransport = !info.messageId && !info.response;
-    if (isStreamTransport) {
-      console.log(
-        `⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`
-      );
-      console.log(`   Destinataire: ${customerEmail}`);
-      console.log(`   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env`);
+    if (result.success) {
+      console.log('✅ Email: confirmation commande envoyée', {
+        orderNumber: order.orderNumber,
+        messageId: result.messageId,
+      });
     } else {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ Email: confirmation envoyée (${order.orderNumber})`);
-        console.log(`   MessageId: ${info.messageId || 'N/A'}`);
-        console.log(`   Destinataire: ${customerEmail}`);
-      } else {
-        console.log('Email: confirmation envoyée', { messageId: info.messageId });
-      }
+      console.error('❌ Email: échec envoi confirmation commande', {
+        orderNumber: order.orderNumber,
+      });
     }
 
-    return true;
-  } catch (error) {
-    console.error('Email: erreur envoi confirmation', error);
+    return result.success;
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi confirmation', { message: error.message });
     return false;
   }
 }
@@ -503,37 +560,33 @@ export async function sendShippingNotificationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
+  console.log('📧 Email: Envoi notification expédition...', {
+    orderNumber: order.orderNumber,
+    to: customerEmail,
+  });
   try {
-    const transport = getTransporter();
     const html = shippingNotificationTemplate(order, customerEmail);
-
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `📦 Votre commande ${order.orderNumber} a ete expediee ! - ${SHOP_NAME}`,
       html,
     });
 
-    // Vérifier si l'email a vraiment été envoyé ou juste simulé
-    const isStreamTransport = !info.messageId && !info.response;
-    if (isStreamTransport) {
-      console.log(
-        `⚠️ Email: mode simulation (streamTransport) - Email NON envoyé réellement (${order.orderNumber})`
-      );
-      console.log(`   Destinataire: ${customerEmail}`);
+    if (result.success) {
+      console.log('✅ Email: notification expédition envoyée', {
+        orderNumber: order.orderNumber,
+        messageId: result.messageId,
+      });
     } else {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ Email: notification expédition envoyée (${order.orderNumber})`);
-        console.log(`   MessageId: ${info.messageId || 'N/A'}`);
-        console.log(`   Destinataire: ${customerEmail}`);
-      } else {
-        console.log('Email: notification expédition envoyée', { messageId: info.messageId });
-      }
+      console.error('❌ Email: échec envoi notification expédition', {
+        orderNumber: order.orderNumber,
+      });
     }
 
-    return true;
-  } catch (error) {
-    console.error('Email: erreur envoi expédition', error);
+    return result.success;
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi expédition', { message: error.message });
     return false;
   }
 }
@@ -542,26 +595,33 @@ export async function sendDeliveryConfirmationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
+  console.log('📧 Email: Envoi confirmation livraison...', {
+    orderNumber: order.orderNumber,
+    to: customerEmail,
+  });
   try {
-    const transport = getTransporter();
     const html = deliveryConfirmationTemplate(order, customerEmail);
-
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${SHOP_EMAIL}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${SHOP_EMAIL}>`,
       to: customerEmail,
       subject: `✅ Votre commande ${order.orderNumber} a ete livree ! - ${SHOP_NAME}`,
       html,
     });
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Email: livraison envoyée (${order.orderNumber})`);
+    if (result.success) {
+      console.log('✅ Email: confirmation livraison envoyée', {
+        orderNumber: order.orderNumber,
+        messageId: result.messageId,
+      });
     } else {
-      console.log('Email: livraison envoyée', { messageId: info.messageId });
+      console.error('❌ Email: échec envoi confirmation livraison', {
+        orderNumber: order.orderNumber,
+      });
     }
 
-    return true;
-  } catch (error) {
-    console.error('Email: erreur envoi livraison', error);
+    return result.success;
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi livraison', { message: error.message });
     return false;
   }
 }
@@ -665,31 +725,30 @@ function contactAutoReplyTemplate(payload: { name: string; subject: string }): s
 }
 
 export async function sendContactEmail(payload: ContactPayload): Promise<boolean> {
-  console.log('📧 Email: Tentative envoi contact...', {
+  console.log('📧 Email: Envoi message contact...', {
     to: CONTACT_TO_EMAIL,
     from: payload.email,
+    provider: EMAIL_PROVIDER,
   });
   try {
-    const transport = getTransporter();
     const html = contactEmailTemplate(payload);
-    console.log('📧 Email: Envoi en cours via SMTP...');
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${EMAIL_FROM}>`,
       to: CONTACT_TO_EMAIL,
       replyTo: sanitizeEmailAddress(payload.email),
       subject: sanitizeHeaderValue(`[Contact – Boulevard] ${payload.subject}`),
       html,
     });
 
-    console.log('✅ Email: contact envoyé avec succès', { messageId: info.messageId });
+    if (result.success) {
+      console.log('✅ Email: contact envoyé avec succès', { messageId: result.messageId });
+    } else {
+      console.error('❌ Email: échec envoi contact');
+    }
 
-    return true;
+    return result.success;
   } catch (error: any) {
-    console.error('❌ Email: erreur envoi contact', {
-      message: error.message,
-      code: error.code,
-      command: error.command,
-    });
+    console.error('❌ Email: erreur envoi contact', { message: error.message });
     return false;
   }
 }
@@ -699,26 +758,26 @@ export async function sendContactAutoReply(payload: {
   email: string;
   subject: string;
 }): Promise<boolean> {
+  console.log('📧 Email: Envoi accusé réception contact...', { to: payload.email });
   try {
-    const transport = getTransporter();
     const html = contactAutoReplyTemplate({ name: payload.name, subject: payload.subject });
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${EMAIL_FROM}>`,
       to: sanitizeEmailAddress(payload.email),
       replyTo: CONTACT_TO_EMAIL,
       subject: sanitizeHeaderValue(`✅ Nous avons bien reçu votre message - ${SHOP_NAME}`),
       html,
     });
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Email: accusé réception contact envoyé');
+    if (result.success) {
+      console.log('✅ Email: accusé réception contact envoyé', { messageId: result.messageId });
     } else {
-      console.log('Email: accusé réception contact envoyé', { messageId: info.messageId });
+      console.error('❌ Email: échec envoi accusé réception contact');
     }
 
-    return true;
-  } catch (error) {
-    console.error('Email: erreur envoi accusé réception contact', error);
+    return result.success;
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi accusé réception contact', { message: error.message });
     return false;
   }
 }
@@ -805,31 +864,33 @@ export async function sendPasswordResetEmail(payload: {
   resetUrl: string;
   expiresIn: string;
 }): Promise<boolean> {
+  console.log('📧 Email: Envoi reset password...', { to: payload.email });
   try {
-    const transport = getTransporter();
     const html = passwordResetTemplate({
       name: payload.name || '',
       resetUrl: payload.resetUrl,
       expiresIn: payload.expiresIn,
     });
 
-    const info = await transport.sendMail({
-      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+    const result = await sendEmail({
+      from: `${SHOP_NAME} <${EMAIL_FROM}>`,
       to: sanitizeEmailAddress(payload.email),
       subject: sanitizeHeaderValue(`🔐 Réinitialisation de votre mot de passe - ${SHOP_NAME}`),
       html,
     });
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Email: reset password envoyé à', payload.email);
-      console.log('  Reset URL:', payload.resetUrl);
+    if (result.success) {
+      console.log('✅ Email: reset password envoyé', {
+        to: payload.email,
+        messageId: result.messageId,
+      });
     } else {
-      console.log('Email: reset password envoyé', { messageId: info.messageId, to: payload.email });
+      console.error('❌ Email: échec envoi reset password', { to: payload.email });
     }
 
-    return true;
-  } catch (error) {
-    console.error('Email: erreur envoi reset password', error);
+    return result.success;
+  } catch (error: any) {
+    console.error('❌ Email: erreur envoi reset password', { message: error.message });
     return false;
   }
 }
