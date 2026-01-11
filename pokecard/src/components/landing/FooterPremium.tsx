@@ -97,17 +97,6 @@ export default function FooterPremium() {
           <span className={styles.copyright}>
             © {currentYear} BoulevardTCG. Tous droits réservés.
           </span>
-
-          <div className={styles.legalLinks}>
-            {LEGAL_LINKS.map((link, index) => (
-              <span key={link.path}>
-                <button onClick={() => navigate(link.path)} className={styles.legalLink}>
-                  {link.label}
-                </button>
-                {index < LEGAL_LINKS.length - 1 && <span className={styles.legalSeparator}>·</span>}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </footer>
