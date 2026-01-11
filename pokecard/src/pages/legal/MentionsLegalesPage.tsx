@@ -38,25 +38,31 @@ export function MentionsLegalesPage() {
                 <strong>Nom commercial :</strong> Boulevard TCG
               </p>
               <p>
-                <strong>Raison sociale :</strong> [À COMPLÉTER]
+                <strong>Raison sociale :</strong> BoulevardTcg
               </p>
               <p>
-                <strong>Forme juridique :</strong> [À COMPLÉTER - SAS / SARL / Auto-entrepreneur]
+                <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
               </p>
               <p>
-                <strong>Capital social :</strong> [À COMPLÉTER] €
+                <strong>Capital social :</strong> 3 000,00 €
               </p>
               <p>
-                <strong>Siège social :</strong> [À COMPLÉTER - Adresse complète]
+                <strong>Siège social :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
               </p>
               <p>
-                <strong>RCS :</strong> [À COMPLÉTER - Ville + numéro]
+                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
               </p>
               <p>
-                <strong>SIRET :</strong> [À COMPLÉTER]
+                <strong>SIREN :</strong> 994 093 797
               </p>
               <p>
-                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER ou "Non applicable"]
+                <strong>N° EUID :</strong> FR9401.994093797
+              </p>
+              <p>
+                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER]
+              </p>
+              <p>
+                <strong>Date d'immatriculation :</strong> 05/12/2025
               </p>
             </div>
           </section>
@@ -69,10 +75,7 @@ export function MentionsLegalesPage() {
                 <strong>Email :</strong> contact@boulevardtcg.com
               </p>
               <p>
-                <strong>Téléphone :</strong> [À COMPLÉTER]
-              </p>
-              <p>
-                <strong>Adresse postale :</strong> [À COMPLÉTER]
+                <strong>Adresse postale :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
               </p>
             </div>
           </section>
@@ -83,10 +86,10 @@ export function MentionsLegalesPage() {
             <p>Le directeur de la publication du site boulevardtcg.com est :</p>
             <div className={styles.infoBox}>
               <p>
-                <strong>Nom :</strong> [À COMPLÉTER - Nom et prénom]
+                <strong>Nom :</strong> [À COMPLÉTER - Nom et prénom du Président]
               </p>
               <p>
-                <strong>Qualité :</strong> [À COMPLÉTER - Gérant / Président / etc.]
+                <strong>Qualité :</strong> Président de la SAS BoulevardTcg
               </p>
             </div>
           </section>
@@ -115,12 +118,21 @@ export function MentionsLegalesPage() {
             <h2>5. Activité</h2>
             <p>
               Boulevard TCG est une boutique en ligne spécialisée dans la vente de produits de
-              Trading Card Games (TCG), notamment :
+              Trading Card Games (TCG).
             </p>
+            <p>
+              <strong>Activités principales :</strong> Achat, vente, import, export, création et
+              distribution en physique, en ligne et à distance de cartes, jeux, figurines, produits
+              dérivés, contenus numériques et licences. Gestion de boutiques, événements, créations
+              visuelles et toutes activités commerciales connexes. Commerce de détail de jeux et de
+              jouets, en toutes matières et à distance.
+            </p>
+            <p>Nos produits comprennent notamment :</p>
             <ul>
               <li>Produits scellés (boosters, displays, ETB, coffrets)</li>
               <li>Cartes à l'unité (singles)</li>
               <li>Accessoires de jeu et de protection</li>
+              <li>Figurines et produits dérivés</li>
               <li>Produits en précommande</li>
             </ul>
             <p>

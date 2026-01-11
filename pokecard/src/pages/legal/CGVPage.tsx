@@ -203,37 +203,31 @@ export function CGVPage() {
 
             <div className={styles.infoBox}>
               <p>
-                <strong>Raison sociale :</strong> [À COMPLÉTER - BOULEVARD TCG]
+                <strong>Raison sociale :</strong> BoulevardTcg
               </p>
               <p>
-                <strong>Forme juridique :</strong> [À COMPLÉTER - SAS/SARL/Auto-entrepreneur]
+                <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
               </p>
               <p>
-                <strong>Capital social :</strong> [À COMPLÉTER] €
+                <strong>Capital social :</strong> 3 000,00 €
               </p>
               <p>
-                <strong>Siège social :</strong> [À COMPLÉTER - Adresse complète]
+                <strong>Siège social :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
               </p>
               <p>
-                <strong>RCS :</strong> [À COMPLÉTER - Ville + numéro]
+                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
               </p>
               <p>
-                <strong>SIRET :</strong> [À COMPLÉTER]
+                <strong>SIREN :</strong> 994 093 797
               </p>
               <p>
-                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER ou "Non assujetti"]
+                <strong>N° TVA intracommunautaire :</strong> [À COMPLÉTER]
               </p>
               <p>
                 <strong>Email :</strong> contact@boulevardtcg.com
               </p>
               <p>
-                <strong>Téléphone :</strong> [À COMPLÉTER]
-              </p>
-              <p>
                 <strong>Horaires SAV :</strong> Du lundi au vendredi, 9h-18h
-              </p>
-              <p>
-                <strong>Directeur de la publication :</strong> [À COMPLÉTER]
               </p>
             </div>
 
@@ -553,8 +547,9 @@ export function CGVPage() {
               <p>
                 <strong>Adresse de retour :</strong>
               </p>
-              <p>BOULEVARD TCG - Service Retours</p>
-              <p>[À COMPLÉTER - Adresse complète]</p>
+              <p>BoulevardTcg - Service Retours</p>
+              <p>6 Rue Talma</p>
+              <p>94400 Vitry-sur-Seine, France</p>
             </div>
             <p>
               Les frais de retour sont à la charge du Client, sauf en cas de produit défectueux ou
@@ -874,9 +869,9 @@ export function CGVPage() {
                 <hr />
                 <p>À l'attention de :</p>
                 <p>
-                  <strong>BOULEVARD TCG</strong>
+                  <strong>BoulevardTcg</strong>
                 </p>
-                <p>[Adresse complète]</p>
+                <p>6 Rue Talma, 94400 Vitry-sur-Seine</p>
                 <p>Email : contact@boulevardtcg.com</p>
                 <hr />
                 <p>

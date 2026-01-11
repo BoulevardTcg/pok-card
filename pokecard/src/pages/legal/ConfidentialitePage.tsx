@@ -50,16 +50,19 @@ export function ConfidentialitePage() {
             <h2>2. Responsable du traitement</h2>
             <div className={styles.infoBox}>
               <p>
-                <strong>Responsable :</strong> Boulevard TCG
+                <strong>Responsable :</strong> BoulevardTcg (SAS)
               </p>
               <p>
-                <strong>Adresse :</strong> [À COMPLÉTER]
+                <strong>Adresse :</strong> 6 Rue Talma, 94400 Vitry-sur-Seine, France
+              </p>
+              <p>
+                <strong>RCS :</strong> 994 093 797 R.C.S. Créteil
               </p>
               <p>
                 <strong>Email :</strong> contact@boulevardtcg.com
               </p>
               <p>
-                <strong>DPO (si applicable) :</strong> [À COMPLÉTER ou "Non désigné"]
+                <strong>DPO :</strong> Non désigné (entreprise de moins de 250 salariés)
               </p>
             </div>
           </section>
@@ -286,7 +289,7 @@ export function ConfidentialitePage() {
                 <strong>Par email :</strong> envoyez votre demande à contact@boulevardtcg.com
               </li>
               <li>
-                <strong>Par courrier :</strong> [À COMPLÉTER - Adresse postale]
+                <strong>Par courrier :</strong> BoulevardTcg, 6 Rue Talma, 94400 Vitry-sur-Seine
               </li>
             </ul>
             <p>
@@ -438,7 +441,7 @@ export function ConfidentialitePage() {
                 <strong>Objet :</strong> [RGPD] Votre demande
               </p>
               <p>
-                <strong>Adresse postale :</strong> [À COMPLÉTER]
+                <strong>Adresse postale :</strong> BoulevardTcg, 6 Rue Talma, 94400 Vitry-sur-Seine
               </p>
             </div>
           </section>
