@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
+import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import { getProductType, productTypeLabels } from '../../utils/filters';
 import styles from './ProductListItem.module.css';
@@ -10,20 +11,7 @@ import styles from './ProductListItem.module.css';
 interface ProductListItemProps {
   product: Product;
   index?: number;
-}
-
-// Fonction pour vérifier si un produit est nouveau (moins de 30 jours)
-function isNewProduct(product: Product): boolean {
-  if (!product.createdAt) return false;
-  const createdDate = new Date(product.createdAt);
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  return createdDate > thirtyDaysAgo;
-}
-
-// Fonction pour vérifier si un produit est phare
-function isFeaturedProduct(product: Product): boolean {
-  return (product.minPriceCents && product.minPriceCents > 5000) || isNewProduct(product);
+  showNewBadge?: boolean;
 }
 
 // Fonction pour obtenir le statut du stock
@@ -39,7 +27,7 @@ function getStockStatus(product: Product): {
   const totalStock = product.variants.reduce((sum, variant) => sum + variant.stock, 0);
 
   if (product.outOfStock || totalStock === 0) {
-    return { status: 'out-of-stock', label: 'Épuisé', totalStock: 0 };
+    return { status: 'out-of-stock', label: 'Bientôt disponible', totalStock: 0 };
   }
 
   if (totalStock < 10) {
@@ -60,12 +48,16 @@ function getProductLanguage(product: Product): string {
   return firstVariant.language || 'N/A';
 }
 
-export default function ProductListItem({ product, index = 0 }: ProductListItemProps) {
+export default function ProductListItem({
+  product,
+  index = 0,
+  showNewBadge = false,
+}: ProductListItemProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { isAuthenticated } = useAuth();
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -122,26 +114,9 @@ export default function ProductListItem({ product, index = 0 }: ProductListItemP
     }
   };
 
-  const handleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!isAuthenticated) {
-      navigate('/login', {
-        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
-      });
-      return;
-    }
-
-    setIsWishlisted(!isWishlisted);
-  };
-
   const stockStatus = getStockStatus(product);
   const productType = getProductType(product);
   const language = getProductLanguage(product);
-  const isNew = isNewProduct(product);
-  const isFeatured = isFeaturedProduct(product);
-  const badge = isNew ? 'Nouveauté' : isFeatured ? 'Produit phare' : null;
 
   const productImage =
     product.images && product.images.length > 0
@@ -166,33 +141,52 @@ export default function ProductListItem({ product, index = 0 }: ProductListItemP
         ) : (
           <div className={styles.placeholderImage}>
             <svg
-              width="40"
-              height="40"
-              viewBox="0 0 64 64"
+              className={styles.placeholderLogo}
+              width="60"
+              height="60"
+              viewBox="0 0 200 200"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <rect
-                x="4"
-                y="8"
-                width="56"
-                height="48"
-                rx="4"
-                fill="#d1d5db"
-                stroke="#9ca3af"
-                strokeWidth="2"
+              <defs>
+                <linearGradient id="phoenixGradientList" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
+                  <stop offset="50%" stopColor="#d4af37" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M100 40 L85 80 L70 100 L85 110 L100 120 L115 110 L130 100 L115 80 Z"
+                fill="url(#phoenixGradientList)"
+                opacity="0.6"
               />
-              <circle cx="20" cy="24" r="3" fill="#9ca3af" />
-              <circle cx="32" cy="24" r="3" fill="#9ca3af" />
-              <circle cx="44" cy="24" r="3" fill="#9ca3af" />
+              <path
+                d="M70 100 L40 90 L30 95 L25 100 L30 105 L40 110 L55 108 L70 105 Z"
+                fill="url(#phoenixGradientList)"
+                opacity="0.5"
+              />
+              <path
+                d="M130 100 L160 90 L170 95 L175 100 L170 105 L160 110 L145 108 L130 105 Z"
+                fill="url(#phoenixGradientList)"
+                opacity="0.5"
+              />
+              <path
+                d="M100 120 L95 140 L90 155 L100 160 L110 155 L105 140 Z"
+                fill="url(#phoenixGradientList)"
+                opacity="0.4"
+              />
+              <ellipse
+                cx="100"
+                cy="50"
+                rx="15"
+                ry="18"
+                fill="url(#phoenixGradientList)"
+                opacity="0.5"
+              />
             </svg>
           </div>
         )}
-        {badge && (
-          <span className={`${styles.badge} ${isNew ? styles.badgeNew : styles.badgeFeatured}`}>
-            {badge}
-          </span>
-        )}
+        {showNewBadge && <span className={`${styles.badge} ${styles.badgeNew}`}>Nouveau</span>}
       </div>
 
       {/* Infos produit */}
@@ -218,27 +212,39 @@ export default function ProductListItem({ product, index = 0 }: ProductListItemP
 
       {/* Actions */}
       <div className={styles.actionsSection}>
-        {stockStatus.status === 'coming-soon' ? (
-          <button className={styles.notifyButton} onClick={handleCardClick}>
-            Me notifier
+        {stockStatus.status === 'coming-soon' || stockStatus.status === 'out-of-stock' ? (
+          <button
+            className={styles.notifyButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              setNotifyModalOpen(true);
+            }}
+          >
+            Me prévenir
           </button>
         ) : (
           <button
             className={`${styles.addToCartButton} ${isAddingToCart ? styles.adding : ''}`}
             onClick={handleAddToCart}
-            disabled={stockStatus.status === 'out-of-stock' || isAddingToCart}
+            disabled={isAddingToCart}
           >
             {isAddingToCart ? 'Ajout...' : 'Ajouter au panier'}
           </button>
         )}
-        <button
-          className={`${styles.wishlistButton} ${isWishlisted ? styles.wishlisted : ''}`}
-          onClick={handleWishlist}
-          aria-label={isWishlisted ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-        >
-          {isWishlisted ? '❤️' : '🤍'}
-        </button>
+        <div className={styles.trustInfo}>
+          <span>Authenticité garantie</span>
+          <span className={styles.separator}>•</span>
+          <span>Paiement sécurisé</span>
+        </div>
       </div>
+
+      {/* Notify Modal */}
+      <NotifyModal
+        isOpen={notifyModalOpen}
+        onClose={() => setNotifyModalOpen(false)}
+        productId={product.id}
+        productName={product.name}
+      />
     </article>
   );
 }

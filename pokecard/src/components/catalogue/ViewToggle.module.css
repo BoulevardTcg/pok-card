@@ -1,10 +1,11 @@
 /* ===================================================================
-   VIEW TOGGLE — Sélecteur de mode d'affichage
+   VIEW TOGGLE — Sélecteur de mode d'affichage dark premium
    =================================================================== */
 
 .viewToggle {
   display: inline-flex;
-  background: #f3f4f6;
+  background: var(--color-bg-elevated, #141416);
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
   border-radius: 8px;
   padding: 4px;
 }
@@ -17,7 +18,7 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: #6b7280;
+  color: var(--color-text-muted, #6b6b6f);
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
   font-weight: 500;
@@ -27,19 +28,19 @@
 }
 
 .toggleButton:hover:not(.active) {
-  color: #374151;
-  background: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-secondary, #a1a1a6);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .toggleButton:focus-visible {
-  outline: 2px solid #0066ff;
+  outline: 2px solid var(--color-accent-secondary, #d4af37);
   outline-offset: 2px;
 }
 
 .toggleButton.active {
-  background: white;
-  color: #0066ff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-subtle, #1a1a1d);
+  color: var(--color-accent-secondary, #d4af37);
+  border: 1px solid var(--color-accent-secondary, rgba(212, 175, 55, 0.3));
 }
 
 .toggleButton svg {

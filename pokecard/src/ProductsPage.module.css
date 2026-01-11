@@ -22,6 +22,10 @@
   margin-bottom: var(--space-6, 1.5rem);
 }
 
+.titleContainer {
+  text-align: center;
+}
+
 .title {
   font-family: var(--font-display);
   font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
