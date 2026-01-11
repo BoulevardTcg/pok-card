@@ -39,6 +39,8 @@ import { AdminReportsPage } from './pages/admin/AdminReportsPage';
 import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
 import { AdminPromoFormPage } from './pages/admin/AdminPromoFormPage';
 import { CGVPage } from './pages/legal/CGVPage';
+import { MentionsLegalesPage } from './pages/legal/MentionsLegalesPage';
+import { ConfidentialitePage } from './pages/legal/ConfidentialitePage';
 
 // Composant principal de l'application
 function AppContent() {
@@ -86,6 +88,8 @@ function AppContent() {
 
           {/* Routes légales */}
           <Route path="/cgv" element={<CGVPage />} />
+          <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+          <Route path="/confidentialite" element={<ConfidentialitePage />} />
 
           {/* Routes d'authentification */}
           <Route path="/login" element={<LoginPage />} />
