@@ -45,6 +45,7 @@
     "nodemailer": "^7.0.11",
     "otpauth": "^9.4.1",
     "qrcode": "^1.5.4",
+    "resend": "^6.7.0",
     "stripe": "^14.24.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
