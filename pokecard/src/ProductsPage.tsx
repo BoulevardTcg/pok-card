@@ -14,12 +14,18 @@ import {
   filterByGameCategories,
   filterByProductTypes,
   filterByAvailability,
+  filterByPriceRange,
+  filterByLanguages,
   parseCategoriesFromString,
   parseTypesFromString,
   parseAvailabilityFromString,
+  parsePriceRangeFromString,
+  parseLanguagesFromString,
   categoriesToString,
   typesToString,
   availabilityToString,
+  priceRangeToString,
+  languagesToString,
 } from './utils/filters';
 
 // Fonction pour vérifier si un produit est nouveau (moins de 30 jours)
@@ -31,6 +37,22 @@ function isNewProduct(product: ProductType): boolean {
   return createdDate > thirtyDaysAgo;
 }
 
+// Fonction pour vérifier si un produit est en stock
+function isInStock(product: ProductType): boolean {
+  if (product.outOfStock) return false;
+  if (!product.variants || product.variants.length === 0) return false;
+  return product.variants.some((v) => v.stock > 0);
+}
+
+// Fonction pour vérifier si un produit a une vraie image (pas placeholder)
+function hasRealImage(product: ProductType): boolean {
+  const placeholderUrl = '/img/products/placeholder.png';
+  const imageUrl = product.images?.[0]?.url || product.image?.url;
+  if (!imageUrl) return false;
+  // Vérifier que ce n'est pas le placeholder
+  return !imageUrl.includes('placeholder.png') && imageUrl !== placeholderUrl;
+}
+
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [allProducts, setAllProducts] = useState<ProductType[]>([]);
@@ -40,7 +62,7 @@ export function ProductsPage() {
   const productsPerPage = 12;
 
   // Récupération des filtres depuis les query params avec valeurs par défaut
-  const sortBy = searchParams.get('sort') || 'newest';
+  const sortBy = searchParams.get('sort') || 'relevance';
   const selectedGameCategories = useMemo(
     () => parseCategoriesFromString(searchParams.get('categories')),
     [searchParams]
@@ -51,6 +73,17 @@ export function ProductsPage() {
   );
   const selectedAvailability = useMemo(
     () => parseAvailabilityFromString(searchParams.get('availability')),
+    [searchParams]
+  );
+
+  // Récupération des filtres Prix et Langue depuis les query params
+  const selectedPriceRange = useMemo(() => {
+    const priceRangeStr = searchParams.get('price');
+    return parsePriceRangeFromString(priceRangeStr);
+  }, [searchParams]);
+
+  const selectedLanguages = useMemo(
+    () => parseLanguagesFromString(searchParams.get('languages')),
     [searchParams]
   );
 
@@ -99,6 +132,20 @@ export function ProductsPage() {
       filtered = filterByAvailability(filtered, selectedAvailability);
     }
 
+    // Filtre par prix
+    if (selectedPriceRange.min !== null || selectedPriceRange.max !== null) {
+      filtered = filterByPriceRange(
+        filtered,
+        selectedPriceRange.min,
+        selectedPriceRange.max
+      );
+    }
+
+    // Filtre par langue
+    if (selectedLanguages.length > 0) {
+      filtered = filterByLanguages(filtered, selectedLanguages);
+    }
+
     // Filtre par onglet actif
     if (activeTab === 'Nouveauté') {
       filtered = filtered.filter((p) => isNewProduct(p));
@@ -114,6 +161,30 @@ export function ProductsPage() {
 
     // Appliquer le tri
     switch (sortBy) {
+      case 'relevance':
+        // Tri par pertinence : en stock d'abord, puis avec vraie image
+        filtered.sort((a, b) => {
+          const aInStock = isInStock(a);
+          const bInStock = isInStock(b);
+          const aHasImage = hasRealImage(a);
+          const bHasImage = hasRealImage(b);
+
+          // Priorité 1 : En stock vs non en stock
+          if (aInStock !== bInStock) {
+            return aInStock ? -1 : 1; // En stock en premier
+          }
+
+          // Priorité 2 : Avec vraie image vs sans vraie image
+          if (aHasImage !== bHasImage) {
+            return aHasImage ? -1 : 1; // Avec image en premier
+          }
+
+          // Si même niveau de pertinence, trier par date (plus récent en premier)
+          return (
+            new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+          );
+        });
+        break;
       case 'price-asc':
         filtered.sort((a, b) => (a.minPriceCents || 0) - (b.minPriceCents || 0));
         break;
@@ -127,10 +198,25 @@ export function ProductsPage() {
         break;
       case 'popular':
       default:
-        // Tri par défaut : plus récent
-        filtered.sort(
-          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
-        );
+        // Tri par défaut : pertinence
+        filtered.sort((a, b) => {
+          const aInStock = isInStock(a);
+          const bInStock = isInStock(b);
+          const aHasImage = hasRealImage(a);
+          const bHasImage = hasRealImage(b);
+
+          if (aInStock !== bInStock) {
+            return aInStock ? -1 : 1;
+          }
+
+          if (aHasImage !== bHasImage) {
+            return aHasImage ? -1 : 1;
+          }
+
+          return (
+            new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+          );
+        });
         break;
     }
 
@@ -140,6 +226,9 @@ export function ProductsPage() {
     selectedGameCategories,
     selectedProductTypes,
     selectedAvailability,
+    selectedPriceRange.min,
+    selectedPriceRange.max,
+    selectedLanguages,
     sortBy,
     catalogSearchQuery,
     activeTab,
@@ -178,6 +267,8 @@ export function ProductsPage() {
     selectedGameCategories,
     selectedProductTypes,
     selectedAvailability,
+    selectedPriceRange,
+    selectedLanguages,
     sortBy,
     catalogSearchQuery,
     activeTab,
@@ -265,9 +356,23 @@ export function ProductsPage() {
     setSearchParams(newParams, { replace: true });
   };
 
-  const handleSortChange = (sort: string) => {
+  const handlePriceRangeChange = (range: { min: number | null; max: number | null }) => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('sort', sort);
+    if (range.min !== null || range.max !== null) {
+      newParams.set('price', priceRangeToString(range.min, range.max));
+    } else {
+      newParams.delete('price');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleLanguagesChange = (languages: string[]) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (languages.length > 0) {
+      newParams.set('languages', languagesToString(languages));
+    } else {
+      newParams.delete('languages');
+    }
     setSearchParams(newParams, { replace: true });
   };
 
@@ -282,6 +387,8 @@ export function ProductsPage() {
     newParams.delete('categories');
     newParams.delete('types');
     newParams.delete('availability');
+    newParams.delete('price');
+    newParams.delete('languages');
     setSearchParams(newParams, { replace: true });
     setActiveTab('Tous');
   };
@@ -310,8 +417,10 @@ export function ProductsPage() {
             onProductTypesChange={handleProductTypesChange}
             selectedAvailability={selectedAvailability}
             onAvailabilityChange={handleAvailabilityChange}
-            sortBy={sortBy}
-            onSortChange={handleSortChange}
+            selectedPriceRange={selectedPriceRange}
+            onPriceRangeChange={handlePriceRangeChange}
+            selectedLanguages={selectedLanguages}
+            onLanguagesChange={handleLanguagesChange}
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onResetFilters={handleResetFilters}

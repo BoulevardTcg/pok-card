@@ -125,6 +125,7 @@ export default function ProductGrid({
               }}
               className={styles.sortSelect}
             >
+              <option value="relevance">Pertinence</option>
               <option value="newest">Plus récent</option>
               <option value="price-asc">Prix : croissant</option>
               <option value="price-desc">Prix : décroissant</option>

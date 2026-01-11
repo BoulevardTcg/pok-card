@@ -215,3 +215,105 @@ export function parseAvailabilityFromString(availabilityStr: string | null): Ava
 export function availabilityToString(availability: Availability[]): string {
   return availability.join(',');
 }
+
+/**
+ * Filtre les produits selon une plage de prix (en centimes)
+ */
+export function filterByPriceRange(
+  products: Product[],
+  minPriceCents: number | null,
+  maxPriceCents: number | null
+): Product[] {
+  if (minPriceCents === null && maxPriceCents === null) {
+    return products;
+  }
+
+  return products.filter((product) => {
+    const productPrice = product.minPriceCents;
+    // Si le produit n'a pas de prix, on l'exclut du filtre
+    if (productPrice === null || productPrice === undefined) return false;
+
+    // Vérifier le minimum
+    if (minPriceCents !== null && productPrice < minPriceCents) {
+      return false;
+    }
+    
+    // Vérifier le maximum (si défini)
+    if (maxPriceCents !== null && productPrice > maxPriceCents) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Filtre les produits selon les langues sélectionnées
+ */
+export function filterByLanguages(products: Product[], selectedLanguages: string[]): Product[] {
+  if (selectedLanguages.length === 0) {
+    return products;
+  }
+
+  return products.filter((product) => {
+    if (!product.variants || product.variants.length === 0) return false;
+    return product.variants.some((variant) => {
+      const variantLang = (variant.language || '').toLowerCase().trim();
+      return selectedLanguages.some((lang) => {
+        const langLower = lang.toLowerCase().trim();
+        // Mapping des codes de langue
+        if (langLower === 'fr') {
+          return variantLang === 'fr' || variantLang === 'français' || variantLang === 'french' || variantLang === 'francais';
+        }
+        if (langLower === 'en') {
+          return variantLang === 'en' || variantLang === 'anglais' || variantLang === 'english';
+        }
+        if (langLower === 'jp') {
+          return variantLang === 'jp' || variantLang === 'japonais' || variantLang === 'japanese';
+        }
+        return variantLang === langLower;
+      });
+    });
+  });
+}
+
+/**
+ * Parse une plage de prix depuis une string (query param) "min-max"
+ */
+export function parsePriceRangeFromString(priceRangeStr: string | null): {
+  min: number | null;
+  max: number | null;
+} {
+  if (!priceRangeStr) return { min: null, max: null };
+  const parts = priceRangeStr.split('-');
+  if (parts.length !== 2) return { min: null, max: null };
+  const min = parseInt(parts[0], 10);
+  const max = parseInt(parts[1], 10);
+  if (isNaN(min) || isNaN(max)) return { min: null, max: null };
+  return { min: min * 100, max: max * 100 }; // Convertir en centimes
+}
+
+/**
+ * Convertit une plage de prix en string pour l'URL "min-max" (en euros)
+ */
+export function priceRangeToString(minPriceCents: number | null, maxPriceCents: number | null): string {
+  if (minPriceCents === null && maxPriceCents === null) return '';
+  const min = minPriceCents !== null ? Math.floor(minPriceCents / 100) : 0;
+  const max = maxPriceCents !== null ? Math.floor(maxPriceCents / 100) : 500;
+  return `${min}-${max}`;
+}
+
+/**
+ * Parse les langues depuis une string (query param)
+ */
+export function parseLanguagesFromString(languagesStr: string | null): string[] {
+  if (!languagesStr) return [];
+  return languagesStr.split(',');
+}
+
+/**
+ * Convertit un tableau de langues en string pour l'URL
+ */
+export function languagesToString(languages: string[]): string {
+  return languages.join(',');
+}
