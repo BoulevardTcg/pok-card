@@ -17,6 +17,12 @@ export enum ProductType {
   OTHER = 'other',
 }
 
+// Enum pour la disponibilité
+export enum Availability {
+  IN_STOCK = 'in-stock',
+  OUT_OF_STOCK = 'out-of-stock',
+}
+
 // Mapping pour l'affichage des catégories
 export const categoryLabels: Record<GameCategory, string> = {
   [GameCategory.POKEMON]: 'Pokémon',
@@ -32,6 +38,12 @@ export const productTypeLabels: Record<ProductType, string> = {
   [ProductType.UPC]: 'UPC',
   [ProductType.COFFRET]: 'Coffret',
   [ProductType.OTHER]: 'Autre',
+};
+
+// Mapping pour l'affichage de la disponibilité
+export const availabilityLabels: Record<Availability, string> = {
+  [Availability.IN_STOCK]: 'En stock',
+  [Availability.OUT_OF_STOCK]: 'Épuisé',
 };
 
 /**
@@ -160,4 +172,46 @@ export function categoriesToString(categories: GameCategory[]): string {
  */
 export function typesToString(types: ProductType[]): string {
   return types.join(',');
+}
+
+/**
+ * Filtre les produits selon la disponibilité sélectionnée
+ */
+export function filterByAvailability(
+  products: Product[],
+  selectedAvailability: Availability[]
+): Product[] {
+  if (selectedAvailability.length === 0) {
+    return products;
+  }
+
+  return products.filter((product) => {
+    const isInStock = !product.outOfStock && product.variants.some((v) => v.stock > 0);
+
+    if (selectedAvailability.includes(Availability.IN_STOCK) && isInStock) {
+      return true;
+    }
+    if (selectedAvailability.includes(Availability.OUT_OF_STOCK) && !isInStock) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+/**
+ * Parse la disponibilité depuis une string (query param)
+ */
+export function parseAvailabilityFromString(availabilityStr: string | null): Availability[] {
+  if (!availabilityStr) return [];
+  return availabilityStr.split(',').filter((a): a is Availability => {
+    return Object.values(Availability).includes(a as Availability);
+  });
+}
+
+/**
+ * Convertit un tableau de disponibilités en string pour l'URL
+ */
+export function availabilityToString(availability: Availability[]): string {
+  return availability.join(',');
 }

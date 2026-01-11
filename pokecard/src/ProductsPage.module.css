@@ -19,7 +19,7 @@
    ───────────────────────────────────────────────────────────────── */
 
 .header {
-  margin-bottom: var(--space-12, 3rem);
+  margin-bottom: var(--space-6, 1.5rem);
 }
 
 .title {

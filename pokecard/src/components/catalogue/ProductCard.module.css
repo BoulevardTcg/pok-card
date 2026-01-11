@@ -38,7 +38,7 @@
 
 @media (max-width: 767px) {
   .imageContainer {
-    height: 200px;
+    height: 140px;
   }
 }
 
@@ -225,7 +225,9 @@
 
 @media (max-width: 767px) {
   .productTitle {
-    font-size: 14px;
+    font-size: 13px;
+    -webkit-line-clamp: 2;
+    margin-bottom: 4px;
   }
 }
 
@@ -263,7 +265,7 @@
 
 @media (max-width: 767px) {
   .price {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 
@@ -416,21 +418,64 @@
 }
 
 @media (max-width: 767px) {
+  .card {
+    border-radius: 8px;
+  }
+
+  .imageContainer {
+    border-radius: 8px 8px 0 0;
+  }
+
   .productInfo {
-    padding: 12px;
+    padding: 8px;
+  }
+
+  .categoryLabel {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .productMeta {
+    gap: 4px;
+  }
+
+  .metaItem {
+    font-size: 11px;
   }
 
   .priceSection {
-    padding: 0 12px 8px;
+    padding: 0 8px 6px;
+  }
+
+  .stockStatus {
+    font-size: 11px;
   }
 
   .actions {
-    padding: 8px 12px 12px;
+    padding: 6px 8px 8px;
   }
 
   .addToCartButton,
   .notifyButton {
-    height: 40px;
-    font-size: 13px;
+    height: 36px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .badge {
+    top: 6px;
+    left: 6px;
+    padding: 4px 8px;
+    font-size: 9px;
+    border-radius: 4px;
+    max-width: 60%;
+  }
+
+  .wishlistButton {
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 }

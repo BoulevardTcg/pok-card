@@ -3,13 +3,13 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
-import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import { getProductType, productTypeLabels } from '../../utils/filters';
-import styles from './ProductCard.module.css';
+import styles from './ProductListItem.module.css';
 
-interface ProductCardProps {
+interface ProductListItemProps {
   product: Product;
+  index?: number;
 }
 
 // Fonction pour vérifier si un produit est nouveau (moins de 30 jours)
@@ -21,9 +21,8 @@ function isNewProduct(product: Product): boolean {
   return createdDate > thirtyDaysAgo;
 }
 
-// Fonction pour vérifier si un produit est phare (logique basée sur prix ou date)
+// Fonction pour vérifier si un produit est phare
 function isFeaturedProduct(product: Product): boolean {
-  // Produit phare si prix élevé ou très récent
   return (product.minPriceCents && product.minPriceCents > 5000) || isNewProduct(product);
 }
 
@@ -57,24 +56,21 @@ function getStockStatus(product: Product): {
 // Fonction pour obtenir la langue du produit
 function getProductLanguage(product: Product): string {
   if (!product.variants || product.variants.length === 0) return 'N/A';
-
-  // Prendre la langue de la première variante disponible
   const firstVariant = product.variants.find((v) => v.language) || product.variants[0];
   return firstVariant.language || 'N/A';
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductListItem({ product, index = 0 }: ProductListItemProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { isAuthenticated } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
     const euros = (cents / 100).toFixed(2);
-    return euros.replace('.', ',') + '€';
+    return euros.replace('.', ',');
   };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -83,7 +79,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     if (isAddingToCart) return;
 
-    // Vérifier l'authentification
     if (!isAuthenticated) {
       navigate('/login', {
         state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
@@ -103,20 +98,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     if (product.variants && product.variants.length > 0) {
       setIsAddingToCart(true);
-
-      // Sélectionner la première variante disponible (avec stock > 0)
       const availableVariant = product.variants.find((v) => v.stock > 0);
 
       if (availableVariant) {
         addToCart(availableVariant, product);
-
-        // Animation de retour après ajout
         setTimeout(() => {
           setIsAddingToCart(false);
         }, 300);
       } else {
         setIsAddingToCart(false);
-        // Si aucune variante n'a de stock, rediriger vers la page de détail
         if (product.slug) {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           navigate(`/produit/${product.slug}`);
@@ -126,15 +116,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleCardClick = () => {
-    if (product.slug) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      navigate(`/produit/${product.slug}`);
-    }
-  };
-
-  const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (product.slug) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       navigate(`/produit/${product.slug}`);
@@ -153,7 +134,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     setIsWishlisted(!isWishlisted);
-    // TODO: Implémenter l'ajout/retrait des favoris avec l'API
   };
 
   const stockStatus = getStockStatus(product);
@@ -161,8 +141,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   const language = getProductLanguage(product);
   const isNew = isNewProduct(product);
   const isFeatured = isFeaturedProduct(product);
-
-  // Déterminer quel badge afficher (priorité: Nouveauté > Produit phare)
   const badge = isNew ? 'Nouveauté' : isFeatured ? 'Produit phare' : null;
 
   const productImage =
@@ -171,71 +149,88 @@ export default function ProductCard({ product }: ProductCardProps) {
       : product.image?.url || null;
 
   return (
-    <div
-      className={`${styles.card} ${stockStatus.status === 'out-of-stock' ? styles.outOfStock : ''}`}
+    <article
+      className={`${styles.listItem} ${stockStatus.status === 'out-of-stock' ? styles.outOfStock : ''}`}
       onClick={handleCardClick}
+      style={{ animationDelay: `${index * 0.05}s` }}
     >
-      {/* Image Container */}
-      <div className={styles.imageContainer}>
+      {/* Image */}
+      <div className={styles.imageWrapper}>
         {productImage ? (
           <img
             src={getImageUrl(productImage)}
             alt={product.image?.altText || product.name}
             className={styles.productImage}
-            onError={(e) => {
-              // En cas d'erreur de chargement, afficher le placeholder
-              e.currentTarget.style.display = 'none';
-              const container = e.currentTarget.parentElement;
-              if (container) {
-                const placeholder = container.querySelector(`.${styles.placeholderImage}`);
-                if (placeholder) {
-                  (placeholder as HTMLElement).style.display = 'flex';
-                }
-              }
-            }}
+            loading="lazy"
           />
-        ) : null}
-
-        {/* Placeholder si pas d'image */}
-        <div
-          className={styles.placeholderImage}
-          style={{ display: productImage ? 'none' : 'flex' }}
-        >
-          <svg
-            className={styles.tcgIcon}
-            width="64"
-            height="64"
-            viewBox="0 0 64 64"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="4"
-              y="8"
-              width="56"
-              height="48"
-              rx="4"
-              fill="#d1d5db"
-              stroke="#9ca3af"
-              strokeWidth="2"
-            />
-            <circle cx="20" cy="24" r="3" fill="#9ca3af" />
-            <circle cx="32" cy="24" r="3" fill="#9ca3af" />
-            <circle cx="44" cy="24" r="3" fill="#9ca3af" />
-            <rect x="12" y="32" width="40" height="8" rx="2" fill="#9ca3af" />
-            <rect x="12" y="44" width="24" height="8" rx="2" fill="#9ca3af" />
-          </svg>
-          <p>Image à venir</p>
-        </div>
-
-        {/* Badge Nouveauté/Phare */}
-        {badge && (
-          <div className={`${styles.badge} ${isNew ? styles.badgeNew : styles.badgeFeatured}`}>
-            {badge}
+        ) : (
+          <div className={styles.placeholderImage}>
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 64 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="4"
+                y="8"
+                width="56"
+                height="48"
+                rx="4"
+                fill="#d1d5db"
+                stroke="#9ca3af"
+                strokeWidth="2"
+              />
+              <circle cx="20" cy="24" r="3" fill="#9ca3af" />
+              <circle cx="32" cy="24" r="3" fill="#9ca3af" />
+              <circle cx="44" cy="24" r="3" fill="#9ca3af" />
+            </svg>
           </div>
         )}
+        {badge && (
+          <span className={`${styles.badge} ${isNew ? styles.badgeNew : styles.badgeFeatured}`}>
+            {badge}
+          </span>
+        )}
+      </div>
 
-        {/* Wishlist Button (top-right) */}
+      {/* Infos produit */}
+      <div className={styles.productInfo}>
+        <div className={styles.topRow}>
+          <span className={styles.categoryBadge}>{product.category}</span>
+        </div>
+        <h3 className={styles.productName}>{product.name}</h3>
+        <div className={styles.metaRow}>
+          <span className={styles.metaItem}>{productTypeLabels[productType]}</span>
+          <span className={styles.metaItem}>{language}</span>
+        </div>
+        {product.description && <p className={styles.description}>{product.description}</p>}
+      </div>
+
+      {/* Prix */}
+      <div className={styles.priceSection}>
+        <span className={styles.price}>{formatPrice(product.minPriceCents)} €</span>
+        <span className={`${styles.stockStatus} ${styles[stockStatus.status]}`}>
+          {stockStatus.label}
+        </span>
+      </div>
+
+      {/* Actions */}
+      <div className={styles.actionsSection}>
+        {stockStatus.status === 'coming-soon' ? (
+          <button className={styles.notifyButton} onClick={handleCardClick}>
+            Me notifier
+          </button>
+        ) : (
+          <button
+            className={`${styles.addToCartButton} ${isAddingToCart ? styles.adding : ''}`}
+            onClick={handleAddToCart}
+            disabled={stockStatus.status === 'out-of-stock' || isAddingToCart}
+          >
+            {isAddingToCart ? 'Ajout...' : 'Ajouter au panier'}
+          </button>
+        )}
         <button
           className={`${styles.wishlistButton} ${isWishlisted ? styles.wishlisted : ''}`}
           onClick={handleWishlist}
@@ -243,66 +238,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           {isWishlisted ? '❤️' : '🤍'}
         </button>
-
-        {/* Quick View Button (hover only) */}
-        <button
-          className={styles.quickViewButton}
-          onClick={handleQuickView}
-          aria-label="Aperçu rapide"
-        >
-          👁 Aperçu rapide
-        </button>
       </div>
-
-      {/* Product Info */}
-      <div className={styles.productInfo}>
-        <div className={styles.categoryLabel}>{product.category}</div>
-        <h3 className={styles.productTitle}>{product.name}</h3>
-        <div className={styles.productMeta}>
-          <span className={styles.metaItem}>{productTypeLabels[productType]}</span>
-          <span className={styles.metaItem}>{language}</span>
-        </div>
-      </div>
-
-      {/* Price Section */}
-      <div className={styles.priceSection}>
-        <div className={styles.price}>{formatPrice(product.minPriceCents)}</div>
-        <div className={`${styles.stockStatus} ${styles[stockStatus.status]}`}>
-          {stockStatus.label}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className={styles.actions}>
-        {stockStatus.status === 'coming-soon' || stockStatus.status === 'out-of-stock' ? (
-          <button
-            className={styles.notifyButton}
-            onClick={(e) => {
-              e.stopPropagation();
-              setNotifyModalOpen(true);
-            }}
-          >
-            Me prévenir
-          </button>
-        ) : (
-          <button
-            className={`${styles.addToCartButton} ${isAddingToCart ? styles.adding : ''}`}
-            onClick={handleAddToCart}
-            disabled={stockStatus.status === 'out-of-stock' || isAddingToCart}
-            aria-label={`Ajouter ${product.name} au panier`}
-          >
-            {isAddingToCart ? 'Ajout...' : 'Ajouter au panier'}
-          </button>
-        )}
-      </div>
-
-      {/* Notify Modal */}
-      <NotifyModal
-        isOpen={notifyModalOpen}
-        onClose={() => setNotifyModalOpen(false)}
-        productId={product.id}
-        productName={product.name}
-      />
-    </div>
+    </article>
   );
 }

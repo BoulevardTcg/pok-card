@@ -5,15 +5,21 @@ import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
 import FilterBar from './components/catalogue/FilterBar';
 import ProductGrid from './components/catalogue/ProductGrid';
+import Breadcrumb from './components/Breadcrumb';
+import { useViewPreference } from './hooks/useViewPreference';
 import {
   GameCategory,
   ProductType as ProductTypeEnum,
+  Availability,
   filterByGameCategories,
   filterByProductTypes,
+  filterByAvailability,
   parseCategoriesFromString,
   parseTypesFromString,
+  parseAvailabilityFromString,
   categoriesToString,
   typesToString,
+  availabilityToString,
 } from './utils/filters';
 
 // Fonction pour vérifier si un produit est nouveau (moins de 30 jours)
@@ -34,13 +40,17 @@ export function ProductsPage() {
   const productsPerPage = 12;
 
   // Récupération des filtres depuis les query params avec valeurs par défaut
-  const sortBy = searchParams.get('sort') || 'popular';
+  const sortBy = searchParams.get('sort') || 'newest';
   const selectedGameCategories = useMemo(
     () => parseCategoriesFromString(searchParams.get('categories')),
     [searchParams]
   );
   const selectedProductTypes = useMemo(
     () => parseTypesFromString(searchParams.get('types')),
+    [searchParams]
+  );
+  const selectedAvailability = useMemo(
+    () => parseAvailabilityFromString(searchParams.get('availability')),
     [searchParams]
   );
 
@@ -54,9 +64,7 @@ export function ProductsPage() {
   });
 
   const [activeTab, setActiveTab] = useState<'Tous' | 'Produits phares' | 'Nouveauté'>('Tous');
-  const [viewMode, setViewMode] = useState<'grid-2x2' | 'grid-3col' | 'list' | 'list-compact'>(
-    'grid-2x2'
-  );
+  const [viewMode, setViewMode] = useViewPreference('grid');
 
   // Filtrer et trier les produits selon les critères
   const filteredProducts = useMemo(() => {
@@ -84,6 +92,11 @@ export function ProductsPage() {
     // Si plusieurs types sélectionnés, produit doit correspondre à l'un d'eux
     if (selectedProductTypes.length > 0) {
       filtered = filterByProductTypes(filtered, selectedProductTypes);
+    }
+
+    // Filtre par disponibilité
+    if (selectedAvailability.length > 0) {
+      filtered = filterByAvailability(filtered, selectedAvailability);
     }
 
     // Filtre par onglet actif
@@ -114,8 +127,7 @@ export function ProductsPage() {
         break;
       case 'popular':
       default:
-        // Tri par popularité : on peut utiliser la date de création (plus récent = plus populaire)
-        // ou toute autre logique de votre choix
+        // Tri par défaut : plus récent
         filtered.sort(
           (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
         );
@@ -127,6 +139,7 @@ export function ProductsPage() {
     allProducts,
     selectedGameCategories,
     selectedProductTypes,
+    selectedAvailability,
     sortBy,
     catalogSearchQuery,
     activeTab,
@@ -161,7 +174,14 @@ export function ProductsPage() {
   // Réinitialiser la page quand les filtres, le tri ou la recherche changent
   useEffect(() => {
     setPage(1);
-  }, [selectedGameCategories, selectedProductTypes, sortBy, catalogSearchQuery, activeTab]);
+  }, [
+    selectedGameCategories,
+    selectedProductTypes,
+    selectedAvailability,
+    sortBy,
+    catalogSearchQuery,
+    activeTab,
+  ]);
 
   async function loadAllProducts() {
     setLoading(true);
@@ -235,6 +255,16 @@ export function ProductsPage() {
     setSearchParams(newParams, { replace: true });
   };
 
+  const handleAvailabilityChange = (availability: Availability[]) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (availability.length > 0) {
+      newParams.set('availability', availabilityToString(availability));
+    } else {
+      newParams.delete('availability');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
   const handleSortChange = (sort: string) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('sort', sort);
@@ -251,6 +281,7 @@ export function ProductsPage() {
     newParams.delete('search');
     newParams.delete('categories');
     newParams.delete('types');
+    newParams.delete('availability');
     setSearchParams(newParams, { replace: true });
     setActiveTab('Tous');
   };
@@ -265,6 +296,9 @@ export function ProductsPage() {
           </div>
         </div>
 
+        {/* Breadcrumb */}
+        <Breadcrumb items={[{ label: 'Accueil', path: '/' }, { label: 'Boutique' }]} />
+
         {/* Zone de filtre */}
         {!loading && !error && (
           <FilterBar
@@ -274,12 +308,12 @@ export function ProductsPage() {
             onGameCategoriesChange={handleGameCategoriesChange}
             selectedProductTypes={selectedProductTypes}
             onProductTypesChange={handleProductTypesChange}
+            selectedAvailability={selectedAvailability}
+            onAvailabilityChange={handleAvailabilityChange}
             sortBy={sortBy}
             onSortChange={handleSortChange}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
             onResetFilters={handleResetFilters}
           />
         )}
@@ -302,13 +336,15 @@ export function ProductsPage() {
                 <p>
                   {catalogSearchQuery ||
                   selectedGameCategories.length > 0 ||
-                  selectedProductTypes.length > 0
+                  selectedProductTypes.length > 0 ||
+                  selectedAvailability.length > 0
                     ? 'Aucun produit ne correspond à ces critères. Essayez de modifier vos filtres.'
                     : 'Aucun produit disponible pour le moment.'}
                 </p>
                 {(catalogSearchQuery ||
                   selectedGameCategories.length > 0 ||
-                  selectedProductTypes.length > 0) && (
+                  selectedProductTypes.length > 0 ||
+                  selectedAvailability.length > 0) && (
                   <button onClick={handleResetFilters} className={styles.clearSearchButton}>
                     Réinitialiser les filtres
                   </button>
@@ -320,6 +356,8 @@ export function ProductsPage() {
                 onPageChange={setPage}
                 currentPage={page}
                 totalPages={totalPages}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
               />
             )}
           </main>

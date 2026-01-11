@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { SearchIcon, ChevronDownIcon } from '../icons/Icons';
 import styles from './FilterBar.module.css';
-import { GameCategory, ProductType, categoryLabels, productTypeLabels } from '../../utils/filters';
+import {
+  GameCategory,
+  ProductType,
+  Availability,
+  categoryLabels,
+  productTypeLabels,
+  availabilityLabels,
+} from '../../utils/filters';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -10,12 +17,12 @@ interface FilterBarProps {
   onGameCategoriesChange: (categories: GameCategory[]) => void;
   selectedProductTypes: ProductType[];
   onProductTypesChange: (types: ProductType[]) => void;
+  selectedAvailability: Availability[];
+  onAvailabilityChange: (availability: Availability[]) => void;
   sortBy: string;
   onSortChange: (sort: string) => void;
   activeTab: 'Tous' | 'Produits phares' | 'Nouveauté';
   onTabChange: (tab: 'Tous' | 'Produits phares' | 'Nouveauté') => void;
-  viewMode?: 'grid-2x2' | 'grid-3col' | 'list' | 'list-compact';
-  onViewModeChange?: (mode: 'grid-2x2' | 'grid-3col' | 'list' | 'list-compact') => void;
   onResetFilters?: () => void;
 }
 
@@ -28,84 +35,13 @@ const productTypes = [
   ProductType.COFFRET,
 ];
 
+const availabilityOptions = [Availability.IN_STOCK, Availability.OUT_OF_STOCK];
+
 const sortOptions = [
-  { label: 'Populaires', value: 'popular' },
   { label: 'Plus récent', value: 'newest' },
   { label: 'Prix : croissant', value: 'price-asc' },
   { label: 'Prix : décroissant', value: 'price-desc' },
 ];
-
-// Icônes pour les modes d'affichage
-const Grid2x2Icon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="7" height="7" rx="1" />
-    <rect x="14" y="3" width="7" height="7" rx="1" />
-    <rect x="3" y="14" width="7" height="7" rx="1" />
-    <rect x="14" y="14" width="7" height="7" rx="1" />
-  </svg>
-);
-
-const Grid3ColIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="5" height="18" rx="1" />
-    <rect x="9.5" y="3" width="5" height="18" rx="1" />
-    <rect x="16" y="3" width="5" height="18" rx="1" />
-  </svg>
-);
-
-const ListIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="3" y1="6" x2="21" y2="6" />
-    <line x1="3" y1="12" x2="21" y2="12" />
-    <line x1="3" y1="18" x2="21" y2="18" />
-  </svg>
-);
-
-const ListCompactIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="3" y1="5" x2="21" y2="5" />
-    <line x1="3" y1="9" x2="21" y2="9" />
-    <line x1="3" y1="13" x2="21" y2="13" />
-    <line x1="3" y1="17" x2="21" y2="17" />
-    <line x1="3" y1="21" x2="21" y2="21" />
-  </svg>
-);
 
 // Icône X pour supprimer les chips
 const CloseIcon = () => (
@@ -131,16 +67,17 @@ export default function FilterBar({
   onGameCategoriesChange,
   selectedProductTypes,
   onProductTypesChange,
+  selectedAvailability,
+  onAvailabilityChange,
   sortBy,
   onSortChange,
   activeTab,
   onTabChange,
-  viewMode = 'grid-2x2',
-  onViewModeChange,
   onResetFilters,
 }: FilterBarProps) {
   const [isGameCategoryOpen, setIsGameCategoryOpen] = useState(false);
   const [isProductTypeOpen, setIsProductTypeOpen] = useState(false);
+  const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +101,14 @@ export default function FilterBar({
     }
   };
 
+  const handleAvailabilityToggle = (availability: Availability) => {
+    if (selectedAvailability.includes(availability)) {
+      onAvailabilityChange(selectedAvailability.filter((a) => a !== availability));
+    } else {
+      onAvailabilityChange([...selectedAvailability, availability]);
+    }
+  };
+
   const handleRemoveGameCategory = (category: GameCategory) => {
     onGameCategoriesChange(selectedGameCategories.filter((c) => c !== category));
   };
@@ -172,15 +117,22 @@ export default function FilterBar({
     onProductTypesChange(selectedProductTypes.filter((t) => t !== type));
   };
 
+  const handleRemoveAvailability = (availability: Availability) => {
+    onAvailabilityChange(selectedAvailability.filter((a) => a !== availability));
+  };
+
   const handleSortSelect = (sort: string) => {
     onSortChange(sort);
     setIsSortOpen(false);
   };
 
-  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || 'Populaires';
+  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || 'Plus récent';
 
   const hasActiveFilters =
-    selectedGameCategories.length > 0 || selectedProductTypes.length > 0 || searchQuery;
+    selectedGameCategories.length > 0 ||
+    selectedProductTypes.length > 0 ||
+    selectedAvailability.length > 0 ||
+    searchQuery;
 
   return (
     <div className={styles.filterBar}>
@@ -247,6 +199,7 @@ export default function FilterBar({
             onClick={() => {
               setIsProductTypeOpen(!isProductTypeOpen);
               setIsGameCategoryOpen(false);
+              setIsAvailabilityOpen(false);
               setIsSortOpen(false);
             }}
           >
@@ -278,6 +231,49 @@ export default function FilterBar({
           )}
         </div>
 
+        {/* Menu déroulant Disponibilité (multi-select) */}
+        <div className={styles.dropdownContainer}>
+          <button
+            className={styles.dropdownButton}
+            onClick={() => {
+              setIsAvailabilityOpen(!isAvailabilityOpen);
+              setIsGameCategoryOpen(false);
+              setIsProductTypeOpen(false);
+              setIsSortOpen(false);
+            }}
+          >
+            <span>
+              Disponibilité{' '}
+              {selectedAvailability.length > 0 ? `(${selectedAvailability.length})` : ''}
+            </span>
+            <ChevronDownIcon size={16} className={styles.chevronIcon} />
+          </button>
+          {isAvailabilityOpen && (
+            <>
+              <div
+                className={styles.dropdownOverlay}
+                onClick={() => setIsAvailabilityOpen(false)}
+              />
+              <div className={styles.dropdownMenu}>
+                {availabilityOptions.map((availability) => {
+                  const isSelected = selectedAvailability.includes(availability);
+                  return (
+                    <label key={availability} className={styles.dropdownItemCheckbox}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleAvailabilityToggle(availability)}
+                        className={styles.checkbox}
+                      />
+                      <span>{availabilityLabels[availability]}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
         {/* Menu déroulant Tri */}
         <div className={styles.dropdownContainer}>
           <button
@@ -286,6 +282,7 @@ export default function FilterBar({
               setIsSortOpen(!isSortOpen);
               setIsGameCategoryOpen(false);
               setIsProductTypeOpen(false);
+              setIsAvailabilityOpen(false);
             }}
           >
             <span>{currentSortLabel}</span>
@@ -308,40 +305,6 @@ export default function FilterBar({
             </>
           )}
         </div>
-
-        {/* Sélecteur de mode d'affichage */}
-        {onViewModeChange && (
-          <div className={styles.viewModeContainer}>
-            <button
-              className={`${styles.viewModeButton} ${viewMode === 'grid-2x2' ? styles.active : ''}`}
-              onClick={() => onViewModeChange('grid-2x2')}
-              title="Grille 2x2"
-            >
-              <Grid2x2Icon />
-            </button>
-            <button
-              className={`${styles.viewModeButton} ${viewMode === 'grid-3col' ? styles.active : ''}`}
-              onClick={() => onViewModeChange('grid-3col')}
-              title="Grille 3 colonnes"
-            >
-              <Grid3ColIcon />
-            </button>
-            <button
-              className={`${styles.viewModeButton} ${viewMode === 'list' ? styles.active : ''}`}
-              onClick={() => onViewModeChange('list')}
-              title="Liste"
-            >
-              <ListIcon />
-            </button>
-            <button
-              className={`${styles.viewModeButton} ${viewMode === 'list-compact' ? styles.active : ''}`}
-              onClick={() => onViewModeChange('list-compact')}
-              title="Liste compacte"
-            >
-              <ListCompactIcon />
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Zone des chips de filtres actifs et bouton réinitialiser */}
@@ -367,6 +330,18 @@ export default function FilterBar({
                   className={styles.chipRemove}
                   onClick={() => handleRemoveProductType(type)}
                   aria-label={`Retirer ${productTypeLabels[type]}`}
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+            ))}
+            {selectedAvailability.map((availability) => (
+              <div key={availability} className={styles.filterChip}>
+                <span className={styles.chipLabel}>{availabilityLabels[availability]}</span>
+                <button
+                  className={styles.chipRemove}
+                  onClick={() => handleRemoveAvailability(availability)}
+                  aria-label={`Retirer ${availabilityLabels[availability]}`}
                 >
                   <CloseIcon />
                 </button>
