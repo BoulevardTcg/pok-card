@@ -18,6 +18,7 @@ import {
 } from '../icons/Icons';
 import { SunIcon } from '../icons/SunIcon';
 import { MoonIcon } from '../icons/MoonIcon';
+import { LiquidMetalIconButton } from '../ui/LiquidMetalIconButton';
 import styles from './NavbarGlass.module.css';
 
 // Constantes de sécurité
@@ -482,16 +483,15 @@ export default function NavbarGlass() {
               </AnimatePresence>
             </div>
 
-            {/* Toggle thème (soleil/lune) */}
-            <motion.button
+            {/* Toggle thème (soleil/lune) avec effet Liquid Metal */}
+            <LiquidMetalIconButton
               onClick={toggleDarkMode}
+              ariaLabel={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
+              ariaPressed={isDark}
+              size={37}
+              borderThickness={3}
+              intensity="soft"
               className={styles.themeToggle}
-              aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
-              aria-pressed={isDark}
-              variants={buttonVariants}
-              initial="rest"
-              whileHover="hover"
-              whileTap="tap"
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
@@ -505,7 +505,7 @@ export default function NavbarGlass() {
                   {isDark ? <MoonIcon size={16} /> : <SunIcon size={16} />}
                 </motion.span>
               </AnimatePresence>
-            </motion.button>
+            </LiquidMetalIconButton>
 
             {/* Panier (toujours visible) */}
             <motion.button
