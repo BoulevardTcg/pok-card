@@ -1,12 +1,15 @@
 .overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9998;
   padding: 1rem;
 }
 
@@ -20,6 +23,7 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
 }
 
 .closeButton {
@@ -36,11 +40,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10000;
+  min-width: 32px;
+  min-height: 32px;
 }
 
 .closeButton:hover {
   background: var(--color-bg-subtle, #1a1a1d);
   color: var(--color-text-primary, #f5f5f3);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
 }
 
 .content {
@@ -190,9 +201,17 @@
 }
 
 @media (max-width: 640px) {
+  .overlay {
+    padding: 1rem;
+  }
+
   .modal {
-    margin: 1rem;
-    max-width: calc(100% - 2rem);
+    position: relative;
+    width: 90vw;
+    max-width: 400px;
+    max-height: 90vh;
+    margin: 0;
+    border-radius: 12px;
   }
 
   .content {
@@ -201,5 +220,20 @@
 
   .title {
     font-size: 1.5rem;
+  }
+
+  .closeButton {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
   }
 }

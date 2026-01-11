@@ -16,10 +16,22 @@
   align-items: center;
   gap: var(--space-3, 0.75rem);
   padding: var(--space-3, 0.75rem);
-  background: #2a2a2d; /* Gris foncé, plus clair que l'arrière-plan noir */
-  border-radius: 10px; /* Coins légèrement arrondis */
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow:
+    var(--glass-shadow),
+    0 0 1px rgba(255, 255, 255, 0.05) inset;
   margin-bottom: var(--space-4, 1rem);
   flex-wrap: wrap;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+  position: relative;
+  z-index: 100; /* Inférieur à la navbar (z-index: 200) */
 }
 
 /* Champ de recherche */
@@ -43,23 +55,25 @@
   width: 100%;
   padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
   padding-left: var(--space-10, 2.5rem);
-  background: #1f1f23; /* Gris foncé, plus foncé que le conteneur principal */
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px; /* Coins arrondis */
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  color: #f5f5f3; /* Texte blanc/gris clair */
+  color: var(--color-text-primary, #f5f5f3);
   transition: all var(--duration-base, 250ms) var(--ease-out);
   outline: none;
 }
 
 .searchInput::placeholder {
-  color: #9a9aa0; /* Gris clair pour le placeholder */
+  color: var(--color-text-secondary, #a1a1a6);
+  opacity: 0.7;
 }
 
 .searchInput:focus {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: #252529;
+  border-color: var(--color-border-hover);
+  background: var(--color-bg-hover);
+  box-shadow: 0 0 0 2px var(--color-border-accent);
 }
 
 /* Menu déroulant */
@@ -73,12 +87,12 @@
   align-items: center;
   gap: var(--space-2, 0.5rem);
   padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-  background: #1f1f23; /* Gris foncé, plus foncé que le conteneur principal */
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px; /* Coins arrondis */
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  color: #a1a1a6; /* Gris clair */
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
   outline: none;
@@ -86,9 +100,9 @@
 }
 
 .dropdownButton:hover {
-  background: #252529;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #f5f5f3; /* Blanc pour le texte au survol */
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .dropdownButton:focus-visible {
@@ -111,7 +125,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 998;
+  z-index: 149; /* Juste en dessous du dropdownMenu */
   background: transparent;
 }
 
@@ -120,12 +134,14 @@
   top: calc(100% + var(--space-1, 0.25rem));
   left: 0;
   min-width: 160px;
-  background: var(--color-bg-elevated, #141416);
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-md, 4px);
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   padding: var(--space-1, 0.25rem);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  box-shadow: var(--shadow-lg);
+  z-index: 150; /* Inférieur à la navbar mais au-dessus du contenu */
   overflow: hidden;
 }
 
@@ -195,9 +211,9 @@
   align-items: center;
   gap: 0;
   padding: 2px;
-  background: #1f1f23; /* Gris foncé, plus foncé que le conteneur principal */
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px; /* Coins arrondis */
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
@@ -211,20 +227,20 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: #6b6b6f; /* Gris pour les icônes inactives */
+  color: var(--color-text-muted, #6b6b6f);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out);
   outline: none;
 }
 
 .viewModeButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #a1a1a6;
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary, #a1a1a6);
 }
 
 .viewModeButton.active {
-  background: rgba(255, 255, 255, 0.1); /* Fond plus clair pour l'icône active */
-  color: #f5f5f3; /* Blanc pour l'icône active */
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .viewModeButton:focus-visible {
@@ -252,7 +268,7 @@
   border: none;
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  color: #9a9aa0; /* Gris clair pour les onglets inactifs */
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
   outline: none;
@@ -260,12 +276,12 @@
 }
 
 .tab:hover {
-  color: #f5f5f3; /* Blanc au survol */
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .tabActive {
-  color: #f5f5f3; /* Blanc pour l'onglet actif */
-  background: rgba(0, 0, 0, 0.3); /* Fond légèrement plus foncé (gris très sombre) */
+  color: var(--color-text-primary, #f5f5f3);
+  background: var(--color-bg-hover);
   padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
   border-radius: 4px;
 }
@@ -278,7 +294,7 @@
   right: 0;
   width: 100%;
   height: 2px;
-  background: #c9a55a; /* Couleur dorée/marron clair pour la ligne d'accent */
+  background: var(--color-accent-primary, #e8e4dd);
   border-radius: 1px;
 }
 
@@ -316,18 +332,18 @@
   gap: var(--space-1, 0.25rem);
   padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem) var(--space-1, 0.25rem)
     var(--space-3, 0.75rem);
-  background: #1f1f23; /* Gris foncé */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px; /* Forme arrondie de chip */
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 16px;
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  color: #f5f5f3;
+  color: var(--color-text-primary, #f5f5f3);
   transition: all var(--duration-fast, 150ms) var(--ease-out);
 }
 
 .filterChip:hover {
-  background: #252529;
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 .chipLabel {
@@ -365,11 +381,11 @@
 .resetButton {
   padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-border-default);
   border-radius: 6px;
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
-  color: #a1a1a6;
+  color: var(--color-text-secondary, #a1a1a6);
   cursor: pointer;
   transition: all var(--duration-base, 250ms) var(--ease-out);
   outline: none;
@@ -377,9 +393,9 @@
 }
 
 .resetButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #f5f5f3;
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary, #f5f5f3);
 }
 
 .resetButton:focus-visible {

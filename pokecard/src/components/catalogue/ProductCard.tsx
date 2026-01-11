@@ -3,7 +3,6 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
-import { NotifyModal } from '../NotifyModal';
 import type { Product } from '../../cartContext';
 import { getProductType, productTypeLabels } from '../../utils/filters';
 import styles from './ProductCard.module.css';
@@ -11,6 +10,7 @@ import styles from './ProductCard.module.css';
 interface ProductCardProps {
   product: Product;
   showNewBadge?: boolean;
+  onNotifyClick?: () => void;
 }
 
 // Fonction pour obtenir le statut du stock
@@ -49,12 +49,15 @@ function getProductLanguage(product: Product): string {
   return firstVariant.language || 'N/A';
 }
 
-export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  showNewBadge = false,
+  onNotifyClick,
+}: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { isAuthenticated } = useAuth();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';
@@ -166,46 +169,10 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           className={styles.placeholderImage}
           style={{ display: productImage ? 'none' : 'flex' }}
         >
-          <svg
-            className={styles.placeholderLogo}
-            width="120"
-            height="120"
-            viewBox="0 0 200 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="phoenixGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
-                <stop offset="50%" stopColor="#d4af37" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.3" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M100 40 L85 80 L70 100 L85 110 L100 120 L115 110 L130 100 L115 80 Z"
-              fill="url(#phoenixGradient)"
-              opacity="0.6"
-            />
-            <path
-              d="M70 100 L40 90 L30 95 L25 100 L30 105 L40 110 L55 108 L70 105 Z"
-              fill="url(#phoenixGradient)"
-              opacity="0.5"
-            />
-            <path
-              d="M130 100 L160 90 L170 95 L175 100 L170 105 L160 110 L145 108 L130 105 Z"
-              fill="url(#phoenixGradient)"
-              opacity="0.5"
-            />
-            <path
-              d="M100 120 L95 140 L90 155 L100 160 L110 155 L105 140 Z"
-              fill="url(#phoenixGradient)"
-              opacity="0.4"
-            />
-            <ellipse cx="100" cy="50" rx="15" ry="18" fill="url(#phoenixGradient)" opacity="0.5" />
-          </svg>
           <div className={styles.placeholderText}>
-            <span className={styles.placeholderBrand}>BoulevardTCG</span>
-            <span className={styles.placeholderSubtext}>Photo du produit à venir</span>
+            <span className={styles.placeholderBrand}>BOULEVARDTCG</span>
+            <br />
+            <span className={styles.placeholderSubtext}>Photo de produit à venir</span>
           </div>
         </div>
 
@@ -251,7 +218,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             className={styles.notifyButton}
             onClick={(e) => {
               e.stopPropagation();
-              setNotifyModalOpen(true);
+              onNotifyClick?.();
             }}
           >
             Me prévenir
@@ -272,14 +239,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           <span>Paiement sécurisé</span>
         </div>
       </div>
-
-      {/* Notify Modal */}
-      <NotifyModal
-        isOpen={notifyModalOpen}
-        onClose={() => setNotifyModalOpen(false)}
-        productId={product.id}
-        productName={product.name}
-      />
     </div>
   );
 }
