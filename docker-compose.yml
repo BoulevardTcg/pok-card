@@ -1,15 +1,19 @@
 
-
 services:
   # Frontend React
   pokecard-frontend:
-    build: ./pokecard
+    build:
+      context: ./pokecard
+      args:
+        # VITE_API_URL est injecté au BUILD-TIME (pas runtime avec Nginx)
+        # Dev Docker: http://localhost:8080/api
+        # Prod: https://api.boulevardtcg.com/api (ou utiliser un reverse-proxy /api)
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
     ports:
       - "3000:80"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://localhost:8080/api
     depends_on:
       - pokecard-backend
     volumes: []
@@ -27,10 +31,19 @@ services:
       - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
       - ORDER_TRACKING_SECRET=test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
       - STRIPE_SECRET_KEY=sk_test_mock_key
-      - CHECKOUT_SUCCESS_URL=http://pokecard-frontend:80/checkout/success
-      - CHECKOUT_CANCEL_URL=http://pokecard-frontend:80/panier
-      - ALLOWED_REDIRECT_DOMAINS=http://pokecard-frontend:80
-      - FRONTEND_URL=http://pokecard-frontend:80
+      # URL publique du frontend (emails, redirects, liens utilisateurs)
+      # Dev: http://localhost:3000 | Prod: https://boulevardtcg.com
+      - FRONTEND_PUBLIC_URL=${FRONTEND_PUBLIC_URL:-http://localhost:3000}
+      # URL interne Docker (pour appels inter-conteneurs si nécessaire)
+      - FRONTEND_INTERNAL_URL=${FRONTEND_INTERNAL_URL:-http://pokecard-frontend:80}
+      # URLs de checkout basées sur l'URL publique
+      - CHECKOUT_SUCCESS_URL=${FRONTEND_PUBLIC_URL:-http://localhost:3000}/checkout/success
+      - CHECKOUT_CANCEL_URL=${FRONTEND_PUBLIC_URL:-http://localhost:3000}/panier
+      # Liste CSV d'origins autorisés pour les redirections Stripe
+      # En prod: https://boulevardtcg.com,https://www.boulevardtcg.com
+      - ALLOWED_REDIRECT_DOMAINS=${ALLOWED_REDIRECT_DOMAINS:-${FRONTEND_PUBLIC_URL:-http://localhost:3000}}
+      # DEPRECATED: utiliser FRONTEND_PUBLIC_URL à la place
+      # - FRONTEND_URL=http://pokecard-frontend:80
       - NODE_ENV=production
       - PORT=8080
       - DATABASE_URL=postgresql://${POSTGRES_USER:-pokecard_user}:${POSTGRES_PASSWORD:-passwd}@postgres:5432/${POSTGRES_DB:-pokecard_db}?schema=public

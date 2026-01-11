@@ -106,8 +106,9 @@ jobs:
         env:
           JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
           JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
-          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
-          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+          FRONTEND_PUBLIC_URL: http://localhost:3000
+          CHECKOUT_SUCCESS_URL: http://localhost:3000/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:3000/panier
           SEED_ADMIN_PASSWORD: TestAdminPassword123
 
       - name: Lint
@@ -120,18 +121,19 @@ jobs:
           JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
           ORDER_TRACKING_SECRET: test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
           STRIPE_SECRET_KEY: sk_test_mock_key
-          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
-          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
-          ALLOWED_REDIRECT_DOMAINS: http://localhost:5173
-          FRONTEND_URL: http://localhost:5173
+          FRONTEND_PUBLIC_URL: http://localhost:3000
+          CHECKOUT_SUCCESS_URL: http://localhost:3000/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:3000/panier
+          ALLOWED_REDIRECT_DOMAINS: http://localhost:3000
 
       - name: Build
         run: npm run build --if-present
         env:
           JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
           JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
-          CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
-          CHECKOUT_CANCEL_URL: http://localhost:5173/panier
+          FRONTEND_PUBLIC_URL: http://localhost:3000
+          CHECKOUT_SUCCESS_URL: http://localhost:3000/checkout/success
+          CHECKOUT_CANCEL_URL: http://localhost:3000/panier
 
       - name: Upload artifact for deployment job
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

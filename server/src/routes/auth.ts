@@ -418,9 +418,16 @@ router.post(
         },
       });
 
-      // Construire l'URL de reset
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      // Construire l'URL de reset avec FRONTEND_PUBLIC_URL (URL accessible par le navigateur)
+      const baseUrl = (
+        process.env.FRONTEND_PUBLIC_URL ||
+        process.env.FRONTEND_URL ||
+        'http://localhost:3000'
+      ).replace(/\/$/, '');
+      const resetUrlObj = new URL(`${baseUrl}/reset-password`);
+      resetUrlObj.searchParams.set('token', resetToken);
+      resetUrlObj.searchParams.set('email', email);
+      const resetUrl = resetUrlObj.toString();
 
       // Envoyer l'email
       const emailSent = await sendPasswordResetEmail({

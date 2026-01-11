@@ -44,8 +44,12 @@ router.post(
 
       const stripeClient = ensureStripeConfigured();
 
-      // Configuration des URLs de redirection
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      // Configuration des URLs de redirection (URL publique accessible par le navigateur)
+      const frontendUrl = (
+        process.env.FRONTEND_PUBLIC_URL ||
+        process.env.FRONTEND_URL ||
+        'http://localhost:3000'
+      ).replace(/\/$/, '');
       const successUrl = `${frontendUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${frontendUrl}/panier`;
 

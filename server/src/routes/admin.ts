@@ -85,10 +85,13 @@ const addOrderEvent = async (
 };
 
 const shopBaseUrl = () =>
-  (process.env.SHOP_URL || process.env.FRONT_BASE_URL || process.env.FRONTEND_URL || '').replace(
-    /\/$/,
+  (
+    process.env.SHOP_URL ||
+    process.env.FRONTEND_PUBLIC_URL ||
+    process.env.FRONT_BASE_URL ||
+    process.env.FRONTEND_URL ||
     ''
-  );
+  ).replace(/\/$/, '');
 
 const buildOrderTrackingLink = (orderId: string, customerEmail?: string | null) => {
   const base = shopBaseUrl();

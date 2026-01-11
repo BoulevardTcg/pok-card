@@ -56,7 +56,12 @@ function getTransporter(): Transporter {
 }
 
 const SHOP_NAME = process.env.SHOP_NAME || 'Boulevard TCG';
-const SHOP_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+// Utiliser FRONTEND_PUBLIC_URL pour les liens dans les emails (URLs accessibles par le navigateur)
+const SHOP_URL = (
+  process.env.FRONTEND_PUBLIC_URL ||
+  process.env.FRONTEND_URL ||
+  'http://localhost:3000'
+).replace(/\/$/, '');
 const SHOP_EMAIL = process.env.SHOP_EMAIL || 'contact@boulevardtcg.com';
 const SHOP_LOGO = `${SHOP_URL}/logo.png`;
 
