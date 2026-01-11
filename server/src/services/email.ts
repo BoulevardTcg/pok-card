@@ -706,4 +706,115 @@ export async function sendContactAutoReply(payload: {
   }
 }
 
+// ============================================================================
+// RESET PASSWORD EMAIL
+// ============================================================================
+
+function passwordResetTemplate(data: {
+  name: string;
+  resetUrl: string;
+  expiresIn: string;
+}): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Réinitialisation de votre mot de passe</title>
+      <style>${emailStyles}</style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>${SHOP_NAME}</h1>
+        </div>
+        <div class="content">
+          <h2 style="color: #1f2937; margin-bottom: 20px;">🔐 Réinitialisation de votre mot de passe</h2>
+          
+          <p style="color: #4b5563; line-height: 1.6;">
+            Bonjour${data.name ? ` ${data.name}` : ''},
+          </p>
+          
+          <p style="color: #4b5563; line-height: 1.6;">
+            Vous avez demandé à réinitialiser le mot de passe de votre compte ${SHOP_NAME}.
+          </p>
+          
+          <p style="color: #4b5563; line-height: 1.6;">
+            Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
+          </p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${data.resetUrl}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              Réinitialiser mon mot de passe
+            </a>
+          </div>
+          
+          <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              ⏰ Ce lien expire dans <strong>${data.expiresIn}</strong>.
+            </p>
+          </div>
+          
+          <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+            Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :
+          </p>
+          <p style="word-break: break-all; color: #3b82f6; font-size: 12px;">
+            ${data.resetUrl}
+          </p>
+          
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+          
+          <p style="color: #9ca3af; font-size: 13px; line-height: 1.6;">
+            Si vous n'avez pas demandé cette réinitialisation, ignorez simplement cet email. 
+            Votre mot de passe restera inchangé.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} ${SHOP_NAME}. Tous droits réservés.</p>
+          <p>
+            <a href="${SHOP_URL}">Visiter notre boutique</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+export async function sendPasswordResetEmail(payload: {
+  email: string;
+  name?: string | null;
+  resetUrl: string;
+  expiresIn: string;
+}): Promise<boolean> {
+  try {
+    const transport = getTransporter();
+    const html = passwordResetTemplate({
+      name: payload.name || '',
+      resetUrl: payload.resetUrl,
+      expiresIn: payload.expiresIn,
+    });
+
+    const info = await transport.sendMail({
+      from: `"${SHOP_NAME}" <${EMAIL_FROM}>`,
+      to: sanitizeEmailAddress(payload.email),
+      subject: sanitizeHeaderValue(`🔐 Réinitialisation de votre mot de passe - ${SHOP_NAME}`),
+      html,
+    });
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Email: reset password envoyé à', payload.email);
+      console.log('  Reset URL:', payload.resetUrl);
+    } else {
+      console.log('Email: reset password envoyé', { messageId: info.messageId, to: payload.email });
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Email: erreur envoi reset password', error);
+    return false;
+  }
+}
+
 export type { OrderDataForEmail, OrderItemForEmail };

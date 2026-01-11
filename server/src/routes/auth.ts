@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 import {
   hashPassword,
   verifyPassword,
@@ -9,10 +10,14 @@ import {
   revokeRefreshToken,
   revokeAllUserTokens,
 } from '../utils/auth.js';
-import { authLimiter } from '../middleware/security.js';
+import { authLimiter, strictAuthLimiter } from '../middleware/security.js';
+import { sendPasswordResetEmail } from '../services/email.js';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+// Configuration du reset de mot de passe
+const PASSWORD_RESET_EXPIRY_HOURS = 1; // Token valide 1 heure
 
 // Validation des données d'inscription
 const registerValidation = [
@@ -354,5 +359,176 @@ router.get('/verify', async (req: Request, res: Response) => {
     });
   }
 });
+
+// ============================================================================
+// MOT DE PASSE OUBLIÉ
+// ============================================================================
+
+// Demander un reset de mot de passe
+router.post(
+  '/forgot-password',
+  strictAuthLimiter, // Rate limit strict (3 req/heure)
+  [body('email').isEmail().withMessage('Email invalide').normalizeEmail()],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Email invalide',
+          details: errors.array(),
+        });
+      }
+
+      const { email } = req.body;
+
+      // Toujours répondre avec succès pour éviter l'énumération d'emails
+      const successResponse = {
+        message:
+          'Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation.',
+        code: 'EMAIL_SENT',
+      };
+
+      // Chercher l'utilisateur
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, firstName: true },
+      });
+
+      if (!user) {
+        // Ne pas révéler que l'email n'existe pas
+        return res.json(successResponse);
+      }
+
+      // Supprimer les anciens tokens de reset pour cet utilisateur
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
+
+      // Générer un token sécurisé
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+      // Créer le token en base
+      const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRY_HOURS * 60 * 60 * 1000);
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token: hashedToken,
+          expiresAt,
+        },
+      });
+
+      // Construire l'URL de reset
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+      // Envoyer l'email
+      const emailSent = await sendPasswordResetEmail({
+        email: user.email,
+        name: user.firstName,
+        resetUrl,
+        expiresIn: `${PASSWORD_RESET_EXPIRY_HOURS} heure${PASSWORD_RESET_EXPIRY_HOURS > 1 ? 's' : ''}`,
+      });
+
+      if (!emailSent) {
+        console.error('Erreur envoi email reset password pour:', email);
+      }
+
+      res.json(successResponse);
+    } catch (error) {
+      console.error('Erreur forgot-password:', error);
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  }
+);
+
+// Réinitialiser le mot de passe avec le token
+router.post(
+  '/reset-password',
+  strictAuthLimiter,
+  [
+    body('token').notEmpty().withMessage('Token requis'),
+    body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
+    body('password')
+      .isLength({ min: 8 })
+      .withMessage('Le mot de passe doit contenir au moins 8 caractères')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+      .withMessage(
+        'Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre'
+      ),
+  ],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Données invalides',
+          details: errors.array(),
+        });
+      }
+
+      const { token, email, password } = req.body;
+
+      // Hasher le token pour le comparer avec celui en base
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+      // Chercher le token en base
+      const resetToken = await prisma.passwordResetToken.findFirst({
+        where: {
+          token: hashedToken,
+          usedAt: null, // Non utilisé
+          expiresAt: { gt: new Date() }, // Non expiré
+          user: { email },
+        },
+        include: { user: true },
+      });
+
+      if (!resetToken) {
+        return res.status(400).json({
+          error: 'Le lien de réinitialisation est invalide ou a expiré',
+          code: 'INVALID_OR_EXPIRED_TOKEN',
+        });
+      }
+
+      // Hasher le nouveau mot de passe
+      const hashedPassword = await hashPassword(password);
+
+      // Transaction : mettre à jour le mot de passe et marquer le token comme utilisé
+      await prisma.$transaction([
+        prisma.user.update({
+          where: { id: resetToken.userId },
+          data: { password: hashedPassword },
+        }),
+        prisma.passwordResetToken.update({
+          where: { id: resetToken.id },
+          data: { usedAt: new Date() },
+        }),
+        // Révoquer tous les refresh tokens pour forcer une reconnexion
+        prisma.refreshToken.deleteMany({
+          where: { userId: resetToken.userId },
+        }),
+      ]);
+
+      // Supprimer tous les tokens de reset pour cet utilisateur
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: resetToken.userId },
+      });
+
+      res.json({
+        message: 'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
+        code: 'PASSWORD_RESET_SUCCESS',
+      });
+    } catch (error) {
+      console.error('Erreur reset-password:', error);
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  }
+);
 
 export default router;

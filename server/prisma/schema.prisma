@@ -51,6 +51,7 @@ model User {
   tradeOffersReceived TradeOffer[]     @relation("TradeOfferReceiver")
   contestTickets      ContestTicket[]
   refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
   reviews             ProductReview[]
   collection          UserCollection[]
 
@@ -251,6 +252,22 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime? // Null si pas encore utilisé
+  createdAt DateTime  @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model ProductReview {
