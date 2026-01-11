@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SearchIcon, ChevronDownIcon } from '../icons/Icons';
 import styles from './FilterBar.module.css';
 import {
@@ -19,8 +19,10 @@ interface FilterBarProps {
   onProductTypesChange: (types: ProductType[]) => void;
   selectedAvailability: Availability[];
   onAvailabilityChange: (availability: Availability[]) => void;
-  sortBy: string;
-  onSortChange: (sort: string) => void;
+  selectedPriceRange: { min: number | null; max: number | null };
+  onPriceRangeChange: (range: { min: number | null; max: number | null }) => void;
+  selectedLanguages: string[];
+  onLanguagesChange: (languages: string[]) => void;
   activeTab: 'Tous' | 'Produits phares' | 'Nouveauté';
   onTabChange: (tab: 'Tous' | 'Produits phares' | 'Nouveauté') => void;
   onResetFilters?: () => void;
@@ -37,10 +39,18 @@ const productTypes = [
 
 const availabilityOptions = [Availability.IN_STOCK, Availability.OUT_OF_STOCK];
 
-const sortOptions = [
-  { label: 'Plus récent', value: 'newest' },
-  { label: 'Prix : croissant', value: 'price-asc' },
-  { label: 'Prix : décroissant', value: 'price-desc' },
+const pricePresets = [
+  { label: 'Tous les prix', value: 'all' },
+  { label: '0€ - 20€', value: '0-20' },
+  { label: '20€ - 50€', value: '20-50' },
+  { label: '50€ - 100€', value: '50-100' },
+  { label: '100€ et plus', value: '100+' },
+];
+
+const languageOptions = [
+  { label: 'Français', value: 'fr', flag: '🇫🇷' },
+  { label: 'Anglais', value: 'en', flag: '🇬🇧' },
+  { label: 'Japonais', value: 'jp', flag: '🇯🇵' },
 ];
 
 // Icône X pour supprimer les chips
@@ -69,8 +79,10 @@ export default function FilterBar({
   onProductTypesChange,
   selectedAvailability,
   onAvailabilityChange,
-  sortBy,
-  onSortChange,
+  selectedPriceRange,
+  onPriceRangeChange,
+  selectedLanguages,
+  onLanguagesChange,
   activeTab,
   onTabChange,
   onResetFilters,
@@ -78,7 +90,65 @@ export default function FilterBar({
   const [isGameCategoryOpen, setIsGameCategoryOpen] = useState(false);
   const [isProductTypeOpen, setIsProductTypeOpen] = useState(false);
   const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isPriceOpen, setIsPriceOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  
+  // État local pour le slider de prix (en euros)
+  const [customPriceRange, setCustomPriceRange] = useState<[number, number]>(() => {
+    // Initialiser depuis selectedPriceRange si présent
+    if (selectedPriceRange.min !== null || selectedPriceRange.max !== null) {
+      const min = selectedPriceRange.min !== null ? Math.floor(selectedPriceRange.min / 100) : 0;
+      const max = selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
+      return [min, max];
+    }
+    return [0, 500];
+  });
+  
+  const [selectedPricePreset, setSelectedPricePreset] = useState<string>(() => {
+    // Déterminer le preset actif depuis selectedPriceRange
+    if (selectedPriceRange.min === null && selectedPriceRange.max === null) return 'all';
+    const min = selectedPriceRange.min !== null ? selectedPriceRange.min : 0;
+    const max = selectedPriceRange.max !== null ? selectedPriceRange.max : 50000;
+    
+    if (min === 0 && max === 2000) return '0-20';
+    if (min === 2000 && max === 5000) return '20-50';
+    if (min === 5000 && max === 10000) return '50-100';
+    if (min === 10000 && max === null) return '100+';
+    return 'custom';
+  });
+  
+  // Synchroniser customPriceRange avec selectedPriceRange quand il change depuis l'extérieur
+  useEffect(() => {
+    if (selectedPriceRange.min === null && selectedPriceRange.max === null) {
+      // Pas de filtre actif
+      setSelectedPricePreset('all');
+      setCustomPriceRange([0, 500]);
+      return;
+    }
+    
+    const minEuros = selectedPriceRange.min !== null ? Math.floor(selectedPriceRange.min / 100) : 0;
+    const maxEuros = selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
+    
+    // Vérifier si cela correspond à un preset
+    if (selectedPriceRange.min === 0 && selectedPriceRange.max === 2000) {
+      setSelectedPricePreset('0-20');
+      setCustomPriceRange([0, 20]);
+    } else if (selectedPriceRange.min === 2000 && selectedPriceRange.max === 5000) {
+      setSelectedPricePreset('20-50');
+      setCustomPriceRange([20, 50]);
+    } else if (selectedPriceRange.min === 5000 && selectedPriceRange.max === 10000) {
+      setSelectedPricePreset('50-100');
+      setCustomPriceRange([50, 100]);
+    } else if (selectedPriceRange.min === 10000 && selectedPriceRange.max === null) {
+      setSelectedPricePreset('100+');
+      setCustomPriceRange([100, 500]);
+    } else {
+      // Plage personnalisée
+      setSelectedPricePreset('custom');
+      setCustomPriceRange([minEuros, maxEuros]);
+    }
+     
+  }, [selectedPriceRange.min, selectedPriceRange.max]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -121,18 +191,79 @@ export default function FilterBar({
     onAvailabilityChange(selectedAvailability.filter((a) => a !== availability));
   };
 
-  const handleSortSelect = (sort: string) => {
-    onSortChange(sort);
-    setIsSortOpen(false);
+  // Handlers pour le filtre Prix
+  const handlePricePresetChange = (preset: string) => {
+    setSelectedPricePreset(preset);
+    
+    if (preset === 'all') {
+      onPriceRangeChange({ min: null, max: null });
+      setCustomPriceRange([0, 500]);
+    } else if (preset === '0-20') {
+      onPriceRangeChange({ min: 0, max: 2000 }); // 20€ en centimes
+      setCustomPriceRange([0, 20]);
+    } else if (preset === '20-50') {
+      onPriceRangeChange({ min: 2000, max: 5000 }); // 20-50€ en centimes
+      setCustomPriceRange([20, 50]);
+    } else if (preset === '50-100') {
+      onPriceRangeChange({ min: 5000, max: 10000 }); // 50-100€ en centimes
+      setCustomPriceRange([50, 100]);
+    } else if (preset === '100+') {
+      onPriceRangeChange({ min: 10000, max: null }); // 100€+ en centimes
+      setCustomPriceRange([100, 500]);
+    }
   };
 
-  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || 'Plus récent';
+  const handleMinPriceChange = (value: string | number) => {
+    const newMin = Math.min(Number(value), customPriceRange[1] - 5);
+    setCustomPriceRange([newMin, customPriceRange[1]]);
+    setSelectedPricePreset('custom');
+  };
+
+  const handleMaxPriceChange = (value: string | number) => {
+    const newMax = Math.max(Number(value), customPriceRange[0] + 5);
+    setCustomPriceRange([customPriceRange[0], newMax]);
+    setSelectedPricePreset('custom');
+  };
+
+  const applyCustomPrice = () => {
+    onPriceRangeChange({
+      min: customPriceRange[0] * 100, // Convertir en centimes
+      max: customPriceRange[1] * 100,
+    });
+    setIsPriceOpen(false);
+  };
+
+  // Handlers pour le filtre Langue
+  const handleLanguageToggle = (language: string) => {
+    if (selectedLanguages.includes(language)) {
+      onLanguagesChange(selectedLanguages.filter((l) => l !== language));
+    } else {
+      onLanguagesChange([...selectedLanguages, language]);
+    }
+  };
+
+  const handleRemoveLanguage = (language: string) => {
+    onLanguagesChange(selectedLanguages.filter((l) => l !== language));
+  };
+
+  const handleRemovePriceFilter = () => {
+    onPriceRangeChange({ min: null, max: null });
+    setSelectedPricePreset('all');
+    setCustomPriceRange([0, 500]);
+  };
+
 
   const hasActiveFilters =
     selectedGameCategories.length > 0 ||
     selectedProductTypes.length > 0 ||
     selectedAvailability.length > 0 ||
+    selectedLanguages.length > 0 ||
+    (selectedPriceRange.min !== null || selectedPriceRange.max !== null) ||
     searchQuery;
+
+  // Calculer le pourcentage pour le slider
+  const minPercent = (customPriceRange[0] / 500) * 100;
+  const maxPercent = (customPriceRange[1] / 500) * 100;
 
   return (
     <div className={styles.filterBar}>
@@ -157,7 +288,9 @@ export default function FilterBar({
             onClick={() => {
               setIsGameCategoryOpen(!isGameCategoryOpen);
               setIsProductTypeOpen(false);
-              setIsSortOpen(false);
+              setIsAvailabilityOpen(false);
+              setIsPriceOpen(false);
+              setIsLanguageOpen(false);
             }}
           >
             <span>
@@ -200,7 +333,8 @@ export default function FilterBar({
               setIsProductTypeOpen(!isProductTypeOpen);
               setIsGameCategoryOpen(false);
               setIsAvailabilityOpen(false);
-              setIsSortOpen(false);
+              setIsPriceOpen(false);
+              setIsLanguageOpen(false);
             }}
           >
             <span>
@@ -239,7 +373,8 @@ export default function FilterBar({
               setIsAvailabilityOpen(!isAvailabilityOpen);
               setIsGameCategoryOpen(false);
               setIsProductTypeOpen(false);
-              setIsSortOpen(false);
+              setIsPriceOpen(false);
+              setIsLanguageOpen(false);
             }}
           >
             <span>
@@ -274,33 +409,163 @@ export default function FilterBar({
           )}
         </div>
 
-        {/* Menu déroulant Tri */}
+        {/* Menu déroulant Prix */}
         <div className={styles.dropdownContainer}>
           <button
             className={styles.dropdownButton}
             onClick={() => {
-              setIsSortOpen(!isSortOpen);
+              setIsPriceOpen(!isPriceOpen);
               setIsGameCategoryOpen(false);
               setIsProductTypeOpen(false);
               setIsAvailabilityOpen(false);
+              setIsLanguageOpen(false);
             }}
           >
-            <span>{currentSortLabel}</span>
+            <span>
+              Prix{' '}
+              {selectedPriceRange.min !== null || selectedPriceRange.max !== null ? '(1)' : ''}
+            </span>
             <ChevronDownIcon size={16} className={styles.chevronIcon} />
           </button>
-          {isSortOpen && (
+          {isPriceOpen && (
             <>
-              <div className={styles.dropdownOverlay} onClick={() => setIsSortOpen(false)} />
-              <div className={styles.dropdownMenu}>
-                {sortOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    className={`${styles.dropdownItem} ${sortBy === option.value ? styles.active : ''}`}
-                    onClick={() => handleSortSelect(option.value)}
-                  >
-                    {option.label}
+              <div className={styles.dropdownOverlay} onClick={() => setIsPriceOpen(false)} />
+              <div className={styles.dropdownMenu} style={{ minWidth: '280px', padding: '12px' }}>
+                {/* Presets */}
+                <div className={styles.pricePresets}>
+                  {pricePresets.map((preset) => (
+                    <label key={preset.value} className={styles.pricePresetOption}>
+                      <input
+                        type="radio"
+                        name="pricePreset"
+                        value={preset.value}
+                        checked={selectedPricePreset === preset.value}
+                        onChange={() => handlePricePresetChange(preset.value)}
+                      />
+                      <span>{preset.label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div className={styles.divider} />
+
+                {/* Custom Price Section */}
+                <div className={styles.customPriceSection}>
+                  <div className={styles.sectionTitle}>Prix personnalisé</div>
+
+                  {/* Slider */}
+                  <div className={styles.priceRangeSlider}>
+                    <input
+                      type="range"
+                      min="0"
+                      max="500"
+                      step="5"
+                      value={customPriceRange[0]}
+                      onChange={(e) => handleMinPriceChange(e.target.value)}
+                      className={styles.sliderMin}
+                    />
+                    <input
+                      type="range"
+                      min="0"
+                      max="500"
+                      step="5"
+                      value={customPriceRange[1]}
+                      onChange={(e) => handleMaxPriceChange(e.target.value)}
+                      className={styles.sliderMax}
+                    />
+                    <div className={styles.sliderTrack}>
+                      <div
+                        className={styles.sliderRange}
+                        style={{
+                          left: `${minPercent}%`,
+                          right: `${100 - maxPercent}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Price Inputs */}
+                  <div className={styles.priceLabels}>
+                    <div className={styles.priceInput}>
+                      <label>Min</label>
+                      <div className={styles.priceInputWrapper}>
+                        <input
+                          type="number"
+                          min="0"
+                          max={customPriceRange[1]}
+                          value={customPriceRange[0]}
+                          onChange={(e) => handleMinPriceChange(e.target.value)}
+                        />
+                        <span>€</span>
+                      </div>
+                    </div>
+
+                    <span className={styles.separator}>-</span>
+
+                    <div className={styles.priceInput}>
+                      <label>Max</label>
+                      <div className={styles.priceInputWrapper}>
+                        <input
+                          type="number"
+                          min={customPriceRange[0]}
+                          max="500"
+                          value={customPriceRange[1]}
+                          onChange={(e) => handleMaxPriceChange(e.target.value)}
+                        />
+                        <span>€</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button className={styles.applyButton} onClick={applyCustomPrice}>
+                    Appliquer
                   </button>
-                ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Menu déroulant Langue */}
+        <div className={styles.dropdownContainer}>
+          <button
+            className={styles.dropdownButton}
+            onClick={() => {
+              setIsLanguageOpen(!isLanguageOpen);
+              setIsGameCategoryOpen(false);
+              setIsProductTypeOpen(false);
+              setIsAvailabilityOpen(false);
+              setIsPriceOpen(false);
+            }}
+          >
+            <span>
+              Langue{' '}
+              {selectedLanguages.length > 0 ? `(${selectedLanguages.length})` : ''}
+            </span>
+            <ChevronDownIcon size={16} className={styles.chevronIcon} />
+          </button>
+          {isLanguageOpen && (
+            <>
+              <div className={styles.dropdownOverlay} onClick={() => setIsLanguageOpen(false)} />
+              <div className={styles.dropdownMenu}>
+                {languageOptions.map((lang) => {
+                  const isSelected = selectedLanguages.includes(lang.value);
+                  return (
+                    <label key={lang.value} className={styles.dropdownItemCheckbox}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleLanguageToggle(lang.value)}
+                        className={styles.checkbox}
+                      />
+                      <span className={styles.languageLabel}>
+                        <span className={styles.flag}>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </>
           )}
@@ -359,6 +624,45 @@ export default function FilterBar({
                 </button>
               </div>
             )}
+            {(selectedPriceRange.min !== null || selectedPriceRange.max !== null) && (
+              <div className={styles.filterChip}>
+                <span className={styles.chipLabel}>
+                  Prix:{' '}
+                  {selectedPriceRange.min !== null
+                    ? `${Math.floor(selectedPriceRange.min / 100)}€`
+                    : '0€'}
+                  {' - '}
+                  {selectedPriceRange.max !== null
+                    ? `${Math.floor(selectedPriceRange.max / 100)}€`
+                    : '500€'}
+                </span>
+                <button
+                  className={styles.chipRemove}
+                  onClick={handleRemovePriceFilter}
+                  aria-label="Retirer le filtre prix"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+            )}
+            {selectedLanguages.map((lang) => {
+              const langOption = languageOptions.find((l) => l.value === lang);
+              if (!langOption) return null;
+              return (
+                <div key={lang} className={styles.filterChip}>
+                  <span className={styles.chipLabel}>
+                    {langOption.flag} {langOption.label}
+                  </span>
+                  <button
+                    className={styles.chipRemove}
+                    onClick={() => handleRemoveLanguage(lang)}
+                    aria-label={`Retirer ${langOption.label}`}
+                  >
+                    <CloseIcon />
+                  </button>
+                </div>
+              );
+            })}
           </div>
           {hasActiveFilters && onResetFilters && (
             <button className={styles.resetButton} onClick={onResetFilters}>
