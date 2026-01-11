@@ -19,6 +19,13 @@
   gap: var(--space-4, 1rem);
 }
 
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+}
+
 .count {
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
@@ -56,14 +63,44 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   GRID
+   GRID VIEW
    ───────────────────────────────────────────────────────────────── */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-6, 1.5rem);
 }
+
+.gridItem {
+  animation: fadeInGrid 0.3s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInGrid {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   LIST VIEW
+   ───────────────────────────────────────────────────────────────── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   EMPTY STATE
+   ───────────────────────────────────────────────────────────────── */
 
 .emptyState {
   text-align: center;
@@ -122,16 +159,69 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   RESPONSIVE
+   RESPONSIVE — DESKTOP LARGE
    ───────────────────────────────────────────────────────────────── */
 
-@media (max-width: 640px) {
+@media (max-width: 1280px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   RESPONSIVE — TABLET
+   ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4, 1rem);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   RESPONSIVE — MOBILE
+   ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3, 0.75rem);
   }
 
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .toolbarRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sortContainer {
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .sortLabel {
+    display: none;
+  }
+
+  .sortSelect {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    font-size: var(--text-xs, 0.75rem);
+  }
+
+  .pagination {
+    gap: var(--space-1, 0.25rem);
+  }
+
+  .pageButton {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    font-size: var(--text-xs, 0.75rem);
+  }
+
+  .list {
+    gap: 12px;
   }
 }

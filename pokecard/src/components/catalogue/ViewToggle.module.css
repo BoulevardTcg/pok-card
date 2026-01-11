@@ -1,0 +1,59 @@
+/* ===================================================================
+   VIEW TOGGLE — Sélecteur de mode d'affichage
+   =================================================================== */
+
+.viewToggle {
+  display: inline-flex;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #6b7280;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.toggleButton:hover:not(.active) {
+  color: #374151;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid #0066ff;
+  outline-offset: 2px;
+}
+
+.toggleButton.active {
+  background: white;
+  color: #0066ff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggleButton svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .desktopOnly {
+    display: inline;
+  }
+}
