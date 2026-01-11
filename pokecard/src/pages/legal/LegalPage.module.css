@@ -1,0 +1,397 @@
+.legalPage {
+  min-height: 100vh;
+  background: var(--bg-primary, #0a0a0a);
+  color: var(--text-primary, #fff);
+  padding-top: 100px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary, #a0a0a0);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin-bottom: 2rem;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #fff);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.content {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 3rem;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 1.5rem;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.75rem;
+  }
+}
+
+.lastUpdate {
+  color: var(--text-secondary, #a0a0a0);
+  font-size: 0.9rem;
+}
+
+/* Table of Contents */
+.toc {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+}
+
+.toc h2 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  color: #60a5fa;
+}
+
+.toc ol {
+  columns: 2;
+  column-gap: 2rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .toc ol {
+    columns: 1;
+  }
+}
+
+.toc li {
+  margin-bottom: 0.5rem;
+  break-inside: avoid;
+}
+
+.toc a {
+  color: var(--text-secondary, #a0a0a0);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.toc a:hover {
+  color: #60a5fa;
+}
+
+/* Key Points Summary */
+.keyPoints {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+}
+
+.keyPoints h2 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  color: #10b981;
+}
+
+.keyPoints ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.keyPoints li {
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #d0d0d0);
+  position: relative;
+}
+
+.keyPoints li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.keyPoints li strong {
+  color: var(--text-primary, #fff);
+}
+
+/* Sections */
+.section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 120px;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  color: var(--text-primary, #fff);
+}
+
+.section h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--text-primary, #fff);
+}
+
+.section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+  color: #60a5fa;
+}
+
+.section p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #d0d0d0);
+  margin: 0 0 1rem;
+}
+
+.section ul,
+.section ol {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.section li {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #d0d0d0);
+  margin-bottom: 0.5rem;
+}
+
+.section li strong {
+  color: var(--text-primary, #fff);
+}
+
+/* Info Box */
+.infoBox {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.infoBox p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.infoBox p:first-child {
+  margin-top: 0;
+}
+
+.infoBox p:last-child {
+  margin-bottom: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.warningBox h4 {
+  color: #f59e0b;
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.warningBox ul {
+  margin: 0;
+}
+
+.warningBox li {
+  font-size: 0.9rem;
+}
+
+/* Legal Quote */
+.legalQuote {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-left: 4px solid #8b5cf6;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.legalQuote p {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.legalQuote p:first-child {
+  font-style: normal;
+  font-weight: 600;
+  color: #8b5cf6;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table th {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+}
+
+.table td {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary, #d0d0d0);
+}
+
+/* Inline Link */
+.inlineLink {
+  background: none;
+  border: none;
+  color: #60a5fa;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+}
+
+.inlineLink:hover {
+  color: #93c5fd;
+}
+
+/* Annexes */
+.annexes {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.annexes h2 {
+  font-size: 1.75rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.annexe {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.annexe h3 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  color: #60a5fa;
+}
+
+.formTemplate,
+.emailTemplate,
+.procedure {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.formTemplate p,
+.emailTemplate p,
+.procedure p {
+  margin: 0.5rem 0;
+}
+
+.formTemplate hr,
+.emailTemplate hr {
+  border: none;
+  border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  margin: 1rem 0;
+}
+
+.procedure h4 {
+  color: #60a5fa;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.procedure h4:first-child {
+  margin-top: 0;
+}
+
+.procedure ul {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.procedure li {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}

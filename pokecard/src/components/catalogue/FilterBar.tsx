@@ -92,7 +92,7 @@ export default function FilterBar({
   const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-  
+
   // État local pour le slider de prix (en euros)
   const [customPriceRange, setCustomPriceRange] = useState<[number, number]>(() => {
     // Initialiser depuis selectedPriceRange si présent
@@ -103,20 +103,20 @@ export default function FilterBar({
     }
     return [0, 500];
   });
-  
+
   const [selectedPricePreset, setSelectedPricePreset] = useState<string>(() => {
     // Déterminer le preset actif depuis selectedPriceRange
     if (selectedPriceRange.min === null && selectedPriceRange.max === null) return 'all';
     const min = selectedPriceRange.min !== null ? selectedPriceRange.min : 0;
     const max = selectedPriceRange.max !== null ? selectedPriceRange.max : 50000;
-    
+
     if (min === 0 && max === 2000) return '0-20';
     if (min === 2000 && max === 5000) return '20-50';
     if (min === 5000 && max === 10000) return '50-100';
     if (min === 10000 && max === null) return '100+';
     return 'custom';
   });
-  
+
   // Synchroniser customPriceRange avec selectedPriceRange quand il change depuis l'extérieur
   useEffect(() => {
     if (selectedPriceRange.min === null && selectedPriceRange.max === null) {
@@ -125,10 +125,11 @@ export default function FilterBar({
       setCustomPriceRange([0, 500]);
       return;
     }
-    
+
     const minEuros = selectedPriceRange.min !== null ? Math.floor(selectedPriceRange.min / 100) : 0;
-    const maxEuros = selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
-    
+    const maxEuros =
+      selectedPriceRange.max !== null ? Math.floor(selectedPriceRange.max / 100) : 500;
+
     // Vérifier si cela correspond à un preset
     if (selectedPriceRange.min === 0 && selectedPriceRange.max === 2000) {
       setSelectedPricePreset('0-20');
@@ -147,7 +148,6 @@ export default function FilterBar({
       setSelectedPricePreset('custom');
       setCustomPriceRange([minEuros, maxEuros]);
     }
-     
   }, [selectedPriceRange.min, selectedPriceRange.max]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +194,7 @@ export default function FilterBar({
   // Handlers pour le filtre Prix
   const handlePricePresetChange = (preset: string) => {
     setSelectedPricePreset(preset);
-    
+
     if (preset === 'all') {
       onPriceRangeChange({ min: null, max: null });
       setCustomPriceRange([0, 500]);
@@ -252,13 +252,13 @@ export default function FilterBar({
     setCustomPriceRange([0, 500]);
   };
 
-
   const hasActiveFilters =
     selectedGameCategories.length > 0 ||
     selectedProductTypes.length > 0 ||
     selectedAvailability.length > 0 ||
     selectedLanguages.length > 0 ||
-    (selectedPriceRange.min !== null || selectedPriceRange.max !== null) ||
+    selectedPriceRange.min !== null ||
+    selectedPriceRange.max !== null ||
     searchQuery;
 
   // Calculer le pourcentage pour le slider
@@ -422,8 +422,7 @@ export default function FilterBar({
             }}
           >
             <span>
-              Prix{' '}
-              {selectedPriceRange.min !== null || selectedPriceRange.max !== null ? '(1)' : ''}
+              Prix {selectedPriceRange.min !== null || selectedPriceRange.max !== null ? '(1)' : ''}
             </span>
             <ChevronDownIcon size={16} className={styles.chevronIcon} />
           </button>
@@ -540,8 +539,7 @@ export default function FilterBar({
             }}
           >
             <span>
-              Langue{' '}
-              {selectedLanguages.length > 0 ? `(${selectedLanguages.length})` : ''}
+              Langue {selectedLanguages.length > 0 ? `(${selectedLanguages.length})` : ''}
             </span>
             <ChevronDownIcon size={16} className={styles.chevronIcon} />
           </button>
