@@ -3,6 +3,11 @@ FROM node:24.12-alpine AS build
 
 WORKDIR /app
 
+# Variables d'environnement Vite (injectées au build-time)
+# VITE_API_URL: URL de l'API backend accessible depuis le navigateur
+ARG VITE_API_URL=http://localhost:8080/api
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copier les fichiers de dépendances
 COPY package*.json ./
 
@@ -12,7 +17,7 @@ RUN npm ci
 # Copier le code source
 COPY . .
 
-# Build de l'application
+# Build de l'application (VITE_API_URL sera injecté ici)
 RUN npm run build
 
 # Production stage

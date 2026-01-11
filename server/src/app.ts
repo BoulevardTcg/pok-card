@@ -15,6 +15,7 @@ import tradeOffersRoutes from './routes/trade-offers.js';
 import adminRoutes from './routes/admin.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
+import gdprRoutes from './routes/gdpr.js';
 
 // Import des middlewares de sécurité
 import {
@@ -118,6 +119,9 @@ export const createApp = () => {
 
   // Contact (formulaire)
   app.use('/api/contact', contactRoutes);
+
+  // Routes RGPD (protection des données)
+  app.use('/api/gdpr', gdprRoutes);
 
   // Gestion des erreurs globales
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

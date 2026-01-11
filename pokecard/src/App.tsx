@@ -22,6 +22,8 @@ import { AdminOrdersPage } from './AdminOrdersPage';
 import { AuthProvider } from './authContext';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
+import ForgotPasswordPage from './ForgotPasswordPage';
+import ResetPasswordPage from './ResetPasswordPage';
 import UserProfile from './UserProfile';
 import NavbarGlass from './components/navbar/NavbarGlass';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -84,6 +86,8 @@ function AppContent() {
           {/* Routes d'authentification */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/profile"
             element={
