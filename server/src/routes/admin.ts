@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OrderStatus, Carrier, FulfillmentStatus, OrderEventType } from '@prisma/client';
+import rateLimit from 'express-rate-limit';
 import prisma from '../lib/prisma.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import multer from 'multer';
@@ -12,8 +13,58 @@ import {
   sendOrderConfirmationEmail,
 } from '../services/email.js';
 import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js';
+import { audit } from '../utils/audit.js';
 
 const router = Router();
+
+// ============================================================================
+// RATE LIMITING POUR ROUTES ADMIN SENSIBLES
+// ============================================================================
+
+/**
+ * Rate limiter standard pour les routes admin (lecture)
+ * 100 requêtes par minute
+ */
+const adminReadLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100,
+  message: {
+    error: 'Trop de requêtes, veuillez réessayer plus tard',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Rate limiter strict pour les routes admin d'écriture
+ * 30 requêtes par minute
+ */
+const adminWriteLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,
+  message: {
+    error: 'Trop de requêtes de modification, veuillez réessayer plus tard',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Rate limiter très strict pour les suppressions
+ * 10 requêtes par minute
+ */
+const adminDeleteLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: {
+    error: 'Trop de requêtes de suppression, veuillez réessayer plus tard',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const carrierWhitelist = Object.values(Carrier);
 
@@ -825,6 +876,7 @@ router.get('/products', async (req: Request, res: Response) => {
 
 router.post(
   '/products',
+  adminWriteLimiter, // Rate limiting pour création
   [
     body('name').isString().notEmpty().withMessage('Le nom est obligatoire'),
     body('slug').isString().notEmpty().withMessage('Le slug est obligatoire'),
@@ -888,6 +940,9 @@ router.post(
           variants: true,
         },
       });
+
+      // Audit log
+      audit.productCreated(req, product.id, product.name);
 
       res.status(201).json({ product });
     } catch (error: any) {
@@ -1032,7 +1087,7 @@ router.put(
 );
 
 // Supprimer un produit
-router.delete('/products/:productId', async (req: Request, res: Response) => {
+router.delete('/products/:productId', adminDeleteLimiter, async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
 
@@ -1065,9 +1120,14 @@ router.delete('/products/:productId', async (req: Request, res: Response) => {
       });
     }
 
+    const productName = product.name;
+
     await prisma.product.delete({
       where: { id: productId },
     });
+
+    // Audit log
+    audit.productDeleted(req, productId, productName);
 
     res.json({ message: 'Produit supprimé avec succès' });
   } catch (error) {

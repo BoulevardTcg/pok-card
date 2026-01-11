@@ -31,6 +31,18 @@ model User {
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret  String? // Secret TOTP encodé
 
+  // RGPD - Consentements
+  marketingConsent     Boolean   @default(false) // Consentement emails marketing
+  marketingConsentAt   DateTime? // Date du consentement marketing
+  analyticsConsent     Boolean   @default(false) // Consentement analytics/cookies
+  analyticsConsentAt   DateTime? // Date du consentement analytics
+  privacyPolicyVersion String?   // Version de la politique de confidentialité acceptée
+  privacyAcceptedAt    DateTime? // Date d'acceptation de la politique
+
+  // RGPD - Suppression de compte
+  deletionRequestedAt DateTime? // Date de demande de suppression
+  deletionScheduledAt DateTime? // Date de suppression programmée (ex: +30 jours)
+
   // Relations
   profile             UserProfile?
   favorites           Favorite[]
