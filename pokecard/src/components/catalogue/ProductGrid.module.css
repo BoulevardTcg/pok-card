@@ -69,7 +69,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-6, 1.5rem);
+  gap: var(--space-8, 2rem);
 }
 
 .gridItem {
@@ -95,7 +95,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -175,7 +175,7 @@
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4, 1rem);
+    gap: var(--space-6, 1.5rem);
   }
 }
 
@@ -186,7 +186,7 @@
 @media (max-width: 767px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3, 0.75rem);
+    gap: var(--space-4, 1rem);
   }
 
   .toolbar {
@@ -222,6 +222,6 @@
   }
 
   .list {
-    gap: 12px;
+    gap: 16px;
   }
 }

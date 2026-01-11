@@ -1,14 +1,14 @@
 /* ===================================================================
-   PRODUCT LIST ITEM — Item liste produit
+   PRODUCT LIST ITEM — Item liste produit premium dark mode
    =================================================================== */
 
 .listItem {
   display: grid;
   grid-template-columns: 120px 1fr auto auto;
-  gap: 20px;
-  padding: 16px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  gap: 24px;
+  padding: 20px;
+  background: var(--color-bg-elevated, #141416);
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -17,12 +17,12 @@
 }
 
 .listItem:hover {
-  border-color: #0066ff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.15));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .listItem.outOfStock {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 @keyframes fadeIn {
@@ -52,7 +52,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: var(--color-bg-subtle, #1a1a1d);
 }
 
 .placeholderImage {
@@ -61,32 +61,71 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(26, 26, 29, 0.9) 0%,
+    rgba(10, 10, 11, 1) 100%
+  );
   border-radius: 8px;
-  color: #9ca3af;
+  position: relative;
+  overflow: hidden;
 }
+
+.placeholderImage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+    linear-gradient(-45deg, rgba(6, 182, 212, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.placeholderLogo {
+  position: relative;
+  z-index: 1;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.listItem:hover .placeholderLogo {
+  opacity: 0.6;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BADGES — Style premium doré
+   ───────────────────────────────────────────────────────────────── */
 
 .badge {
   position: absolute;
   top: 6px;
   left: 6px;
   padding: 4px 8px;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
-  border-radius: 4px;
+  border-radius: 3px;
   font-family: var(--font-body, 'Inter', sans-serif);
   letter-spacing: 0.5px;
 }
 
 .badgeNew {
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  color: #000;
 }
 
 .badgeFeatured {
-  background: #f59e0b;
-  color: white;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  color: #000;
+}
+
+.badgeNotify {
+  background: transparent;
+  border: 1px solid #d4af37;
+  color: #d4af37;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -96,7 +135,7 @@
 .productInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
   justify-content: center;
@@ -109,18 +148,30 @@
 }
 
 .categoryBadge {
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--color-text-muted, #6b6b6f);
   font-weight: 600;
   letter-spacing: 0.5px;
   font-family: var(--font-body, 'Inter', sans-serif);
 }
 
+.categoryBadge::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--color-accent-secondary, #d4af37);
+  border-radius: 50%;
+}
+
 .productName {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary, #f5f5f3);
   margin: 0;
   line-height: 1.3;
   font-family: var(--font-body, 'Inter', sans-serif);
@@ -129,8 +180,8 @@
 .metaRow {
   display: flex;
   gap: 16px;
-  font-size: 13px;
-  color: #6b7280;
+  font-size: 12px;
+  color: var(--color-text-muted, #6b6b6f);
 }
 
 .metaItem {
@@ -138,8 +189,8 @@
 }
 
 .description {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 13px;
+  color: var(--color-text-secondary, #a1a1a6);
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
@@ -162,33 +213,64 @@
 }
 
 .price {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: #0066ff;
-  margin-bottom: 4px;
+  color: var(--color-text-primary, #f5f5f3);
+  margin-bottom: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
+  line-height: 1.2;
 }
 
 .stockStatus {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 400;
   font-family: var(--font-body, 'Inter', sans-serif);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.stockStatus::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .stockStatus.in-stock {
   color: #10b981;
 }
 
+.stockStatus.in-stock::before {
+  background: #10b981;
+}
+
 .stockStatus.low-stock {
   color: #f59e0b;
+  font-weight: 400;
+}
+
+.stockStatus.low-stock::before {
+  background: #f59e0b;
 }
 
 .stockStatus.out-of-stock {
-  color: #ef4444;
+  color: var(--color-text-muted, #6b6b6f);
+}
+
+.stockStatus.out-of-stock::before {
+  background: var(--color-text-muted, #6b6b6f);
 }
 
 .stockStatus.coming-soon {
-  color: #6b7280;
+  color: var(--color-text-muted, #6b6b6f);
+}
+
+.stockStatus.coming-soon::before {
+  background: var(--color-text-muted, #6b6b6f);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -199,34 +281,65 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   min-width: 160px;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   TRUST INFO - Informations rassurantes
+   ───────────────────────────────────────────────────────────────── */
+
+.trustInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 11px;
+  color: var(--color-text-muted, #6b6b6f);
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.separator {
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ADD TO CART BUTTON - Style CTA premium
+   ───────────────────────────────────────────────────────────────── */
+
 .addToCartButton {
   width: 100%;
-  padding: 10px 20px;
-  background: #0066ff;
-  color: white;
+  padding: 14px 20px;
+  background: #ffffff;
+  color: #0a0a0b;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: #0052cc;
+  background: #f5f5f5;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
 }
 
 .addToCartButton:disabled {
-  background: #d1d5db;
+  background: var(--color-bg-subtle, #1a1a1d);
+  color: var(--color-text-muted, #6b6b6f);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .addToCartButton.adding {
@@ -234,28 +347,44 @@
   cursor: wait;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   NOTIFY BUTTON - Style doré premium
+   ───────────────────────────────────────────────────────────────── */
+
 .notifyButton {
   width: 100%;
-  padding: 10px 20px;
-  background: #6b7280;
-  color: white;
-  border: none;
+  padding: 14px 20px;
+  background: transparent;
+  color: var(--color-text-secondary, #a1a1a6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 500;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition: all 0.2s ease;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .notifyButton:hover {
-  background: #4b5563;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: var(--color-text-primary, #f5f5f3);
+  transform: translateY(-1px);
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   WISHLIST BUTTON
+   ───────────────────────────────────────────────────────────────── */
 
 .wishlistButton {
   padding: 10px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: transparent;
+  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.12));
   border-radius: 8px;
   cursor: pointer;
   font-size: 18px;
@@ -264,12 +393,12 @@
 }
 
 .wishlistButton:hover {
-  background: #fef2f2;
-  border-color: #ef4444;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border-hover, rgba(255, 255, 255, 0.2));
 }
 
 .wishlistButton.wishlisted {
-  background: #fee2e2;
+  background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
 }
 
@@ -280,7 +409,12 @@
 @media (max-width: 1024px) {
   .listItem {
     grid-template-columns: 100px 1fr auto;
-    gap: 16px;
+    gap: 20px;
+  }
+
+  .imageWrapper {
+    width: 100px;
+    height: 100px;
   }
 
   .actionsSection {
@@ -304,7 +438,7 @@
   }
 
   .price {
-    font-size: 24px;
+    font-size: 26px;
   }
 }
 
@@ -316,8 +450,9 @@
   .listItem {
     grid-template-columns: 80px 1fr;
     grid-template-rows: auto auto auto;
-    gap: 12px;
-    padding: 12px;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 10px;
   }
 
   .imageWrapper {
@@ -342,7 +477,7 @@
 
   .metaRow {
     gap: 8px;
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .description {
@@ -359,7 +494,7 @@
   }
 
   .price {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 0;
   }
 
@@ -374,7 +509,13 @@
   .notifyButton {
     flex: 1;
     padding: 10px 16px;
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  .trustInfo {
+    font-size: 10px;
+    margin-top: 4px;
+    gap: 4px;
   }
 
   .wishlistButton {
@@ -384,15 +525,25 @@
   }
 
   .badge {
-    font-size: 9px;
+    font-size: 8px;
     padding: 3px 6px;
   }
 
   .categoryBadge {
-    font-size: 10px;
+    font-size: 9px;
+  }
+
+  .categoryBadge::before {
+    width: 4px;
+    height: 4px;
   }
 
   .stockStatus {
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  .stockStatus::before {
+    width: 4px;
+    height: 4px;
   }
 }

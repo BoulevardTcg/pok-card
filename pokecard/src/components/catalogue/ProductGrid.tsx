@@ -1,10 +1,31 @@
 import { useSearchParams } from 'react-router-dom';
+import { useMemo } from 'react';
 import ProductCard from './ProductCard';
 import ProductListItem from './ProductListItem';
 import ViewToggle from './ViewToggle';
 import type { Product } from '../../cartContext';
 import type { ViewMode } from '../../hooks/useViewPreference';
 import styles from './ProductGrid.module.css';
+
+// Nombre max de badges "NOUVEAU" à afficher
+const MAX_NEW_BADGES = 5;
+
+// Vérifie si un produit a une image
+function hasProductImage(product: Product): boolean {
+  return !!(
+    (product.images && product.images.length > 0 && product.images[0].url) ||
+    product.image?.url
+  );
+}
+
+// Vérifie si un produit est récent (moins de 30 jours)
+function isRecentProduct(product: Product): boolean {
+  if (!product.createdAt) return false;
+  const createdDate = new Date(product.createdAt);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return createdDate > thirtyDaysAgo;
+}
 
 interface ProductGridProps {
   products: Product[];
@@ -25,6 +46,22 @@ export default function ProductGrid({
 }: ProductGridProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortBy = searchParams.get('sort') || 'newest';
+
+  // Calculer les IDs des produits éligibles au badge "NOUVEAU"
+  const newBadgeProductIds = useMemo(() => {
+    // Filtrer : récent (30 jours) ET a une image
+    const eligibleProducts = products
+      .filter((p) => isRecentProduct(p) && hasProductImage(p))
+      .sort((a, b) => {
+        // Trier par date de création décroissante (plus récent en premier)
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, MAX_NEW_BADGES);
+
+    return new Set(eligibleProducts.map((p) => p.id));
+  }, [products]);
 
   return (
     <div className={styles.gridContainer}>
@@ -68,14 +105,19 @@ export default function ProductGrid({
               className={styles.gridItem}
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <ProductCard product={product} />
+              <ProductCard product={product} showNewBadge={newBadgeProductIds.has(product.id)} />
             </div>
           ))}
         </div>
       ) : (
         <div className={styles.list} key="list-view">
           {products.map((product, index) => (
-            <ProductListItem key={product.id} product={product} index={index} />
+            <ProductListItem
+              key={product.id}
+              product={product}
+              index={index}
+              showNewBadge={newBadgeProductIds.has(product.id)}
+            />
           ))}
         </div>
       )}
