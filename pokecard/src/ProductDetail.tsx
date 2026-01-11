@@ -456,9 +456,40 @@ export function ProductDetail() {
                   </div>
                 </div>
               )}
+
+              {/* Bouton CTA Mobile — Juste sous l'image sur mobile */}
+              <div className={styles.actionSectionMobile}>
+                <button
+                  className={`${styles.addButtonMobile} ${!isAvailable ? styles.disabled : ''}`}
+                  onClick={handleAddToCart}
+                  disabled={!isAvailable}
+                  aria-label={
+                    isAvailable
+                      ? isPreorder
+                        ? 'Précommander ce produit'
+                        : `Ajouter ${quantity} ${quantity > 1 ? 'exemplaires' : 'exemplaire'} à ma collection`
+                      : 'Produit indisponible'
+                  }
+                  aria-describedby={
+                    isAvailable && selectedVariant ? 'stock-info-mobile' : undefined
+                  }
+                >
+                  {isAvailable
+                    ? isPreorder
+                      ? 'Précommander'
+                      : 'Ajouter à ma collection'
+                    : 'Indisponible'}
+                </button>
+                {isAvailable && selectedVariant && (
+                  <span id="stock-info-mobile" className="sr-only">
+                    Stock disponible : {selectedVariant.stock}{' '}
+                    {selectedVariant.stock === 1 ? 'exemplaire' : 'exemplaires'}
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Section Produits similaires — Sous les images */}
+            {/* Section Produits similaires — Sous les images (Desktop) */}
             {similarProducts.length > 0 && (
               <section
                 className={styles.similarSectionInline}
@@ -671,7 +702,7 @@ export function ProductDetail() {
                 </div>
               )}
 
-              {/* CTA unique */}
+              {/* CTA unique — Desktop uniquement */}
               <div className={styles.actionSection}>
                 <button
                   className={`${styles.addButton} ${!isAvailable ? styles.disabled : ''}`}
@@ -1049,6 +1080,75 @@ export function ProductDetail() {
           )}
         </div>
       </section>
+
+      {/* Section Produits similaires — En bas sur mobile */}
+      {similarProducts.length > 0 && (
+        <section
+          className={styles.similarSectionBottom}
+          aria-labelledby="similar-products-title-bottom"
+        >
+          <h2 id="similar-products-title-bottom" className={styles.similarSectionTitle}>
+            Produits similaires
+          </h2>
+          <div className={styles.similarGrid} role="list">
+            {similarProducts.map((similarProduct) => {
+              const imageUrl = getImageUrl(
+                similarProduct.images?.[0]?.url || '/img/products/placeholder.png'
+              );
+              const price = similarProduct.minPriceCents || 0;
+
+              return (
+                <article
+                  key={similarProduct.id}
+                  className={styles.similarCard}
+                  role="listitem"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigate(`/produit/${similarProduct.slug}`);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigate(`/produit/${similarProduct.slug}`);
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label={`Voir le produit ${similarProduct.name}`}
+                >
+                  <div className={styles.similarImageWrapper}>
+                    <img
+                      src={imageUrl}
+                      alt={`${similarProduct.name} - Image du produit`}
+                      className={styles.similarImage}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
+                      }}
+                    />
+                  </div>
+
+                  <div className={styles.similarContent}>
+                    <h3 className={styles.similarName}>{similarProduct.name}</h3>
+                    <div className={styles.similarFooter}>
+                      <span
+                        className={styles.similarPrice}
+                        aria-label={`Prix : ${price > 0 ? `${formatPrice(price)} euros` : 'Prix sur demande'}`}
+                      >
+                        {price > 0 ? `${formatPrice(price)} €` : 'Prix sur demande'}
+                      </span>
+                      <span className={styles.similarAction} aria-hidden="true">
+                        <ArrowRightIcon size={16} strokeWidth={1.5} />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
