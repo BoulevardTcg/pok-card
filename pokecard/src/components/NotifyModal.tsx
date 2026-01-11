@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { API_BASE } from '../api';
 import styles from './NotifyModal.module.css';
@@ -23,7 +24,19 @@ export function NotifyModal({
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  // Gérer l'overflow du body quand la modal est ouverte
+  useEffect(() => {
+    if (isOpen) {
+      // Sauvegarder la valeur actuelle de overflow
+      const originalOverflow = document.body.style.overflow;
+      // Désactiver le scroll
+      document.body.style.overflow = 'hidden';
+      // Restaurer au démontage
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +79,9 @@ export function NotifyModal({
     }
   };
 
-  return (
+  if (!isOpen) return null;
+
+  const modalContent = (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose} aria-label="Fermer">
@@ -124,4 +139,7 @@ export function NotifyModal({
       </div>
     </div>
   );
+
+  // Utiliser createPortal pour rendre la modal directement dans le body
+  return createPortal(modalContent, document.body);
 }

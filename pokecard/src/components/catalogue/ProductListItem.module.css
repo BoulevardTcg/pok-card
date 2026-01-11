@@ -59,40 +59,54 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(
-    circle at 50% 40%,
-    rgba(26, 26, 29, 0.9) 0%,
-    rgba(10, 10, 11, 1) 100%
-  );
+  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   position: relative;
   overflow: hidden;
 }
 
+/* Logo BoulevardTCG en filigrane */
 .placeholderImage::before {
-  content: '';
+  content: 'BOULEVARDTCG';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
-    linear-gradient(-45deg, rgba(6, 182, 212, 0.03) 0%, transparent 50%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display, 'Inter', sans-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  opacity: 0.1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
   pointer-events: none;
+  z-index: 0;
 }
 
-.placeholderLogo {
+.placeholderText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   position: relative;
   z-index: 1;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
+  text-align: center;
 }
 
-.listItem:hover .placeholderLogo {
-  opacity: 0.6;
+.placeholderBrand {
+  display: none; /* Masqué sur desktop, affiché uniquement sur mobile si nécessaire */
+}
+
+.placeholderSubtext {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -173,8 +187,14 @@
   font-weight: 600;
   color: var(--color-text-primary, #f5f5f3);
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.5;
   font-family: var(--font-body, 'Inter', sans-serif);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .metaRow {
@@ -311,28 +331,30 @@
    ───────────────────────────────────────────────────────────────── */
 
 .addToCartButton {
-  width: 100%;
+  width: 100%; /* Full-width pour les listes */
   padding: 14px 20px;
-  background: #ffffff;
-  color: #0a0a0b;
+  background: #3d6e4e; /* Vert uniforme */
+  color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 8px; /* rounded-lg */
+  font-weight: 600; /* font-semibold */
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  font-size: 0.875rem; /* text-sm */
+  letter-spacing: 0.05em; /* tracking-wide */
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: #f5f5f5;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+  filter: brightness(0.9); /* hover:brightness-90 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .addToCartButton:disabled {
@@ -348,33 +370,69 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   NOTIFY BUTTON - Style doré premium
+   NOTIFY BUTTON - Style outline attractif adapté au thème (identique homepage)
    ───────────────────────────────────────────────────────────────── */
 
 .notifyButton {
+  position: relative;
   width: 100%;
   padding: 14px 20px;
-  background: transparent;
-  color: var(--color-text-secondary, #a1a1a6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  color: var(--color-accent-primary);
+  border: 2px solid var(--color-accent-primary);
   border-radius: 8px;
-  font-weight: 500;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
+  font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Effet glow pulsant */
+.notifyButton::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
+    transparent,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent)
+  );
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
 .notifyButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: var(--color-text-primary, #f5f5f3);
-  transform: translateY(-1px);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.notifyButton:hover::after {
+  opacity: 1;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -457,8 +515,19 @@
 
   .imageWrapper {
     width: 80px;
-    height: 80px;
+    height: 106px; /* Ratio 3:4 pour carte TCG (80 * 4/3 = 106.67) */
     grid-row: 1 / 2;
+    aspect-ratio: 3 / 4;
+  }
+
+  .placeholderImage::before {
+    font-size: 16px;
+    letter-spacing: 0.08em;
+  }
+
+  .placeholderSubtext {
+    font-size: 0.75rem; /* text-sm */
+    color: rgba(255, 255, 255, 0.3);
   }
 
   .productInfo {
@@ -473,6 +542,10 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    min-height: 48px;
+    line-height: 1.5;
   }
 
   .metaRow {

@@ -1,0 +1,64 @@
+/* ===================================================================
+   ADD TO CART BUTTON — Style uniforme pour tous les boutons "Ajouter"
+   Correspond exactement au bouton homepage
+   =================================================================== */
+
+.addToCartButton {
+  position: relative;
+  padding: 0.625rem 2.5rem; /* py-2.5 px-10 */
+  background: #3d6e4e; /* Vert comme demandé */
+  color: white;
+  border: none;
+  border-radius: 8px; /* rounded-lg */
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600; /* font-semibold */
+  letter-spacing: 0.05em; /* tracking-wide */
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  white-space: nowrap;
+  width: auto; /* Pas de width: 100% par défaut */
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.addToCartButton:hover:not(:disabled) {
+  filter: brightness(0.9); /* hover:brightness-90 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.addToCartButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.addToCartButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+}
+
+.addToCartButton:focus-visible {
+  outline: 2px solid #3d6e4e;
+  outline-offset: 2px;
+}
+
+/* Variante full-width pour les cartes produits */
+.addToCartButton.fullWidth {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 767px) {
+  .addToCartButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+  }
+}

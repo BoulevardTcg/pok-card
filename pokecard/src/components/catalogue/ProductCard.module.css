@@ -85,25 +85,14 @@
   pointer-events: none;
 }
 
-.placeholderLogo {
-  position: relative;
-  z-index: 1;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
-}
-
-.card:hover .placeholderLogo {
-  opacity: 0.6;
-}
-
 .placeholderText {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  margin-top: 16px;
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 
 .placeholderBrand {
@@ -290,6 +279,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-word;
   font-family: var(--font-body, 'Inter', sans-serif);
 }
 
@@ -298,6 +288,8 @@
     font-size: 13px;
     -webkit-line-clamp: 2;
     margin-bottom: 4px;
+    min-height: 48px;
+    line-height: 1.5;
   }
 }
 
@@ -426,28 +418,30 @@
    ───────────────────────────────────────────────────────────────── */
 
 .addToCartButton {
-  width: 100%;
+  width: 100%; /* Full-width pour les cartes produits */
   height: 48px;
-  background: #ffffff;
-  color: #0a0a0b;
+  background: #3d6e4e; /* Vert uniforme */
+  color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 8px; /* rounded-lg */
+  font-weight: 600; /* font-semibold */
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  font-size: 0.875rem; /* text-sm */
+  letter-spacing: 0.05em; /* tracking-wide */
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:hover:not(:disabled) {
-  background: #f5f5f5;
+  filter: brightness(0.9); /* hover:brightness-90 */
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .addToCartButton:active:not(:disabled) {
@@ -468,33 +462,70 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   NOTIFY BUTTON - Style doré premium
+   NOTIFY BUTTON - Style outline attractif adapté au thème (identique homepage)
    ───────────────────────────────────────────────────────────────── */
 
 .notifyButton {
+  position: relative;
   width: 100%;
   height: 48px;
-  background: transparent;
-  color: var(--color-text-secondary, #a1a1a6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1.25rem;
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  color: var(--color-accent-primary);
+  border: 2px solid var(--color-accent-primary);
   border-radius: 8px;
-  font-weight: 500;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 14px;
+  font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Effet glow pulsant */
+.notifyButton::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
+    transparent,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent)
+  );
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
 .notifyButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: var(--color-text-primary, #f5f5f3);
-  transform: translateY(-2px);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.notifyButton:hover::after {
+  opacity: 1;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
