@@ -15,6 +15,7 @@ export async function cleanupDatabase() {
   await prisma.orderEvent.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.cartReservation.deleteMany(); // Ajout: nettoyer les réservations
   await prisma.refreshToken.deleteMany();
   await prisma.userProfile.deleteMany();
   await prisma.user.deleteMany();
@@ -78,6 +79,28 @@ export async function createTestProduct(overrides?: {
   });
 
   return product;
+}
+
+// Créer une variante de produit (helper pour tests)
+export async function createProductVariant(
+  productId: string,
+  overrides?: {
+    name?: string;
+    priceCents?: number;
+    stock?: number;
+    isActive?: boolean;
+  }
+) {
+  const variant = await prisma.productVariant.create({
+    data: {
+      productId,
+      name: overrides?.name || 'Standard',
+      priceCents: overrides?.priceCents || 1000,
+      stock: overrides?.stock ?? 10,
+      isActive: overrides?.isActive ?? true,
+    },
+  });
+  return variant;
 }
 
 export { prisma };

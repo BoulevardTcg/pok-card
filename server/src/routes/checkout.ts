@@ -166,7 +166,8 @@ async function createOrderFromSession(
   return createdOrder;
 }
 
-async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
+// Export pour les tests
+export async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
   const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email;
   const items = parseMetadataItems(session.metadata ?? null);
 
