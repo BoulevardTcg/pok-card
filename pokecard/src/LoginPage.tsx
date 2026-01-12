@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './authContext';
-import { Shield, Key, ArrowLeft, Loader2 } from 'lucide-react';
+import { Shield, Key, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import styles from './LoginPage.module.css';
 
 const LoginPage: React.FC = () => {
@@ -188,8 +188,9 @@ const LoginPage: React.FC = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className={styles.passwordToggle}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               <div className={styles.forgotPassword}>

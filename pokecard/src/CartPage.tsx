@@ -539,7 +539,7 @@ export function CartPage() {
                 onClick={handleCheckout}
                 disabled={loading || cart.length === 0}
               >
-                {loading ? '⏳ Redirection...' : '💳 Passer la commande'}
+                {loading ? '⏳ Redirection...' : 'Passer la commande'}
                 <span className={styles.arrow}>→</span>
               </button>
 
