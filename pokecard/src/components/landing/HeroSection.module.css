@@ -109,6 +109,29 @@
   box-shadow: 0 0 4px var(--color-accent-primary, #e8e4dd);
 }
 
+.particle:nth-child(3n) {
+  width: 4px;
+  height: 4px;
+  box-shadow:
+    0 0 8px var(--color-accent-secondary, #8b7355),
+    0 0 12px rgba(139, 115, 85, 0.4);
+}
+
+.particle:nth-child(4n) {
+  width: 2.5px;
+  height: 2.5px;
+  background: rgba(232, 228, 221, 0.8);
+  box-shadow: 0 0 5px rgba(232, 228, 221, 0.6);
+}
+
+.particle:nth-child(5n) {
+  width: 3.5px;
+  height: 3.5px;
+  box-shadow:
+    0 0 7px var(--color-accent-secondary, #8b7355),
+    0 0 10px rgba(139, 115, 85, 0.3);
+}
+
 @keyframes floatUp {
   0% {
     transform: translateY(0) translateX(0);

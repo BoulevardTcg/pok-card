@@ -71,7 +71,7 @@ export default function HeroSection() {
   // Particules mémorisées pour éviter le recalcul à chaque re-render
   const particles = useMemo(
     () =>
-      [...Array(20)].map((_, i) => ({
+      [...Array(50)].map((_, i) => ({
         id: i,
         left: `${Math.random() * 100}%`,
         animationDelay: `${Math.random() * 5}s`,
