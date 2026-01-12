@@ -245,8 +245,7 @@ export default function HeroSection() {
           </h1>
 
           <motion.p className={styles.description} variants={itemVariants}>
-            Boosters, displays, coffrets ETB et collections premium — Boulevard vous propose une
-            sélection soignée de produits scellés pour tous les passionnés de TCG.
+            Boulevard propose des produits scellés pour les passionnés de cartes à collectionner.
           </motion.p>
 
           <motion.div className={styles.heroActions} variants={itemVariants}>
