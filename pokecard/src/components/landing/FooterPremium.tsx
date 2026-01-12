@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { InstagramIcon, TwitterIcon, MailIcon, VintedIcon } from '../icons/Icons';
+import { InstagramIcon, MailIcon, VintedIcon } from '../icons/Icons';
 import styles from './FooterPremium.module.css';
 
 const NAV_LINKS = [
@@ -16,15 +16,18 @@ const LEGAL_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { href: 'https://instagram.com/boulevardtcg', icon: InstagramIcon, label: 'Instagram' },
-  { href: 'https://twitter.com/boulevardtcg', icon: TwitterIcon, label: 'X (Twitter)' },
+  {
+    href: 'https://www.instagram.com/boulevard_tcg?igsh=NnNhcGE3ZmY1OTI4&utm_source=qr',
+    icon: InstagramIcon,
+    label: 'Instagram',
+  },
   { href: 'https://www.vinted.fr/member/27229438', icon: VintedIcon, label: 'Vinted' },
   { href: 'mailto:contact@boulevardtcg.com', icon: MailIcon, label: 'Email' },
 ];
 
 export default function FooterPremium() {
   const navigate = useNavigate();
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2025;
 
   return (
     <footer className={styles.footer}>
@@ -38,8 +41,11 @@ export default function FooterPremium() {
               onClick={() => navigate('/')}
               aria-label="Retour à l'accueil"
             >
-              <span className={styles.logoMark}>B</span>
-              <span className={styles.logoText}>Boulevard</span>
+              <img
+                src="/img/phoenix-logo.png.png"
+                alt="BoulevardTCG"
+                className={styles.logoImage}
+              />
             </button>
             <p className={styles.tagline}>Play your cards.</p>
             <div className={styles.socialSection}>

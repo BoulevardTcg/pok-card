@@ -92,8 +92,8 @@ html[data-theme='light'] {
   --color-text-muted: #a8a29e;
   --color-text-inverse: #fafaf9;
 
-  /* Accents CTA - Vert forêt pour light mode */
-  --color-accent-primary: #3f784c;
+  /* Accents CTA - Bleu cyan pour light mode */
+  --color-accent-primary: #3f7ef3;
   --color-accent-secondary: #4a8a58;
   --color-accent-gold: #5a9c68;
   --color-accent-hover: #2d5a38;
@@ -102,7 +102,7 @@ html[data-theme='light'] {
   --color-border-subtle: rgba(0, 0, 0, 0.06);
   --color-border-default: rgba(0, 0, 0, 0.1);
   --color-border-hover: rgba(0, 0, 0, 0.15);
-  --color-border-accent: rgba(63, 120, 76, 0.25);
+  --color-border-accent: rgba(63, 126, 243, 0.25);
 
   /* Glass effect pour light mode */
   --glass-bg: rgba(255, 255, 255, 0.75);
@@ -110,13 +110,13 @@ html[data-theme='light'] {
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
-  /* Ombres ajustées avec accent vert forêt */
+  /* Ombres ajustées avec accent bleu cyan */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(63, 120, 76, 0.15);
-  --shadow-lg: 0 8px 24px rgba(63, 120, 76, 0.2);
+  --shadow-md: 0 4px 12px rgba(63, 126, 243, 0.15);
+  --shadow-lg: 0 8px 24px rgba(63, 126, 243, 0.2);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 0 40px rgba(63, 120, 76, 0.15);
-  --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 40px rgba(63, 120, 76, 0.1);
+  --shadow-glow: 0 0 40px rgba(63, 126, 243, 0.15);
+  --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 40px rgba(63, 126, 243, 0.1);
 }
 
 /* Rétrocompatibilité avec l'ancienne classe .light */

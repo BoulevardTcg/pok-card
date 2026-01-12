@@ -409,42 +409,6 @@ export function ContactPage() {
             </form>
           </main>
         </div>
-
-        <section className={styles.faqSection}>
-          <h2 className={styles.faqTitle}>Questions fréquentes</h2>
-          <div className={styles.faqGrid}>
-            <article className={styles.faqItem}>
-              <h3 className={styles.faqItemTitle}>Comment fonctionne le système d'échanges ?</h3>
-              <p className={styles.faqItemText}>
-                Vous pouvez proposer vos cartes en échange et rechercher des cartes spécifiques.
-                Notre plateforme facilite les échanges entre collectionneurs.
-              </p>
-            </article>
-
-            <article className={styles.faqItem}>
-              <h3 className={styles.faqItemTitle}>Comment participer aux concours ?</h3>
-              <p className={styles.faqItemText}>
-                Rendez-vous sur la page Concours pour voir les événements en cours et acheter vos
-                tickets de participation.
-              </p>
-            </article>
-
-            <article className={styles.faqItem}>
-              <h3 className={styles.faqItemTitle}>Livraison gratuite à partir de quel montant ?</h3>
-              <p className={styles.faqItemText}>
-                La livraison est gratuite dès 50€ d'achat en France métropolitaine.
-              </p>
-            </article>
-
-            <article className={styles.faqItem}>
-              <h3 className={styles.faqItemTitle}>Comment devenir vendeur sur la plateforme ?</h3>
-              <p className={styles.faqItemText}>
-                Contactez-nous via ce formulaire en précisant votre projet. Nous étudierons votre
-                demande et vous accompagnerons dans votre démarche.
-              </p>
-            </article>
-          </div>
-        </section>
       </div>
     </div>
   );

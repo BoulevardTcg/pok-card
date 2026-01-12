@@ -344,7 +344,7 @@ export default function NavbarGlass() {
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
             transition={shouldReduceMotion ? { duration: 0.15 } : SPRING_CONFIG}
           >
-            <span className={styles.logoText}>Boulevard</span>
+            <img src="/img/phoenix-logo.png.png" alt="BoulevardTCG" className={styles.logoImage} />
           </motion.button>
 
           {/* Navigation Centrale */}
@@ -641,7 +641,11 @@ export default function NavbarGlass() {
                       }}
                       aria-label="Retour à l'accueil"
                     >
-                      <span className={styles.logoText}>Boulevard</span>
+                      <img
+                        src="/img/phoenix-logo.png.png"
+                        alt="BoulevardTCG"
+                        className={styles.logoImage}
+                      />
                     </button>
                     <button
                       className={styles.mobileCloseButton}

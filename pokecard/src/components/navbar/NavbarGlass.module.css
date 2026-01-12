@@ -85,6 +85,13 @@
   flex-shrink: 0;
 }
 
+.logoImage {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
 .logoText {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: 1.125rem;
@@ -616,6 +623,10 @@
   outline: none;
 }
 
+.mobileLogoButton .logoImage {
+  height: 32px;
+}
+
 .mobileCloseButton {
   display: flex;
   align-items: center;
@@ -869,6 +880,10 @@
 
   .logoText {
     font-size: 1rem;
+  }
+
+  .logoImage {
+    height: 32px;
   }
 
   .logoMark {

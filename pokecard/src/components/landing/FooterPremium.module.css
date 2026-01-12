@@ -66,6 +66,13 @@
   opacity: 0.8;
 }
 
+.logoImage {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
 .logoMark {
   display: flex;
   align-items: center;

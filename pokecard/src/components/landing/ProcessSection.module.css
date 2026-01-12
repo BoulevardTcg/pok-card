@@ -56,6 +56,11 @@
   color: var(--color-accent-secondary, #8b7355);
 }
 
+/* Mode clair : bleu cyan pour l'overline */
+html[data-theme='light'] .overline {
+  color: #3f7ef3;
+}
+
 .title {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
@@ -116,6 +121,11 @@
   will-change: height;
 }
 
+/* Mode clair : bleu cyan pour la progression */
+html[data-theme='light'] .timelineProgress {
+  background: linear-gradient(180deg, #3f7ef3 0%, #3f7ef3 90%, transparent 100%);
+}
+
 .timelineDot {
   position: relative;
   z-index: 1;
@@ -143,6 +153,13 @@
   border-color: var(--color-accent-secondary, #8b7355);
   box-shadow: 0 0 20px rgba(139, 115, 85, 0.4);
   transform: scale(1.15);
+}
+
+/* Mode clair : bleu cyan pour les dots actifs */
+html[data-theme='light'] .timelineDot.active {
+  background: #3f7ef3;
+  border-color: #3f7ef3;
+  box-shadow: 0 0 20px rgba(63, 126, 243, 0.4);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -214,6 +231,20 @@
   border-color: var(--color-accent-secondary, #8b7355);
   color: var(--color-bg-primary, #0a0a0b);
   box-shadow: 0 4px 20px rgba(139, 115, 85, 0.3);
+}
+
+/* Mode clair : bleu cyan pour les icônes actives */
+html[data-theme='light'] .step.active .stepIcon {
+  background: rgba(63, 126, 243, 0.3);
+  border-color: rgba(63, 126, 243, 0.5);
+  color: #3f7ef3;
+}
+
+html[data-theme='light'] .step.current .stepIcon {
+  background: #3f7ef3;
+  border-color: #3f7ef3;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(63, 126, 243, 0.3);
 }
 
 .stepContent {

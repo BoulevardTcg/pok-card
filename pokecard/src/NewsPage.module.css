@@ -138,6 +138,11 @@
   margin: var(--space-6, 1.5rem) auto;
 }
 
+/* Mode clair : bleu cyan pour le divider */
+html[data-theme='light'] .divider {
+  background: linear-gradient(90deg, transparent, #3f7ef3, transparent);
+}
+
 .description {
   font-family: var(--font-body);
   font-size: var(--text-lg, 1.125rem);
@@ -216,6 +221,13 @@
   border-color: var(--color-accent-secondary, #8b7355);
   color: var(--color-text-inverse, #0a0a0b);
   font-weight: var(--font-semibold, 600);
+}
+
+/* Mode clair : bleu cyan pour les filtres actifs */
+html[data-theme='light'] .filterPill.active {
+  background: #3f7ef3;
+  border-color: #3f7ef3;
+  color: #ffffff;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -377,6 +389,12 @@
   color: var(--color-accent-gold, #c9a55a);
 }
 
+/* Mode clair : bleu cyan pour le badge "À venir" */
+html[data-theme='light'] .cardTypeBadge[data-type='upcoming'] {
+  background: rgba(63, 126, 243, 0.15);
+  color: #3f7ef3;
+}
+
 .cardTitle {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: var(--text-xl, 1.25rem);
@@ -416,6 +434,11 @@
   font-weight: var(--font-semibold, 600);
   color: var(--color-accent-secondary, #8b7355);
   transition: all var(--duration-base, 250ms) var(--ease-out);
+}
+
+/* Mode clair : bleu cyan pour le lien "Lire la suite" */
+html[data-theme='light'] .readMore {
+  color: #3f7ef3;
 }
 
 .newsCard:hover .readMore {

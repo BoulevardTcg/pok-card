@@ -45,6 +45,11 @@
   margin: var(--space-6, 1.5rem) auto;
 }
 
+/* Mode clair : bleu cyan pour le divider */
+html[data-theme='light'] .divider {
+  background: linear-gradient(90deg, transparent, #3f7ef3, transparent);
+}
+
 .subtitle {
   font-family: var(--font-body);
   font-size: var(--text-lg, 1.125rem);
