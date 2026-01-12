@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient, TradeStatus } from '@prisma/client';
+import { TradeStatus } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
+import prisma from '../lib/prisma.js';
 
 const router = Router();
 
