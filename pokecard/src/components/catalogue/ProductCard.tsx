@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
-import { useAuth } from '../../authContext';
 import { getImageUrl } from '../../api';
 import type { Product } from '../../cartContext';
 import { getProductType, productTypeLabels } from '../../utils/filters';
@@ -56,7 +55,6 @@ export default function ProductCard({
 }: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-  const { isAuthenticated } = useAuth();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const formatPrice = (cents: number | null) => {
@@ -70,14 +68,6 @@ export default function ProductCard({
     e.stopPropagation();
 
     if (isAddingToCart) return;
-
-    // Vérifier l'authentification
-    if (!isAuthenticated) {
-      navigate('/login', {
-        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
-      });
-      return;
-    }
 
     const stockStatus = getStockStatus(product);
 

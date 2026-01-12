@@ -212,12 +212,6 @@ export function ProductDetail() {
     if (!product || !selectedVariant) return;
     if (selectedVariant.stock <= 0) return;
 
-    // Vérifier l'authentification
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: `/produit/${product.slug}` } });
-      return;
-    }
-
     // Ajouter la quantité spécifiée
     for (let i = 0; i < quantity; i++) {
       addToCart(selectedVariant, product);
