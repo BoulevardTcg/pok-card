@@ -4,6 +4,7 @@ import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
 import { generateAccessToken } from '../utils/auth.js';
 import Stripe from 'stripe';
+import { asStripeSession } from './vitest.setup.js';
 
 const app = createApp();
 
@@ -59,11 +60,13 @@ describe('POST /api/checkout/create-session avec vérification HOLD', () => {
     testVariant = testProduct.variants[0];
 
     // Mock par défaut pour createSession
-    mockStripeCreateSession.mockResolvedValue({
-      id: 'cs_test_123',
-      url: 'https://checkout.stripe.com/test',
-      metadata: {},
-    } as Stripe.Checkout.Session);
+    mockStripeCreateSession.mockResolvedValue(
+      asStripeSession({
+        id: 'cs_test_123',
+        url: 'https://checkout.stripe.com/test',
+        metadata: {},
+      })
+    );
   });
 
   describe('Cas 1: HOLD_EXPIRED 409', () => {
@@ -168,15 +171,17 @@ describe('POST /api/checkout/create-session avec vérification HOLD', () => {
         },
       });
 
-      mockStripeCreateSession.mockResolvedValue({
-        id: 'cs_test_456',
-        url: 'https://checkout.stripe.com/test-success',
-        metadata: {
-          ownerKey,
-          cartId,
-          userId: testUser.id,
-        },
-      } as Stripe.Checkout.Session);
+      mockStripeCreateSession.mockResolvedValue(
+        asStripeSession({
+          id: 'cs_test_456',
+          url: 'https://checkout.stripe.com/test-success',
+          metadata: {
+            ownerKey,
+            cartId,
+            userId: testUser.id,
+          },
+        })
+      );
 
       const response = await request(app)
         .post('/api/checkout/create-session')
@@ -226,14 +231,16 @@ describe('POST /api/checkout/create-session avec vérification HOLD', () => {
         },
       });
 
-      mockStripeCreateSession.mockResolvedValue({
-        id: 'cs_test_guest',
-        url: 'https://checkout.stripe.com/test-guest',
-        metadata: {
-          ownerKey,
-          cartId,
-        },
-      } as Stripe.Checkout.Session);
+      mockStripeCreateSession.mockResolvedValue(
+        asStripeSession({
+          id: 'cs_test_guest',
+          url: 'https://checkout.stripe.com/test-guest',
+          metadata: {
+            ownerKey,
+            cartId,
+          },
+        })
+      );
 
       const response = await request(app)
         .post('/api/checkout/create-session')

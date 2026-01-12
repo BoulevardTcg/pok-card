@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import type Stripe from 'stripe';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,47 +79,74 @@ for (const [key, value] of Object.entries(defaultTestEnv)) {
   }
 }
 
+// Helpers pour les mocks Stripe (évite les casts "moches" partout)
+export function asStripeSession(
+  partial: Partial<Stripe.Checkout.Session>
+): Stripe.Checkout.Session {
+  return partial as unknown as Stripe.Checkout.Session;
+}
+
+export function asStripeEvent(partial: Partial<Stripe.Event>): Stripe.Event {
+  return partial as unknown as Stripe.Event;
+}
+
 // Mock Stripe global pour tous les tests
 // Compatible ESM et CJS
 vi.mock('../config/stripe.js', () => {
+  // Helper local pour le cast (car vi.mock est hoisted, on ne peut pas utiliser les exports)
+  const asStripeSession = (partial: Partial<Stripe.Checkout.Session>): Stripe.Checkout.Session =>
+    partial as unknown as Stripe.Checkout.Session;
+
+  const asStripeEvent = (partial: Partial<Stripe.Event>): Stripe.Event =>
+    partial as unknown as Stripe.Event;
+
+  // Créer les objets mockés via les helpers
+  const mockSession = asStripeSession({
+    id: 'cs_test_mock_session_id',
+    object: 'checkout.session',
+    url: 'https://checkout.stripe.com/test',
+    metadata: {
+      ownerKey: 'cart:test-cart-id',
+      cartId: 'test-cart-id',
+    },
+    currency: 'eur',
+    payment_status: 'unpaid',
+    customer_details: {
+      email: 'test@example.com',
+    } as any,
+  });
+
+  const mockEvent = asStripeEvent({
+    id: 'evt_test_mock_event_id',
+    object: 'event',
+    type: 'checkout.session.completed',
+    data: {
+      object: mockSession,
+    },
+  });
+
   const mockCheckoutSessionsCreate = vi.fn((config: any) =>
-    Promise.resolve({
-      id: 'cs_test_mock_session_id',
-      url: 'https://checkout.stripe.com/test',
-      metadata: config?.metadata || {
-        ownerKey: 'cart:test-cart-id',
-        cartId: 'test-cart-id',
-      },
-      currency: config?.currency || 'eur',
-      payment_status: 'unpaid',
-      customer_details: {
-        email: config?.customer_email || 'test@example.com',
-      },
-      shipping_details: config?.shipping_address_collection
-        ? {
-            address: config.shipping_address_collection,
-          }
-        : null,
-    })
+    Promise.resolve(
+      asStripeSession({
+        ...mockSession,
+        metadata: config?.metadata || mockSession.metadata,
+        currency: config?.currency || mockSession.currency,
+        customer_details: {
+          email:
+            config?.customer_email || mockSession.customer_details?.email || 'test@example.com',
+        } as any,
+        shipping_details: config?.shipping_address_collection
+          ? {
+              address: config.shipping_address_collection,
+            }
+          : null,
+      })
+    )
   );
 
   const mockWebhooksConstructEvent = vi.fn((payload: any, signature: string, secret: string) => {
     // Simuler un événement webhook Stripe valide
-    return {
-      id: 'evt_test_mock_event_id',
-      type: 'checkout.session.completed',
-      data: {
-        object: {
-          id: 'cs_test_mock_session_id',
-          payment_status: 'paid',
-          customer_email: 'test@example.com',
-          metadata: {
-            ownerKey: 'cart:test-cart-id',
-            cartId: 'test-cart-id',
-          },
-        },
-      },
-    };
+    return mockEvent;
   });
 
   // Mock de l'instance Stripe

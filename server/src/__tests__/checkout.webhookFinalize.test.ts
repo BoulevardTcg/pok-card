@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vites
 import { cleanupDatabase, createTestUser, createTestProduct, prisma } from './setup.js';
 import { processCompletedCheckoutSession } from '../routes/checkout.js';
 import Stripe from 'stripe';
+import { asStripeSession } from './vitest.setup.js';
 
 describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
   let testUser: any;
@@ -49,14 +50,14 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
       });
 
       // Mock session Stripe
-      const mockSession = {
+      const mockSession = asStripeSession({
         id: 'cs_test_finalize',
         currency: 'eur',
         payment_method_types: ['card'],
         payment_status: 'paid',
         customer_details: {
           email: 'customer@example.com',
-        },
+        } as any,
         metadata: {
           ownerKey,
           cartId,
@@ -70,7 +71,7 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
           shippingMethodCode: 'MONDIAL_RELAY',
           shippingPriceCents: '490',
         },
-      } as Stripe.Checkout.Session;
+      });
 
       // Appeler processCompletedCheckoutSession
       await processCompletedCheckoutSession(mockSession);
@@ -124,14 +125,14 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
         },
       });
 
-      const mockSession = {
+      const mockSession = asStripeSession({
         id: sessionId,
         currency: 'eur',
         payment_method_types: ['card'],
         payment_status: 'paid',
         customer_details: {
           email: 'customer@example.com',
-        },
+        } as any,
         metadata: {
           ownerKey,
           cartId,
@@ -145,7 +146,7 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
           shippingMethodCode: 'MONDIAL_RELAY',
           shippingPriceCents: '490',
         },
-      } as Stripe.Checkout.Session;
+      });
 
       // Premier appel : devrait créer la commande
       await processCompletedCheckoutSession(mockSession);
@@ -203,12 +204,12 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
         },
       });
 
-      const mockSession = {
+      const mockSession = asStripeSession({
         id: sessionId,
         currency: 'eur',
         payment_method_types: ['card'],
         payment_status: 'paid',
-        customer_details: { email: 'customer@example.com' },
+        customer_details: { email: 'customer@example.com' } as any,
         metadata: {
           ownerKey,
           cartId,
@@ -217,7 +218,7 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
           shippingMethodCode: 'MONDIAL_RELAY',
           shippingPriceCents: '490',
         },
-      } as Stripe.Checkout.Session;
+      });
 
       // Premier appel : crée la commande
       await processCompletedCheckoutSession(mockSession);
@@ -252,12 +253,12 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
         data: { stock: 1 },
       });
 
-      const mockSession = {
+      const mockSession = asStripeSession({
         id: 'cs_test_rollback',
         currency: 'eur',
         payment_method_types: ['card'],
         payment_status: 'paid',
-        customer_details: { email: 'customer@example.com' },
+        customer_details: { email: 'customer@example.com' } as any,
         metadata: {
           ownerKey,
           cartId,
@@ -271,7 +272,7 @@ describe('Webhook finalisation (processCompletedCheckoutSession)', () => {
           shippingMethodCode: 'MONDIAL_RELAY',
           shippingPriceCents: '490',
         },
-      } as Stripe.Checkout.Session;
+      });
 
       // Appeler processCompletedCheckoutSession : devrait throw
       await expect(processCompletedCheckoutSession(mockSession)).rejects.toThrow(
