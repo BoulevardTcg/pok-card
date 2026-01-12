@@ -278,21 +278,16 @@
   color: var(--color-text-primary, #f5f5f3);
   line-height: 1.4;
   margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
   word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
   font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 @media (max-width: 767px) {
   .productTitle {
     font-size: 13px;
-    -webkit-line-clamp: 2;
     margin-bottom: 4px;
-    min-height: 48px;
     line-height: 1.5;
   }
 }
@@ -422,42 +417,46 @@
    ───────────────────────────────────────────────────────────────── */
 
 .addToCartButton {
+  position: relative;
   width: 100%; /* Full-width pour les cartes produits */
-  height: 48px;
+  padding: 0.75rem 1.25rem;
   background: var(--color-accent-primary);
   color: var(--color-text-inverse);
   border: none;
-  border-radius: var(--radius-lg, 8px);
-  font-weight: var(--font-semibold, 600);
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-sm, 0.875rem);
-  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-md);
 }
 
 .addToCartButton:hover:not(:disabled) {
   background: var(--color-accent-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .addToCartButton:active:not(:disabled) {
-  animation: addToCart 0.3s ease;
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:disabled {
-  background: var(--color-bg-subtle, #1a1a1d);
-  color: var(--color-text-muted, #6b6b6f);
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
-  opacity: 0.6;
+  box-shadow: none;
 }
 
 .addToCartButton.adding {
