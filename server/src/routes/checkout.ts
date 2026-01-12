@@ -732,22 +732,13 @@ router.post(
 
       // STRATÉGIE: Vérifier que les réservations (HOLD) existent pour cet ownerKey
       // Le frontend doit avoir appelé /checkout/hold avant /create-session
-      let existingReservations: Array<{ variantId: string; quantity: number }> = [];
-      try {
-        existingReservations = await prisma.cartReservation.findMany({
-          where: {
-            ownerKey,
-            variantId: { in: variantIds },
-            expiresAt: { gt: now },
-          },
-        });
-      } catch (error: any) {
-        // Si la table n'existe pas (P2021), considérer qu'il n'y a pas de réservations
-        // Cela déclenchera une erreur HOLD_EXPIRED, ce qui est cohérent
-        if (error?.code !== 'P2021') {
-          throw error;
-        }
-      }
+      const existingReservations = await prisma.cartReservation.findMany({
+        where: {
+          ownerKey,
+          variantId: { in: variantIds },
+          expiresAt: { gt: now },
+        },
+      });
 
       const reservationMap = new Map(existingReservations.map((r) => [r.variantId, r.quantity]));
 

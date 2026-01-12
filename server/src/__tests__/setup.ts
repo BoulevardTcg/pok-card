@@ -16,15 +16,7 @@ export async function cleanupDatabase() {
   await prisma.orderEvent.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
-  // Nettoyer les réservations si la table existe (gère le cas où la migration n'est pas encore appliquée)
-  try {
-    await prisma.cartReservation.deleteMany();
-  } catch (error: any) {
-    // Ignorer l'erreur P2021 (table does not exist) - la table sera créée par la migration
-    if (error?.code !== 'P2021') {
-      throw error;
-    }
-  }
+  await prisma.cartReservation.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.userProfile.deleteMany();
   await prisma.user.deleteMany();

@@ -31,6 +31,11 @@ const keyGenerator = (req: Request): string => {
   return userId ? `user:${userId}` : `ip:${ip}`;
 };
 
+// Helper pour désactiver le rate limiting en mode test
+const skipInTest = (req: Request): boolean => {
+  return process.env.NODE_ENV === 'test';
+};
+
 // Helper pour logger les erreurs 429 avec détails
 const logRateLimit = (req: Request, res: Response) => {
   const userId = (req as any).user?.userId || 'anonymous';
@@ -61,6 +66,7 @@ export const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
+  skip: skipInTest,
   keyGenerator,
   handler: (req: Request, res: Response) => {
     logRateLimit(req, res);
@@ -82,6 +88,7 @@ export const strictAuthLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
 });
 
@@ -96,6 +103,10 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
+    // Désactiver complètement le rate limiter en mode test
+    if (skipInTest(req)) {
+      return true;
+    }
     // Utiliser originalUrl au lieu de path pour capturer les chemins complets
     const url = req.originalUrl || req.url;
     return (
@@ -125,7 +136,7 @@ export const authenticatedApiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
-  skip: (req) => !(req as any).user, // Skip si pas authentifié
+  skip: (req) => skipInTest(req) || !(req as any).user, // Skip en test ou si pas authentifié
 });
 
 export const adminLimiter = rateLimit({
@@ -137,6 +148,7 @@ export const adminLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
 });
 
@@ -149,6 +161,7 @@ export const uploadLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
 });
 
@@ -161,6 +174,7 @@ export const checkoutLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
   handler: (req: Request, res: Response) => {
     logRateLimit(req, res);
@@ -183,6 +197,7 @@ export const authRefreshLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
   handler: (req: Request, res: Response) => {
     logRateLimit(req, res);
@@ -205,6 +220,7 @@ export const productsLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
   handler: (req: Request, res: Response) => {
     logRateLimit(req, res);
@@ -227,6 +243,7 @@ export const usersProfileLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTest,
   keyGenerator,
   handler: (req: Request, res: Response) => {
     logRateLimit(req, res);

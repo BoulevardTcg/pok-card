@@ -30,28 +30,16 @@ async function enrichVariantsWithAvailability(variants: ProductVariant[]): Promi
   const now = new Date();
 
   // Récupérer toutes les réservations actives pour ces variantes en une seule requête
-  // Gérer le cas où la table n'existe pas encore (migration pas encore appliquée)
-  let reservations: Array<{ variantId: string; _sum: { quantity: number | null } }> = [];
-  try {
-    reservations = await prisma.cartReservation.groupBy({
-      by: ['variantId'],
-      where: {
-        variantId: { in: variantIds },
-        expiresAt: { gt: now },
-      },
-      _sum: {
-        quantity: true,
-      },
-    });
-  } catch (error: any) {
-    // Si la table n'existe pas (P2021), continuer avec 0 réservations
-    if (error?.code === 'P2021') {
-      // Table n'existe pas encore, toutes les réservations sont à 0
-      reservations = [];
-    } else {
-      throw error;
-    }
-  }
+  const reservations = await prisma.cartReservation.groupBy({
+    by: ['variantId'],
+    where: {
+      variantId: { in: variantIds },
+      expiresAt: { gt: now },
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
 
   const reservedMap = new Map(reservations.map((r) => [r.variantId, r._sum.quantity || 0]));
 
@@ -409,43 +397,29 @@ router.post(
       const now = new Date();
 
       // Calculer reservedTotal : réservations actives pour tous les owners
-      // Gérer le cas où la table n'existe pas encore (migration pas encore appliquée)
-      let reservedTotal: Array<{ variantId: string; _sum: { quantity: number | null } }> = [];
-      let reservedByMe: Array<{ variantId: string; _sum: { quantity: number | null } }> = [];
-      try {
-        reservedTotal = await prisma.cartReservation.groupBy({
-          by: ['variantId'],
-          where: {
-            variantId: { in: variantIds },
-            expiresAt: { gt: now },
-          },
-          _sum: {
-            quantity: true,
-          },
-        });
+      const reservedTotal = await prisma.cartReservation.groupBy({
+        by: ['variantId'],
+        where: {
+          variantId: { in: variantIds },
+          expiresAt: { gt: now },
+        },
+        _sum: {
+          quantity: true,
+        },
+      });
 
-        // Calculer reservedByMe : réservations actives pour cet ownerKey spécifique
-        reservedByMe = await prisma.cartReservation.groupBy({
-          by: ['variantId'],
-          where: {
-            variantId: { in: variantIds },
-            ownerKey: ownerKey,
-            expiresAt: { gt: now },
-          },
-          _sum: {
-            quantity: true,
-          },
-        });
-      } catch (error: any) {
-        // Si la table n'existe pas (P2021), continuer avec 0 réservations
-        if (error?.code === 'P2021') {
-          // Table n'existe pas encore, toutes les réservations sont à 0
-          reservedTotal = [];
-          reservedByMe = [];
-        } else {
-          throw error;
-        }
-      }
+      // Calculer reservedByMe : réservations actives pour cet ownerKey spécifique
+      const reservedByMe = await prisma.cartReservation.groupBy({
+        by: ['variantId'],
+        where: {
+          variantId: { in: variantIds },
+          ownerKey: ownerKey,
+          expiresAt: { gt: now },
+        },
+        _sum: {
+          quantity: true,
+        },
+      });
 
       const reservedTotalMap = new Map(
         reservedTotal.map((r) => [r.variantId, r._sum.quantity || 0])
