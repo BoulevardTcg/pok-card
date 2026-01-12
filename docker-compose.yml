@@ -30,7 +30,7 @@ services:
       - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
       - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
       - ORDER_TRACKING_SECRET=test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
-      - STRIPE_SECRET_KEY=sk_test_mock_key
+      # STRIPE_SECRET_KEY est défini dans le fichier .env
       # URL publique du frontend (emails, redirects, liens utilisateurs)
       # Dev: http://localhost:3000 | Prod: https://boulevardtcg.com
       - FRONTEND_PUBLIC_URL=${FRONTEND_PUBLIC_URL:-http://localhost:3000}
