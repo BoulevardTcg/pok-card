@@ -697,6 +697,11 @@
   color: var(--color-accent-secondary, #8b7355);
 }
 
+/* Mode clair : bleu cyan pour le sous-titre de carte */
+html[data-theme='light'] .cardSubtitle {
+  color: #3f7ef3;
+}
+
 /* ─── MOBILE: Textes carte réduits ─── */
 @media (max-width: 767px) {
   .cardSet {

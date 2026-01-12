@@ -37,6 +37,11 @@
   margin-bottom: var(--space-4, 1rem);
 }
 
+/* Mode clair : bleu cyan pour l'overline */
+html[data-theme='light'] .overline {
+  color: #3f7ef3;
+}
+
 .title {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
   font-size: clamp(2rem, 5vw, 3rem);
@@ -123,6 +128,11 @@
   margin-top: 2px;
 }
 
+/* Mode clair : bleu cyan pour les icônes d'information */
+html[data-theme='light'] .infoIcon {
+  color: #3f7ef3;
+}
+
 .infoContent {
   flex: 1;
   min-width: 0;
@@ -196,6 +206,13 @@
   border-color: rgba(139, 115, 85, 0.3);
 }
 
+/* Mode clair : bleu cyan pour le message warning */
+html[data-theme='light'] .statusMessage.warning {
+  background: rgba(63, 126, 243, 0.15);
+  color: #3f7ef3;
+  border-color: rgba(63, 126, 243, 0.3);
+}
+
 .linkButton {
   background: none;
   border: none;
@@ -211,6 +228,11 @@
 
 .linkButton:hover {
   opacity: 0.8;
+}
+
+/* Mode clair : bleu cyan pour le bouton lien */
+html[data-theme='light'] .linkButton {
+  color: #3f7ef3;
 }
 
 @keyframes fadeIn {

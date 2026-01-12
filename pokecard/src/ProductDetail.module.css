@@ -982,11 +982,11 @@
   }
 }
 
-/* Mode clair : bouton vert */
+/* Mode clair : bouton bleu cyan */
 html[data-theme='light'] .addButton {
-  background: var(--color-accent-primary, #3f784c);
+  background: var(--color-accent-primary, #3f7ef3);
   color: #ffffff;
-  border: 1px solid var(--color-accent-primary, #3f784c);
+  border: 1px solid var(--color-accent-primary, #3f7ef3);
 }
 
 .addButton::before {

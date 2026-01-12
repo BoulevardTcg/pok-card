@@ -8,8 +8,8 @@ interface StatItem {
 }
 
 const STATS: StatItem[] = [
-  { value: 30, suffix: '', label: 'Produits disponibles' },
-  { value: 100, suffix: '+', label: 'Commandes honorées' },
+  { value: 1, suffix: '', label: "Livraison en moins d'une semaine" },
+  { value: 100, suffix: '%', label: 'Clients satisfaits' },
   { value: 5, suffix: '', label: 'Univers TCG' },
   { value: 100, suffix: '%', label: 'Authenticité garantie' },
 ];

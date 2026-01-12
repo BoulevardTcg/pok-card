@@ -144,7 +144,7 @@
 }
 
 .badgeNew {
-  background: linear-gradient(135deg, var(--color-accent-gold, #c9a55a) 0%, #f4d03f 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
   color: #000;
 }
 

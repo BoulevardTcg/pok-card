@@ -68,6 +68,11 @@
   margin-bottom: var(--space-4, 1rem);
 }
 
+/* Mode clair : bleu cyan pour l'overline */
+html[data-theme='light'] .overline {
+  color: #3f7ef3;
+}
+
 /* ─── MOBILE: Overline ─── */
 @media (max-width: 767px) {
   .overline {
