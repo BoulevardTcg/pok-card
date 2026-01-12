@@ -516,27 +516,27 @@
 
 .addToCartButton {
   position: relative;
-  padding: 0.625rem 2.5rem; /* py-2.5 px-10 */
-  background: #3d6e4e; /* Vert uniforme */
-  color: white;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px; /* rounded-lg */
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 600; /* font-semibold */
-  letter-spacing: 0.05em; /* tracking-wide */
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
   white-space: nowrap;
-  width: auto; /* Pas de width: 100% */
-  display: inline-block;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  outline: none;
 }
 
 .addToCartButton:hover:not(:disabled) {
-  filter: brightness(0.9); /* hover:brightness-90 */
+  background: var(--color-accent-hover);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
