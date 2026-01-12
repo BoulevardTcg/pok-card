@@ -10,6 +10,7 @@ import {
   canReviewProduct,
   listProducts,
   getImageUrl,
+  reserveVariant,
 } from './api';
 import { ArrowRightIcon } from './components/icons/Icons';
 
@@ -44,7 +45,7 @@ interface ReviewsData {
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, cart } = useContext(CartContext);
   const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<ProductType | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
@@ -208,17 +209,38 @@ export function ProductDetail() {
     return (cents / 100).toFixed(2).replace('.', ',');
   };
 
-  const handleAddToCart = () => {
+  const [addingToCart, setAddingToCart] = useState(false);
+
+  const handleAddToCart = async () => {
     if (!product || !selectedVariant) return;
     if (selectedVariant.stock <= 0) return;
+    if (addingToCart) return;
 
-    // Ajouter la quantité spécifiée
-    for (let i = 0; i < quantity; i++) {
-      addToCart(selectedVariant, product);
+    setAddingToCart(true);
+
+    try {
+      // Calculer la quantité totale à réserver (celle déjà dans le panier + la nouvelle)
+      const existingCartItem = cart.find((item) => item.variantId === selectedVariant.id);
+      const currentCartQuantity = existingCartItem?.quantity || 0;
+      const totalQuantity = currentCartQuantity + quantity;
+
+      // Réserver la quantité totale (le service mettra à jour la réservation existante)
+      await reserveVariant(selectedVariant.id, totalQuantity);
+
+      // Si la réservation réussit, ajouter au panier local
+      for (let i = 0; i < quantity; i++) {
+        addToCart(selectedVariant, product);
+      }
+
+      // Réinitialiser la quantité après ajout
+      setQuantity(1);
+    } catch (err: any) {
+      console.error('Erreur lors de la réservation:', err);
+      // Note: L'erreur est loggée mais pas affichée à l'utilisateur
+      // (ancien code avec addToCartError supprimé car non utilisé)
+    } finally {
+      setAddingToCart(false);
     }
-
-    // Réinitialiser la quantité après ajout
-    setQuantity(1);
   };
 
   const handleQuantityChange = (delta: number) => {

@@ -1,6 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient, type Product, type ProductImage, type ProductVariant } from '@prisma/client';
+import { getActiveReservedQty } from '../services/reservationService.js';
+import { getOwnerKey } from '../utils/cartId.js';
+import { optionalAuth } from '../middleware/auth.js';
+import { productsLimiter } from '../middleware/security.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -10,9 +14,53 @@ type ProductWithRelations = Product & {
   variants: ProductVariant[];
 };
 
-const toProductResponse = (product: ProductWithRelations) => {
+/**
+ * Calcule le stock disponible pour toutes les variantes d'un produit
+ * Utilise une seule requête pour récupérer toutes les réservations actives
+ */
+async function enrichVariantsWithAvailability(variants: ProductVariant[]): Promise<
+  Array<
+    ProductVariant & {
+      reserved: number;
+      available: number;
+    }
+  >
+> {
+  const variantIds = variants.map((v) => v.id);
+  const now = new Date();
+
+  // Récupérer toutes les réservations actives pour ces variantes en une seule requête
+  const reservations = await prisma.cartReservation.groupBy({
+    by: ['variantId'],
+    where: {
+      variantId: { in: variantIds },
+      expiresAt: { gt: now },
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  const reservedMap = new Map(reservations.map((r) => [r.variantId, r._sum.quantity || 0]));
+
+  return variants.map((variant) => {
+    const reserved = reservedMap.get(variant.id) || 0;
+    const available = Math.max(0, variant.stock - reserved);
+
+    return {
+      ...variant,
+      reserved,
+      available,
+    };
+  });
+}
+
+const toProductResponse = async (product: ProductWithRelations) => {
   const activeVariants = product.variants.filter((variant) => variant.isActive);
   const sortedVariants = [...activeVariants].sort((a, b) => a.priceCents - b.priceCents);
+
+  // Enrichir les variantes avec le stock disponible
+  const enrichedVariants = await enrichVariantsWithAvailability(activeVariants);
 
   const primaryImage = product.images.length > 0 ? product.images[0] : null;
 
@@ -36,24 +84,26 @@ const toProductResponse = (product: ProductWithRelations) => {
       altText: image.altText,
       position: image.position,
     })),
-    variants: activeVariants.map((variant) => ({
+    variants: enrichedVariants.map((variant) => ({
       id: variant.id,
       name: variant.name,
       language: variant.language,
       edition: variant.edition,
       priceCents: variant.priceCents,
-      stock: variant.stock,
+      stock: variant.stock, // Stock total
+      reserved: variant.reserved, // Stock réservé
+      available: variant.available, // Stock disponible (stock - reserved)
       sku: variant.sku,
       createdAt: variant.createdAt,
       updatedAt: variant.updatedAt,
     })),
     minPriceCents: sortedVariants.length > 0 ? sortedVariants[0].priceCents : null,
-    outOfStock:
-      activeVariants.length === 0 || activeVariants.every((variant) => variant.stock <= 0),
+    outOfStock: enrichedVariants.every((variant) => variant.available <= 0),
   };
 };
 
-router.get('/', async (req, res) => {
+// Utilise un limiter large (120/min) pour éviter de casser le front avec listProducts limit=500
+router.get('/', productsLimiter, async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page ?? 1));
     const limitParam = Number(req.query.limit ?? 12);
@@ -101,8 +151,11 @@ router.get('/', async (req, res) => {
       prisma.product.count({ where }),
     ]);
 
+    // Enrichir les produits avec le stock disponible (calculé avec les réservations)
+    const enrichedProducts = await Promise.all(products.map(toProductResponse));
+
     res.json({
-      products: products.map(toProductResponse),
+      products: enrichedProducts,
       pagination: {
         page,
         limit,
@@ -171,7 +224,7 @@ router.get('/:slug', async (req, res) => {
       });
     }
 
-    const response = toProductResponse(product);
+    const response = await toProductResponse(product);
     console.log('✅ Réponse formatée:', {
       id: response.id,
       name: response.name,
@@ -273,6 +326,140 @@ router.post(
 
       res.status(500).json({
         error: "Erreur lors de l'enregistrement",
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/products/variants/stock
+ * Récupère le stock et le prix pour plusieurs variants en une seule requête
+ *
+ * Body:
+ * {
+ *   "variantIds": ["variantId1", "variantId2", ...] (max 200)
+ * }
+ *
+ * Réponse:
+ * {
+ *   "variantId1": {
+ *     "available": 10,        // Stock disponible (totalStock - réservations globales)
+ *     "reservedByMe": 2,      // Réservations actives de cet ownerKey
+ *     "maxAllowed": 12,       // available + reservedByMe (quantité max autorisée)
+ *     "priceCents": 1999,
+ *     "stock": 10             // Alias pour available (rétrocompatibilité)
+ *   },
+ *   ...
+ * }
+ */
+router.post(
+  '/variants/stock',
+  optionalAuth,
+  [
+    body('variantIds')
+      .isArray({ min: 1, max: 200 })
+      .withMessage('variantIds doit être un tableau de 1 à 200 éléments'),
+    body('variantIds.*')
+      .isString()
+      .notEmpty()
+      .withMessage('Chaque variantId doit être une chaîne non vide'),
+  ],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Données invalides',
+          details: errors.array(),
+        });
+      }
+
+      const { variantIds } = req.body as { variantIds: string[] };
+
+      // Récupérer l'ownerKey (user:userId ou cart:cartId) pour calculer reservedByMe
+      const ownerKey = getOwnerKey(req, res);
+
+      // Récupérer les variants
+      const variants = await prisma.productVariant.findMany({
+        where: {
+          id: { in: variantIds },
+          isActive: true,
+        },
+        select: {
+          id: true,
+          stock: true,
+          priceCents: true,
+        },
+      });
+
+      const now = new Date();
+
+      // Calculer reservedTotal : réservations actives pour tous les owners
+      const reservedTotal = await prisma.cartReservation.groupBy({
+        by: ['variantId'],
+        where: {
+          variantId: { in: variantIds },
+          expiresAt: { gt: now },
+        },
+        _sum: {
+          quantity: true,
+        },
+      });
+
+      // Calculer reservedByMe : réservations actives pour cet ownerKey spécifique
+      const reservedByMe = await prisma.cartReservation.groupBy({
+        by: ['variantId'],
+        where: {
+          variantId: { in: variantIds },
+          ownerKey: ownerKey,
+          expiresAt: { gt: now },
+        },
+        _sum: {
+          quantity: true,
+        },
+      });
+
+      const reservedTotalMap = new Map(
+        reservedTotal.map((r) => [r.variantId, r._sum.quantity || 0])
+      );
+      const reservedByMeMap = new Map(reservedByMe.map((r) => [r.variantId, r._sum.quantity || 0]));
+
+      // Construire la réponse avec available, reservedByMe, maxAllowed
+      // available = stock total - réservations globales (ce qui reste disponible pour tous)
+      // maxAllowed = available + reservedByMe (quantité max que cet utilisateur peut avoir)
+      const stockMap: Record<
+        string,
+        {
+          available: number;
+          reservedByMe: number;
+          maxAllowed: number;
+          priceCents: number;
+          stock: number; // Alias pour rétrocompatibilité
+        }
+      > = {};
+
+      variants.forEach((variant) => {
+        const reservedTotal = reservedTotalMap.get(variant.id) || 0;
+        const reservedByMeCount = reservedByMeMap.get(variant.id) || 0;
+        const available = Math.max(0, variant.stock - reservedTotal);
+        const maxAllowed = available + reservedByMeCount;
+
+        stockMap[variant.id] = {
+          available, // Stock disponible globalement
+          reservedByMe: reservedByMeCount, // Réservations de cet owner
+          maxAllowed, // Quantité max autorisée pour cet owner (available + ses réservations)
+          priceCents: variant.priceCents,
+          stock: available, // Alias pour rétrocompatibilité
+        };
+      });
+
+      res.json(stockMap);
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération du stock des variants:', error);
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });

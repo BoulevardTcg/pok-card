@@ -21,6 +21,7 @@ import adminRoutes from './routes/admin.js';
 import twoFactorRoutes from './routes/twoFactor.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
+import reservationRoutes from './routes/reservations.js';
 
 // Import des middlewares de sécurité
 import {
@@ -40,6 +41,9 @@ import logger, { requestLoggerMiddleware } from './utils/logger.js';
 import { setupSwagger } from './swagger.js';
 import { validateEnvOrThrow } from './config/validateEnv.js';
 
+// Import du service de réservation pour le nettoyage automatique
+import { cleanupExpired } from './services/reservationService.js';
+
 const app = express();
 
 // Trust proxy - nécessaire pour Railway/Heroku/etc. (derrière un load balancer)
@@ -55,6 +59,15 @@ const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origi
 ];
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// Webhook Stripe - DOIT être défini AVANT le middleware CORS (pas d'origin header - server-to-server)
+// Les webhooks Stripe sont authentifiés par signature, pas par CORS
+app.post(
+  '/api/checkout/webhook',
+  express.raw({ type: 'application/json' }),
+  checkoutWebhookHandler
+);
+
+// Middleware CORS sécurisé (appliqué après le webhook)
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -65,8 +78,15 @@ app.use(
       ) {
         return callback(null, true);
       }
+
+      // En production, bloquer !origin (les webhooks sont gérés avant ce middleware)
+      if (!origin) {
+        console.warn('🚫 CORS: Requête sans origin header en production - bloquée');
+        return callback(new Error('CORS: Origin header requis en production'));
+      }
+
       // En production, vérifier strictement les origines autorisées
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
@@ -75,7 +95,7 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Cart-Id'],
     optionsSuccessStatus: 200,
   })
 );
@@ -87,13 +107,6 @@ if (isDevelopment) {
     next();
   });
 }
-
-// Webhook Stripe - doit utiliser express.raw avant express.json
-app.post(
-  '/api/checkout/webhook',
-  express.raw({ type: 'application/json' }),
-  checkoutWebhookHandler
-);
 
 // Servir les fichiers uploadés (images produits)
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
@@ -168,6 +181,9 @@ app.use('/api/gdpr', gdprRoutes);
 
 // Contact (formulaire)
 app.use('/api/contact', contactRoutes);
+
+// Routes des réservations de panier
+app.use('/api/reservations', reservationRoutes);
 
 // Route de santé
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
@@ -370,4 +386,36 @@ app.listen(port, host, () => {
   logger.info(`📨 API contact: http://${host}:${port}/api/contact`);
   logger.info(`💚 Santé: http://${host}:${port}/api/health`);
   logger.info(`📖 Documentation API: http://${host}:${port}/api-docs`);
+
+  // Job de nettoyage automatique des réservations expirées
+  // Nettoie toutes les 60 secondes (1 minute)
+  const CLEANUP_INTERVAL_MS = 60 * 1000;
+
+  // Exécuter un premier nettoyage après 30 secondes (pour éviter de surcharger au démarrage)
+  setTimeout(async () => {
+    try {
+      const count = await cleanupExpired();
+      if (count > 0) {
+        logger.info(`🧹 Nettoyage initial: ${count} réservation(s) expirée(s) supprimée(s)`);
+      }
+    } catch (error) {
+      logger.error('Erreur lors du nettoyage initial des réservations:', error);
+    }
+  }, 30 * 1000);
+
+  // Puis nettoyer toutes les minutes
+  setInterval(async () => {
+    try {
+      const count = await cleanupExpired();
+      if (count > 0) {
+        logger.info(`🧹 Nettoyage automatique: ${count} réservation(s) expirée(s) supprimée(s)`);
+      }
+    } catch (error) {
+      logger.error('Erreur lors du nettoyage automatique des réservations:', error);
+    }
+  }, CLEANUP_INTERVAL_MS);
+
+  logger.info(
+    `🧹 Job de nettoyage des réservations démarré (intervalle: ${CLEANUP_INTERVAL_MS / 1000}s)`
+  );
 });

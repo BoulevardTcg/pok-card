@@ -1,25 +1,50 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
 import { CartIcon } from './components/icons/Icons';
 import styles from './CartPage.module.css';
-import { createCheckoutSession, getVariantsStock, validatePromoCode, getImageUrl } from './api';
+import {
+  createCheckoutSession,
+  getVariantsStock,
+  type VariantStockInfo,
+  validatePromoCode,
+  getImageUrl,
+  checkoutHold,
+} from './api';
 import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
-import type { CartItem } from './cartContext';
 
 export function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart, getTotalCents } =
     useContext(CartContext);
+
+  // Handler pour retirer un article du panier (purement local, pas de réservation)
+  // STRATÉGIE: HOLD au checkout uniquement, pas au panier
+  const handleRemoveFromCart = (variantId: string) => {
+    removeFromCart(variantId);
+  };
+
+  // Handler pour mettre à jour la quantité (purement local, pas de réservation)
+  // STRATÉGIE: HOLD au checkout uniquement, pas au panier
+  const handleUpdateQuantity = (variantId: string, newQuantity: number) => {
+    updateQuantity(variantId, newQuantity);
+  };
+
+  // Handler pour vider le panier (purement local, pas de réservation)
+  // STRATÉGIE: HOLD au checkout uniquement, pas au panier
+  const handleClearCart = () => {
+    clearCart();
+  };
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const totalCents = getTotalCents();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [stockErrors, setStockErrors] = useState<Record<string, string>>({});
   const [refreshingStock, setRefreshingStock] = useState(false);
-  const [cartItemsWithStock, setCartItemsWithStock] = useState<CartItem[]>(cart);
+  // State séparé pour les infos stock/prix par variantId (mis à jour uniquement lors du refresh)
+  // variantKey déclenche le refresh uniquement quand la liste des variantIds change (ajout/suppression)
+  const [variantInfo, setVariantInfo] = useState<Record<string, VariantStockInfo>>({});
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
@@ -49,12 +74,24 @@ export function CartPage() {
   const totalAfterDiscount = Math.max(0, totalCents - promoDiscount);
   const totalWithShipping = totalAfterDiscount + shippingCostCents;
 
+  // Clé stable basée uniquement sur les variantIds présents dans le panier (triés)
+  // Utilisée pour déclencher le refresh stock uniquement quand la liste des items change
+  // (ajout/suppression), pas lors des changements de quantités (+/-)
+  const variantKey = useMemo(() => {
+    return cart
+      .map((item) => item.variantId)
+      .sort()
+      .join('|');
+  }, [cart]);
+
   // Rafraîchir le stock des articles du panier
+  // IMPORTANT: On dépend uniquement de variantKey (liste des variantIds) et non de cart complet
+  // pour éviter de déclencher un refetch lors des changements de quantités (+/-)
+  // Le stock n'est rafraîchi que quand la liste des items change (ajout/suppression)
   useEffect(() => {
     async function refreshStock() {
       if (cart.length === 0) {
-        setCartItemsWithStock([]);
-        setStockErrors({});
+        setVariantInfo({});
         return;
       }
 
@@ -62,45 +99,66 @@ export function CartPage() {
       try {
         const variantIds = cart.map((item) => item.variantId);
         const stockMap = await getVariantsStock(variantIds);
-        const errors: Record<string, string> = {};
-        const updatedCart: CartItem[] = [];
-
-        cart.forEach((item) => {
-          const currentStock = stockMap[item.variantId];
-
-          if (!currentStock) {
-            errors[item.variantId] = "Ce produit n'est plus disponible";
-            return;
-          }
-
-          if (currentStock.stock <= 0) {
-            errors[item.variantId] = 'Rupture de stock';
-          } else if (currentStock.stock < item.quantity) {
-            errors[item.variantId] =
-              `Stock insuffisant (${currentStock.stock} disponible${currentStock.stock > 1 ? 's' : ''})`;
-          }
-
-          const updatedItem: CartItem = {
-            ...item,
-            stock: currentStock.stock,
-            priceCents: currentStock.priceCents,
-          };
-
-          updatedCart.push(updatedItem);
-        });
-
-        setCartItemsWithStock(updatedCart);
-        setStockErrors(errors);
+        setVariantInfo(stockMap);
       } catch (error) {
         console.error('Erreur lors du rafraîchissement du stock:', error);
-        setCartItemsWithStock(cart);
+        // En cas d'erreur, garder les infos précédentes
       } finally {
         setRefreshingStock(false);
       }
     }
 
-    refreshStock();
-  }, [cart]);
+    // Debounce: attendre 300ms avant de rafraîchir le stock
+    // Cela évite de déclencher un refresh à chaque petit changement
+    const timeoutId = setTimeout(() => {
+      refreshStock();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variantKey]); // Seulement variantKey : le refresh ne se déclenche que quand la liste des items change
+
+  // Recréer cartItemsWithStock à partir de cart (source de vérité pour les quantités) + variantInfo
+  // available = stock disponible globalement (totalStock - réservations globales)
+  // maxAllowed = available + reservedByMe (quantité max autorisée pour cet utilisateur)
+  const cartItemsWithStock = useMemo(() => {
+    return cart.map((item) => {
+      const info = variantInfo[item.variantId];
+      const available = info?.available ?? 0;
+      const reservedByMe = info?.reservedByMe ?? 0;
+      const maxAllowed = info?.maxAllowed ?? available + reservedByMe;
+      return {
+        ...item,
+        available, // Stock disponible globalement
+        reservedByMe, // Réservations de cet utilisateur
+        maxAllowed, // Quantité max autorisée (available + ses réservations)
+        priceCents: info?.priceCents ?? item.priceCents,
+      };
+    });
+  }, [cart, variantInfo]);
+
+  // STRATÉGIE: HOLD au checkout uniquement, pas au panier
+  // Stock estimé informatif seulement (pas d'erreurs bloquantes au panier)
+  // La vérification réelle se fait au moment du HOLD (/checkout/hold)
+  // On garde juste un warning doux si le stock est faible (informatif)
+  const stockWarnings = useMemo(() => {
+    const warnings: Record<string, string> = {};
+    cartItemsWithStock.forEach((item) => {
+      const info = variantInfo[item.variantId];
+      if (!info) {
+        // Si on n'a pas encore les infos de stock, pas de warning
+        return;
+      }
+
+      // Warning informatif seulement (pas bloquant)
+      if (info.available <= 0) {
+        warnings[item.variantId] = 'Stock faible, vérification au paiement';
+      } else if (info.available < 5) {
+        warnings[item.variantId] = 'Stock faible, vérification au paiement';
+      }
+    });
+    return warnings;
+  }, [cartItemsWithStock, variantInfo]);
 
   function validateShipping() {
     if (!shipping.fullName.trim()) return 'Veuillez renseigner le nom complet.';
@@ -112,6 +170,11 @@ export function CartPage() {
   }
 
   async function handleCheckout() {
+    // AJUSTEMENT A: Anti double-clic (guard inFlight)
+    if (loading) {
+      return; // Déjà en cours, ignorer
+    }
+
     // Vérifier l'authentification uniquement au moment du clic sur "Commander"
     if (!isAuthenticated) {
       // Stocker l'intention de checkout et le panier invité avant redirection
@@ -123,23 +186,9 @@ export function CartPage() {
 
     if (cart.length === 0) return;
 
-    if (Object.keys(stockErrors).length > 0) {
-      const hasRupture = Object.values(stockErrors).some((msg) => msg.includes('Rupture'));
-      const hasInsuffisant = Object.values(stockErrors).some((msg) =>
-        msg.includes('Stock insuffisant')
-      );
-
-      if (hasRupture) {
-        setEmailError(
-          'Impossible de procéder au paiement : certains articles sont en rupture de stock.'
-        );
-        return;
-      }
-      if (hasInsuffisant) {
-        setEmailError('Les quantités ont été ajustées selon le stock disponible.');
-        return;
-      }
-    }
+    // STRATÉGIE: HOLD au checkout uniquement
+    // Ne pas bloquer au panier (stock estimé informatif seulement)
+    // La vérification réelle se fait au moment du HOLD (/checkout/hold)
 
     const shippingValidation = validateShipping();
     if (shippingValidation) {
@@ -161,18 +210,47 @@ export function CartPage() {
     setShippingError('');
     setLoading(true);
     try {
-      const items = cartItemsWithStock
-        .map((item) => ({
-          variantId: item.variantId,
-          quantity: Math.min(item.quantity, item.stock),
-        }))
-        .filter((item) => item.quantity > 0);
+      const items = cart.map((item) => ({
+        variantId: item.variantId,
+        quantity: item.quantity,
+      }));
 
       if (items.length === 0) {
         setEmailError('Aucun article disponible dans votre panier.');
         setLoading(false);
         return;
       }
+
+      // STRATÉGIE: HOLD au checkout uniquement (TTL 10 minutes)
+      // Créer un HOLD pour tout le panier avant de créer la session Stripe
+      try {
+        await checkoutHold(items, 10); // TTL 10 minutes pour le paiement
+      } catch (holdError: any) {
+        console.error('Erreur lors du HOLD:', holdError);
+        if (holdError?.status === 409) {
+          // Stock insuffisant au moment du HOLD
+          const errorData = holdError?.response?.data;
+          if (errorData?.code === 'OUT_OF_STOCK' && errorData?.details) {
+            const details = errorData.details;
+            const messages = details.map(
+              (d: any) => `${d.variantId}: ${d.requested} demandé, ${d.available} disponible`
+            );
+            setEmailError(
+              `Stock insuffisant pour certains articles. ${messages.join('; ')}. Veuillez ajuster votre panier.`
+            );
+          } else {
+            setEmailError(
+              'Stock insuffisant pour certains articles. Veuillez vérifier votre panier et réessayer.'
+            );
+          }
+        } else {
+          setEmailError('Erreur lors de la réservation du stock. Veuillez réessayer.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Si HOLD réussi, créer la session Stripe
       const { url } = await createCheckoutSession(
         items,
         email || undefined,
@@ -258,15 +336,11 @@ export function CartPage() {
           {/* Liste des articles - toujours accessible en invité */}
           <div className={styles.itemsList}>
             {cartItemsWithStock.map((item) => {
-              const stockError = stockErrors[item.variantId];
-              const isOutOfStock = item.stock <= 0;
-              const hasInsufficientStock = item.stock < item.quantity;
+              const stockWarning = stockWarnings[item.variantId];
+              const available = item.available;
 
               return (
-                <div
-                  key={item.variantId}
-                  className={`${styles.cartItem} ${stockError ? styles.hasError : ''}`}
-                >
+                <div key={item.variantId} className={styles.cartItem}>
                   {/* Image */}
                   <div className={styles.imageContainer}>
                     {item.imageUrl ? (
@@ -290,7 +364,7 @@ export function CartPage() {
                         )}
                       </div>
                       <button
-                        onClick={() => removeFromCart(item.variantId)}
+                        onClick={() => handleRemoveFromCart(item.variantId)}
                         className={styles.removeButton}
                         aria-label="Retirer du panier"
                       >
@@ -302,7 +376,7 @@ export function CartPage() {
                     <div className={styles.quantityRow}>
                       <div className={styles.quantityControls}>
                         <button
-                          onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                          onClick={() => handleUpdateQuantity(item.variantId, item.quantity - 1)}
                           className={styles.quantityButton}
                           disabled={item.quantity <= 1}
                           aria-label="Diminuer la quantité"
@@ -311,9 +385,8 @@ export function CartPage() {
                         </button>
                         <span className={styles.quantityValue}>{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                          onClick={() => handleUpdateQuantity(item.variantId, item.quantity + 1)}
                           className={styles.quantityButton}
-                          disabled={item.stock <= item.quantity}
                           aria-label="Augmenter la quantité"
                         >
                           +
@@ -331,17 +404,21 @@ export function CartPage() {
                       </div>
                     </div>
 
-                    {/* Stock info */}
+                    {/* Stock info - Informatif seulement (pas bloquant) */}
                     <div className={styles.stockRow}>
                       <span
-                        className={`${styles.stockInfo} ${isOutOfStock ? styles.outOfStock : hasInsufficientStock ? styles.lowStock : ''}`}
+                        className={`${styles.stockInfo} ${available <= 0 ? styles.outOfStock : available < 5 ? styles.lowStock : ''}`}
                       >
-                        Stock :{' '}
-                        {item.stock > 0
-                          ? `${item.stock} disponible${item.stock > 1 ? 's' : ''}`
+                        Stock estimé :{' '}
+                        {available > 0
+                          ? `${available} disponible${available > 1 ? 's' : ''}`
                           : 'Rupture'}
                       </span>
-                      {stockError && <div className={styles.stockError}>⚠️ {stockError}</div>}
+                      {stockWarning && (
+                        <div className={styles.stockError} style={{ opacity: 0.8 }}>
+                          ⚠️ {stockWarning}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -550,7 +627,7 @@ export function CartPage() {
                 Continuer les achats
               </button>
 
-              <button className={styles.clearButton} onClick={clearCart}>
+              <button className={styles.clearButton} onClick={handleClearCart}>
                 Vider le panier
               </button>
             </div>

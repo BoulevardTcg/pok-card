@@ -16,6 +16,7 @@ import adminRoutes from './routes/admin.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
+import reservationRoutes from './routes/reservations.js';
 
 // Import des middlewares de sécurité
 import {
@@ -37,6 +38,15 @@ export const createApp = () => {
   ];
   const isDevelopment = process.env.NODE_ENV === 'development';
 
+  // Webhook Stripe - DOIT être défini AVANT le middleware CORS (pas d'origin header - server-to-server)
+  // Les webhooks Stripe sont authentifiés par signature, pas par CORS
+  app.post(
+    '/api/checkout/webhook',
+    express.raw({ type: 'application/json' }),
+    checkoutWebhookHandler
+  );
+
+  // Middleware CORS sécurisé (appliqué après le webhook)
   app.use(
     cors({
       origin: (origin, callback) => {
@@ -47,8 +57,15 @@ export const createApp = () => {
         ) {
           return callback(null, true);
         }
+
+        // En production, bloquer !origin (les webhooks sont gérés avant ce middleware)
+        if (!origin) {
+          console.warn('🚫 CORS: Requête sans origin header en production - bloquée');
+          return callback(new Error('CORS: Origin header requis en production'));
+        }
+
         // En production, vérifier strictement les origines autorisées
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
           console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
@@ -57,7 +74,7 @@ export const createApp = () => {
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Cart-Id'],
       optionsSuccessStatus: 200,
     })
   );
@@ -93,11 +110,7 @@ export const createApp = () => {
 
   // Routes de checkout
   app.use('/api/checkout', checkoutRoutes);
-  app.post(
-    '/api/checkout/webhook',
-    express.raw({ type: 'application/json' }),
-    checkoutWebhookHandler
-  );
+  // Note: Le webhook Stripe est défini AVANT le middleware CORS (voir plus haut)
 
   // Routes des avis
   app.use('/api/reviews', reviewsRoutes);
@@ -122,6 +135,9 @@ export const createApp = () => {
 
   // Routes RGPD (protection des données)
   app.use('/api/gdpr', gdprRoutes);
+
+  // Routes des réservations de panier
+  app.use('/api/reservations', reservationRoutes);
 
   // Gestion des erreurs globales
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -31,6 +31,25 @@ const keyGenerator = (req: Request): string => {
   return userId ? `user:${userId}` : `ip:${ip}`;
 };
 
+// Helper pour logger les erreurs 429 avec détails
+const logRateLimit = (req: Request, res: Response) => {
+  const userId = (req as any).user?.userId || 'anonymous';
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  const userAgent = req.headers['user-agent'] || 'unknown';
+  const referer = req.headers.referer || 'none';
+  const origin = req.headers.origin || 'none';
+  const cartId = req.headers['x-cart-id'] || 'none';
+
+  console.warn(`🚫 Rate limit 429 - ${req.method} ${req.originalUrl}`, {
+    userId,
+    ip,
+    userAgent: userAgent.substring(0, 100), // Limiter la longueur
+    referer,
+    origin,
+    cartId,
+  });
+};
+
 export const authLimiter = rateLimit({
   windowMs: RATE_LIMITS.auth.windowMs,
   max: RATE_LIMITS.auth.max,
@@ -43,6 +62,14 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.ceil(RATE_LIMITS.auth.windowMs / 1000),
+    });
+  },
 });
 
 export const strictAuthLimiter = rateLimit({
@@ -69,9 +96,23 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    return req.path === '/api/health' || req.path === '/api/checkout/webhook';
+    // Utiliser originalUrl au lieu de path pour capturer les chemins complets
+    const url = req.originalUrl || req.url;
+    return (
+      url === '/api/health' ||
+      url.startsWith('/api/checkout/webhook') ||
+      url.startsWith('/api/auth/refresh')
+    );
   },
   keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de requêtes. Réessayez dans 15 minutes.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.ceil(RATE_LIMITS.api.windowMs / 1000),
+    });
+  },
 });
 
 export const authenticatedApiLimiter = rateLimit({
@@ -121,6 +162,80 @@ export const checkoutLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de tentatives de paiement. Réessayez dans 1 heure.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.ceil(RATE_LIMITS.checkout.windowMs / 1000),
+    });
+  },
+});
+
+// Limiter spécifique pour /auth/refresh : très large (120/min) car appelé fréquemment
+export const authRefreshLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // 120 req/min (très large pour éviter les blocages)
+  message: {
+    error: 'Trop de tentatives de rafraîchissement. Réessayez dans 1 minute.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de tentatives de rafraîchissement. Réessayez dans 1 minute.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: 60,
+    });
+  },
+});
+
+// Limiter spécifique pour /products : large (120/min) pour éviter de casser le front
+export const productsLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // 120 req/min (large pour listProducts limit=500)
+  message: {
+    error: 'Trop de requêtes produits. Réessayez dans 1 minute.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de requêtes produits. Réessayez dans 1 minute.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: 60,
+    });
+  },
+});
+
+// Limiter spécifique pour /users/profile : large (120/min) pour éviter de casser le front
+export const usersProfileLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // 120 req/min (large)
+  message: {
+    error: 'Trop de requêtes profil. Réessayez dans 1 minute.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator,
+  handler: (req: Request, res: Response) => {
+    logRateLimit(req, res);
+    res.status(429).json({
+      error: 'Trop de requêtes profil. Réessayez dans 1 minute.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: 60,
+    });
+  },
 });
 
 export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
@@ -257,7 +372,7 @@ export const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cart-Id'],
   exposedHeaders: ['X-Total-Count'],
   maxAge: 86400, // 24 heures
 };
