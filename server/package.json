@@ -19,6 +19,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:setup": "prisma generate && prisma migrate deploy",
+    "test:ci": "prisma generate && prisma migrate deploy && vitest run",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "preseed": "node scripts/scan-secrets.mjs",
     "gdpr:cleanup": "tsx scripts/gdpr-cleanup.ts",

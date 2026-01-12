@@ -142,9 +142,15 @@ export const createApp = () => {
   // Gestion des erreurs globales
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Erreur globale:', err);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_SERVER_ERROR',
+
+    // En mode test, exposer les détails de l'erreur pour faciliter le débogage
+    const isTest = process.env.NODE_ENV === 'test';
+    const statusCode = (err as any).statusCode || 500;
+
+    res.status(statusCode).json({
+      error: isTest ? err.message : 'Erreur interne du serveur',
+      code: (err as any).code || 'INTERNAL_SERVER_ERROR',
+      ...(isTest && { stack: err.stack, details: err }),
     });
   });
 

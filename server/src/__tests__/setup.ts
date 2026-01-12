@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
 // Utiliser une base de données de test séparée
+// Les variables d'environnement sont chargées dans vitest.setup.ts
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+      url: process.env.DATABASE_URL,
     },
   },
 });
@@ -109,6 +110,15 @@ export async function createProductVariant(
     },
   });
   return variant;
+}
+
+// Fonctions utilitaires pour la connexion/disconnexion
+export async function connectDatabase() {
+  await prisma.$connect();
+}
+
+export async function disconnectDatabase() {
+  await prisma.$disconnect();
 }
 
 export { prisma };
