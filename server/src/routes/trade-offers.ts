@@ -4,7 +4,6 @@ import { PrismaClient, TradeStatus } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Créer une offre d'échange
 router.post(
