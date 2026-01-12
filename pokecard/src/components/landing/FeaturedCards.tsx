@@ -3,7 +3,6 @@ import { useState, useEffect, useContext, useRef } from 'react';
 import { ArrowUpRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
 import { CartContext, type Product } from '../../cartContext';
-import { useAuth } from '../../authContext';
 import { NotifyModal } from '../NotifyModal';
 import styles from './FeaturedCards.module.css';
 
@@ -53,7 +52,6 @@ function isNewProduct(product: Product): boolean {
 export default function FeaturedCards() {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-  const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifyModal, setNotifyModal] = useState<{
@@ -174,13 +172,6 @@ export default function FeaturedCards() {
   // Gérer l'ajout au panier
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
-
-    if (!isAuthenticated) {
-      navigate('/login', {
-        state: { from: product.slug ? `/produit/${product.slug}` : '/produits' },
-      });
-      return;
-    }
 
     if (!product.outOfStock && product.variants && product.variants.length > 0) {
       const availableVariant = product.variants.find((v) => v.stock > 0);

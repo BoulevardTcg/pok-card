@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from './authContext';
+import { CartContext } from './cartContext';
 import { Shield, Key, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import styles from './LoginPage.module.css';
 
@@ -15,7 +16,53 @@ const LoginPage: React.FC = () => {
   const [pendingEmail, setPendingEmail] = useState('');
 
   const { login } = useAuth();
+  const { mergeCart, cart } = useContext(CartContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Fonction utilitaire pour obtenir la route de redirection après connexion
+  const getRedirectPath = (): string => {
+    const returnTo = searchParams.get('returnTo');
+    const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+
+    // Si on vient du panier avec intention de checkout, retourner au panier
+    if (checkoutIntent === 'true' || returnTo === '/panier') {
+      sessionStorage.removeItem('checkoutIntent');
+      return '/panier';
+    }
+
+    // Sinon, utiliser returnTo ou fallback vers la page d'accueil
+    return returnTo || '/';
+  };
+
+  // Récupérer le panier invité depuis sessionStorage (stocké avant la redirection)
+  const getGuestCart = (): typeof cart => {
+    try {
+      const stored = sessionStorage.getItem('guestCart');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Erreur lors de la récupération du panier invité:', e);
+    }
+    return [];
+  };
+
+  // Vérifier si deux paniers sont identiques (même variantes et quantités)
+  const areCartsEqual = (cart1: typeof cart, cart2: typeof cart): boolean => {
+    if (cart1.length !== cart2.length) return false;
+
+    const cart1Map = new Map(cart1.map((item) => [item.variantId, item.quantity]));
+    const cart2Map = new Map(cart2.map((item) => [item.variantId, item.quantity]));
+
+    if (cart1Map.size !== cart2Map.size) return false;
+
+    for (const [variantId, quantity] of cart1Map) {
+      if (cart2Map.get(variantId) !== quantity) return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +73,28 @@ const LoginPage: React.FC = () => {
       const result = await login(email, password);
 
       if (result.success) {
-        navigate('/');
+        // Récupérer le panier invité stocké avant la redirection
+        const guestCart = getGuestCart();
+
+        // Ne fusionner que si :
+        // 1. Il y a un panier invité stocké
+        // 2. Le panier invité est différent du panier actuel (pour éviter de fusionner avec lui-même)
+        // 3. Le panier actuel n'est pas vide (pour éviter de fusionner un panier vide)
+        if (guestCart.length > 0 && cart.length > 0 && !areCartsEqual(guestCart, cart)) {
+          // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
+          // ou qui ont des quantités différentes
+          mergeCart(guestCart);
+        } else if (guestCart.length > 0 && cart.length === 0) {
+          // Si le panier actuel est vide, on peut simplement ajouter le panier invité
+          mergeCart(guestCart);
+        }
+
+        // Nettoyer sessionStorage après traitement
+        sessionStorage.removeItem('guestCart');
+
+        // Rediriger vers la route de retour ou le panier
+        const redirectPath = getRedirectPath();
+        navigate(redirectPath, { replace: true });
       } else if (result.requiresTwoFactor) {
         // 2FA requis, afficher le formulaire 2FA
         setRequiresTwoFactor(true);
@@ -51,7 +119,28 @@ const LoginPage: React.FC = () => {
       const result = await login(pendingEmail, password, twoFactorCode);
 
       if (result.success) {
-        navigate('/');
+        // Récupérer le panier invité stocké avant la redirection
+        const guestCart = getGuestCart();
+
+        // Ne fusionner que si :
+        // 1. Il y a un panier invité stocké
+        // 2. Le panier invité est différent du panier actuel (pour éviter de fusionner avec lui-même)
+        // 3. Le panier actuel n'est pas vide (pour éviter de fusionner un panier vide)
+        if (guestCart.length > 0 && cart.length > 0 && !areCartsEqual(guestCart, cart)) {
+          // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
+          // ou qui ont des quantités différentes
+          mergeCart(guestCart);
+        } else if (guestCart.length > 0 && cart.length === 0) {
+          // Si le panier actuel est vide, on peut simplement ajouter le panier invité
+          mergeCart(guestCart);
+        }
+
+        // Nettoyer sessionStorage après traitement
+        sessionStorage.removeItem('guestCart');
+
+        // Rediriger vers la route de retour ou le panier
+        const redirectPath = getRedirectPath();
+        navigate(redirectPath, { replace: true });
       } else if (result.requiresTwoFactor) {
         setError(result.error || 'Code 2FA invalide');
         setTwoFactorCode('');
