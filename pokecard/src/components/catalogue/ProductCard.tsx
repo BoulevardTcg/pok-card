@@ -179,7 +179,7 @@ export default function ProductCard({
           onClick={handleQuickView}
           aria-label="Aperçu rapide"
         >
-          👁 Aperçu rapide
+          Aperçu rapide
         </button>
       </div>
 

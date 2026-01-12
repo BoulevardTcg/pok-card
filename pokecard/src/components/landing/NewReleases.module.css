@@ -369,22 +369,56 @@
   color: var(--color-accent-primary, #e8e4dd);
 }
 
-.releaseDate {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+.stockStatus {
+  font-size: 12px;
+  font-weight: 400;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.stockStatus::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stockStatus.in-stock {
+  color: #10b981;
+}
+
+.stockStatus.in-stock::before {
+  background: #10b981;
+}
+
+.stockStatus.low-stock {
+  color: #f59e0b;
+  font-weight: 400;
+}
+
+.stockStatus.low-stock::before {
+  background: #f59e0b;
+}
+
+.stockStatus.out-of-stock {
   color: var(--color-text-muted, #6b6b6f);
 }
 
-.releaseDate::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: currentColor;
-  border-radius: 50%;
-  opacity: 0.5;
+.stockStatus.out-of-stock::before {
+  background: var(--color-text-muted, #6b6b6f);
+}
+
+.stockStatus.coming-soon {
+  color: var(--color-text-muted, #6b6b6f);
+}
+
+.stockStatus.coming-soon::before {
+  background: var(--color-text-muted, #6b6b6f);
 }
 
 /* ─────────────────────────────────────────────────────────────────
