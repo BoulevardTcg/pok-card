@@ -4,40 +4,43 @@ import { ArrowUpRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
 import { CartContext, type Product } from '../../cartContext';
 import { NotifyModal } from '../NotifyModal';
+import { getProductType as getProductTypeFromUtils, productTypeLabels } from '../../utils/filters';
 import styles from './FeaturedCards.module.css';
 
-// Détermine l'univers à partir de la catégorie du produit
-function getUniverse(product: Product): 'Pokémon' | 'One Piece' | 'Yu-Gi-Oh' | 'Autre' {
-  const category = product.category?.toLowerCase() || '';
+// Fonction pour obtenir le statut du stock
+function getStockStatus(product: Product): {
+  status: 'in-stock' | 'low-stock' | 'out-of-stock' | 'coming-soon';
+  label: string;
+  totalStock: number;
+} {
+  if (!product.variants || product.variants.length === 0) {
+    return { status: 'coming-soon', label: 'Bientôt disponible', totalStock: 0 };
+  }
 
-  if (category === 'one piece' || category === 'onepiece') {
-    return 'One Piece';
+  const totalStock = product.variants.reduce((sum, variant) => sum + variant.stock, 0);
+
+  if (product.outOfStock || totalStock === 0) {
+    return { status: 'out-of-stock', label: 'Bientôt disponible', totalStock: 0 };
   }
-  if (category === 'yu-gi-oh' || category === 'yugioh') {
-    return 'Yu-Gi-Oh';
+
+  if (totalStock < 10) {
+    return { status: 'low-stock', label: `Stock limité (${totalStock})`, totalStock };
   }
-  if (category === 'pokémon' || category === 'pokemon') {
-    return 'Pokémon';
-  }
-  return 'Autre';
+
+  return {
+    status: 'in-stock',
+    label: totalStock >= 150 ? 'En stock (150+)' : `En stock (${totalStock})`,
+    totalStock,
+  };
 }
 
-// Détermine le type de produit à partir de la catégorie
-function getProductType(product: Product): string {
-  const category = product.category?.toLowerCase() || '';
-  const name = product.name.toLowerCase();
+// Fonction pour obtenir la langue du produit
+function getProductLanguage(product: Product): string {
+  if (!product.variants || product.variants.length === 0) return 'N/A';
 
-  if (category.includes('display') || name.includes('display')) return 'Display';
-  if (
-    category.includes('etb') ||
-    name.includes('elite trainer') ||
-    name.includes('coffret dresseur')
-  )
-    return "Coffret Dresseur d'Élite";
-  if (category.includes('upc') || name.includes('ultra premium')) return 'Ultra Premium Collection';
-  if (category.includes('booster') || name.includes('booster')) return 'Booster';
-  if (category.includes('coffret') || name.includes('coffret')) return 'Coffret';
-  return product.category || 'Produit scellé';
+  // Prendre la langue de la première variante disponible
+  const firstVariant = product.variants.find((v) => v.language) || product.variants[0];
+  return firstVariant.language || 'N/A';
 }
 
 // Vérifie si le produit est récent (moins de 30 jours)
@@ -275,8 +278,9 @@ export default function FeaturedCards() {
                 const isNew = isNewProduct(product);
                 const inStock = isInStock(product);
                 const price = getLowestPrice(product);
-                const productType = getProductType(product);
-                const universe = getUniverse(product);
+                const productType = getProductTypeFromUtils(product);
+                const language = getProductLanguage(product);
+                const stockStatus = getStockStatus(product);
                 const imageUrl = getImageUrl(
                   product.images?.[0]?.url || '/img/products/placeholder.png'
                 );
@@ -303,23 +307,20 @@ export default function FeaturedCards() {
 
                       {/* Badge */}
                       {isNew && <div className={styles.badge}>Nouveau</div>}
-
-                      {/* Stock indicator */}
-                      {inStock && (
-                        <div className={styles.stockBadge}>
-                          <span className={styles.stockDot} />
-                          En stock
-                        </div>
-                      )}
                     </div>
 
                     {/* Content */}
                     <div className={styles.cardContent}>
                       <div className={styles.cardInfo}>
-                        <span className={styles.cardMeta}>
-                          {universe} · {productType}
-                        </span>
+                        <div className={styles.categoryLabel}>{product.category}</div>
                         <h3 className={styles.cardName}>{product.name}</h3>
+                        <div className={styles.cardMeta}>
+                          <span className={styles.metaItem}>{productTypeLabels[productType]}</span>
+                          <span className={styles.metaItem}>{language}</span>
+                        </div>
+                        <div className={`${styles.stockStatus} ${styles[stockStatus.status]}`}>
+                          {stockStatus.label}
+                        </div>
                       </div>
 
                       <div className={styles.cardFooter}>

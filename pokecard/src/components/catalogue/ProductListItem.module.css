@@ -331,37 +331,46 @@
    ───────────────────────────────────────────────────────────────── */
 
 .addToCartButton {
+  position: relative;
   width: 100%; /* Full-width pour les listes */
-  padding: 14px 20px;
-  background: #3d6e4e; /* Vert uniforme */
-  color: white;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px; /* rounded-lg */
-  font-weight: 600; /* font-semibold */
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.875rem; /* text-sm */
-  letter-spacing: 0.05em; /* tracking-wide */
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .addToCartButton:hover:not(:disabled) {
-  filter: brightness(0.9); /* hover:brightness-90 */
+  background: var(--color-accent-hover);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
+.addToCartButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
 .addToCartButton:disabled {
-  background: var(--color-bg-subtle, #1a1a1d);
-  color: var(--color-text-muted, #6b6b6f);
+  opacity: 0.4;
   cursor: not-allowed;
-  opacity: 0.6;
+  box-shadow: none;
 }
 
 .addToCartButton.adding {

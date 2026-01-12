@@ -55,6 +55,33 @@ function isNewProduct(product: Product): boolean {
   return createdDate > thirtyDaysAgo;
 }
 
+// Fonction pour obtenir le statut du stock
+function getStockStatus(product: Product): {
+  status: 'in-stock' | 'low-stock' | 'out-of-stock' | 'coming-soon';
+  label: string;
+  totalStock: number;
+} {
+  if (!product.variants || product.variants.length === 0) {
+    return { status: 'coming-soon', label: 'Bientôt disponible', totalStock: 0 };
+  }
+
+  const totalStock = product.variants.reduce((sum, variant) => sum + variant.stock, 0);
+
+  if (product.outOfStock || totalStock === 0) {
+    return { status: 'out-of-stock', label: 'Bientôt disponible', totalStock: 0 };
+  }
+
+  if (totalStock < 10) {
+    return { status: 'low-stock', label: `Stock limité (${totalStock})`, totalStock };
+  }
+
+  return {
+    status: 'in-stock',
+    label: totalStock >= 150 ? 'En stock (150+)' : `En stock (${totalStock})`,
+    totalStock,
+  };
+}
+
 export default function NewReleases() {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
@@ -190,6 +217,7 @@ export default function NewReleases() {
               const inStock = isInStock(product);
               const price = getLowestPrice(product);
               const productType = getProductType(product);
+              const stockStatus = getStockStatus(product);
               const imageUrl = getImageUrl(
                 product.images?.[0]?.url || '/img/products/placeholder.png'
               );
@@ -225,9 +253,9 @@ export default function NewReleases() {
                     <div className={styles.releaseInfo}>
                       <span className={styles.releaseType}>{productType}</span>
                       <h3 className={styles.releaseName}>{product.name}</h3>
-                      <span className={styles.releaseDate}>
-                        {inStock ? 'Disponible' : 'Bientôt disponible'}
-                      </span>
+                      <div className={`${styles.stockStatus} ${styles[stockStatus.status]}`}>
+                        {stockStatus.label}
+                      </div>
                     </div>
 
                     <div className={styles.releaseFooter}>
