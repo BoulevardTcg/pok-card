@@ -437,6 +437,11 @@
   background: var(--color-border-default, rgba(255, 255, 255, 0.1));
 }
 
+/* Mode clair : bleu cyan pour les indicateurs actifs */
+html[data-theme='light'] .indicator.active {
+  background: rgba(63, 126, 243, 0.2);
+}
+
 .indicatorProgress {
   position: absolute;
   top: 0;
@@ -445,6 +450,11 @@
   width: 0;
   background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
+}
+
+/* Mode clair : bleu cyan pour la barre de progression */
+html[data-theme='light'] .indicatorProgress {
+  background: #3f7ef3;
 }
 
 /* ─── MOBILE: Progress bar positionnée correctement ─── */
@@ -754,6 +764,11 @@ html[data-theme='light'] .cardSubtitle {
   background: var(--color-accent-secondary, #8b7355);
   border-radius: var(--radius-full, 9999px);
   animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* Mode clair : bleu cyan pour le point de défilement */
+html[data-theme='light'] .scrollDot {
+  background: #3f7ef3;
 }
 
 @keyframes scrollBounce {
