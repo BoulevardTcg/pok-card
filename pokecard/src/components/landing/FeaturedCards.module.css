@@ -67,7 +67,12 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-accent-secondary, #8b7355);
+  color: #3f7ef3;
+}
+
+/* Mode sombre : bleu cyan également */
+html[data-theme='dark'] .overline {
+  color: #3f7ef3;
 }
 
 .title {

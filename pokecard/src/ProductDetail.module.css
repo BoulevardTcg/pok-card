@@ -854,93 +854,6 @@
   }
 }
 
-.addButtonMobile {
-  width: 100%;
-  height: 52px;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-primary) 0%,
-    var(--color-accent-secondary) 100%
-  );
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-lg, 8px);
-  font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-base, 1rem);
-  font-weight: var(--font-bold, 700);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  box-shadow:
-    0 4px 16px color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
-    var(--shadow-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.addButtonMobile::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-hover) 0%,
-    var(--color-accent-primary) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.addButtonMobile:hover:not(.disabled)::before {
-  opacity: 1;
-}
-
-.addButtonMobile span,
-.addButtonMobile {
-  position: relative;
-  z-index: 1;
-}
-
-.addButtonMobile:hover:not(.disabled) {
-  transform: translateY(-3px);
-  box-shadow:
-    0 8px 24px color-mix(in srgb, var(--color-accent-primary) 40%, transparent),
-    var(--shadow-lg);
-}
-
-.addButtonMobile:active:not(.disabled) {
-  transform: translateY(-1px);
-  box-shadow:
-    0 4px 12px color-mix(in srgb, var(--color-accent-primary) 35%, transparent),
-    var(--shadow-md);
-}
-
-.addButtonMobile:focus-visible {
-  outline: 3px solid var(--color-text-primary);
-  outline-offset: 2px;
-}
-
-.addButtonMobile.disabled {
-  background: var(--color-bg-subtle);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.addButtonMobile.disabled::before {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .addButtonMobile:hover:not(.disabled),
-  .addButtonMobile:active:not(.disabled) {
-    transform: none;
-  }
-}
-
 /* ─────────────────────────────────────────────────────────────────
    ACTION SECTION — Bouton CTA Desktop (dans purchasePanel)
    ───────────────────────────────────────────────────────────────── */
@@ -957,92 +870,160 @@
   }
 }
 
-.addButton {
+/* ─────────────────────────────────────────────────────────────────
+   ADD TO CART BUTTON - Style identique à ProductCard
+   ───────────────────────────────────────────────────────────────── */
+
+.addToCartButton {
+  position: relative;
   width: 100%;
-  height: 52px;
-  background: #ffffff;
-  color: var(--color-text-inverse, #0a0a0b);
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
-  border-radius: var(--radius-lg, 8px);
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 8px;
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-base, 1rem);
-  font-weight: var(--font-bold, 700);
-  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   outline: none;
-  box-shadow: var(--shadow-md);
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
 }
 
 @media (min-width: 768px) {
-  .addButton {
+  .addToCartButton {
+    height: 48px;
+  }
+}
+
+.addToCartButton:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.addToCartButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.addToCartButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.addToCartButton.adding {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+@media (max-width: 767px) {
+  .addToCartButton {
+    height: 40px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .addToCartButton:hover:not(:disabled),
+  .addToCartButton:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   NOTIFY BUTTON - Style outline attractif adapté au thème (identique ProductCard)
+   ───────────────────────────────────────────────────────────────── */
+
+.notifyButton {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  padding: 0.75rem 1.25rem;
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  color: var(--color-accent-primary);
+  border: 2px solid var(--color-accent-primary);
+  border-radius: var(--radius-lg, 8px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: var(--text-base, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .notifyButton {
     height: 56px;
   }
 }
 
-/* Mode clair : bouton bleu cyan */
-html[data-theme='light'] .addButton {
-  background: var(--color-accent-primary, #3f7ef3);
-  color: #ffffff;
-  border: 1px solid var(--color-accent-primary, #3f7ef3);
+/* Effet glow pulsant */
+.notifyButton::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
+    transparent,
+    color-mix(in srgb, var(--color-accent-primary) 30%, transparent)
+  );
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
-.addButton::before {
-  display: none;
-}
-
-.addButton span,
-.addButton {
-  position: relative;
-  z-index: 1;
-}
-
-.addButton:hover:not(.disabled) {
-  background: #f5f5f5;
+.notifyButton:hover {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
 
-/* Mode clair : hover vert foncé */
-html[data-theme='light'] .addButton:hover:not(.disabled) {
-  background: var(--color-accent-hover, #2d5a38);
-  border-color: var(--color-accent-hover, #2d5a38);
+.notifyButton:hover::after {
+  opacity: 1;
+  animation: glowPulse 2s ease-in-out infinite;
 }
 
-.addButton:active:not(.disabled) {
-  background: #e8e8e8;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-/* Mode clair : active vert encore plus foncé */
-html[data-theme='light'] .addButton:active:not(.disabled) {
-  background: var(--color-accent-hover, #2d5a38);
-  border-color: var(--color-accent-hover, #2d5a38);
-}
-
-.addButton:focus-visible {
+.notifyButton:focus-visible {
   outline: 3px solid var(--color-text-primary);
   outline-offset: 2px;
 }
 
-.addButton.disabled {
-  background: var(--color-bg-subtle);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.addButton.disabled::before {
-  display: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .addButton:hover:not(.disabled),
-  .addButton:active:not(.disabled) {
+  .notifyButton:hover {
     transform: none;
   }
 }
