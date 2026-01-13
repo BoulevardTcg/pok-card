@@ -7,6 +7,21 @@ export const API_URL = import.meta.env.VITE_API_URL
   : 'http://localhost:8080';
 
 /**
+ * Parse JSON en toute sécurité avec gestion d'erreurs
+ * @param json - Chaîne JSON à parser
+ * @param fallback - Valeur par défaut si le parsing échoue
+ * @returns Objet parsé ou fallback
+ */
+export function safeParse<T>(json: string | null | undefined, fallback: T): T {
+  if (!json) return fallback;
+  try {
+    return JSON.parse(json) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Normalise une URL d'image pour qu'elle fonctionne en développement et en production.
  * Si l'URL est relative (commence par /), elle est convertie en URL absolue avec API_URL.
  * Si l'URL est déjà absolue (http:// ou https://), elle est retournée telle quelle.
@@ -79,7 +94,8 @@ export async function createCheckoutSession(
   email?: string,
   promoCode?: string,
   shipping?: ShippingInfo,
-  shippingMethodCode?: string
+  shippingMethodCode?: string,
+  idempotencyKey?: string
 ): Promise<{ url: string | null; sessionId?: string } | { url?: string; sessionId: string }> {
   // Construire les URLs de redirection basées sur l'origine actuelle
   const origin = window.location.origin;
@@ -98,6 +114,11 @@ export async function createCheckoutSession(
   // Ajouter le token si l'utilisateur est connecté
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  // Ajouter la clé d'idempotence si fournie
+  if (idempotencyKey) {
+    headers['Idempotency-Key'] = idempotencyKey;
   }
 
   const res = await fetch(`${API_BASE}/checkout/create-session`, {
@@ -119,6 +140,14 @@ export async function createCheckoutSession(
     try {
       const errorData = await res.json();
       errorMessage = errorData.error || errorData.message || errorMessage;
+
+      // Si c'est une erreur d'idempotence (session existante), retourner la session
+      if (errorData.code === 'IDEMPOTENT_REQUEST' && errorData.sessionId && errorData.url) {
+        return {
+          sessionId: errorData.sessionId,
+          url: errorData.url,
+        };
+      }
     } catch {
       // ignore
     }

@@ -21,9 +21,6 @@ export function CheckoutSuccess() {
     } else {
       setLoading(false);
     }
-
-    // Vider le panier après un checkout réussi
-    clearCart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -51,6 +48,12 @@ export function CheckoutSuccess() {
         console.log(
           `✅ Commande ${data.alreadyCreated ? 'existante' : 'créée'}: ${data.orderNumber}`
         );
+        // Vider le panier uniquement si la commande est confirmée avec succès
+        clearCart();
+        // Nettoyer aussi les drafts de checkout
+        sessionStorage.removeItem('checkoutDraft');
+        sessionStorage.removeItem('idempotencyKeyCheckout');
+        sessionStorage.removeItem('idempotencyKeyCheckoutSignature');
       } else {
         // Ne pas afficher d'erreur si le paiement n'est pas encore complété
         if (data.code !== 'PAYMENT_NOT_COMPLETED') {
