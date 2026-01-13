@@ -311,9 +311,14 @@ export function CartPage() {
         status?: number;
         message?: string;
         response?: { data?: { error?: string } };
+        isNetworkError?: boolean;
       };
 
-      if (err?.status === 409 || err?.message?.includes('Stock insuffisant')) {
+      // Erreur réseau (CORS, timeout, connexion refusée, etc.)
+      if (err?.isNetworkError || err?.status === 0) {
+        errorMsg =
+          err?.message || 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
+      } else if (err?.status === 409 || err?.message?.includes('Stock insuffisant')) {
         errorMsg = 'Stock insuffisant pour certains articles. Veuillez vérifier votre panier.';
       } else if (err?.status === 401) {
         // Forcer login si 401
@@ -400,7 +405,11 @@ export function CartPage() {
             </div>
             <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
             <p className={styles.emptyText}>Découvrez nos collections premium</p>
-            <button onClick={() => navigate('/produits')} className={styles.emptyButton}>
+            <button
+              type="button"
+              onClick={() => navigate('/produits')}
+              className={styles.emptyButton}
+            >
               Explorer le catalogue
               <span className={styles.arrow}>→</span>
             </button>
@@ -470,6 +479,7 @@ export function CartPage() {
                         )}
                       </div>
                       <button
+                        type="button"
                         onClick={() => removeFromCart(item.variantId)}
                         className={styles.removeButton}
                         aria-label="Retirer du panier"
@@ -482,6 +492,7 @@ export function CartPage() {
                     <div className={styles.quantityRow}>
                       <div className={styles.quantityControls}>
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                           className={styles.quantityButton}
                           disabled={item.quantity <= 1}
@@ -491,6 +502,7 @@ export function CartPage() {
                         </button>
                         <span className={styles.quantityValue}>{item.quantity}</span>
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                           className={styles.quantityButton}
                           disabled={item.stock <= item.quantity}
@@ -597,6 +609,7 @@ export function CartPage() {
                       Code appliqué: <strong>{appliedPromo}</strong>
                     </span>
                     <button
+                      type="button"
                       onClick={() => {
                         setAppliedPromo(null);
                         setPromoDiscount(0);
@@ -620,6 +633,7 @@ export function CartPage() {
                       className={`${styles.promoInput} ${promoError ? styles.hasError : ''}`}
                     />
                     <button
+                      type="button"
                       onClick={async () => {
                         if (!promoCode.trim()) {
                           setPromoError('Veuillez entrer un code promo');
@@ -719,6 +733,7 @@ export function CartPage() {
               </div>
 
               <button
+                type="button"
                 className={styles.checkoutButton}
                 onClick={handleCheckout}
                 disabled={loading || cart.length === 0}
@@ -727,11 +742,15 @@ export function CartPage() {
                 <span className={styles.arrow}>→</span>
               </button>
 
-              <button className={styles.continueButton} onClick={() => navigate('/produits')}>
+              <button
+                type="button"
+                className={styles.continueButton}
+                onClick={() => navigate('/produits')}
+              >
                 Continuer les achats
               </button>
 
-              <button className={styles.clearButton} onClick={clearCart}>
+              <button type="button" className={styles.clearButton} onClick={clearCart}>
                 Vider le panier
               </button>
             </div>

@@ -170,6 +170,7 @@ body,
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable; /* Évite le layout shift quand la scrollbar apparaît/disparaît */
 }
 
 /* Focus visible pour accessibilité */

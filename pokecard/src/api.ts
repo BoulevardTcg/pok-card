@@ -121,10 +121,8 @@ export async function createCheckoutSession(
     headers['Idempotency-Key'] = idempotencyKey;
   }
 
-  const res = await fetch(`${API_BASE}/checkout/create-session`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
+  try {
+    const requestBody = {
       items,
       customerEmail: email,
       promoCode,
@@ -132,29 +130,78 @@ export async function createCheckoutSession(
       cancelUrl,
       shipping,
       shippingMethodCode,
-    }),
-  });
+    };
 
-  if (!res.ok) {
-    let errorMessage = `HTTP ${res.status}`;
-    try {
-      const errorData = await res.json();
-      errorMessage = errorData.error || errorData.message || errorMessage;
-
-      // Si c'est une erreur d'idempotence (session existante), retourner la session
-      if (errorData.code === 'IDEMPOTENT_REQUEST' && errorData.sessionId && errorData.url) {
-        return {
-          sessionId: errorData.sessionId,
-          url: errorData.url,
-        };
-      }
-    } catch {
-      // ignore
+    // Log de débogage en développement
+    if (import.meta.env.DEV) {
+      console.log('[Checkout] Appel API:', {
+        endpoint: `${API_BASE}/checkout/create-session`,
+        headers: { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : undefined },
+        body: requestBody,
+        idempotencyKey: idempotencyKey ? `${idempotencyKey.substring(0, 20)}...` : undefined,
+      });
     }
-    throw new Error(errorMessage);
-  }
 
-  return res.json();
+    const res = await fetch(`${API_BASE}/checkout/create-session`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!res.ok) {
+      let errorMessage = `HTTP ${res.status}`;
+      let errorData: any = {};
+      try {
+        errorData = await res.json();
+        errorMessage = errorData.error || errorData.message || errorMessage;
+
+        // Log de débogage en développement
+        if (import.meta.env.DEV) {
+          console.error('[Checkout] Erreur serveur:', {
+            status: res.status,
+            error: errorData,
+          });
+        }
+
+        // Si c'est une erreur d'idempotence (session existante), retourner la session
+        if (errorData.code === 'IDEMPOTENT_REQUEST' && errorData.sessionId && errorData.url) {
+          return {
+            sessionId: errorData.sessionId,
+            url: errorData.url,
+          };
+        }
+      } catch {
+        // Erreur lors du parsing JSON (réponse non-JSON)
+        if (import.meta.env.DEV) {
+          console.error(
+            '[Checkout] Réponse non-JSON:',
+            res.status,
+            await res.text().catch(() => '')
+          );
+        }
+      }
+      const error = new Error(errorMessage) as any;
+      error.status = res.status;
+      error.response = { data: errorData, status: res.status };
+      throw error;
+    }
+
+    return res.json();
+  } catch (error: any) {
+    // Si c'est déjà une erreur avec status, la ré-émettre
+    if (error.status) {
+      throw error;
+    }
+
+    // Sinon, c'est une erreur réseau (CORS, timeout, connexion refusée, etc.)
+    console.error('Erreur réseau lors de la création de la session:', error);
+    const networkError = new Error(
+      error.message || 'Erreur de connexion au serveur. Vérifiez votre connexion internet.'
+    ) as any;
+    networkError.status = 0; // 0 = erreur réseau
+    networkError.isNetworkError = true;
+    throw networkError;
+  }
 }
 
 export async function listProducts(params?: {
