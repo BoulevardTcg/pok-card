@@ -7,6 +7,8 @@ import { ensureStripeConfigured } from '../config/stripe.js';
 import { optionalAuth } from '../middleware/auth.js';
 import { sendOrderConfirmationEmail } from '../services/email.js';
 import { findShippingMethod } from '../config/shipping.js';
+import { releaseAllForOwner } from '../services/reservationService.js';
+import { getOwnerKey, getOrCreateCartId } from '../utils/cartId.js';
 
 const router = Router();
 
@@ -164,7 +166,8 @@ async function createOrderFromSession(
   return createdOrder;
 }
 
-async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
+// Export pour les tests
+export async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
   const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email;
   const items = parseMetadataItems(session.metadata ?? null);
 
@@ -178,6 +181,15 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
     session.metadata?.userId && session.metadata.userId.trim() !== ''
       ? session.metadata.userId
       : null;
+
+  // STRATÉGIE: Récupérer ownerKey depuis les metadata pour libérer les réservations
+  const ownerKey = session.metadata?.ownerKey || (userId ? `user:${userId}` : null);
+  if (!ownerKey) {
+    console.warn('⚠️ Webhook: ownerKey manquant dans metadata, utilisation userId uniquement', {
+      sessionId: session.id,
+      userId,
+    });
+  }
 
   await prisma.$transaction(async (tx) => {
     const variants = await tx.productVariant.findMany({
@@ -210,6 +222,31 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
 
     const orderItemsData = [];
 
+    // STRATÉGIE: Vérifier que les réservations (HOLD) existent et couvrent les quantités
+    // avant de décrémenter le stock (double vérification de sécurité)
+    if (ownerKey) {
+      const existingReservations = await tx.cartReservation.findMany({
+        where: {
+          ownerKey,
+          variantId: { in: variantIds },
+          expiresAt: { gt: new Date() },
+        },
+      });
+
+      const reservationMap = new Map(existingReservations.map((r) => [r.variantId, r.quantity]));
+
+      // Vérifier que toutes les quantités sont couvertes
+      for (const item of items) {
+        const held = reservationMap.get(item.variantId) || 0;
+        if (held < item.quantity) {
+          console.error(
+            `⚠️ Webhook: Réservation insuffisante pour ${item.variantId} (held: ${held}, requested: ${item.quantity})`
+          );
+          throw new Error(`Réservation insuffisante pour la variante ${item.variantId}`);
+        }
+      }
+    }
+
     for (const item of items) {
       const variant = variantsMap.get(item.variantId);
       if (!variant) {
@@ -226,6 +263,7 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
 
       const actualPriceCents = currentVariant.priceCents;
 
+      // STRATÉGIE: Décrémenter le stock atomiquement (dans la transaction)
       const updated = await tx.productVariant.updateMany({
         where: {
           id: variant.id,
@@ -295,6 +333,20 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
         },
       },
     });
+
+    // STRATÉGIE: Supprimer les réservations (HOLD) dans la même transaction
+    // après avoir créé la commande et décrémenté le stock
+    if (ownerKey) {
+      await tx.cartReservation.deleteMany({
+        where: {
+          ownerKey,
+          variantId: { in: variantIds },
+        },
+      });
+      console.log(
+        `✅ Réservations (HOLD) supprimées pour ownerKey ${ownerKey} après commande validée`
+      );
+    }
   });
 }
 
@@ -395,6 +447,175 @@ const buildShippingAddress = (
     address: serializeStripeAddress(details.address),
   };
 };
+
+/**
+ * POST /api/checkout/hold
+ * STRATÉGIE: HOLD au checkout uniquement (TTL 10 minutes par défaut)
+ * Crée des réservations pour tout le panier avant le paiement Stripe
+ *
+ * Body: { items: [{ variantId: string; quantity: number }], ttlMinutes?: number }
+ *
+ * Retourne: { ok: true, expiresAt: ISO, holdTtlMinutes: number, items: [{variantId, quantityHeld}] }
+ * Erreur 409: { ok: false, code: "OUT_OF_STOCK", details: [{variantId, available, requested}] }
+ */
+router.post(
+  '/hold',
+  optionalAuth,
+  [
+    body('items')
+      .isArray({ min: 1, max: MAX_ITEMS })
+      .withMessage(`La liste des articles est obligatoire (max ${MAX_ITEMS} articles).`),
+    body('items.*.variantId')
+      .isString()
+      .notEmpty()
+      .withMessage("L'identifiant variante est obligatoire."),
+    body('items.*.quantity')
+      .isInt({ min: 1, max: MAX_QUANTITY_PER_ITEM })
+      .withMessage(`La quantité doit être entre 1 et ${MAX_QUANTITY_PER_ITEM}.`),
+    body('ttlMinutes')
+      .optional()
+      .isInt({ min: 1, max: 60 })
+      .withMessage('ttlMinutes doit être entre 1 et 60'),
+  ],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Données invalides',
+          details: errors.array(),
+        });
+      }
+
+      const { items, ttlMinutes = 10 } = req.body as {
+        items: CheckoutItemInput[];
+        ttlMinutes?: number;
+      };
+
+      // CRITIQUE 1: Utiliser cartId même si connecté pour garantir stabilité entre /hold et /create-session
+      // Pendant le checkout, on force l'ownerKey basé sur cartId pour éviter les bascules user:* ↔ cart:*
+      const cartId = getOrCreateCartId(req, res);
+      const ownerKey = `cart:${cartId}`;
+
+      const variantIds = items.map((item) => item.variantId);
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + ttlMinutes * 60 * 1000);
+
+      // Transaction atomique pour créer les réservations
+      const result = await prisma.$transaction(async (tx) => {
+        // 1. Récupérer les variants et vérifier qu'ils existent
+        const variants = await tx.productVariant.findMany({
+          where: {
+            id: { in: variantIds },
+            isActive: true,
+          },
+        });
+
+        if (variants.length !== variantIds.length) {
+          const foundIds = new Set(variants.map((v) => v.id));
+          const missing = variantIds.filter((id) => !foundIds.has(id));
+          throw new Error(`Variantes introuvables: ${missing.join(', ')}`);
+        }
+
+        // 2. Calculer les réservations actives globales (tous owners sauf cet ownerKey)
+        const globalReservations = await tx.cartReservation.groupBy({
+          by: ['variantId'],
+          where: {
+            variantId: { in: variantIds },
+            expiresAt: { gt: now },
+            NOT: { ownerKey }, // Exclure les réservations de cet ownerKey
+          },
+          _sum: {
+            quantity: true,
+          },
+        });
+
+        const globalReservedMap = new Map(
+          globalReservations.map((r) => [r.variantId, r._sum.quantity || 0])
+        );
+
+        // 3. Vérifier le stock disponible pour chaque item et créer les réservations
+        const holdResults: Array<{ variantId: string; quantityHeld: number }> = [];
+        const stockErrors: Array<{ variantId: string; available: number; requested: number }> = [];
+
+        for (const item of items) {
+          const variant = variants.find((v) => v.id === item.variantId);
+          if (!variant) continue;
+
+          const globalReserved = globalReservedMap.get(item.variantId) || 0;
+          const available = Math.max(0, variant.stock - globalReserved);
+
+          if (available < item.quantity) {
+            stockErrors.push({
+              variantId: item.variantId,
+              available,
+              requested: item.quantity,
+            });
+          } else {
+            // Upsert la réservation pour cet ownerKey et variantId
+            await tx.cartReservation.upsert({
+              where: {
+                variantId_ownerKey: {
+                  variantId: item.variantId,
+                  ownerKey,
+                },
+              },
+              create: {
+                variantId: item.variantId,
+                ownerKey,
+                quantity: item.quantity,
+                expiresAt,
+              },
+              update: {
+                quantity: item.quantity,
+                expiresAt, // Mettre à jour l'expiration
+              },
+            });
+
+            holdResults.push({
+              variantId: item.variantId,
+              quantityHeld: item.quantity,
+            });
+          }
+        }
+
+        // Si des erreurs de stock, throw 409
+        if (stockErrors.length > 0) {
+          const error: any = new Error('Stock insuffisant pour certains articles');
+          error.code = 'OUT_OF_STOCK';
+          error.details = stockErrors;
+          throw error;
+        }
+
+        return { holdResults, expiresAt, ttlMinutes };
+      });
+
+      res.status(200).json({
+        ok: true,
+        expiresAt: result.expiresAt.toISOString(),
+        holdTtlMinutes: result.ttlMinutes,
+        items: result.holdResults,
+      });
+    } catch (error: any) {
+      console.error('Erreur lors du HOLD checkout:', error);
+
+      if (error.code === 'OUT_OF_STOCK') {
+        return res.status(409).json({
+          ok: false,
+          code: 'OUT_OF_STOCK',
+          error: 'Stock insuffisant pour certains articles',
+          details: error.details || [],
+        });
+      }
+
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+);
 
 router.post(
   '/create-session',
@@ -503,6 +724,46 @@ router.post(
         });
       }
 
+      // CRITIQUE 1: Utiliser cartId même si connecté pour garantir stabilité entre /hold et /create-session
+      // Pendant le checkout, on force l'ownerKey basé sur cartId pour éviter les bascules user:* ↔ cart:*
+      const cartId = getOrCreateCartId(req, res);
+      const ownerKey = `cart:${cartId}`;
+      const now = new Date();
+
+      // STRATÉGIE: Vérifier que les réservations (HOLD) existent pour cet ownerKey
+      // Le frontend doit avoir appelé /checkout/hold avant /create-session
+      const existingReservations = await prisma.cartReservation.findMany({
+        where: {
+          ownerKey,
+          variantId: { in: variantIds },
+          expiresAt: { gt: now },
+        },
+      });
+
+      const reservationMap = new Map(existingReservations.map((r) => [r.variantId, r.quantity]));
+
+      // Vérifier que toutes les quantités demandées sont couvertes par les réservations
+      const missingReservations: Array<{ variantId: string; requested: number; held: number }> = [];
+      for (const item of requestedItems) {
+        const held = reservationMap.get(item.variantId) || 0;
+        if (held < item.quantity) {
+          missingReservations.push({
+            variantId: item.variantId,
+            requested: item.quantity,
+            held,
+          });
+        }
+      }
+
+      if (missingReservations.length > 0) {
+        return res.status(409).json({
+          error: 'Votre réservation a expiré, veuillez réessayer',
+          code: 'HOLD_EXPIRED',
+          details: missingReservations,
+        });
+      }
+
+      // Récupérer les variants uniquement pour les prix et infos produit (pas pour vérifier le stock)
       const variants = await prisma.productVariant.findMany({
         where: {
           id: { in: variantIds },
@@ -528,27 +789,6 @@ router.post(
       }
 
       const variantsMap = new Map(variants.map((variant) => [variant.id, variant]));
-
-      const validationErrors: Array<{ variantId: string; reason: string }> = [];
-
-      for (const item of requestedItems) {
-        const variant = variantsMap.get(item.variantId);
-        if (!variant) continue;
-
-        if (variant.stock <= 0) {
-          validationErrors.push({ variantId: item.variantId, reason: 'OUT_OF_STOCK' });
-        } else if (variant.stock < item.quantity) {
-          validationErrors.push({ variantId: item.variantId, reason: 'INSUFFICIENT_STOCK' });
-        }
-      }
-
-      if (validationErrors.length > 0) {
-        return res.status(409).json({
-          error: 'Stock insuffisant pour certains articles',
-          code: 'INSUFFICIENT_STOCK',
-          details: validationErrors,
-        });
-      }
 
       const stripeClient = ensureStripeConfigured();
 
@@ -680,6 +920,15 @@ router.post(
         }
       }
 
+      // CRITIQUE 4: Vérifier que ownerKey n'est pas null/undefined (déjà garanti par getOrCreateCartId)
+      // Note: cartId et ownerKey sont déjà déclarés plus haut (ligne 726-727)
+      if (!ownerKey || !cartId) {
+        return res.status(500).json({
+          error: 'Erreur interne: cartId manquant',
+          code: 'INTERNAL_ERROR',
+        });
+      }
+
       const metadata: Record<string, string> = {
         items: JSON.stringify(
           requestedItems.map((item) => ({
@@ -699,6 +948,9 @@ router.post(
         ...(shipping.phone ? { shippingPhone: shipping.phone } : {}),
         // Stocker l'email du formulaire pour l'utiliser dans l'email de confirmation
         ...(req.body.customerEmail ? { customerEmail: req.body.customerEmail } : {}),
+        // STRATÉGIE: Stocker ownerKey dans metadata pour le webhook
+        ownerKey,
+        cartId, // Pour les invités
       };
 
       // Ajouter le userId si l'utilisateur est connecté

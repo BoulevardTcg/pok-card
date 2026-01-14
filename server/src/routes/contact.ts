@@ -19,6 +19,7 @@ const contactLimiter = rateLimit({
   max: process.env.NODE_ENV === 'development' ? 100 : 5,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => process.env.NODE_ENV === 'test',
   message: {
     error: 'Trop de messages envoyés. Réessayez dans quelques minutes.',
     code: 'RATE_LIMITED',

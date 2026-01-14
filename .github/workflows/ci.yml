@@ -117,14 +117,28 @@ jobs:
       - name: Test
         run: npm test --if-present
         env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
+          NODE_ENV: test
           JWT_SECRET: test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
           JWT_REFRESH_SECRET: test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+          JWT_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
           ORDER_TRACKING_SECRET: test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
-          STRIPE_SECRET_KEY: sk_test_mock_key
+          STRIPE_SECRET_KEY: sk_test_dummy_key_for_testing_purposes_only
+          STRIPE_WEBHOOK_SECRET: whsec_dummy_webhook_secret_for_testing
+          STRIPE_API_VERSION: 2024-06-20
           FRONTEND_PUBLIC_URL: http://localhost:3000
           CHECKOUT_SUCCESS_URL: http://localhost:3000/checkout/success
           CHECKOUT_CANCEL_URL: http://localhost:3000/panier
           ALLOWED_REDIRECT_DOMAINS: http://localhost:3000
+          CORS_ORIGIN: http://localhost:3000
+          SMTP_HOST: smtp.example.com
+          SMTP_PORT: 587
+          SMTP_SECURE: false
+          SMTP_USER: test@example.com
+          SMTP_PASS: dummy_password
+          SHOP_NAME: Test Shop
+          SHOP_EMAIL: test@example.com
 
       - name: Build
         run: npm run build --if-present

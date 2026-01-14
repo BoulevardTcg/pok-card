@@ -10,7 +10,7 @@ import {
   revokeRefreshToken,
   revokeAllUserTokens,
 } from '../utils/auth.js';
-import { authLimiter, strictAuthLimiter } from '../middleware/security.js';
+import { authLimiter, strictAuthLimiter, authRefreshLimiter } from '../middleware/security.js';
 import { sendPasswordResetEmail } from '../services/email.js';
 
 const router = Router();
@@ -241,7 +241,8 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
 });
 
 // Rafraîchir le token d'accès
-router.post('/refresh', async (req: Request, res: Response) => {
+// Utilise un limiter très large (120/min) car appelé fréquemment
+router.post('/refresh', authRefreshLimiter, async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
 

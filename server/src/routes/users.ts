@@ -2,61 +2,68 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, requireOwnerOrAdmin } from '../middleware/auth.js';
+import { usersProfileLimiter } from '../middleware/security.js';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 // Récupérer le profil de l'utilisateur connecté
-router.get('/profile', authenticateToken, async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!.userId;
+// Utilise un limiter large (120/min) pour éviter de casser le front
+router.get(
+  '/profile',
+  authenticateToken,
+  usersProfileLimiter,
+  async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.userId;
 
-    // Note: Prisma ne permet pas d'utiliser include et select en même temps
-    // On utilise select uniquement avec les relations incluses via select
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        firstName: true,
-        lastName: true,
-        avatar: true,
-        bio: true,
-        isAdmin: true,
-        isVerified: true,
-        createdAt: true,
-        updatedAt: true,
-        profile: true,
-        _count: {
-          select: {
-            favorites: true,
-            orders: true,
-            tradeOffers: true,
-            tradeOffersReceived: true,
+      // Note: Prisma ne permet pas d'utiliser include et select en même temps
+      // On utilise select uniquement avec les relations incluses via select
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+          avatar: true,
+          bio: true,
+          isAdmin: true,
+          isVerified: true,
+          createdAt: true,
+          updatedAt: true,
+          profile: true,
+          _count: {
+            select: {
+              favorites: true,
+              orders: true,
+              tradeOffers: true,
+              tradeOffersReceived: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!user) {
-      return res.status(404).json({
-        error: 'Utilisateur non trouvé',
-        code: 'USER_NOT_FOUND',
+      if (!user) {
+        return res.status(404).json({
+          error: 'Utilisateur non trouvé',
+          code: 'USER_NOT_FOUND',
+        });
+      }
+
+      res.json({
+        user,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération du profil:', error);
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
       });
     }
-
-    res.json({
-      user,
-    });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du profil:', error);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_SERVER_ERROR',
-    });
   }
-});
+);
 
 // Mettre à jour le profil de l'utilisateur connecté
 router.put(

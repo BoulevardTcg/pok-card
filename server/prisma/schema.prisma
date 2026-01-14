@@ -36,7 +36,7 @@ model User {
   marketingConsentAt   DateTime? // Date du consentement marketing
   analyticsConsent     Boolean   @default(false) // Consentement analytics/cookies
   analyticsConsentAt   DateTime? // Date du consentement analytics
-  privacyPolicyVersion String?   // Version de la politique de confidentialité acceptée
+  privacyPolicyVersion String? // Version de la politique de confidentialité acceptée
   privacyAcceptedAt    DateTime? // Date d'acceptation de la politique
 
   // RGPD - Suppression de compte
@@ -47,8 +47,8 @@ model User {
   profile             UserProfile?
   favorites           Favorite[]
   orders              Order[]
-  tradeOffers         TradeOffer[]     @relation("TradeOfferCreator")
-  tradeOffersReceived TradeOffer[]     @relation("TradeOfferReceiver")
+  tradeOffers         TradeOffer[]         @relation("TradeOfferCreator")
+  tradeOffersReceived TradeOffer[]         @relation("TradeOfferReceiver")
   contestTickets      ContestTicket[]
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
@@ -200,8 +200,9 @@ model ProductVariant {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
+  product          Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems       OrderItem[]
+  cartReservations CartReservation[]
 
   @@index([productId])
   @@map("product_variants")
@@ -255,9 +256,9 @@ model RefreshToken {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  token     String   @unique
+  token     String    @unique
   expiresAt DateTime
   usedAt    DateTime? // Null si pas encore utilisé
   createdAt DateTime  @default(now())
@@ -400,4 +401,22 @@ enum TradeStatus {
 enum PromoType {
   PERCENTAGE
   FIXED
+}
+
+model CartReservation {
+  id        String   @id @default(cuid())
+  variantId String
+  ownerKey  String // Format: "user:abc123" ou "cart:xyz789"
+  quantity  Int      @default(1)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, ownerKey])
+  @@index([variantId])
+  @@index([ownerKey])
+  @@index([expiresAt])
+  @@map("cart_reservations")
 }

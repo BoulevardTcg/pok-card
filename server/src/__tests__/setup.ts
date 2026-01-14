@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
 // Utiliser une base de données de test séparée
+// Les variables d'environnement sont chargées dans vitest.setup.ts
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+      url: process.env.DATABASE_URL,
     },
   },
 });
@@ -15,6 +16,7 @@ export async function cleanupDatabase() {
   await prisma.orderEvent.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.cartReservation.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.userProfile.deleteMany();
   await prisma.user.deleteMany();
@@ -78,6 +80,37 @@ export async function createTestProduct(overrides?: {
   });
 
   return product;
+}
+
+// Créer une variante de produit (helper pour tests)
+export async function createProductVariant(
+  productId: string,
+  overrides?: {
+    name?: string;
+    priceCents?: number;
+    stock?: number;
+    isActive?: boolean;
+  }
+) {
+  const variant = await prisma.productVariant.create({
+    data: {
+      productId,
+      name: overrides?.name || 'Standard',
+      priceCents: overrides?.priceCents || 1000,
+      stock: overrides?.stock ?? 10,
+      isActive: overrides?.isActive ?? true,
+    },
+  });
+  return variant;
+}
+
+// Fonctions utilitaires pour la connexion/disconnexion
+export async function connectDatabase() {
+  await prisma.$connect();
+}
+
+export async function disconnectDatabase() {
+  await prisma.$disconnect();
 }
 
 export { prisma };

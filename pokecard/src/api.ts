@@ -1,6 +1,9 @@
 // URL de base de l'API (avec /api)
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api';
 
+// Import des utilitaires pour le cartId
+import { getReservationHeaders } from './utils/cartId.js';
+
 // URL de base du serveur (sans /api) - pour construire des URLs complètes
 export const API_URL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
@@ -54,11 +57,19 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
       const error = new Error(errorMessage) as any;
       error.status = res.status;
       error.response = { data: errorData, status: res.status };
+
+      // IMPORTANT: Ne pas retry automatiquement sur 429 (rate limit)
+      // Le code appelant doit gérer 429 sans retry pour éviter les boucles
+      if (res.status === 429) {
+        console.warn('⚠️ Rate limit 429 - Pas de retry automatique', { path, errorData });
+      }
+
       throw error;
     }
     return res.json();
   } catch (error) {
     // Ré-émettre l'erreur pour qu'elle soit gérée par le code appelant
+    // IMPORTANT: Pas de retry automatique sur 429 pour éviter les boucles
     throw error;
   }
 }
@@ -88,17 +99,10 @@ export async function createCheckoutSession(
   const successUrl = `${origin}/checkout/success?sid={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/panier`;
 
-  // Récupérer le token pour identifier l'utilisateur
-  const token = localStorage.getItem('accessToken');
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  // Ajouter le token si l'utilisateur est connecté
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  // STRATÉGIE: Utiliser getReservationHeaders() pour inclure X-Cart-Id et Authorization
+  // Cela permet au backend d'identifier l'ownerKey correctement
+  const headers = getReservationHeaders();
+  headers['Content-Type'] = 'application/json';
 
   const res = await fetch(`${API_BASE}/checkout/create-session`, {
     method: 'POST',
@@ -146,28 +150,31 @@ export async function getProduct(slug: string) {
   return fetchJson(`/products/${slug}`);
 }
 
+// Type de retour pour getVariantsStock
+export type VariantStockInfo = {
+  available: number; // Stock disponible (totalStock - réservations globales)
+  reservedByMe: number; // Réservations actives de cet ownerKey
+  maxAllowed: number; // available + reservedByMe (quantité max autorisée)
+  priceCents: number;
+  stock?: number; // Alias pour available (rétrocompatibilité)
+};
+
 // Récupérer le stock à jour pour des variants spécifiques
+// Utilise un endpoint dédié léger au lieu de récupérer tous les produits
 export async function getVariantsStock(
   variantIds: string[]
-): Promise<Record<string, { stock: number; priceCents: number }>> {
+): Promise<Record<string, VariantStockInfo>> {
   if (variantIds.length === 0) return {};
 
-  // Pour l'instant, on récupère les produits et on extrait les variants
-  // Dans une vraie app, on aurait un endpoint dédié /products/variants/stock
   try {
-    // Récupérer tous les produits avec leurs variants
-    const response = (await listProducts({ limit: 500 })) as { products: any[] };
-    const stockMap: Record<string, { stock: number; priceCents: number }> = {};
-
-    response.products.forEach((product) => {
-      product.variants.forEach((variant: any) => {
-        if (variantIds.includes(variant.id)) {
-          stockMap[variant.id] = {
-            stock: variant.stock,
-            priceCents: variant.priceCents,
-          };
-        }
-      });
+    // Utiliser l'endpoint dédié POST /api/products/variants/stock
+    // qui est beaucoup plus léger que listProducts({ limit: 500 })
+    // IMPORTANT: inclure getReservationHeaders() pour que reservedByMe soit correct
+    const headers = getReservationHeaders();
+    const stockMap = await fetchJson<Record<string, VariantStockInfo>>('/products/variants/stock', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ variantIds }),
     });
 
     return stockMap;
@@ -341,5 +348,70 @@ export async function rejectTradeOffer(offerId: string) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+  });
+}
+
+// Réservations de panier
+export async function reserveVariant(variantId: string, quantity: number, ttlMinutes?: number) {
+  const headers = getReservationHeaders();
+  return fetchJson<{
+    reservation: {
+      id: string;
+      variantId: string;
+      quantity: number;
+      expiresAt: string;
+      createdAt: string;
+    };
+    availableAfter: number;
+    expiresAt: string;
+  }>('/reservations/reserve', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ variantId, quantity, ttlMinutes }),
+  });
+}
+
+export async function releaseReservation(variantId: string, quantity?: number) {
+  const headers = getReservationHeaders();
+  return fetchJson<{ message: string }>('/reservations/release', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ variantId, quantity }),
+  });
+}
+
+export async function releaseAllReservations() {
+  const headers = getReservationHeaders();
+  return fetchJson<{ message: string; count: number }>('/reservations/release-all', {
+    method: 'POST',
+    headers,
+  });
+}
+
+export async function getVariantAvailability(variantId: string) {
+  return fetchJson<{
+    variantId: string;
+    stock: number;
+    reserved: number;
+    available: number;
+  }>(`/reservations/availability/${variantId}`);
+}
+
+// HOLD au checkout : réserve le stock pour tout le panier avant le paiement
+// STRATÉGIE: HOLD uniquement au checkout (TTL 10 minutes), pas au panier
+export async function checkoutHold(
+  items: CheckoutItem[],
+  ttlMinutes: number = 10
+): Promise<{
+  ok: boolean;
+  expiresAt: string;
+  holdTtlMinutes: number;
+  items: Array<{ variantId: string; quantityHeld: number }>;
+}> {
+  const headers = getReservationHeaders(); // Inclut X-Cart-Id et Authorization si connecté
+  return fetchJson('/checkout/hold', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ items, ttlMinutes }),
   });
 }
