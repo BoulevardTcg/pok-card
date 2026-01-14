@@ -29,12 +29,12 @@ function getStockStatus(product: Product): {
   }
 
   if (totalStock < 10) {
-    return { status: 'low-stock', label: `Stock limité (${totalStock})`, totalStock };
+    return { status: 'low-stock', label: 'Stock limité', totalStock };
   }
 
   return {
     status: 'in-stock',
-    label: totalStock >= 150 ? 'En stock (150+)' : `En stock (${totalStock})`,
+    label: 'En stock',
     totalStock,
   };
 }

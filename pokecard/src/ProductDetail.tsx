@@ -12,6 +12,7 @@ import {
   getImageUrl,
 } from './api';
 import { ArrowRightIcon } from './components/icons/Icons';
+import { NotifyModal } from './components/NotifyModal';
 
 interface Review {
   id: string;
@@ -68,6 +69,18 @@ export function ProductDetail() {
 
   // États pour produits similaires
   const [similarProducts, setSimilarProducts] = useState<ProductType[]>([]);
+
+  // État pour la modal "Me prévenir"
+  const [notifyModal, setNotifyModal] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+    variantId?: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: '',
+  });
 
   useEffect(() => {
     // Scroll to top quand on arrive sur la page
@@ -195,7 +208,7 @@ export function ProductDetail() {
       setSubmitSuccess(true);
       setShowReviewForm(false);
       setNewReview({ rating: 5, title: '', comment: '' });
-    } catch (err: Error) {
+    } catch (err: any) {
       setSubmitError(err.message || "Erreur lors de l'envoi de l'avis");
     }
   }
@@ -451,27 +464,34 @@ export function ProductDetail() {
 
               {/* Bouton CTA Mobile — Juste sous l'image sur mobile */}
               <div className={styles.actionSectionMobile}>
-                <button
-                  className={`${styles.addButtonMobile} ${!isAvailable ? styles.disabled : ''}`}
-                  onClick={handleAddToCart}
-                  disabled={!isAvailable}
-                  aria-label={
-                    isAvailable
-                      ? isPreorder
-                        ? 'Précommander ce produit'
-                        : `Ajouter ${quantity} ${quantity > 1 ? 'exemplaires' : 'exemplaire'} à ma collection`
-                      : 'Produit indisponible'
-                  }
-                  aria-describedby={
-                    isAvailable && selectedVariant ? 'stock-info-mobile' : undefined
-                  }
-                >
-                  {isAvailable
-                    ? isPreorder
-                      ? 'Précommander'
-                      : 'Ajouter à ma collection'
-                    : 'Indisponible'}
-                </button>
+                {isAvailable ? (
+                  <button
+                    className={styles.addToCartButton}
+                    onClick={handleAddToCart}
+                    aria-label={
+                      isPreorder ? 'Précommander ce produit' : `Ajouter ${product.name} au panier`
+                    }
+                    aria-describedby={selectedVariant ? 'stock-info-mobile' : undefined}
+                  >
+                    {isPreorder ? 'Précommander' : 'Ajouter au panier'}
+                  </button>
+                ) : (
+                  <button
+                    className={styles.notifyButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNotifyModal({
+                        isOpen: true,
+                        productId: product.id,
+                        productName: product.name,
+                        variantId: selectedVariantId || undefined,
+                      });
+                    }}
+                    aria-label="Me prévenir quand ce produit sera disponible"
+                  >
+                    Me prévenir
+                  </button>
+                )}
                 {isAvailable && selectedVariant && (
                   <span id="stock-info-mobile" className="sr-only">
                     Stock disponible : {selectedVariant.stock}{' '}
@@ -696,25 +716,34 @@ export function ProductDetail() {
 
               {/* CTA unique — Desktop uniquement */}
               <div className={styles.actionSection}>
-                <button
-                  className={`${styles.addButton} ${!isAvailable ? styles.disabled : ''}`}
-                  onClick={handleAddToCart}
-                  disabled={!isAvailable}
-                  aria-label={
-                    isAvailable
-                      ? isPreorder
-                        ? 'Précommander ce produit'
-                        : `Ajouter ${quantity} ${quantity > 1 ? 'exemplaires' : 'exemplaire'} à ma collection`
-                      : 'Produit indisponible'
-                  }
-                  aria-describedby={isAvailable && selectedVariant ? 'stock-info' : undefined}
-                >
-                  {isAvailable
-                    ? isPreorder
-                      ? 'Précommander'
-                      : 'Ajouter à ma collection'
-                    : 'Indisponible'}
-                </button>
+                {isAvailable ? (
+                  <button
+                    className={styles.addToCartButton}
+                    onClick={handleAddToCart}
+                    aria-label={
+                      isPreorder ? 'Précommander ce produit' : `Ajouter ${product.name} au panier`
+                    }
+                    aria-describedby={selectedVariant ? 'stock-info' : undefined}
+                  >
+                    {isPreorder ? 'Précommander' : 'Ajouter au panier'}
+                  </button>
+                ) : (
+                  <button
+                    className={styles.notifyButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNotifyModal({
+                        isOpen: true,
+                        productId: product.id,
+                        productName: product.name,
+                        variantId: selectedVariantId || undefined,
+                      });
+                    }}
+                    aria-label="Me prévenir quand ce produit sera disponible"
+                  >
+                    Me prévenir
+                  </button>
+                )}
                 {isAvailable && selectedVariant && (
                   <span id="stock-info" className="sr-only">
                     Stock disponible : {selectedVariant.stock}{' '}
@@ -1141,6 +1170,15 @@ export function ProductDetail() {
           </div>
         </section>
       )}
+
+      {/* Modal "Me prévenir" */}
+      <NotifyModal
+        isOpen={notifyModal.isOpen}
+        onClose={() => setNotifyModal({ isOpen: false, productId: '', productName: '' })}
+        productId={notifyModal.productId}
+        productName={notifyModal.productName}
+        variantId={notifyModal.variantId}
+      />
     </div>
   );
 }

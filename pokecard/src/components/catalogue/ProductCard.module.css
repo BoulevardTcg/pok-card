@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .card:hover {
@@ -35,24 +36,58 @@
   overflow: hidden;
   background: var(--color-bg-subtle, #1a1a1d);
   border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .imageContainer {
+    height: 240px;
+  }
 }
 
 @media (max-width: 767px) {
   .imageContainer {
-    height: 140px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .imageContainer {
+    height: 160px;
   }
 }
 
 .productImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.4s ease;
+  padding: var(--space-3, 0.75rem);
+}
+
+@media (max-width: 1024px) {
+  .productImage {
+    padding: var(--space-2, 0.5rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .productImage {
+    padding: var(--space-2, 0.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .productImage {
+    padding: var(--space-1, 0.25rem);
+  }
 }
 
 .card:hover .productImage {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 /* Placeholder Image */
@@ -248,6 +283,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .categoryLabel {
@@ -585,6 +621,7 @@
 
   .productInfo {
     padding: 12px;
+    min-height: 0;
   }
 
   .categoryLabel {
