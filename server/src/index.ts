@@ -54,6 +54,7 @@ const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origi
   'http://localhost:5173',
 ];
 const isDevelopment = process.env.NODE_ENV === 'development';
+const swaggerEnabled = isDevelopment || process.env.ENABLE_SWAGGER === 'true';
 
 app.use(
   cors({
@@ -172,8 +173,10 @@ app.use('/api/contact', contactRoutes);
 // Route de santé
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
-// Documentation API Swagger
-setupSwagger(app);
+// Documentation API Swagger (dev only by default)
+if (swaggerEnabled) {
+  setupSwagger(app);
+}
 
 // Fonction pour récupérer les données depuis l'API REST de TCGdx
 const fetchTCGdx = async (endpoint: string) => {
@@ -369,5 +372,7 @@ app.listen(port, host, () => {
   logger.info(`🔐 API 2FA: http://${host}:${port}/api/2fa`);
   logger.info(`📨 API contact: http://${host}:${port}/api/contact`);
   logger.info(`💚 Santé: http://${host}:${port}/api/health`);
-  logger.info(`📖 Documentation API: http://${host}:${port}/api-docs`);
+  if (swaggerEnabled) {
+    logger.info(`📖 Documentation API: http://${host}:${port}/api-docs`);
+  }
 });
