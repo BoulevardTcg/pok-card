@@ -123,8 +123,7 @@ router.post('/register', authLimiter, registerValidation, async (req: Request, r
       message: 'Utilisateur créé avec succès',
       user,
     });
-  } catch (error) {
-    console.error("Erreur lors de l'inscription:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -231,8 +230,7 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
         profile,
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la connexion:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -279,8 +277,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     res.json({
       accessToken: newAccessToken,
     });
-  } catch (error) {
-    console.error('Erreur lors du rafraîchissement du token:', error);
+  } catch {
     res.status(401).json({
       error: 'Token de rafraîchissement invalide',
       code: 'INVALID_REFRESH_TOKEN',
@@ -300,8 +297,7 @@ router.post('/logout', async (req: Request, res: Response) => {
     res.json({
       message: 'Déconnexion réussie',
     });
-  } catch (error) {
-    console.error('Erreur lors de la déconnexion:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -323,8 +319,7 @@ router.post('/logout-all', async (req: Request, res: Response) => {
     res.json({
       message: 'Déconnexion de tous les appareils réussie',
     });
-  } catch (error) {
-    console.error('Erreur lors de la déconnexion globale:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -429,21 +424,15 @@ router.post(
       resetUrlObj.searchParams.set('email', email);
       const resetUrl = resetUrlObj.toString();
 
-      // Envoyer l'email
-      const emailSent = await sendPasswordResetEmail({
+      await sendPasswordResetEmail({
         email: user.email,
         name: user.firstName,
         resetUrl,
         expiresIn: `${PASSWORD_RESET_EXPIRY_HOURS} heure${PASSWORD_RESET_EXPIRY_HOURS > 1 ? 's' : ''}`,
       });
 
-      if (!emailSent) {
-        console.error('Erreur envoi email reset password pour:', email);
-      }
-
       res.json(successResponse);
-    } catch (error) {
-      console.error('Erreur forgot-password:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -528,8 +517,7 @@ router.post(
         message: 'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
         code: 'PASSWORD_RESET_SUCCESS',
       });
-    } catch (error) {
-      console.error('Erreur reset-password:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',

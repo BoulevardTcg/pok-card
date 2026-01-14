@@ -90,8 +90,8 @@ export function AdminInventoryPage() {
       setVariants(data.variants || []);
       setLowStockVariants(data.lowStock || []);
       setStats(data.stats);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }

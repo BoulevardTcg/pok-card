@@ -117,8 +117,8 @@ export function AdminProductsPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setProducts(data.products || []);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }

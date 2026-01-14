@@ -61,8 +61,7 @@ router.post('/setup', async (req: Request, res: Response) => {
       message:
         "Scannez le QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)",
     });
-  } catch (error) {
-    console.error('Erreur lors de la configuration 2FA:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -130,8 +129,7 @@ router.post('/enable', async (req: Request, res: Response) => {
       message: '2FA activé avec succès',
       twoFactorEnabled: true,
     });
-  } catch (error) {
-    console.error("Erreur lors de l'activation 2FA:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -206,8 +204,7 @@ router.post('/disable', async (req: Request, res: Response) => {
       message: '2FA désactivé avec succès',
       twoFactorEnabled: false,
     });
-  } catch (error) {
-    console.error('Erreur lors de la désactivation 2FA:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -260,8 +257,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       valid: true,
       message: 'Code vérifié avec succès',
     });
-  } catch (error) {
-    console.error('Erreur lors de la vérification 2FA:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -289,8 +285,7 @@ router.get('/status', async (req: Request, res: Response) => {
     res.json({
       twoFactorEnabled: user.twoFactorEnabled,
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du statut 2FA:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

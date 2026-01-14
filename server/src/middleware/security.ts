@@ -215,8 +215,6 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
 };
 
 export const secureLogging = (req: Request, res: Response, next: NextFunction) => {
-  const sanitizedUrl = req.url.replace(/\/api\/auth\/.*/, '/api/auth/***');
-  console.log(`HTTP ${req.method} ${sanitizedUrl} - IP: ${req.ip}`);
   next();
 };
 

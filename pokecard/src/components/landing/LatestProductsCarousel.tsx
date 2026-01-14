@@ -32,8 +32,7 @@ export default function LatestProductsCarousel() {
       const filtered = response.products.filter((p) => p.category !== 'Accessoires').slice(0, 8);
 
       setProducts(filtered);
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
+    } catch {
       setProducts([]);
     } finally {
       setLoading(false);

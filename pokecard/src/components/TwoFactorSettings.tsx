@@ -43,8 +43,8 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
         const data = await response.json();
         setIsEnabled(data.twoFactorEnabled);
       }
-    } catch (err) {
-      console.error('Erreur lors de la vérification 2FA:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }

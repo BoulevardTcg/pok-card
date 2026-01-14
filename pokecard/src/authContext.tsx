@@ -128,8 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return newAccessToken;
       }
       return null;
-    } catch (error) {
-      console.error('Erreur lors du rafraîchissement du token:', error);
+    } catch {
       return null;
     }
   }, []);
@@ -222,8 +221,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         else if (refreshToken) {
           await handleRefreshTokenCase(refreshToken);
         }
-      } catch (error) {
-        console.error('Erreur auth:', error);
+      } catch {
+        // Ignorer les erreurs
       } finally {
         setIsLoading(false);
       }
@@ -288,9 +287,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Si on ne peut pas récupérer le profil, utiliser les données de base du login
             setUser(data.user);
           }
-        } catch (profileError) {
-          console.error('Erreur lors de la récupération du profil:', profileError);
-          // Utiliser les données de base du login en cas d'erreur
+        } catch {
           setUser(data.user);
         }
 
@@ -301,8 +298,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: data.error || 'Erreur de connexion',
         };
       }
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
+    } catch {
       return {
         success: false,
         error: 'Erreur de connexion au serveur',
@@ -330,8 +326,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: data.error || "Erreur d'inscription",
         };
       }
-    } catch (error) {
-      console.error("Erreur lors de l'inscription:", error);
+    } catch {
       return {
         success: false,
         error: "Erreur d'inscription au serveur",
@@ -359,7 +354,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ refreshToken }),
-      }).catch(console.error);
+      }).catch(() => {});
     }
   };
 
@@ -390,8 +385,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(decoded as User);
         }
       }
-    } catch (error) {
-      console.error('Erreur lors du rafraîchissement du profil:', error);
+    } catch {
       const decoded = token ? decodeAccessToken(token) : null;
       if (decoded) {
         setUser(decoded as User);

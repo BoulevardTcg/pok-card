@@ -89,7 +89,6 @@ export function AdminProductFormPage() {
       setVariants(product.variants || []);
       setImages(product.images || [{ url: '', altText: '', position: 0 }]);
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -232,7 +231,6 @@ export function AdminProductFormPage() {
           return [...withoutPlaceholders, ...newImages];
         });
       } catch (err: Error) {
-        console.error('Upload error:', err);
         setUploadError(err.message);
         // Retirer les placeholders en cas d'erreur
         setImages((prev) => prev.filter((img) => !img.isUploading));
@@ -318,7 +316,6 @@ export function AdminProductFormPage() {
 
       navigate('/admin/products');
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message);
     } finally {
       setLoading(false);

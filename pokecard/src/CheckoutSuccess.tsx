@@ -45,9 +45,6 @@ export function CheckoutSuccess() {
       if (response.ok && data.success) {
         setOrderNumber(data.orderNumber);
         setOrderCreated(true);
-        console.log(
-          `✅ Commande ${data.alreadyCreated ? 'existante' : 'créée'}: ${data.orderNumber}`
-        );
         // Vider le panier uniquement si la commande est confirmée avec succès
         clearCart();
         // Nettoyer aussi les drafts de checkout
@@ -61,7 +58,6 @@ export function CheckoutSuccess() {
         }
       }
     } catch (err: Error) {
-      console.error('Erreur lors de la vérification:', err);
       setError(err.message || 'Erreur de connexion au serveur');
     } finally {
       setLoading(false);

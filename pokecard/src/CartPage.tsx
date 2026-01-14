@@ -163,8 +163,7 @@ export function CartPage() {
 
         setCartItemsWithStock(updatedCart);
         setStockErrors(errors);
-      } catch (error) {
-        console.error('Erreur lors du rafraîchissement du stock:', error);
+      } catch {
         setCartItemsWithStock(cart);
       } finally {
         setRefreshingStock(false);
@@ -335,8 +334,6 @@ export function CartPage() {
       setLoading(false);
       inFlightRef.current = false;
     } catch (e: unknown) {
-      console.error('Erreur checkout:', e);
-
       let errorMsg = 'Erreur lors de la création du paiement';
       const err = e as {
         status?: number;

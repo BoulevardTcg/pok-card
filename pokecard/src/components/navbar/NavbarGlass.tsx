@@ -141,8 +141,7 @@ export default function NavbarGlass() {
           setSearchResults([]);
           setShowSearchResults(false);
         }
-      } catch (error) {
-        console.error('Erreur lors de la recherche:', error);
+      } catch {
         setSearchResults([]);
         setShowSearchResults(false);
       } finally {

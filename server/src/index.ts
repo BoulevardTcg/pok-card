@@ -68,7 +68,6 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
     },
@@ -78,14 +77,6 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
-
-// Middleware de debug CORS (uniquement en développement)
-if (isDevelopment) {
-  app.use((req, res, next) => {
-    console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
-    next();
-  });
-}
 
 // Webhook Stripe - doit utiliser express.raw avant express.json
 app.post(
@@ -218,26 +209,9 @@ app.get('/api/trade/sets', validateInput, async (_req, res) => {
       return isValidLogo || isValidSymbol;
     });
 
-    console.log(`📊 Séries trouvées: ${mapped.length}, Séries avec images: ${filteredSets.length}`);
-
-    // Log des séries filtrées pour debug
-    if (filteredSets.length < mapped.length) {
-      const removedSets = mapped.filter((set: any) => {
-        const hasLogo = set.imagesLogo && set.imagesLogo.trim() !== '' && set.imagesLogo !== 'null';
-        const hasSymbol =
-          set.imagesSymbol && set.imagesSymbol.trim() !== '' && set.imagesSymbol !== 'null';
-        return !hasLogo && !hasSymbol;
-      });
-      console.log(
-        `🚫 Séries supprimées (pas d'images):`,
-        removedSets.map((s: any) => s.name)
-      );
-    }
-
     setCache(key, filteredSets);
     res.json(filteredSets);
-  } catch (e) {
-    console.error('Error fetching sets:', e);
+  } catch {
     res.json([]);
   }
 });
@@ -277,15 +251,6 @@ app.get('/api/trade/sets/:id/cards', validateInput, async (req, res) => {
         const baseImageUrl = (card as any).image || null;
         const highQualityPng = baseImageUrl ? `${baseImageUrl}/high.png` : null;
         const lowQualityWebp = baseImageUrl ? `${baseImageUrl}/low.webp` : null;
-
-        // Debug: afficher les URLs d'images (seulement en développement)
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Carte ${(card as any).name}:`, {
-            baseImageUrl,
-            highQualityPng,
-            lowQualityWebp,
-          });
-        }
 
         return {
           id: (card as any).id,
@@ -327,15 +292,13 @@ app.get('/api/trade/sets/:id/cards', validateInput, async (req, res) => {
 
     setCache(key, filteredCards);
     res.json(filteredCards);
-  } catch (e) {
-    console.error(`Error fetching cards for set ${id}:`, e);
+  } catch {
     res.json([]);
   }
 });
 
 // Gestion des erreurs globales
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Erreur globale:', err);
   res.status(500).json({
     error: 'Erreur interne du serveur',
     code: 'INTERNAL_SERVER_ERROR',

@@ -18,7 +18,6 @@ function getResendClient(): Resend {
     if (!apiKey) {
       throw new Error('RESEND_API_KEY non définie');
     }
-    console.log('📧 Email: Utilisation de Resend');
     resendClient = new Resend(apiKey);
   }
   return resendClient;
@@ -44,14 +43,11 @@ async function sendEmail(options: {
       });
 
       if (error) {
-        console.error('❌ Resend error:', error);
         return { success: false };
       }
 
-      console.log('✅ Email envoyé via Resend', { id: data?.id });
       return { success: true, messageId: data?.id };
-    } catch (error: any) {
-      console.error('❌ Resend exception:', error.message);
+    } catch {
       return { success: false };
     }
   } else {
@@ -71,7 +67,6 @@ async function sendEmail(options: {
 function getTransporter(): Transporter {
   if (!transporter) {
     if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
-      console.log('Email: mode développement (streamTransport)');
       transporter = nodemailer.createTransport({
         streamTransport: true,
         newline: 'unix',
@@ -82,29 +77,12 @@ function getTransporter(): Transporter {
       const smtpUser = process.env.SMTP_USER;
       const smtpPass = process.env.SMTP_PASS;
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Email: Configuration SMTP');
-        console.log(`  Host: ${smtpHost}`);
-        console.log(`  Port: ${smtpPort}`);
-        console.log(`  User: ${smtpUser ? smtpUser.substring(0, 3) + '***' : 'NON DÉFINI'}`);
-        console.log(
-          `  Pass: ${smtpPass ? (smtpPass.length > 0 ? '***' + smtpPass.substring(smtpPass.length - 2) : 'VIDE') : 'NON DÉFINI'}`
-        );
-      }
-
       if (!smtpUser || !smtpPass) {
-        console.warn(
-          '⚠️ SMTP_USER ou SMTP_PASS non défini. Les emails seront simulés (pas envoyés réellement).'
-        );
-        console.warn('   Pour envoyer réellement, configurez SMTP_USER et SMTP_PASS dans .env');
         transporter = nodemailer.createTransport({
           streamTransport: true,
           newline: 'unix',
         });
       } else {
-        console.log(
-          `📧 Email: Connexion SMTP ${smtpHost}:${smtpPort} (secure: ${process.env.SMTP_SECURE === 'true'})`
-        );
         transporter = nodemailer.createTransport({
           host: smtpHost,
           port: smtpPort,
@@ -525,10 +503,6 @@ export async function sendOrderConfirmationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
-  console.log('📧 Email: Envoi confirmation commande...', {
-    orderNumber: order.orderNumber,
-    to: customerEmail,
-  });
   try {
     const html = orderConfirmationTemplate(order, customerEmail);
     const result = await sendEmail({
@@ -538,20 +512,8 @@ export async function sendOrderConfirmationEmail(
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: confirmation commande envoyée', {
-        orderNumber: order.orderNumber,
-        messageId: result.messageId,
-      });
-    } else {
-      console.error('❌ Email: échec envoi confirmation commande', {
-        orderNumber: order.orderNumber,
-      });
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi confirmation', { message: error.message });
+  } catch {
     return false;
   }
 }
@@ -560,10 +522,6 @@ export async function sendShippingNotificationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
-  console.log('📧 Email: Envoi notification expédition...', {
-    orderNumber: order.orderNumber,
-    to: customerEmail,
-  });
   try {
     const html = shippingNotificationTemplate(order, customerEmail);
     const result = await sendEmail({
@@ -573,20 +531,8 @@ export async function sendShippingNotificationEmail(
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: notification expédition envoyée', {
-        orderNumber: order.orderNumber,
-        messageId: result.messageId,
-      });
-    } else {
-      console.error('❌ Email: échec envoi notification expédition', {
-        orderNumber: order.orderNumber,
-      });
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi expédition', { message: error.message });
+  } catch {
     return false;
   }
 }
@@ -595,10 +541,6 @@ export async function sendDeliveryConfirmationEmail(
   order: OrderDataForEmail,
   customerEmail: string
 ): Promise<boolean> {
-  console.log('📧 Email: Envoi confirmation livraison...', {
-    orderNumber: order.orderNumber,
-    to: customerEmail,
-  });
   try {
     const html = deliveryConfirmationTemplate(order, customerEmail);
     const result = await sendEmail({
@@ -608,20 +550,8 @@ export async function sendDeliveryConfirmationEmail(
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: confirmation livraison envoyée', {
-        orderNumber: order.orderNumber,
-        messageId: result.messageId,
-      });
-    } else {
-      console.error('❌ Email: échec envoi confirmation livraison', {
-        orderNumber: order.orderNumber,
-      });
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi livraison', { message: error.message });
+  } catch {
     return false;
   }
 }
@@ -725,11 +655,6 @@ function contactAutoReplyTemplate(payload: { name: string; subject: string }): s
 }
 
 export async function sendContactEmail(payload: ContactPayload): Promise<boolean> {
-  console.log('📧 Email: Envoi message contact...', {
-    to: CONTACT_TO_EMAIL,
-    from: payload.email,
-    provider: EMAIL_PROVIDER,
-  });
   try {
     const html = contactEmailTemplate(payload);
     const result = await sendEmail({
@@ -740,15 +665,8 @@ export async function sendContactEmail(payload: ContactPayload): Promise<boolean
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: contact envoyé avec succès', { messageId: result.messageId });
-    } else {
-      console.error('❌ Email: échec envoi contact');
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi contact', { message: error.message });
+  } catch {
     return false;
   }
 }
@@ -758,7 +676,6 @@ export async function sendContactAutoReply(payload: {
   email: string;
   subject: string;
 }): Promise<boolean> {
-  console.log('📧 Email: Envoi accusé réception contact...', { to: payload.email });
   try {
     const html = contactAutoReplyTemplate({ name: payload.name, subject: payload.subject });
     const result = await sendEmail({
@@ -769,15 +686,8 @@ export async function sendContactAutoReply(payload: {
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: accusé réception contact envoyé', { messageId: result.messageId });
-    } else {
-      console.error('❌ Email: échec envoi accusé réception contact');
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi accusé réception contact', { message: error.message });
+  } catch {
     return false;
   }
 }
@@ -864,7 +774,6 @@ export async function sendPasswordResetEmail(payload: {
   resetUrl: string;
   expiresIn: string;
 }): Promise<boolean> {
-  console.log('📧 Email: Envoi reset password...', { to: payload.email });
   try {
     const html = passwordResetTemplate({
       name: payload.name || '',
@@ -879,18 +788,8 @@ export async function sendPasswordResetEmail(payload: {
       html,
     });
 
-    if (result.success) {
-      console.log('✅ Email: reset password envoyé', {
-        to: payload.email,
-        messageId: result.messageId,
-      });
-    } else {
-      console.error('❌ Email: échec envoi reset password', { to: payload.email });
-    }
-
     return result.success;
-  } catch (error: any) {
-    console.error('❌ Email: erreur envoi reset password', { message: error.message });
+  } catch {
     return false;
   }
 }

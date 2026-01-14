@@ -132,16 +132,6 @@ export async function createCheckoutSession(
       shippingMethodCode,
     };
 
-    // Log de débogage en développement
-    if (import.meta.env.DEV) {
-      console.log('[Checkout] Appel API:', {
-        endpoint: `${API_BASE}/checkout/create-session`,
-        headers: { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : undefined },
-        body: requestBody,
-        idempotencyKey: idempotencyKey ? `${idempotencyKey.substring(0, 20)}...` : undefined,
-      });
-    }
-
     const res = await fetch(`${API_BASE}/checkout/create-session`, {
       method: 'POST',
       headers,
@@ -155,14 +145,6 @@ export async function createCheckoutSession(
         errorData = await res.json();
         errorMessage = errorData.error || errorData.message || errorMessage;
 
-        // Log de débogage en développement
-        if (import.meta.env.DEV) {
-          console.error('[Checkout] Erreur serveur:', {
-            status: res.status,
-            error: errorData,
-          });
-        }
-
         // Si c'est une erreur d'idempotence (session existante), retourner la session
         if (errorData.code === 'IDEMPOTENT_REQUEST' && errorData.sessionId && errorData.url) {
           return {
@@ -171,14 +153,7 @@ export async function createCheckoutSession(
           };
         }
       } catch {
-        // Erreur lors du parsing JSON (réponse non-JSON)
-        if (import.meta.env.DEV) {
-          console.error(
-            '[Checkout] Réponse non-JSON:',
-            res.status,
-            await res.text().catch(() => '')
-          );
-        }
+        // Erreur lors du parsing JSON
       }
       const error = new Error(errorMessage) as any;
       error.status = res.status;
@@ -193,8 +168,6 @@ export async function createCheckoutSession(
       throw error;
     }
 
-    // Sinon, c'est une erreur réseau (CORS, timeout, connexion refusée, etc.)
-    console.error('Erreur réseau lors de la création de la session:', error);
     const networkError = new Error(
       error.message || 'Erreur de connexion au serveur. Vérifiez votre connexion internet.'
     ) as any;
@@ -247,8 +220,7 @@ export async function getVariantsStock(
     });
 
     return stockMap;
-  } catch (error) {
-    console.error('Erreur lors de la récupération du stock:', error);
+  } catch {
     return {};
   }
 }

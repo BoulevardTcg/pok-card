@@ -98,7 +98,6 @@ export function ProductDetail() {
         setSelectedImage(0);
       }
     } catch (error: any) {
-      console.error('Erreur lors du chargement du produit:', error);
       setProduct(null);
       setError(error.message || 'Erreur lors du chargement du produit');
     } finally {
@@ -113,8 +112,8 @@ export function ProductDetail() {
     try {
       const data = (await getProductReviews(product.id)) as ReviewsData;
       setReviewsData(data);
-    } catch (err) {
-      console.error('Erreur chargement avis:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setReviewsLoading(false);
     }
@@ -151,8 +150,7 @@ export function ProductDetail() {
         .slice(0, 4);
 
       setSimilarProducts(filtered);
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits similaires:', error);
+    } catch {
       setSimilarProducts([]);
     }
   }, [product?.category, product?.id, product?.slug]);

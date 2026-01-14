@@ -205,8 +205,7 @@ router.get('/export', async (req: Request, res: Response) => {
     );
 
     res.json(exportData);
-  } catch (error) {
-    console.error("Erreur lors de l'export des données:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -282,8 +281,7 @@ router.post(
         scheduledDeletionDate: deletionDate.toISOString(),
         info: 'Votre compte sera supprimé dans 30 jours. Vous pouvez annuler cette demande en vous reconnectant.',
       });
-    } catch (error) {
-      console.error('Erreur lors de la demande de suppression:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -332,8 +330,7 @@ router.post('/cancel-delete', async (req: Request, res: Response) => {
     res.json({
       message: 'Demande de suppression annulée',
     });
-  } catch (error) {
-    console.error("Erreur lors de l'annulation de la suppression:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -415,8 +412,7 @@ router.delete(
         message: 'Votre compte a été supprimé définitivement',
         info: 'Toutes vos données personnelles ont été effacées. Vos commandes sont conservées de manière anonyme pour des raisons légales.',
       });
-    } catch (error) {
-      console.error('Erreur lors de la suppression du compte:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -472,8 +468,7 @@ router.get('/consent', async (req: Request, res: Response) => {
         },
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des consentements:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -566,8 +561,7 @@ router.put(
           },
         },
       });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des consentements:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -608,8 +602,7 @@ router.get('/deletion-status', async (req: Request, res: Response) => {
       requestedAt: user.deletionRequestedAt,
       scheduledAt: user.deletionScheduledAt,
     });
-  } catch (error) {
-    console.error('Erreur lors de la vérification du statut de suppression:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

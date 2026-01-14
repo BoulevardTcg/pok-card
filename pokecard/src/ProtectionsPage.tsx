@@ -37,8 +37,7 @@ export function ProtectionsPage() {
 
       setProducts(response.products);
       setTotalPages(response.pagination.pages);
-    } catch (error) {
-      console.error('Erreur lors du chargement des protections:', error);
+    } catch {
       setProducts([]);
     } finally {
       setLoading(false);

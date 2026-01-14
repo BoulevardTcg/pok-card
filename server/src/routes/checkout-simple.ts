@@ -90,8 +90,6 @@ router.post(
         url: session.url,
       });
     } catch (error: any) {
-      console.error('Erreur lors de la création de la session Stripe:', error);
-
       // Gérer les erreurs spécifiques
       if (error.code === 'STRIPE_NOT_CONFIGURED') {
         return res.status(500).json({

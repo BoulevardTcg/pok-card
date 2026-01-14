@@ -39,10 +39,7 @@ export function TradePage() {
         }));
         setSets(mapped);
       })
-      .catch((error) => {
-        console.error('Erreur lors du chargement des séries:', error);
-        setSets([]);
-      })
+      .catch(() => setSets([]))
       .finally(() => setLoading(false));
   }, []);
 

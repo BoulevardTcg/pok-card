@@ -75,7 +75,6 @@ export function AdminPromoFormPage() {
         isActive: promo.isActive,
       });
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -143,7 +142,6 @@ export function AdminPromoFormPage() {
 
       navigate('/admin/promos');
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message);
     } finally {
       setLoading(false);

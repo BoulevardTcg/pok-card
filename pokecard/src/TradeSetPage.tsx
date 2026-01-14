@@ -30,10 +30,7 @@ export function TradeSetPage() {
         .then((r) => r.json())
 
         .then((data: any) => (Array.isArray(data) ? data : []))
-        .catch((error) => {
-          console.error('Erreur lors du chargement des cartes:', error);
-          return [];
-        }),
+        .catch(() => []),
       loadFoilMap().catch(() => new Map()),
     ]).then(([cardsData, foilMapData]) => {
       setCards(cardsData);

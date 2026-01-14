@@ -49,7 +49,6 @@ export const createApp = () => {
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
           callback(new Error('Not allowed by CORS'));
         }
       },
@@ -59,14 +58,6 @@ export const createApp = () => {
       optionsSuccessStatus: 200,
     })
   );
-
-  // Middleware de debug CORS (uniquement en développement)
-  if (isDevelopment) {
-    app.use((req, res, next) => {
-      console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
-      next();
-    });
-  }
 
   // Middlewares de sécurité
   app.use(helmetConfig);
@@ -124,7 +115,6 @@ export const createApp = () => {
   // Gestion des erreurs globales
   app.use(
     (err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-      console.error('Erreur globale:', err);
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',

@@ -108,8 +108,6 @@ export default function NewReleases() {
       setLoading(true);
       const response = await fetch(`${API_BASE}/products?limit=50`);
       if (!response.ok) {
-        // Si le backend n'est pas disponible, ne pas afficher d'erreur
-        console.warn('Backend non disponible, affichage des produits désactivé');
         setProducts([]);
         return;
       }
@@ -131,9 +129,9 @@ export default function NewReleases() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
-      setProducts(sortedProducts.slice(0, 9)); // Prendre les 9 plus récents (3x3)
-    } catch (error) {
-      console.error('Erreur:', error);
+      setProducts(sortedProducts.slice(0, 9));
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }

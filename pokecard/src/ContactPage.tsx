@@ -159,8 +159,6 @@ export function ContactPage() {
 
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error: any) {
-      console.error(error);
-
       // Gérer les erreurs de validation du backend
       if (error?.response?.data?.code === 'VALIDATION_ERROR' && error?.response?.data?.details) {
         const backendErrors: FormErrors = {};

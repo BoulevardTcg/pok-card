@@ -188,7 +188,6 @@ export function AdminDashboard() {
         setTotalStock(stock);
       }
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message);
     } finally {
       setLoading(false);

@@ -121,7 +121,6 @@ export default function FeaturedCards() {
       setLoading(true);
       const response = await fetch(`${API_BASE}/products?limit=50`);
       if (!response.ok) {
-        console.warn('Backend non disponible, affichage des produits désactivé');
         setProducts([]);
         return;
       }
@@ -147,8 +146,7 @@ export default function FeaturedCards() {
       });
 
       setProducts(sortedProducts.slice(0, 12));
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
+    } catch {
       setProducts([]);
     } finally {
       setLoading(false);

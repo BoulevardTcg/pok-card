@@ -40,8 +40,8 @@ const LoginPage: React.FC = () => {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch (e) {
-      console.error('Erreur lors de la récupération du panier invité:', e);
+    } catch {
+      // Ignorer les erreurs
     }
     return [];
   };
@@ -143,8 +143,7 @@ const LoginPage: React.FC = () => {
       } else {
         setError(result.error || 'Erreur de connexion');
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch {
       setError('Erreur inattendue');
     } finally {
       setIsLoading(false);

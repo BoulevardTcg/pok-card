@@ -381,8 +381,7 @@ export function AdminReportsPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setSalesData(data);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
       const demoData = generateDemoData(period);
       setSalesData(demoData);
     } finally {

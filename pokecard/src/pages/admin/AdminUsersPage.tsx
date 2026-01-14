@@ -71,8 +71,8 @@ export function AdminUsersPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setUsers(data.users || []);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }

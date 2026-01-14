@@ -82,8 +82,7 @@ router.get('/:orderId', optionalAuth, async (req: Request, res: Response) => {
       order: canUseToken ? toPublicTrackingOrderDto(order) : order,
       access: canUseToken ? 'token' : 'owner',
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la commande:', error);
+  } catch {
     res.status(500).json({ error: 'Erreur interne du serveur', code: 'INTERNAL_SERVER_ERROR' });
   }
 });

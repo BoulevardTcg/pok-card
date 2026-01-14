@@ -100,8 +100,8 @@ export function AdminPromosPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setPromos(data.promos || []);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }
