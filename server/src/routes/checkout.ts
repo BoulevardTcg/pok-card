@@ -357,6 +357,34 @@ const MAX_ITEMS = 50;
 const MAX_QUANTITY_PER_ITEM = 100;
 const MAX_TOTAL_QUANTITY = 500;
 
+// Cache d'idempotence pour /create-session (TTL: 1 heure)
+type IdempotencyCacheEntry = {
+  sessionId: string;
+  url: string | null;
+  timestamp: number;
+};
+
+const idempotencyCache = new Map<string, IdempotencyCacheEntry>();
+const IDEMPOTENCY_TTL_MS = 60 * 60 * 1000; // 1 heure
+
+// Purge périodique des entrées expirées (toutes les 15 minutes)
+setInterval(
+  () => {
+    const now = Date.now();
+    let purgedCount = 0;
+    for (const [key, entry] of idempotencyCache.entries()) {
+      if (now - entry.timestamp > IDEMPOTENCY_TTL_MS) {
+        idempotencyCache.delete(key);
+        purgedCount++;
+      }
+    }
+    if (purgedCount > 0) {
+      console.log(`🧹 Purge idempotence: ${purgedCount} entrée(s) expirée(s) supprimée(s)`);
+    }
+  },
+  15 * 60 * 1000
+); // 15 minutes
+
 const serializeStripeAddress = (
   address: Stripe.Address | null | undefined
 ): Prisma.InputJsonValue | null => {
@@ -469,6 +497,27 @@ router.post(
           error: 'Données invalides',
           details: errors.array(),
         });
+      }
+
+      // Vérifier l'idempotence si une clé est fournie
+      const idempotencyKey = req.headers['idempotency-key'] || req.headers['Idempotency-Key'];
+      if (idempotencyKey && typeof idempotencyKey === 'string') {
+        const cachedEntry = idempotencyCache.get(idempotencyKey);
+        if (cachedEntry) {
+          const now = Date.now();
+          // Vérifier si l'entrée n'est pas expirée
+          if (now - cachedEntry.timestamp <= IDEMPOTENCY_TTL_MS) {
+            // Retourner le résultat en cache
+            return res.status(200).json({
+              sessionId: cachedEntry.sessionId,
+              url: cachedEntry.url,
+              cached: true,
+            });
+          } else {
+            // Entrée expirée, la supprimer
+            idempotencyCache.delete(idempotencyKey);
+          }
+        }
       }
 
       const requestedItems: CheckoutItemInput[] = req.body.items;
@@ -800,6 +849,15 @@ router.post(
       }
 
       const session = await stripeClient.checkout.sessions.create(sessionConfig);
+
+      // Stocker dans le cache d'idempotence si une clé était fournie
+      if (idempotencyKey && typeof idempotencyKey === 'string') {
+        idempotencyCache.set(idempotencyKey, {
+          sessionId: session.id,
+          url: session.url,
+          timestamp: Date.now(),
+        });
+      }
 
       res.status(201).json({
         sessionId: session.id,
