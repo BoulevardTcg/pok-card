@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import prisma from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Récupérer les avis d'un produit
 router.get('/product/:productId', async (req: Request, res: Response) => {

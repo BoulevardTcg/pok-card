@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { type Product, type ProductImage, type ProductVariant } from '@prisma/client';
-import prisma from '../lib/prisma.js';
+import { PrismaClient, type Product, type ProductImage, type ProductVariant } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 type ProductWithRelations = Product & {
   images: ProductImage[];

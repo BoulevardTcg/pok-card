@@ -1,19 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
 
 // Utiliser une base de données de test séparée
-const connectionString = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error('DATABASE_URL or TEST_DATABASE_URL is not defined');
-}
-
-const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-
 const prisma = new PrismaClient({
-  adapter,
+  datasources: {
+    db: {
+      url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+    },
+  },
 });
 
 // Nettoyer la base de données avant les tests

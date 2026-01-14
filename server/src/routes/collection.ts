@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import prisma from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Récupérer la collection de l'utilisateur
 router.get('/', authenticateToken, async (req: Request, res: Response) => {

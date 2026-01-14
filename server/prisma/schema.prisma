@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
   // Connection pooling recommandé pour la production
   // Utiliser une URL avec ?pgbouncer=true pour PgBouncer
   // ou ?connection_limit=10 pour limiter les connexions

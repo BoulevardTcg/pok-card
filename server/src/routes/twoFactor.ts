@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
-import prisma from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 import * as OTPAuth from 'otpauth';
 import QRCode from 'qrcode';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Toutes les routes 2FA nécessitent une authentification
 router.use(authenticateToken);
