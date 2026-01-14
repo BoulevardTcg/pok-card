@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
@@ -68,6 +68,7 @@ export function CartPage() {
   // Refs pour l'auto-checkout (une seule exécution)
   const autoCheckoutRanRef = useRef(false);
   const inFlightRef = useRef(false);
+  const refreshStockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const formatPrice = (cents: number) => {
     return (cents / 100).toFixed(2).replace('.', ',');
@@ -78,6 +79,21 @@ export function CartPage() {
   const shippingCostCents = selectedShippingMethod?.priceCents ?? 0;
   const totalAfterDiscount = Math.max(0, totalCents - promoDiscount);
   const totalWithShipping = totalAfterDiscount + shippingCostCents;
+
+  // Fusionner cart (quantités à jour) avec cartItemsWithStock (stock/prix à jour)
+  // pour éviter les décalages visuels lors des changements de quantité
+  const displayItems = useMemo(() => {
+    if (cart.length === 0) return [];
+
+    // Créer un Map pour un accès rapide aux données de stock
+    const stockMap = new Map(cartItemsWithStock.map((item) => [item.variantId, item]));
+
+    return cart.map((cartItem) => {
+      const stockItem = stockMap.get(cartItem.variantId);
+      // Utiliser la quantité de cart (mise à jour instantanément) et le stock/prix de cartItemsWithStock
+      return stockItem ? { ...stockItem, quantity: cartItem.quantity } : cartItem;
+    });
+  }, [cart, cartItemsWithStock]);
 
   // Restaurer le draft de checkout au mount
   useEffect(() => {
@@ -155,7 +171,22 @@ export function CartPage() {
       }
     }
 
-    refreshStock();
+    // Debounce: nettoyer le timeout précédent si cart change rapidement
+    if (refreshStockTimeoutRef.current) {
+      clearTimeout(refreshStockTimeoutRef.current);
+    }
+
+    // Délai de 300ms avant de rafraîchir le stock pour éviter les appels multiples
+    refreshStockTimeoutRef.current = setTimeout(() => {
+      refreshStock();
+    }, 300);
+
+    // Cleanup: nettoyer le timeout si le composant est démonté ou si cart change
+    return () => {
+      if (refreshStockTimeoutRef.current) {
+        clearTimeout(refreshStockTimeoutRef.current);
+      }
+    };
   }, [cart]);
 
   function validateShipping() {
@@ -424,29 +455,33 @@ export function CartPage() {
       <div className={styles.container}>
         <h1 className={styles.title}>Panier</h1>
 
-        {refreshingStock && (
-          <div className={styles.refreshingStock}>
-            <svg
-              className={styles.refreshIcon}
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-            </svg>
-            Vérification du stock en cours...
-          </div>
-        )}
+        <div
+          className={styles.refreshingStock}
+          style={{
+            opacity: refreshingStock ? 1 : 0,
+            visibility: refreshingStock ? 'visible' : 'hidden',
+          }}
+        >
+          <svg
+            className={styles.refreshIcon}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+          </svg>
+          Vérification du stock en cours...
+        </div>
 
         <div className={styles.content}>
           {/* Liste des articles - toujours accessible en invité */}
           <div className={styles.itemsList}>
-            {cartItemsWithStock.map((item) => {
+            {displayItems.map((item) => {
               const stockError = stockErrors[item.variantId];
               const isOutOfStock = item.stock <= 0;
               const hasInsufficientStock = item.stock < item.quantity;

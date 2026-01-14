@@ -564,6 +564,30 @@ router.post(
         }
       });
 
+      // Ajouter aussi l'origin de CHECKOUT_SUCCESS_URL et FRONTEND_PUBLIC_URL si définis
+      const additionalOrigins: string[] = [];
+      if (process.env.CHECKOUT_SUCCESS_URL) {
+        try {
+          const origin = new URL(process.env.CHECKOUT_SUCCESS_URL).origin;
+          if (!allowedOrigins.includes(origin)) {
+            additionalOrigins.push(origin);
+          }
+        } catch {
+          // Ignorer
+        }
+      }
+      if (process.env.FRONTEND_PUBLIC_URL) {
+        try {
+          const origin = new URL(process.env.FRONTEND_PUBLIC_URL).origin;
+          if (!allowedOrigins.includes(origin) && !additionalOrigins.includes(origin)) {
+            additionalOrigins.push(origin);
+          }
+        } catch {
+          // Ignorer
+        }
+      }
+      allowedOrigins.push(...additionalOrigins);
+
       const validateUrl = createUrlValidator(allowedOrigins);
 
       const successUrl = validateUrl(req.body.successUrl, process.env.CHECKOUT_SUCCESS_URL);

@@ -60,6 +60,8 @@
   border-radius: var(--radius-xl, 12px);
   margin-bottom: var(--space-6, 1.5rem);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity var(--duration-fast, 150ms) var(--ease-out);
+  min-height: 3.5rem;
 }
 
 .refreshIcon {
@@ -390,7 +392,9 @@
   font-family: var(--font-body);
   font-size: var(--text-xl, 1.25rem);
   cursor: pointer;
-  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  transition:
+    background-color var(--duration-fast, 150ms) var(--ease-out),
+    color var(--duration-fast, 150ms) var(--ease-out);
   min-width: 40px;
   display: flex;
   align-items: center;
@@ -404,7 +408,6 @@
 
 .quantityButton:active:not(:disabled) {
   background: var(--color-bg-subtle);
-  transform: scale(0.95);
 }
 
 .quantityButton:disabled {
