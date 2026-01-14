@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import { API_BASE } from './api';
 
 export interface User {
@@ -67,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
 
   // Vérifier si un token JWT est expiré
-  const isTokenExpired = (accessToken: string): boolean => {
+  const isTokenExpired = useCallback((accessToken: string): boolean => {
     try {
       const payloadPart = accessToken.split('.')[1];
       if (!payloadPart) return true;
@@ -78,11 +85,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       return true;
     }
-  };
+  }, []);
 
   // Décoder un token JWT côté client (sans vérification de signature) pour éviter les redirections
   // prématurées en cas d'erreur réseau ou de profil indisponible.
-  const decodeAccessToken = (accessToken: string): Partial<User> | null => {
+  const decodeAccessToken = useCallback((accessToken: string): Partial<User> | null => {
     try {
       const payloadPart = accessToken.split('.')[1];
       if (!payloadPart) return null;
@@ -100,10 +107,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       return null;
     }
-  };
+  }, []);
 
   // Fonction pour rafraîchir le token
-  const refreshAccessToken = async (refreshToken: string): Promise<string | null> => {
+  const refreshAccessToken = useCallback(async (refreshToken: string): Promise<string | null> => {
     try {
       const response = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
@@ -121,14 +128,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return newAccessToken;
       }
       return null;
-    } catch (error) {
-      console.error('Erreur lors du rafraîchissement du token:', error);
+    } catch {
       return null;
     }
-  };
+  }, []);
 
   // Fonction helper pour charger le profil
-  const loadProfile = async (accessToken: string) => {
+  const loadProfile = useCallback(async (accessToken: string) => {
     try {
       const response = await fetch(`${API_BASE}/users/profile`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -140,25 +146,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       // Silently fail - user is already set from decoded token
     }
-  };
+  }, []);
 
   // Fonction utilitaire pour gérer le cas où on a un token d'accès
-  const handleAccessTokenCase = async (storedToken: string, refreshToken: string | null) => {
-    // Pré-remplir avec le payload décodé
-    const decoded = decodeAccessToken(storedToken);
-    if (decoded) {
-      setUser((prev) => prev ?? (decoded as User));
-    }
+  const handleAccessTokenCase = useCallback(
+    async (storedToken: string, refreshToken: string | null) => {
+      // Pré-remplir avec le payload décodé
+      const decoded = decodeAccessToken(storedToken);
+      if (decoded) {
+        setUser((prev) => prev ?? (decoded as User));
+      }
 
-    // Si le token n'est pas expiré, l'utiliser directement
-    if (!isTokenExpired(storedToken)) {
-      setToken(storedToken);
-      await loadProfile(storedToken);
-      return;
-    }
+      // Si le token n'est pas expiré, l'utiliser directement
+      if (!isTokenExpired(storedToken)) {
+        setToken(storedToken);
+        await loadProfile(storedToken);
+        return;
+      }
 
-    // Si le token est expiré, essayer de le rafraîchir
-    if (refreshToken) {
+      // Si le token est expiré, essayer de le rafraîchir
+      if (refreshToken) {
+        const newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken) {
+          const decodedNew = decodeAccessToken(newAccessToken);
+          if (decodedNew) {
+            setUser(decodedNew as User);
+          }
+          await loadProfile(newAccessToken);
+          return;
+        }
+      }
+
+      // Refresh échoué ou pas de refresh token, déconnecter
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setToken(null);
+      setUser(null);
+    },
+    [decodeAccessToken, isTokenExpired, loadProfile, refreshAccessToken]
+  );
+
+  // Fonction utilitaire pour gérer le cas où on a seulement un refresh token
+  const handleRefreshTokenCase = useCallback(
+    async (refreshToken: string) => {
       const newAccessToken = await refreshAccessToken(refreshToken);
       if (newAccessToken) {
         const decodedNew = decodeAccessToken(newAccessToken);
@@ -166,33 +196,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(decodedNew as User);
         }
         await loadProfile(newAccessToken);
-        return;
+      } else {
+        // Refresh token invalide
+        localStorage.removeItem('refreshToken');
+        setToken(null);
+        setUser(null);
       }
-    }
-
-    // Refresh échoué ou pas de refresh token, déconnecter
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    setToken(null);
-    setUser(null);
-  };
-
-  // Fonction utilitaire pour gérer le cas où on a seulement un refresh token
-  const handleRefreshTokenCase = async (refreshToken: string) => {
-    const newAccessToken = await refreshAccessToken(refreshToken);
-    if (newAccessToken) {
-      const decodedNew = decodeAccessToken(newAccessToken);
-      if (decodedNew) {
-        setUser(decodedNew as User);
-      }
-      await loadProfile(newAccessToken);
-    } else {
-      // Refresh token invalide
-      localStorage.removeItem('refreshToken');
-      setToken(null);
-      setUser(null);
-    }
-  };
+    },
+    [decodeAccessToken, loadProfile, refreshAccessToken]
+  );
 
   // Vérifier si l'utilisateur est déjà connecté au chargement
   useEffect(() => {
@@ -209,15 +221,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         else if (refreshToken) {
           await handleRefreshTokenCase(refreshToken);
         }
-      } catch (error) {
-        console.error('Erreur auth:', error);
+      } catch {
+        // Ignorer les erreurs
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAuthStatus();
-  }, []);
+  }, [handleAccessTokenCase, handleRefreshTokenCase]);
 
   const login = async (
     email: string,
@@ -275,9 +287,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Si on ne peut pas récupérer le profil, utiliser les données de base du login
             setUser(data.user);
           }
-        } catch (profileError) {
-          console.error('Erreur lors de la récupération du profil:', profileError);
-          // Utiliser les données de base du login en cas d'erreur
+        } catch {
           setUser(data.user);
         }
 
@@ -288,8 +298,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: data.error || 'Erreur de connexion',
         };
       }
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
+    } catch {
       return {
         success: false,
         error: 'Erreur de connexion au serveur',
@@ -317,8 +326,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: data.error || "Erreur d'inscription",
         };
       }
-    } catch (error) {
-      console.error("Erreur lors de l'inscription:", error);
+    } catch {
       return {
         success: false,
         error: "Erreur d'inscription au serveur",
@@ -346,7 +354,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ refreshToken }),
-      }).catch(console.error);
+      }).catch(() => {});
     }
   };
 
@@ -377,8 +385,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(decoded as User);
         }
       }
-    } catch (error) {
-      console.error('Erreur lors du rafraîchissement du profil:', error);
+    } catch {
       const decoded = token ? decodeAccessToken(token) : null;
       if (decoded) {
         setUser(decoded as User);

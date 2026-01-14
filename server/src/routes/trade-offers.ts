@@ -84,8 +84,7 @@ router.post(
         message: "Offre d'échange créée avec succès",
         offer,
       });
-    } catch (error) {
-      console.error("Erreur lors de la création de l'offre:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -134,8 +133,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
     });
 
     res.json({ offers });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des offres:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -186,8 +184,7 @@ router.get('/:offerId', authenticateToken, async (req: Request, res: Response) =
     }
 
     res.json({ offer });
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'offre:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -255,8 +252,7 @@ router.post('/:offerId/accept', authenticateToken, async (req: Request, res: Res
       message: 'Offre acceptée avec succès',
       offer: updated,
     });
-  } catch (error) {
-    console.error("Erreur lors de l'acceptation de l'offre:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -324,8 +320,7 @@ router.post('/:offerId/reject', authenticateToken, async (req: Request, res: Res
       message: 'Offre refusée',
       offer: updated,
     });
-  } catch (error) {
-    console.error("Erreur lors du refus de l'offre:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -393,8 +388,7 @@ router.post('/:offerId/cancel', authenticateToken, async (req: Request, res: Res
       message: 'Offre annulée',
       offer: updated,
     });
-  } catch (error) {
-    console.error("Erreur lors de l'annulation de l'offre:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

@@ -359,8 +359,8 @@ export function CategorySpecificPage() {
           })) as { products: ProductType[] };
           setApiProducts(response.products);
         }
-      } catch (error) {
-        console.error('Erreur lors du chargement des produits API:', error);
+      } catch {
+        // Ignorer les erreurs
       } finally {
         setLoading(false);
       }
@@ -414,18 +414,6 @@ export function CategorySpecificPage() {
     const mappedCategories = categoryMap[category as string] || [];
     return mappedCategories.includes(apiProduct.category);
   });
-
-  // Debug: afficher les résultats du filtrage
-  if (category === 'displays') {
-    console.log('🔍 Debug Displays:');
-    console.log('- Produits API chargés:', apiProducts.length);
-    console.log('- Produits API après filtrage:', filteredApiProducts.length);
-    console.log(
-      '- Produits API filtrés:',
-      filteredApiProducts.map((p) => `${p.name} (${p.category})`)
-    );
-    console.log('- Produits statiques filtrés:', filteredStaticProducts.length);
-  }
 
   // Combiner les produits statiques et API
   const allCombinedProducts = [

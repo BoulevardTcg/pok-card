@@ -30,9 +30,6 @@ function createUrlValidator(allowedOrigins: string[]) {
       const testUrl = url.replace('{CHECKOUT_SESSION_ID}', 'test-session-id');
       const urlObj = new URL(testUrl);
       if (!allowedOrigins.includes(urlObj.origin)) {
-        console.warn(
-          `🚫 URL de redirection non autorisée: ${url} (origine: ${urlObj.origin}, autorisées: ${allowedOrigins.join(', ')})`
-        );
         throw new Error('URL de redirection non autorisée');
       }
       return url;
@@ -169,7 +166,6 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
   const items = parseMetadataItems(session.metadata ?? null);
 
   if (items.length === 0) {
-    console.warn('Session Stripe sans items, ignorée:', session.id);
     return;
   }
 
@@ -357,6 +353,29 @@ const MAX_ITEMS = 50;
 const MAX_QUANTITY_PER_ITEM = 100;
 const MAX_TOTAL_QUANTITY = 500;
 
+// Cache d'idempotence pour /create-session (TTL: 1 heure)
+type IdempotencyCacheEntry = {
+  sessionId: string;
+  url: string | null;
+  timestamp: number;
+};
+
+const idempotencyCache = new Map<string, IdempotencyCacheEntry>();
+const IDEMPOTENCY_TTL_MS = 60 * 60 * 1000; // 1 heure
+
+// Purge périodique des entrées expirées (toutes les 15 minutes)
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, entry] of idempotencyCache.entries()) {
+      if (now - entry.timestamp > IDEMPOTENCY_TTL_MS) {
+        idempotencyCache.delete(key);
+      }
+    }
+  },
+  15 * 60 * 1000
+); // 15 minutes
+
 const serializeStripeAddress = (
   address: Stripe.Address | null | undefined
 ): Prisma.InputJsonValue | null => {
@@ -471,6 +490,27 @@ router.post(
         });
       }
 
+      // Vérifier l'idempotence si une clé est fournie
+      const idempotencyKey = req.headers['idempotency-key'] || req.headers['Idempotency-Key'];
+      if (idempotencyKey && typeof idempotencyKey === 'string') {
+        const cachedEntry = idempotencyCache.get(idempotencyKey);
+        if (cachedEntry) {
+          const now = Date.now();
+          // Vérifier si l'entrée n'est pas expirée
+          if (now - cachedEntry.timestamp <= IDEMPOTENCY_TTL_MS) {
+            // Retourner le résultat en cache
+            return res.status(200).json({
+              sessionId: cachedEntry.sessionId,
+              url: cachedEntry.url,
+              cached: true,
+            });
+          } else {
+            // Entrée expirée, la supprimer
+            idempotencyCache.delete(idempotencyKey);
+          }
+        }
+      }
+
       const requestedItems: CheckoutItemInput[] = req.body.items;
       const shipping = req.body.shipping || {};
       const shippingMethodCode = (req.body.shippingMethodCode || '')
@@ -564,6 +604,30 @@ router.post(
         }
       });
 
+      // Ajouter aussi l'origin de CHECKOUT_SUCCESS_URL et FRONTEND_PUBLIC_URL si définis
+      const additionalOrigins: string[] = [];
+      if (process.env.CHECKOUT_SUCCESS_URL) {
+        try {
+          const origin = new URL(process.env.CHECKOUT_SUCCESS_URL).origin;
+          if (!allowedOrigins.includes(origin)) {
+            additionalOrigins.push(origin);
+          }
+        } catch {
+          // Ignorer
+        }
+      }
+      if (process.env.FRONTEND_PUBLIC_URL) {
+        try {
+          const origin = new URL(process.env.FRONTEND_PUBLIC_URL).origin;
+          if (!allowedOrigins.includes(origin) && !additionalOrigins.includes(origin)) {
+            additionalOrigins.push(origin);
+          }
+        } catch {
+          // Ignorer
+        }
+      }
+      allowedOrigins.push(...additionalOrigins);
+
       const validateUrl = createUrlValidator(allowedOrigins);
 
       const successUrl = validateUrl(req.body.successUrl, process.env.CHECKOUT_SUCCESS_URL);
@@ -595,11 +659,7 @@ router.post(
 
           // Sinon, l'ajouter avec un / entre l'origine et le chemin
           return encodeURI(`${frontendOrigin}/${relativeUrl}`);
-        } catch (error) {
-          console.warn(
-            `Impossible de convertir l'URL relative en URL absolue: ${relativeUrl}`,
-            error
-          );
+        } catch {
           return undefined;
         }
       };
@@ -674,9 +734,8 @@ router.post(
             redeem_by: Math.floor(Date.now() / 1000) + 3600, // Expire dans 1h
           });
           stripeCouponId = coupon.id;
-        } catch (couponError) {
-          console.error('Erreur lors de la creation du coupon Stripe:', couponError);
-          // Continuer sans le coupon plutot que d'echouer completement
+        } catch {
+          // Continuer sans le coupon
         }
       }
 
@@ -777,16 +836,20 @@ router.post(
 
       const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
+      // Stocker dans le cache d'idempotence si une clé était fournie
+      if (idempotencyKey && typeof idempotencyKey === 'string') {
+        idempotencyCache.set(idempotencyKey, {
+          sessionId: session.id,
+          url: session.url,
+          timestamp: Date.now(),
+        });
+      }
+
       res.status(201).json({
         sessionId: session.id,
         url: session.url,
       });
     } catch (error: any) {
-      console.error('❌ Erreur lors de la création de la session Stripe:', error);
-      console.error('Stack trace:', error.stack);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-
       // Ne pas exposer les détails d'erreur en production
       const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -807,7 +870,6 @@ router.post(
 
       // Gérer les erreurs Prisma/PostgreSQL
       if (error.code === 'P2002' || error.code?.startsWith('P')) {
-        console.error('Erreur Prisma:', error.code, error.meta);
         return res.status(500).json({
           error: 'Erreur de base de données',
           code: 'DATABASE_ERROR',
@@ -904,10 +966,6 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
       return createOrderFromSession(tx, session, items, sessionId, userId);
     });
 
-    console.log(
-      `✅ Commande créée: ${order.orderNumber} pour le user ${order.userId || 'anonyme'}`
-    );
-
     // Envoyer l'email de confirmation
     // Priorité : email du formulaire (métadonnées) > email Stripe > email utilisateur connecté
     const customerEmail =
@@ -945,7 +1003,7 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
             promoDiscount: promoDiscount || undefined,
           },
           customerEmail
-        ).catch((err) => console.error('Erreur email confirmation:', err));
+        ).catch(() => {});
       }
     }
 
@@ -955,12 +1013,10 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
       orderId: order.id,
       orderNumber: order.orderNumber,
     });
-  } catch (error: any) {
-    console.error('Erreur lors de la vérification de la session:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur lors de la création de la commande',
       code: 'ORDER_CREATION_ERROR',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -981,8 +1037,7 @@ const parseMetadataItems = (metadata: Stripe.Metadata | null | undefined): Check
         quantity: Number(item.quantity),
       }))
       .filter((item) => item.variantId && item.quantity > 0);
-  } catch (error) {
-    console.error('Impossible de parser le metadata items:', error);
+  } catch {
     return [];
   }
 };
@@ -992,7 +1047,6 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.error('Webhook Stripe non configuré: STRIPE_WEBHOOK_SECRET manquant');
     return res.status(500).send('Webhook non configuré');
   }
 
@@ -1007,17 +1061,13 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
     const rawBody = (req as unknown as { body: Buffer }).body;
     event = stripeClient.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (err: any) {
-    console.error('Signature Stripe invalide:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === 'checkout.session.completed') {
     try {
       await processCompletedCheckoutSession(event.data.object as Stripe.Checkout.Session);
-    } catch (error: any) {
-      console.error('Erreur lors du traitement du webhook Stripe:', error);
-      // Ne pas exposer les détails d'erreur
-      // Stripe retentera automatiquement en cas d'erreur 5xx
+    } catch {
       return res.status(500).json({
         received: false,
         error: 'Erreur lors du traitement du webhook',

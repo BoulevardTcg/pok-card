@@ -75,8 +75,8 @@ export async function navigateToProduct(
       navigate(`/produit/${found.slug}`);
       return;
     }
-  } catch (error) {
-    console.error('Erreur lors de la recherche:', error);
+  } catch {
+    // Ignorer les erreurs
   }
 
   // Fallback : recherche par URL

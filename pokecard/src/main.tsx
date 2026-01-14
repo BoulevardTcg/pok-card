@@ -18,9 +18,6 @@ window.addEventListener('unhandledrejection', (event) => {
     event.preventDefault();
     return;
   }
-
-  // Logger les autres erreurs pour le débogage
-  console.error('Unhandled promise rejection:', event.reason);
 });
 
 // Gestionnaire pour les erreurs non capturées

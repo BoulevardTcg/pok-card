@@ -69,8 +69,7 @@ router.get('/product/:productId', async (req: Request, res: Response) => {
         totalReviews: ratings._count.rating || 0,
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des avis:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -128,8 +127,7 @@ router.get('/can-review/:productId', authenticateToken, async (req: Request, res
       reason: null,
       message: null,
     });
-  } catch (error) {
-    console.error('Erreur lors de la vérification:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -230,8 +228,7 @@ router.post(
         review,
         message: 'Avis créé avec succès. Il sera publié après modération.',
       });
-    } catch (error) {
-      console.error("Erreur lors de la création de l'avis:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -314,8 +311,7 @@ router.put(
         review: updatedReview,
         message: 'Avis mis à jour avec succès',
       });
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'avis:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -355,8 +351,7 @@ router.delete('/:reviewId', authenticateToken, async (req: Request, res: Respons
     res.json({
       message: 'Avis supprimé avec succès',
     });
-  } catch (error) {
-    console.error("Erreur lors de la suppression de l'avis:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

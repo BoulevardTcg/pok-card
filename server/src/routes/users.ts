@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken, requireOwnerOrAdmin } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -49,8 +49,7 @@ router.get('/profile', authenticateToken, async (req: Request, res: Response) =>
     res.json({
       user,
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du profil:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -116,8 +115,7 @@ router.put(
         message: 'Profil mis à jour avec succès',
         user: updatedUser,
       });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du profil:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -203,8 +201,7 @@ router.put(
         message: 'Profil étendu mis à jour avec succès',
         profile: updatedProfile,
       });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du profil étendu:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -281,8 +278,7 @@ router.put(
         message:
           'Mot de passe changé avec succès. Vous devrez vous reconnecter sur tous vos appareils.',
       });
-    } catch (error) {
-      console.error('Erreur lors du changement de mot de passe:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -320,8 +316,7 @@ router.get('/favorites', authenticateToken, async (req: Request, res: Response) 
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des favoris:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -385,8 +380,7 @@ router.post(
         message: 'Carte ajoutée aux favoris',
         favorite,
       });
-    } catch (error) {
-      console.error("Erreur lors de l'ajout aux favoris:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -429,8 +423,7 @@ router.delete('/favorites/:cardId', authenticateToken, async (req: Request, res:
     res.json({
       message: 'Carte supprimée des favoris',
     });
-  } catch (error) {
-    console.error('Erreur lors de la suppression du favori:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -473,8 +466,7 @@ router.get('/orders', authenticateToken, async (req: Request, res: Response) => 
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des commandes:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -508,8 +500,7 @@ router.get('/orders/:orderId', authenticateToken, async (req: Request, res: Resp
     res.json({
       order,
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la commande:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

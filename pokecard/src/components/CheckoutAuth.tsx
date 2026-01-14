@@ -30,6 +30,7 @@ export function CheckoutAuth({ onAuthenticated }: CheckoutAuthProps) {
   useEffect(() => {
     // Capturer le panier invité au montage
     guestCartRef.current = [...cart];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Seulement au montage
 
   const handleLogin = async (e: React.FormEvent) => {

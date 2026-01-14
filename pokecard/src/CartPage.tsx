@@ -1,17 +1,43 @@
-import { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
 import { CartIcon } from './components/icons/Icons';
 import styles from './CartPage.module.css';
-import { createCheckoutSession, getVariantsStock, validatePromoCode, getImageUrl } from './api';
+import {
+  createCheckoutSession,
+  getVariantsStock,
+  validatePromoCode,
+  getImageUrl,
+  safeParse,
+} from './api';
 import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
 import type { CartItem } from './cartContext';
+
+// Types pour le draft de checkout
+type CheckoutDraft = {
+  email: string;
+  promoCode: string | null;
+  shipping: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    phone: string;
+  };
+  shippingMethodCode: string;
+  createdAt: number;
+};
+
+const CHECKOUT_DRAFT_TTL = 30 * 60 * 1000; // 30 minutes
 
 export function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart, getTotalCents } =
     useContext(CartContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const totalCents = getTotalCents();
   const [loading, setLoading] = useState(false);
@@ -39,6 +65,11 @@ export function CartPage() {
     enabledShippingMethods[0]?.code ?? 'MONDIAL_RELAY'
   );
 
+  // Refs pour l'auto-checkout (une seule exécution)
+  const autoCheckoutRanRef = useRef(false);
+  const inFlightRef = useRef(false);
+  const refreshStockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const formatPrice = (cents: number) => {
     return (cents / 100).toFixed(2).replace('.', ',');
   };
@@ -48,6 +79,47 @@ export function CartPage() {
   const shippingCostCents = selectedShippingMethod?.priceCents ?? 0;
   const totalAfterDiscount = Math.max(0, totalCents - promoDiscount);
   const totalWithShipping = totalAfterDiscount + shippingCostCents;
+
+  // Fusionner cart (quantités à jour) avec cartItemsWithStock (stock/prix à jour)
+  // pour éviter les décalages visuels lors des changements de quantité
+  const displayItems = useMemo(() => {
+    if (cart.length === 0) return [];
+
+    // Créer un Map pour un accès rapide aux données de stock
+    const stockMap = new Map(cartItemsWithStock.map((item) => [item.variantId, item]));
+
+    return cart.map((cartItem) => {
+      const stockItem = stockMap.get(cartItem.variantId);
+      // Utiliser la quantité de cart (mise à jour instantanément) et le stock/prix de cartItemsWithStock
+      return stockItem ? { ...stockItem, quantity: cartItem.quantity } : cartItem;
+    });
+  }, [cart, cartItemsWithStock]);
+
+  // Restaurer le draft de checkout au mount
+  useEffect(() => {
+    const draftStr = sessionStorage.getItem('checkoutDraft');
+    if (!draftStr) return;
+
+    const draft = safeParse<CheckoutDraft | null>(draftStr, null);
+    if (!draft) return;
+
+    // Vérifier TTL (30 minutes)
+    const now = Date.now();
+    if (now - draft.createdAt > CHECKOUT_DRAFT_TTL) {
+      sessionStorage.removeItem('checkoutDraft');
+      sessionStorage.removeItem('idempotencyKeyCheckout');
+      return;
+    }
+
+    // Restaurer les champs
+    setEmail(draft.email);
+    if (draft.promoCode) {
+      setPromoCode(draft.promoCode);
+      setAppliedPromo(draft.promoCode);
+    }
+    setShipping(draft.shipping);
+    setShippingMethodCode(draft.shippingMethodCode);
+  }, []);
 
   // Rafraîchir le stock des articles du panier
   useEffect(() => {
@@ -91,15 +163,29 @@ export function CartPage() {
 
         setCartItemsWithStock(updatedCart);
         setStockErrors(errors);
-      } catch (error) {
-        console.error('Erreur lors du rafraîchissement du stock:', error);
+      } catch {
         setCartItemsWithStock(cart);
       } finally {
         setRefreshingStock(false);
       }
     }
 
-    refreshStock();
+    // Debounce: nettoyer le timeout précédent si cart change rapidement
+    if (refreshStockTimeoutRef.current) {
+      clearTimeout(refreshStockTimeoutRef.current);
+    }
+
+    // Délai de 300ms avant de rafraîchir le stock pour éviter les appels multiples
+    refreshStockTimeoutRef.current = setTimeout(() => {
+      refreshStock();
+    }, 300);
+
+    // Cleanup: nettoyer le timeout si le composant est démonté ou si cart change
+    return () => {
+      if (refreshStockTimeoutRef.current) {
+        clearTimeout(refreshStockTimeoutRef.current);
+      }
+    };
   }, [cart]);
 
   function validateShipping() {
@@ -111,32 +197,59 @@ export function CartPage() {
     return '';
   }
 
-  async function handleCheckout() {
-    // Vérifier l'authentification uniquement au moment du clic sur "Commander"
-    if (!isAuthenticated) {
-      // Stocker l'intention de checkout et le panier invité avant redirection
-      sessionStorage.setItem('checkoutIntent', 'true');
-      sessionStorage.setItem('guestCart', JSON.stringify(cart));
-      navigate('/login?returnTo=/panier', { replace: true });
-      return;
-    }
+  // Helpers pour l'idempotence basée sur la signature du payload
+  type CheckoutSignatureArgs = {
+    items: { variantId: string; quantity: number }[];
+    promoCode?: string;
+    shippingMethodCode?: string;
+    shipping?: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2?: string;
+      postalCode: string;
+      city: string;
+      country: string;
+      phone?: string;
+    };
+  };
 
+  function buildCheckoutSignature(args: CheckoutSignatureArgs) {
+    const itemsSorted = [...args.items].sort((a, b) => a.variantId.localeCompare(b.variantId));
+    return JSON.stringify({
+      items: itemsSorted,
+      promoCode: args.promoCode || null,
+      shippingMethodCode: args.shippingMethodCode || null,
+      shipping: args.shipping || null,
+    });
+  }
+
+  function getOrCreateIdempotencyKey(signature: string) {
+    const sigKey = 'idempotencyKeyCheckoutSignature';
+    const keyKey = 'idempotencyKeyCheckout';
+
+    const storedSig = sessionStorage.getItem(sigKey);
+    const storedKey = sessionStorage.getItem(keyKey);
+
+    if (storedSig === signature && storedKey) return storedKey;
+
+    const newKey = `${Date.now()}-${crypto.randomUUID?.() || Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(sigKey, signature);
+    sessionStorage.setItem(keyKey, newKey);
+    return newKey;
+  }
+
+  // Fonction pour démarrer le checkout Stripe
+  async function startStripeCheckout() {
+    if (inFlightRef.current) return; // Déjà en cours
     if (cart.length === 0) return;
 
+    // Validations
     if (Object.keys(stockErrors).length > 0) {
       const hasRupture = Object.values(stockErrors).some((msg) => msg.includes('Rupture'));
-      const hasInsuffisant = Object.values(stockErrors).some((msg) =>
-        msg.includes('Stock insuffisant')
-      );
-
       if (hasRupture) {
         setEmailError(
           'Impossible de procéder au paiement : certains articles sont en rupture de stock.'
         );
-        return;
-      }
-      if (hasInsuffisant) {
-        setEmailError('Les quantités ont été ajustées selon le stock disponible.');
         return;
       }
     }
@@ -160,6 +273,8 @@ export function CartPage() {
     setEmailError('');
     setShippingError('');
     setLoading(true);
+    inFlightRef.current = true;
+
     try {
       const items = cartItemsWithStock
         .map((item) => ({
@@ -171,43 +286,141 @@ export function CartPage() {
       if (items.length === 0) {
         setEmailError('Aucun article disponible dans votre panier.');
         setLoading(false);
+        inFlightRef.current = false;
         return;
       }
+
+      const shippingMapped = {
+        fullName: shipping.fullName,
+        addressLine1: shipping.addressLine1,
+        addressLine2: shipping.addressLine2 || undefined,
+        postalCode: shipping.postalCode,
+        city: shipping.city,
+        country: shipping.country,
+        phone: shipping.phone || undefined,
+      };
+
+      // ✅ Idempotence stable seulement si le payload est identique
+      // Assurer que shippingMethodCode est une string stable (pas undefined)
+      const stableShippingMethodCode = shippingMethodCode || enabledShippingMethods[0]?.code || '';
+      // Assurer que promoCode est undefined quand vide (pas '')
+      const stablePromoCode = appliedPromo && appliedPromo.trim() ? appliedPromo : undefined;
+
+      const signature = buildCheckoutSignature({
+        items,
+        promoCode: stablePromoCode,
+        shippingMethodCode: stableShippingMethodCode,
+        shipping: shippingMapped,
+      });
+      const idempotencyKey = getOrCreateIdempotencyKey(signature);
+
       const { url } = await createCheckoutSession(
         items,
         email || undefined,
-        appliedPromo || undefined,
-        {
-          fullName: shipping.fullName,
-          addressLine1: shipping.addressLine1,
-          addressLine2: shipping.addressLine2 || undefined,
-          postalCode: shipping.postalCode,
-          city: shipping.city,
-          country: shipping.country,
-          phone: shipping.phone || undefined,
-        },
-        shippingMethodCode
+        stablePromoCode,
+        shippingMapped,
+        stableShippingMethodCode,
+        idempotencyKey
       );
 
       if (url) {
-        window.location.href = url;
-      } else {
-        setEmailError('Session de paiement créée, mais aucune URL retournée.');
-        setLoading(false);
+        // ✅ IMPORTANT: ne pas nettoyer checkoutDraft/idempotency ici
+        // (sinon si l'utilisateur annule sur Stripe, il perd ses champs)
+        window.location.assign(url);
+        return;
       }
-    } catch (e: Error) {
-      console.error('Erreur checkout:', e);
-      let errorMsg = 'Erreur lors de la création du paiement';
 
-      if (e?.status === 409 || e?.message?.includes('Stock insuffisant')) {
+      setEmailError('Session de paiement créée, mais aucune URL retournée.');
+      setLoading(false);
+      inFlightRef.current = false;
+    } catch (e: unknown) {
+      let errorMsg = 'Erreur lors de la création du paiement';
+      const err = e as {
+        status?: number;
+        message?: string;
+        response?: { data?: { error?: string } };
+        isNetworkError?: boolean;
+      };
+
+      // Erreur réseau (CORS, timeout, connexion refusée, etc.)
+      if (err?.isNetworkError || err?.status === 0) {
+        errorMsg =
+          err?.message || 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
+      } else if (err?.status === 409 || err?.message?.includes('Stock insuffisant')) {
         errorMsg = 'Stock insuffisant pour certains articles. Veuillez vérifier votre panier.';
+      } else if (err?.status === 401) {
+        // Forcer login si 401
+        // ✅ Reset des états avant navigation pour éviter blocage si l'utilisateur revient
+        setLoading(false);
+        inFlightRef.current = false;
+
+        const draft: CheckoutDraft = {
+          email,
+          promoCode: appliedPromo,
+          shipping,
+          shippingMethodCode,
+          createdAt: Date.now(),
+        };
+
+        sessionStorage.setItem('checkoutIntent', JSON.stringify({ v: 1, createdAt: Date.now() }));
+        sessionStorage.setItem('guestCart', JSON.stringify(cart));
+        sessionStorage.setItem('checkoutDraft', JSON.stringify(draft));
+
+        navigate('/login?returnTo=/panier?autocheckout=1', { replace: true });
+        return;
       } else {
-        errorMsg = e?.response?.data?.error || e?.message || errorMsg;
+        errorMsg = err?.response?.data?.error || err?.message || errorMsg;
       }
 
       setEmailError(errorMsg);
       setLoading(false);
+      inFlightRef.current = false;
     }
+  }
+
+  // Auto-checkout si autocheckout=1 dans l'URL
+  useEffect(() => {
+    const shouldAuto = searchParams.get('autocheckout') === '1';
+    if (!shouldAuto) return;
+    if (!isAuthenticated) return;
+    if (autoCheckoutRanRef.current) return;
+    if (loading || inFlightRef.current) return;
+
+    autoCheckoutRanRef.current = true;
+
+    // ✅ Enlever le param pour éviter que ça relance au refresh
+    navigate('/panier', { replace: true });
+
+    // Lancer le checkout après un court délai pour laisser le temps aux states de se mettre à jour
+    setTimeout(() => {
+      startStripeCheckout();
+    }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, isAuthenticated]);
+
+  async function handleCheckout() {
+    // Protection anti double-clic
+    if (loading || inFlightRef.current) return;
+
+    // Vérifier l'authentification uniquement au moment du clic sur "Commander"
+    if (!isAuthenticated) {
+      // Sauvegarder le draft de checkout
+      const draft: CheckoutDraft = {
+        email,
+        promoCode: appliedPromo,
+        shipping,
+        shippingMethodCode,
+        createdAt: Date.now(),
+      };
+      sessionStorage.setItem('checkoutIntent', JSON.stringify({ v: 1, createdAt: Date.now() }));
+      sessionStorage.setItem('guestCart', JSON.stringify(cart));
+      sessionStorage.setItem('checkoutDraft', JSON.stringify(draft));
+      navigate('/login?returnTo=/panier?autocheckout=1', { replace: true });
+      return;
+    }
+
+    // Si authentifié, lancer directement le checkout
+    await startStripeCheckout();
   }
 
   if (cart.length === 0) {
@@ -220,7 +433,11 @@ export function CartPage() {
             </div>
             <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
             <p className={styles.emptyText}>Découvrez nos collections premium</p>
-            <button onClick={() => navigate('/produits')} className={styles.emptyButton}>
+            <button
+              type="button"
+              onClick={() => navigate('/produits')}
+              className={styles.emptyButton}
+            >
               Explorer le catalogue
               <span className={styles.arrow}>→</span>
             </button>
@@ -235,29 +452,33 @@ export function CartPage() {
       <div className={styles.container}>
         <h1 className={styles.title}>Panier</h1>
 
-        {refreshingStock && (
-          <div className={styles.refreshingStock}>
-            <svg
-              className={styles.refreshIcon}
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-            </svg>
-            Vérification du stock en cours...
-          </div>
-        )}
+        <div
+          className={styles.refreshingStock}
+          style={{
+            opacity: refreshingStock ? 1 : 0,
+            visibility: refreshingStock ? 'visible' : 'hidden',
+          }}
+        >
+          <svg
+            className={styles.refreshIcon}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+          </svg>
+          Vérification du stock en cours...
+        </div>
 
         <div className={styles.content}>
           {/* Liste des articles - toujours accessible en invité */}
           <div className={styles.itemsList}>
-            {cartItemsWithStock.map((item) => {
+            {displayItems.map((item) => {
               const stockError = stockErrors[item.variantId];
               const isOutOfStock = item.stock <= 0;
               const hasInsufficientStock = item.stock < item.quantity;
@@ -290,6 +511,7 @@ export function CartPage() {
                         )}
                       </div>
                       <button
+                        type="button"
                         onClick={() => removeFromCart(item.variantId)}
                         className={styles.removeButton}
                         aria-label="Retirer du panier"
@@ -302,6 +524,7 @@ export function CartPage() {
                     <div className={styles.quantityRow}>
                       <div className={styles.quantityControls}>
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                           className={styles.quantityButton}
                           disabled={item.quantity <= 1}
@@ -311,6 +534,7 @@ export function CartPage() {
                         </button>
                         <span className={styles.quantityValue}>{item.quantity}</span>
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                           className={styles.quantityButton}
                           disabled={item.stock <= item.quantity}
@@ -417,6 +641,7 @@ export function CartPage() {
                       Code appliqué: <strong>{appliedPromo}</strong>
                     </span>
                     <button
+                      type="button"
                       onClick={() => {
                         setAppliedPromo(null);
                         setPromoDiscount(0);
@@ -440,6 +665,7 @@ export function CartPage() {
                       className={`${styles.promoInput} ${promoError ? styles.hasError : ''}`}
                     />
                     <button
+                      type="button"
                       onClick={async () => {
                         if (!promoCode.trim()) {
                           setPromoError('Veuillez entrer un code promo');
@@ -455,8 +681,9 @@ export function CartPage() {
                           } else {
                             setPromoError('Code promo invalide');
                           }
-                        } catch (err: Error) {
-                          setPromoError(err.message || 'Code promo invalide');
+                        } catch (err: unknown) {
+                          const error = err as { message?: string };
+                          setPromoError(error.message || 'Code promo invalide');
                         }
                       }}
                       className={styles.applyPromoButton}
@@ -538,6 +765,7 @@ export function CartPage() {
               </div>
 
               <button
+                type="button"
                 className={styles.checkoutButton}
                 onClick={handleCheckout}
                 disabled={loading || cart.length === 0}
@@ -546,11 +774,15 @@ export function CartPage() {
                 <span className={styles.arrow}>→</span>
               </button>
 
-              <button className={styles.continueButton} onClick={() => navigate('/produits')}>
+              <button
+                type="button"
+                className={styles.continueButton}
+                onClick={() => navigate('/produits')}
+              >
                 Continuer les achats
               </button>
 
-              <button className={styles.clearButton} onClick={clearCart}>
+              <button type="button" className={styles.clearButton} onClick={clearCart}>
                 Vider le panier
               </button>
             </div>

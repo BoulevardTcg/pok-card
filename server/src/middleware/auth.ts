@@ -27,7 +27,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     const user = verifyAccessToken(token);
     req.user = user;
     next();
-  } catch (error) {
+  } catch {
     return res.status(403).json({
       error: 'Token invalide ou expiré',
       code: 'INVALID_TOKEN',
@@ -89,7 +89,7 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
     try {
       const user = verifyAccessToken(token);
       req.user = user;
-    } catch (error) {
+    } catch {
       // Token invalide, mais on continue sans utilisateur
       req.user = undefined;
     }

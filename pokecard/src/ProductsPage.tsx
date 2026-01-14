@@ -277,24 +277,16 @@ export function ProductsPage() {
         pagination: { page: number; total: number; pages: number };
       };
 
-      console.log('📦 Produits reçus:', response.products?.length || 0);
-
       if (!response || !response.products) {
-        console.error("❌ Réponse invalide de l'API:", response);
         setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
         setAllProducts([]);
         return;
       }
 
-      // Filtrer pour exclure les produits de la catégorie "Accessoires"
       const filteredProducts = response.products.filter((p) => p.category !== 'Accessoires');
 
-      console.log('✅ Produits filtrés:', filteredProducts.length);
-
-      // Ne pas mélanger pour garder l'ordre (le filtrage se fait côté client)
       setAllProducts(filteredProducts);
-    } catch (error) {
-      console.error('❌ Erreur lors du chargement des produits:', error);
+    } catch {
       setError('Erreur lors du chargement des produits. Veuillez réessayer.');
       setAllProducts([]);
     } finally {

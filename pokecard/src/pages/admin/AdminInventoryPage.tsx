@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE, getImageUrl } from '../../api';
@@ -76,16 +76,7 @@ export function AdminInventoryPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadInventory();
-  }, [user, authLoading]);
-
-  async function loadInventory() {
+  const loadInventory = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -99,12 +90,22 @@ export function AdminInventoryPage() {
       setVariants(data.variants || []);
       setLowStockVariants(data.lowStock || []);
       setStats(data.stats);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadInventory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, loadInventory]);
 
   async function updateStock(variantId: string, stock: number) {
     if (!token) return;

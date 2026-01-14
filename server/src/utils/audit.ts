@@ -135,14 +135,6 @@ export function auditLog(
   if (process.env.NODE_ENV === 'production') {
     // En production, log vers stdout (sera capturé par le système de logs)
     process.stdout.write(`[AUDIT] ${logLine}\n`);
-  } else {
-    // En dev, format plus lisible
-    console.log(
-      `[AUDIT] ${entry.timestamp} | ${entry.action} | ${resourceType}:${resourceId} | admin:${entry.adminId || 'unknown'}`
-    );
-    if (Object.keys(details).length > 0) {
-      console.log(`        Details: ${JSON.stringify(sanitizeObject(details))}`);
-    }
   }
 }
 

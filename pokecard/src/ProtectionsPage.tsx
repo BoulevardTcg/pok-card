@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProductsPage.module.css';
 import { listProducts, getImageUrl } from './api';
@@ -22,11 +22,7 @@ export function ProtectionsPage() {
     productName: '',
   });
 
-  useEffect(() => {
-    loadProducts();
-  }, [search, page]);
-
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       const response = (await listProducts({
@@ -41,13 +37,16 @@ export function ProtectionsPage() {
 
       setProducts(response.products);
       setTotalPages(response.pagination.pages);
-    } catch (error) {
-      console.error('Erreur lors du chargement des protections:', error);
+    } catch {
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [page, search]);
+
+  useEffect(() => {
+    loadProducts();
+  }, [search, page, loadProducts]);
 
   const formatPrice = (cents: number | null) => {
     if (cents === null) return 'Prix sur demande';

@@ -1,4 +1,4 @@
-import jwt, { type SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
@@ -80,7 +80,7 @@ export const verifyAccessToken = (token: string): JWTPayload => {
 
   try {
     return jwt.verify(token, secret) as JWTPayload;
-  } catch (error) {
+  } catch {
     throw new Error('Invalid access token');
   }
 };
@@ -109,7 +109,7 @@ export const verifyRefreshToken = async (token: string): Promise<RefreshTokenPay
     }
 
     return payload;
-  } catch (error) {
+  } catch {
     throw new Error('Invalid refresh token');
   }
 };

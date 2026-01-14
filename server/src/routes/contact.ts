@@ -74,14 +74,8 @@ router.post(
             e.type === 'field' && (['website', 'companyWebsite'] as const).includes((e as any).path)
         );
       if (hasHoneypot) {
-        console.warn('Contact: honeypot déclenché', { ip: req.ip });
         return res.status(200).json({ ok: true });
       }
-
-      console.warn('Contact: validation error', {
-        ip: req.ip,
-        fields: errors.array().map((e: any) => ({ field: e.path, msg: e.msg })),
-      });
 
       return res.status(400).json({
         ok: false,
@@ -113,26 +107,17 @@ router.post(
         createdAt,
       });
       if (!sent) {
-        console.error('Contact: échec envoi email admin', { ip });
         return res
           .status(500)
           .json({ ok: false, error: 'Erreur lors de l’envoi du message', code: 'SEND_FAILED' });
       }
 
-      if (!CONTACT_AUTOREPLY_ENABLED) {
-        console.log('Contact: accusé réception désactivé (CONTACT_AUTOREPLY_ENABLED=false)');
-      } else if (isBlockedAutoReplyRecipient(email)) {
-        console.log('Contact: accusé réception ignoré (destinataire bloqué/test)', { email });
-      } else {
-        const ack = await sendContactAutoReply({ name, email, subject });
-        if (!ack) {
-          console.warn('Contact: accusé réception non envoyé', { ip });
-        }
+      if (CONTACT_AUTOREPLY_ENABLED && !isBlockedAutoReplyRecipient(email)) {
+        await sendContactAutoReply({ name, email, subject });
       }
 
       return res.status(200).json({ ok: true });
-    } catch (err) {
-      console.error('Contact: erreur serveur', err);
+    } catch {
       return res
         .status(500)
         .json({ ok: false, error: 'Erreur interne du serveur', code: 'INTERNAL_SERVER_ERROR' });

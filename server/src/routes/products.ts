@@ -110,8 +110,7 @@ router.get('/', async (req, res) => {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des produits:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -122,15 +121,11 @@ router.get('/', async (req, res) => {
 router.get('/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    console.log('🔍 Recherche du produit avec slug:', slug);
 
-    // Si c'est un ID numérique (ancien système), on cherche par ID
     const isNumericId = /^\d+$/.test(slug);
 
     let product;
     if (isNumericId) {
-      // Ancien système avec IDs numériques - chercher par ID
-      console.log('⚠️ ID numérique détecté, recherche par ID (ancien système)');
       product = await prisma.product.findUnique({
         where: { id: slug },
         include: {
@@ -159,8 +154,6 @@ router.get('/:slug', async (req, res) => {
       });
     }
 
-    console.log('📦 Produit trouvé:', product ? product.name : 'Aucun');
-
     if (!product) {
       return res.status(404).json({
         error: 'Produit non trouvé',
@@ -172,16 +165,9 @@ router.get('/:slug', async (req, res) => {
     }
 
     const response = toProductResponse(product);
-    console.log('✅ Réponse formatée:', {
-      id: response.id,
-      name: response.name,
-      variantsCount: response.variants.length,
-    });
 
     res.json({ product: response });
   } catch (error: any) {
-    console.error('❌ Erreur lors de la récupération du produit:', error);
-    console.error('Stack:', error.stack);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -202,7 +188,6 @@ router.post(
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.error('❌ Erreurs de validation:', errors.array());
         return res.status(400).json({
           error: errors.array()[0].msg,
           details: errors.array(),
@@ -210,8 +195,6 @@ router.post(
       }
 
       const { email, productId, variantId } = req.body;
-
-      console.log('📧 Notification de stock demandée:', { email, productId, variantId });
 
       // Vérifier que le produit existe
       const product = await prisma.product.findUnique({
@@ -252,11 +235,6 @@ router.post(
           'Votre demande a été enregistrée. Vous recevrez un email dès que le produit sera disponible.',
       });
     } catch (error: any) {
-      console.error("❌ Erreur lors de l'enregistrement de la notification:", error);
-      console.error('Stack:', error.stack);
-      console.error('Message:', error.message);
-      console.error('Code:', error.code);
-
       // Vérifier si c'est une erreur de table manquante
       if (
         error.code === 'P2001' ||
