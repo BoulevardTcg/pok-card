@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import prisma from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import {
   hashPassword,
@@ -14,6 +14,7 @@ import { authLimiter, strictAuthLimiter } from '../middleware/security.js';
 import { sendPasswordResetEmail } from '../services/email.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Configuration du reset de mot de passe
 const PASSWORD_RESET_EXPIRY_HOURS = 1; // Token valide 1 heure

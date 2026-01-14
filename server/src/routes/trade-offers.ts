@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { TradeStatus } from '@prisma/client';
+import { PrismaClient, TradeStatus } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
-import prisma from '../lib/prisma.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Créer une offre d'échange
 router.post(

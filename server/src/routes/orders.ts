@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
-import prisma from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import { optionalAuth } from '../middleware/auth.js';
 import { verifyOrderTrackingToken } from '../utils/tracking.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 const toPublicTrackingOrderDto = (order: any) => ({
   id: order.id,
