@@ -91,6 +91,9 @@ describe('Checkout Routes', () => {
           },
         });
 
+      if (response.status !== 201) {
+        console.log('Test failed - Response body:', JSON.stringify(response.body, null, 2));
+      }
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('sessionId');
       expect(response.body).toHaveProperty('url');
@@ -119,6 +122,12 @@ describe('Checkout Routes', () => {
           },
         });
 
+      if (response.status !== 201) {
+        console.log(
+          'Test failed (anonymous) - Response body:',
+          JSON.stringify(response.body, null, 2)
+        );
+      }
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('sessionId');
     });
