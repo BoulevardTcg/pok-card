@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE, getImageUrl } from '../../api';
@@ -105,16 +105,7 @@ export function AdminProductsPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadProducts();
-  }, [user, authLoading]);
-
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -131,7 +122,17 @@ export function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, loadProducts]);
 
   async function deleteProduct(productId: string) {
     if (!token || !confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return;

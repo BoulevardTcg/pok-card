@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { ArrowUpRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
 import { CartContext, type Product } from '../../cartContext';
@@ -79,7 +79,7 @@ export default function FeaturedCards() {
   }, []);
 
   // Check scroll position and update active index
-  const checkScrollButtons = () => {
+  const checkScrollButtons = useCallback(() => {
     if (carouselRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
       setCanScrollLeft(scrollLeft > 0);
@@ -91,7 +91,7 @@ export default function FeaturedCards() {
       const newIndex = Math.round(scrollLeft / (cardWidth + gap));
       setActiveIndex(Math.min(newIndex, products.length - 1));
     }
-  };
+  }, [products]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -101,7 +101,7 @@ export default function FeaturedCards() {
       checkScrollButtons();
       return () => carousel.removeEventListener('scroll', checkScrollButtons);
     }
-  }, [products]);
+  }, [products, checkScrollButtons]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {

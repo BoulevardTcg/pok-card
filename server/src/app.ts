@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import fetch from 'node-fetch';
 import cors from 'cors';
 
 // Import des routes
@@ -20,7 +19,6 @@ import gdprRoutes from './routes/gdpr.js';
 // Import des middlewares de sécurité
 import {
   helmetConfig,
-  corsOptions,
   apiLimiter,
   validateInput,
   sanitizeInput,
@@ -124,13 +122,15 @@ export const createApp = () => {
   app.use('/api/gdpr', gdprRoutes);
 
   // Gestion des erreurs globales
-  app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Erreur globale:', err);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_SERVER_ERROR',
-    });
-  });
+  app.use(
+    (err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+      console.error('Erreur globale:', err);
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  );
 
   // Gestion des routes non trouvées
   app.use('*', (req, res) => {

@@ -25,7 +25,6 @@ import gdprRoutes from './routes/gdpr.js';
 // Import des middlewares de sécurité
 import {
   helmetConfig,
-  corsOptions,
   apiLimiter,
   validateInput,
   sanitizeInput,
@@ -335,7 +334,7 @@ app.get('/api/trade/sets/:id/cards', validateInput, async (req, res) => {
 });
 
 // Gestion des erreurs globales
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Erreur globale:', err);
   res.status(500).json({
     error: 'Erreur interne du serveur',

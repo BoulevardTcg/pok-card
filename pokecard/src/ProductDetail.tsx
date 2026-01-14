@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { CartContext, type Product as ProductType } from './cartContext';
 import { useAuth } from './authContext';
 import styles from './ProductDetail.module.css';
@@ -74,30 +74,7 @@ export function ProductDetail() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [slug]);
 
-  useEffect(() => {
-    if (!slug) return;
-    loadProduct();
-  }, [slug]);
-
-  useEffect(() => {
-    if (product?.id) {
-      loadReviews();
-      checkCanReview();
-    }
-  }, [product?.id, isAuthenticated]);
-
-  useEffect(() => {
-    if (product?.category) {
-      loadSimilarProducts();
-    }
-  }, [product?.category, product?.id]);
-
-  useEffect(() => {
-    // Réinitialiser la quantité quand le produit ou la variante change
-    setQuantity(1);
-  }, [product?.id, selectedVariantId]);
-
-  async function loadProduct() {
+  const loadProduct = useCallback(async () => {
     if (!slug) {
       setLoading(false);
       setError('Slug manquant');
@@ -127,9 +104,9 @@ export function ProductDetail() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [slug]);
 
-  async function loadReviews() {
+  const loadReviews = useCallback(async () => {
     if (!product?.id) return;
 
     setReviewsLoading(true);
@@ -141,9 +118,9 @@ export function ProductDetail() {
     } finally {
       setReviewsLoading(false);
     }
-  }
+  }, [product?.id]);
 
-  async function checkCanReview() {
+  const checkCanReview = useCallback(async () => {
     if (!product?.id) return;
 
     if (!isAuthenticated) {
@@ -157,9 +134,9 @@ export function ProductDetail() {
 
     const result = await canReviewProduct(product.id);
     setCanReview(result);
-  }
+  }, [product?.id, isAuthenticated]);
 
-  async function loadSimilarProducts() {
+  const loadSimilarProducts = useCallback(async () => {
     if (!product?.category || !product?.id) return;
 
     try {
@@ -178,7 +155,30 @@ export function ProductDetail() {
       console.error('Erreur lors du chargement des produits similaires:', error);
       setSimilarProducts([]);
     }
-  }
+  }, [product?.category, product?.id, product?.slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    loadProduct();
+  }, [slug, loadProduct]);
+
+  useEffect(() => {
+    if (product?.id) {
+      loadReviews();
+      checkCanReview();
+    }
+  }, [product?.id, isAuthenticated, loadReviews, checkCanReview]);
+
+  useEffect(() => {
+    if (product?.category) {
+      loadSimilarProducts();
+    }
+  }, [product?.category, product?.id, loadSimilarProducts]);
+
+  useEffect(() => {
+    // Réinitialiser la quantité quand le produit ou la variante change
+    setQuantity(1);
+  }, [product?.id, selectedVariantId]);
 
   async function handleSubmitReview(e: React.FormEvent) {
     e.preventDefault();

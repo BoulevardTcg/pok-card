@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import cors from 'cors';
 
 const userRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 

@@ -361,16 +361,7 @@ export function AdminReportsPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadReports();
-  }, [user, authLoading, period]);
-
-  async function loadReports() {
+  const loadReports = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -397,7 +388,17 @@ export function AdminReportsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token, period]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, period, loadReports]);
 
   function generateDemoData(period: 'day' | 'week' | 'month') {
     const sales: SalePoint[] = [];

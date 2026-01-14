@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
@@ -102,16 +102,7 @@ export function AdminReviewsPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadReviews();
-  }, [user, authLoading, filter]);
-
-  async function loadReviews() {
+  const loadReviews = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -129,7 +120,17 @@ export function AdminReviewsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token, filter]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, filter, loadReviews]);
 
   async function moderateReview(reviewId: string, isApproved: boolean) {
     if (!token) return;

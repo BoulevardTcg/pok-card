@@ -21,20 +21,17 @@ const router = Router();
 // RATE LIMITING POUR ROUTES ADMIN SENSIBLES
 // ============================================================================
 
-/**
- * Rate limiter standard pour les routes admin (lecture)
- * 100 requêtes par minute
- */
-const adminReadLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 100,
-  message: {
-    error: 'Trop de requêtes, veuillez réessayer plus tard',
-    code: 'RATE_LIMIT_EXCEEDED',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Note: adminReadLimiter défini mais non utilisé actuellement
+// const adminReadLimiter = rateLimit({
+//   windowMs: 60 * 1000, // 1 minute
+//   max: 100,
+//   message: {
+//     error: 'Trop de requêtes, veuillez réessayer plus tard',
+//     code: 'RATE_LIMIT_EXCEEDED',
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
 /**
  * Rate limiter strict pour les routes admin d'écriture
@@ -1368,7 +1365,7 @@ router.patch(
       }
 
       const { variantId } = req.params;
-      const { stock, reason } = req.body;
+      const { stock } = req.body;
 
       const variant = await prisma.productVariant.update({
         where: { id: variantId },

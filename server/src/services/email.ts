@@ -132,7 +132,7 @@ const SHOP_URL = (
   'http://localhost:3000'
 ).replace(/\/$/, '');
 const SHOP_EMAIL = process.env.SHOP_EMAIL || 'contact@boulevardtcg.com';
-const SHOP_LOGO = `${SHOP_URL}/logo.png`;
+// const SHOP_LOGO = `${SHOP_URL}/logo.png`; // Non utilisé actuellement
 
 const EMAIL_FROM = process.env.EMAIL_FROM || SHOP_EMAIL;
 const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || 'contact@boulevardtcg.com';
@@ -353,7 +353,7 @@ function getCarrierDisplayName(carrier?: string | null): string {
 }
 
 function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: string): string {
-  const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`;
+  // const trackingCtaUrl = order.orderTrackingUrl || order.trackingUrl || `${SHOP_URL}/commandes`; // Non utilisé actuellement
   const carrierName = getCarrierDisplayName(order.carrier);
 
   return `
@@ -470,7 +470,7 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
 `;
 }
 
-function deliveryConfirmationTemplate(order: OrderDataForEmail, customerEmail: string): string {
+function deliveryConfirmationTemplate(order: OrderDataForEmail, _customerEmail: string): string {
   const trackingCtaUrl = order.orderTrackingUrl || `${SHOP_URL}/commandes`;
   return `
 <!DOCTYPE html>

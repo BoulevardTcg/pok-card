@@ -58,18 +58,7 @@ export function AdminProductFormPage() {
   const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    if (isEditing) {
-      loadProduct();
-    }
-  }, [user, authLoading, productId]);
-
-  async function loadProduct() {
+  const loadProduct = useCallback(async () => {
     if (!token || !productId) return;
 
     try {
@@ -105,7 +94,19 @@ export function AdminProductFormPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token, productId, navigate]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    if (isEditing) {
+      loadProduct();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, productId, isEditing, loadProduct]);
 
   function generateSlug(name: string) {
     return name
@@ -165,77 +166,80 @@ export function AdminProductFormPage() {
   }
 
   // Upload d'images
-  async function uploadImages(files: FileList | File[]) {
-    if (!token) return;
+  const uploadImages = useCallback(
+    async (files: FileList | File[]) => {
+      if (!token) return;
 
-    setUploadError(null);
-    const fileArray = Array.from(files);
+      setUploadError(null);
+      const fileArray = Array.from(files);
 
-    // Vérifier les types de fichiers (par extension ET type MIME)
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      // Vérifier les types de fichiers (par extension ET type MIME)
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-    const invalidFiles = fileArray.filter((f) => {
-      const ext = f.name.toLowerCase().substring(f.name.lastIndexOf('.'));
-      const isValidExt = allowedExtensions.includes(ext);
-      const isValidType = allowedTypes.includes(f.type) || f.type.startsWith('image/');
-      return !isValidExt && !isValidType;
-    });
-
-    if (invalidFiles.length > 0) {
-      setUploadError(
-        `Fichiers non supportés: ${invalidFiles.map((f) => f.name).join(', ')}. Utilisez JPG, PNG, GIF ou WebP.`
-      );
-      return;
-    }
-
-    // Ajouter des placeholders pour les images en cours d'upload
-    const placeholders = fileArray.map((_, i) => ({
-      url: '',
-      altText: '',
-      position: images.length + i,
-      isUploading: true,
-    }));
-    setImages([...images, ...placeholders]);
-
-    try {
-      const formData = new FormData();
-      fileArray.forEach((file) => {
-        formData.append('images', file);
+      const invalidFiles = fileArray.filter((f) => {
+        const ext = f.name.toLowerCase().substring(f.name.lastIndexOf('.'));
+        const isValidExt = allowedExtensions.includes(ext);
+        const isValidType = allowedTypes.includes(f.type) || f.type.startsWith('image/');
+        return !isValidExt && !isValidType;
       });
 
-      const response = await fetch(`${API_BASE}/admin/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Erreur lors de l'upload");
+      if (invalidFiles.length > 0) {
+        setUploadError(
+          `Fichiers non supportés: ${invalidFiles.map((f) => f.name).join(', ')}. Utilisez JPG, PNG, GIF ou WebP.`
+        );
+        return;
       }
 
-      const data = await response.json();
+      // Ajouter des placeholders pour les images en cours d'upload
+      const placeholders = fileArray.map((_, i) => ({
+        url: '',
+        altText: '',
+        position: images.length + i,
+        isUploading: true,
+      }));
+      setImages([...images, ...placeholders]);
 
-      // Remplacer les placeholders par les vraies images
-      setImages((prev) => {
-        const withoutPlaceholders = prev.filter((img) => !img.isUploading);
-        const newImages = data.images.map((img: any, i: number) => ({
-          url: img.url,
-          altText: '',
-          position: withoutPlaceholders.length + i,
-        }));
-        return [...withoutPlaceholders, ...newImages];
-      });
-    } catch (err: Error) {
-      console.error('Upload error:', err);
-      setUploadError(err.message);
-      // Retirer les placeholders en cas d'erreur
-      setImages((prev) => prev.filter((img) => !img.isUploading));
-    }
-  }
+      try {
+        const formData = new FormData();
+        fileArray.forEach((file) => {
+          formData.append('images', file);
+        });
+
+        const response = await fetch(`${API_BASE}/admin/upload`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Erreur lors de l'upload");
+        }
+
+        const data = await response.json();
+
+        // Remplacer les placeholders par les vraies images
+        setImages((prev) => {
+          const withoutPlaceholders = prev.filter((img) => !img.isUploading);
+          const newImages = data.images.map((img: any, i: number) => ({
+            url: img.url,
+            altText: '',
+            position: withoutPlaceholders.length + i,
+          }));
+          return [...withoutPlaceholders, ...newImages];
+        });
+      } catch (err: Error) {
+        console.error('Upload error:', err);
+        setUploadError(err.message);
+        // Retirer les placeholders en cas d'erreur
+        setImages((prev) => prev.filter((img) => !img.isUploading));
+      }
+    },
+    [token, images]
+  );
 
   // Drag & Drop handlers
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -266,7 +270,7 @@ export function AdminProductFormPage() {
         uploadImages(files);
       }
     },
-    [token, images]
+    [uploadImages]
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

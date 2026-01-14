@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
@@ -42,18 +42,7 @@ export function AdminPromoFormPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    if (isEditing) {
-      loadPromo();
-    }
-  }, [user, authLoading, promoId]);
-
-  async function loadPromo() {
+  const loadPromo = useCallback(async () => {
     if (!token || !promoId) return;
 
     try {
@@ -91,7 +80,19 @@ export function AdminPromoFormPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token, promoId, navigate]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    if (isEditing) {
+      loadPromo();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, promoId, isEditing, loadPromo]);
 
   function generateCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

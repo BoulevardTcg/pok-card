@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
@@ -152,16 +152,7 @@ export function AdminDashboard() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadDashboard();
-  }, [user, authLoading]);
-
-  async function loadDashboard() {
+  const loadDashboard = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -202,7 +193,17 @@ export function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadDashboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, loadDashboard]);
 
   const formatPrice = (cents: number) => {
     return (cents / 100).toFixed(2).replace('.', ',');

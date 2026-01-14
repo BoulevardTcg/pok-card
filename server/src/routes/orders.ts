@@ -48,7 +48,7 @@ router.get('/:orderId', optionalAuth, async (req: Request, res: Response) => {
         const payload = verifyOrderTrackingToken(token);
         tokenOrderId = payload.orderId;
       }
-    } catch (error) {
+    } catch {
       return res
         .status(401)
         .json({ error: 'Token de suivi invalide', code: 'INVALID_TRACKING_TOKEN' });
