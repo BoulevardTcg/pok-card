@@ -63,15 +63,15 @@
 
 .overline {
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-medium, 500);
+  letter-spacing: var(--tracking-widest, 0.1em);
   text-transform: uppercase;
-  color: #3f7ef3;
+  color: var(--color-accent-secondary, #8b7355);
 }
 
-/* Mode sombre : bleu cyan également */
-html[data-theme='dark'] .overline {
+/* Mode clair : bleu cyan pour l'overline */
+html[data-theme='light'] .overline {
   color: #3f7ef3;
 }
 
