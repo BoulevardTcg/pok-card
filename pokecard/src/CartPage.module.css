@@ -21,9 +21,9 @@
 
 .title {
   font-family: var(--font-display, 'Cormorant Garamond', serif);
-  font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-5xl, 3rem));
+  font-size: clamp(var(--text-4xl, 2.5rem), 6vw, var(--text-6xl, 4rem));
   font-weight: var(--font-medium, 500);
-  color: var(--color-text-primary);
+  color: var(--color-text-primary, #f5f5f3);
   margin-bottom: var(--space-4, 1rem);
   line-height: var(--leading-tight, 1.15);
   letter-spacing: var(--tracking-tight, -0.02em);
@@ -35,8 +35,18 @@
   display: block;
   width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #3f7ef3, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-secondary, #8b7355),
+    transparent
+  );
   margin: var(--space-6, 1.5rem) auto;
+}
+
+/* Mode clair : bleu cyan pour le divider */
+html[data-theme='light'] .title::after {
+  background: linear-gradient(90deg, transparent, #3f7ef3, transparent);
 }
 
 .refreshingStock {
@@ -125,51 +135,44 @@
 }
 
 .emptyButton {
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2, 0.5rem);
-  padding: var(--space-4, 1rem) var(--space-8, 2rem);
-  background: #3f7ef3;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent-primary);
   color: var(--color-text-inverse);
   border: none;
-  border-radius: var(--radius-lg, 8px);
-  font-family: var(--font-body);
-  font-size: var(--text-base, 1rem);
-  font-weight: var(--font-semibold, 600);
+  border-radius: 8px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all var(--duration-base, 250ms) var(--ease-out);
-  box-shadow: 0 4px 12px rgba(63, 126, 243, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.emptyButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left var(--duration-slow, 400ms) var(--ease-out);
-}
-
-.emptyButton:hover::before {
-  left: 100%;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  outline: none;
 }
 
 .emptyButton:hover {
-  background: #2d5fd8;
+  background: var(--color-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(63, 126, 243, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .emptyButton:active {
   transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .arrow {
-  transition: transform var(--duration-base, 250ms) var(--ease-out);
+  transition: transform 0.2s ease;
 }
 
 .emptyButton:hover .arrow {
@@ -437,11 +440,9 @@
 
 .itemPrice {
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-2xl, 1.5rem);
-  font-weight: var(--font-bold, 700);
-  color: #3f7ef3;
-  letter-spacing: var(--tracking-normal, 0);
-  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f5f5f3);
   line-height: 1.2;
 }
 
@@ -585,12 +586,12 @@
 
 .shippingOption input[type='radio'] {
   margin-top: 4px;
-  accent-color: #3f7ef3;
+  accent-color: var(--color-accent-primary);
   cursor: pointer;
 }
 
 .shippingOption input[type='radio']:checked {
-  accent-color: #3f7ef3;
+  accent-color: var(--color-accent-primary);
 }
 
 .shippingOptionContent {
@@ -615,8 +616,13 @@
 
 .shippingPrice {
   font-weight: var(--font-bold, 700);
-  color: #3f7ef3;
+  color: var(--color-accent-secondary, #8b7355);
   font-size: var(--text-base, 1rem);
+}
+
+/* Mode clair : bleu cyan pour le prix de livraison */
+html[data-theme='light'] .shippingPrice {
+  color: #3f7ef3;
 }
 
 .shippingDescription {
@@ -675,11 +681,10 @@
 
 .totalValue {
   font-family: var(--font-body, 'Inter', sans-serif);
-  font-size: var(--text-2xl, 1.5rem);
-  font-weight: var(--font-bold, 700);
-  color: #3f7ef3;
-  letter-spacing: var(--tracking-normal, 0);
-  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f5f5f3);
+  line-height: 1.2;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -797,7 +802,7 @@
 
 .applyPromoButton {
   padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
-  background: #3f7ef3;
+  background: var(--color-accent-primary);
   color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-lg, 8px);
@@ -805,19 +810,23 @@
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all var(--duration-base, 250ms) var(--ease-out);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(63, 126, 243, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .applyPromoButton:hover {
-  background: #2d5fd8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(63, 126, 243, 0.4);
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .applyPromoButton:active {
   transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .promoApplied {
@@ -880,7 +889,7 @@
   justify-content: center;
   gap: var(--space-2, 0.5rem);
   padding: var(--space-4, 1rem) var(--space-8, 2rem);
-  background: #3f7ef3;
+  background: var(--color-accent-primary);
   color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-lg, 8px);
@@ -888,9 +897,12 @@
   font-size: var(--text-base, 1rem);
   font-weight: var(--font-semibold, 600);
   cursor: pointer;
-  transition: all var(--duration-base, 250ms) var(--ease-out);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
   margin-bottom: var(--space-4, 1rem);
-  box-shadow: 0 4px 12px rgba(63, 126, 243, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
 }
@@ -911,13 +923,14 @@
 }
 
 .checkoutButton:hover:not(:disabled) {
-  background: #2d5fd8;
+  background: var(--color-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(63, 126, 243, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .checkoutButton:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .checkoutButton:disabled {
@@ -1078,7 +1091,7 @@
   }
 
   .itemPrice {
-    font-size: var(--text-xl, 1.25rem);
+    font-size: 20px;
   }
 
   .stockRow {
@@ -1142,7 +1155,7 @@
   }
 
   .totalValue {
-    font-size: var(--text-xl, 1.25rem);
+    font-size: 20px;
   }
 
   /* Email Section */
