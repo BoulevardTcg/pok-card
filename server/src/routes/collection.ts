@@ -50,8 +50,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
         uniqueCards: stats._count.id || 0,
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la collection:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -138,8 +137,7 @@ router.post(
         message: 'Carte ajoutée à la collection',
         item: collectionItem,
       });
-    } catch (error) {
-      console.error("Erreur lors de l'ajout à la collection:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -211,8 +209,7 @@ router.put(
         message: 'Carte mise à jour',
         item: updated,
       });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la collection:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -252,8 +249,7 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
     res.json({
       message: 'Carte supprimée de la collection',
     });
-  } catch (error) {
-    console.error('Erreur lors de la suppression de la collection:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

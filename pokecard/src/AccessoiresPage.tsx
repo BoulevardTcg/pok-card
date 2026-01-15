@@ -201,8 +201,8 @@ export function AccessoiresPage() {
           limit: 200,
         })) as { products: ProductType[] };
         setApiProducts(response.products);
-      } catch (error) {
-        console.error('Erreur lors du chargement des produits API:', error);
+      } catch {
+        // Ignorer les erreurs
       } finally {
         setLoading(false);
       }

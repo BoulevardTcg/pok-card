@@ -35,7 +35,6 @@ export function CheckoutButton({
   // Charger Stripe avec la clé publique
   useEffect(() => {
     if (!STRIPE_PUBLISHABLE_KEY) {
-      console.error("⚠️ VITE_STRIPE_PUBLISHABLE_KEY n'est pas définie");
       setError("Stripe n'est pas configuré");
       return;
     }
@@ -48,8 +47,7 @@ export function CheckoutButton({
           setError('Impossible de charger Stripe');
         }
       })
-      .catch((err) => {
-        console.error('Erreur lors du chargement de Stripe:', err);
+      .catch(() => {
         setError('Erreur lors du chargement de Stripe');
       });
   }, []);
@@ -95,7 +93,6 @@ export function CheckoutButton({
         throw new Error(result.error.message);
       }
     } catch (err: Error) {
-      console.error('Erreur lors du checkout:', err);
       setError(err.message || 'Une erreur est survenue lors du paiement');
     } finally {
       setLoading(false);

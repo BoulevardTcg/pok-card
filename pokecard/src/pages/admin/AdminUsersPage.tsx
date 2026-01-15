@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { API_BASE } from '../../api';
@@ -59,16 +59,7 @@ export function AdminUsersPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user?.isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadUsers();
-  }, [user, authLoading]);
-
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -80,12 +71,22 @@ export function AdminUsersPage() {
       if (!response.ok) throw new Error('Erreur lors du chargement');
       const data = await response.json();
       setUsers(data.users || []);
-    } catch (err: Error) {
-      console.error('Erreur:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user?.isAdmin) {
+      navigate('/');
+      return;
+    }
+    loadUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, loadUsers]);
 
   const filteredUsers = users.filter(
     (u) =>

@@ -23,16 +23,14 @@ const LoginPage: React.FC = () => {
   // Fonction utilitaire pour obtenir la route de redirection après connexion
   const getRedirectPath = (): string => {
     const returnTo = searchParams.get('returnTo');
-    const checkoutIntent = sessionStorage.getItem('checkoutIntent');
 
-    // Si on vient du panier avec intention de checkout, retourner au panier
-    if (checkoutIntent === 'true' || returnTo === '/panier') {
-      sessionStorage.removeItem('checkoutIntent');
-      return '/panier';
+    // Si returnTo contient déjà des query params, les préserver
+    if (returnTo) {
+      return returnTo;
     }
 
-    // Sinon, utiliser returnTo ou fallback vers la page d'accueil
-    return returnTo || '/';
+    // Sinon, fallback vers la page d'accueil
+    return '/';
   };
 
   // Récupérer le panier invité depuis sessionStorage (stocké avant la redirection)
@@ -42,8 +40,8 @@ const LoginPage: React.FC = () => {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch (e) {
-      console.error('Erreur lors de la récupération du panier invité:', e);
+    } catch {
+      // Ignorer les erreurs
     }
     return [];
   };
@@ -76,21 +74,20 @@ const LoginPage: React.FC = () => {
         // Récupérer le panier invité stocké avant la redirection
         const guestCart = getGuestCart();
 
-        // Ne fusionner que si :
-        // 1. Il y a un panier invité stocké
-        // 2. Le panier invité est différent du panier actuel (pour éviter de fusionner avec lui-même)
-        // 3. Le panier actuel n'est pas vide (pour éviter de fusionner un panier vide)
-        if (guestCart.length > 0 && cart.length > 0 && !areCartsEqual(guestCart, cart)) {
-          // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
-          // ou qui ont des quantités différentes
-          mergeCart(guestCart);
-        } else if (guestCart.length > 0 && cart.length === 0) {
-          // Si le panier actuel est vide, on peut simplement ajouter le panier invité
-          mergeCart(guestCart);
+        // Fusionner le panier invité si présent
+        if (guestCart.length > 0) {
+          if (cart.length > 0 && !areCartsEqual(guestCart, cart)) {
+            // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
+            mergeCart(guestCart);
+          } else if (cart.length === 0) {
+            // Si le panier actuel est vide, on peut simplement ajouter le panier invité
+            mergeCart(guestCart);
+          }
         }
 
-        // Nettoyer sessionStorage après traitement
+        // Nettoyer sessionStorage après traitement (mais garder checkoutDraft pour /panier)
         sessionStorage.removeItem('guestCart');
+        sessionStorage.removeItem('checkoutIntent');
 
         // Rediriger vers la route de retour ou le panier
         const redirectPath = getRedirectPath();
@@ -122,21 +119,20 @@ const LoginPage: React.FC = () => {
         // Récupérer le panier invité stocké avant la redirection
         const guestCart = getGuestCart();
 
-        // Ne fusionner que si :
-        // 1. Il y a un panier invité stocké
-        // 2. Le panier invité est différent du panier actuel (pour éviter de fusionner avec lui-même)
-        // 3. Le panier actuel n'est pas vide (pour éviter de fusionner un panier vide)
-        if (guestCart.length > 0 && cart.length > 0 && !areCartsEqual(guestCart, cart)) {
-          // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
-          // ou qui ont des quantités différentes
-          mergeCart(guestCart);
-        } else if (guestCart.length > 0 && cart.length === 0) {
-          // Si le panier actuel est vide, on peut simplement ajouter le panier invité
-          mergeCart(guestCart);
+        // Fusionner le panier invité si présent
+        if (guestCart.length > 0) {
+          if (cart.length > 0 && !areCartsEqual(guestCart, cart)) {
+            // Fusionner uniquement les items qui ne sont pas déjà dans le panier actuel
+            mergeCart(guestCart);
+          } else if (cart.length === 0) {
+            // Si le panier actuel est vide, on peut simplement ajouter le panier invité
+            mergeCart(guestCart);
+          }
         }
 
-        // Nettoyer sessionStorage après traitement
+        // Nettoyer sessionStorage après traitement (mais garder checkoutDraft pour /panier)
         sessionStorage.removeItem('guestCart');
+        sessionStorage.removeItem('checkoutIntent');
 
         // Rediriger vers la route de retour ou le panier
         const redirectPath = getRedirectPath();
@@ -147,8 +143,7 @@ const LoginPage: React.FC = () => {
       } else {
         setError(result.error || 'Erreur de connexion');
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch {
       setError('Erreur inattendue');
     } finally {
       setIsLoading(false);

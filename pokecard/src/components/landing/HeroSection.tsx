@@ -186,13 +186,16 @@ export default function HeroSection() {
 
     rafId = requestAnimationFrame(animate);
 
+    // Capture the ref value for cleanup
+    const productElement = productRef.current;
+
     return () => {
       isActive = false;
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
-      if (productRef.current) {
-        productRef.current.style.willChange = 'auto';
+      if (productElement) {
+        productElement.style.willChange = 'auto';
       }
     };
   }, []);

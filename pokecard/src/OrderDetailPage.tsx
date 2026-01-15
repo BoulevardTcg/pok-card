@@ -141,7 +141,6 @@ export function OrderDetailPage() {
       const data = await response.json();
       setOrder(data.order);
     } catch (err: Error) {
-      console.error('Erreur:', err);
       setError(err.message || 'Erreur lors du chargement de la commande');
     } finally {
       setLoading(false);

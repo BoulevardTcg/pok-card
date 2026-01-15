@@ -1,11 +1,9 @@
 import { Router, type Request, type Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient, OrderStatus } from '@prisma/client';
 import { ensureStripeConfigured } from '../config/stripe.js';
 import { optionalAuth } from '../middleware/auth.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Route simplifiée pour créer une session Checkout Stripe
@@ -92,8 +90,6 @@ router.post(
         url: session.url,
       });
     } catch (error: any) {
-      console.error('Erreur lors de la création de la session Stripe:', error);
-
       // Gérer les erreurs spécifiques
       if (error.code === 'STRIPE_NOT_CONFIGURED') {
         return res.status(500).json({

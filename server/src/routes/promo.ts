@@ -82,8 +82,7 @@ router.post(
         discountCents,
         finalAmountCents: totalCents - discountCents,
       });
-    } catch (error) {
-      console.error('Erreur lors de la validation du code promo:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -132,8 +131,7 @@ router.post(
       res.json({
         message: 'Code promo appliqué avec succès',
       });
-    } catch (error) {
-      console.error("Erreur lors de l'application du code promo:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',

@@ -152,7 +152,6 @@ export function OrderTrackingPage() {
       const data = await response.json();
       setOrder(data.order);
     } catch (err: Error) {
-      console.error(err);
       setError(err.message || 'Erreur lors du chargement de la commande');
     } finally {
       setLoading(false);

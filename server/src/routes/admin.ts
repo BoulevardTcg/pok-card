@@ -21,20 +21,17 @@ const router = Router();
 // RATE LIMITING POUR ROUTES ADMIN SENSIBLES
 // ============================================================================
 
-/**
- * Rate limiter standard pour les routes admin (lecture)
- * 100 requêtes par minute
- */
-const adminReadLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 100,
-  message: {
-    error: 'Trop de requêtes, veuillez réessayer plus tard',
-    code: 'RATE_LIMIT_EXCEEDED',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Note: adminReadLimiter défini mais non utilisé actuellement
+// const adminReadLimiter = rateLimit({
+//   windowMs: 60 * 1000, // 1 minute
+//   max: 100,
+//   message: {
+//     error: 'Trop de requêtes, veuillez réessayer plus tard',
+//     code: 'RATE_LIMIT_EXCEEDED',
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
 /**
  * Rate limiter strict pour les routes admin d'écriture
@@ -165,7 +162,6 @@ router.post('/upload', upload.array('images', 10), async (req: Request, res: Res
 
     res.json({ images: uploadedImages });
   } catch (error: any) {
-    console.error("Erreur lors de l'upload:", error);
     res.status(500).json({
       error: error.message || "Erreur lors de l'upload",
       code: 'UPLOAD_ERROR',
@@ -187,8 +183,7 @@ router.delete('/upload/:filename', async (req: Request, res: Response) => {
         code: 'FILE_NOT_FOUND',
       });
     }
-  } catch (error) {
-    console.error('Erreur lors de la suppression:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur lors de la suppression',
       code: 'DELETE_ERROR',
@@ -246,8 +241,7 @@ router.get('/orders', async (req: Request, res: Response) => {
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des commandes (admin):', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -286,8 +280,7 @@ router.get('/orders/:orderId', async (req: Request, res: Response) => {
     }
 
     res.json({ order });
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la commande (admin):', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -401,17 +394,14 @@ router.post(
           carrier: updatedOrder.carrier ?? undefined,
         };
 
-        sendShippingNotificationEmail(orderDataForEmail, customerEmail).catch((err) =>
-          console.error('Erreur email expedition:', err)
-        );
+        sendShippingNotificationEmail(orderDataForEmail, customerEmail).catch(() => {});
       }
 
       res.json({
         message: 'Commande marquée comme expédiée',
         order: updatedOrder,
       });
-    } catch (error) {
-      console.error('Erreur lors du marquage expédié:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -502,17 +492,14 @@ router.post(
           carrier: updatedOrder.carrier ?? undefined,
         };
 
-        sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail).catch((err) =>
-          console.error('Erreur email livraison:', err)
-        );
+        sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail).catch(() => {});
       }
 
       res.json({
         message: 'Commande marquée comme livrée',
         order: updatedOrder,
       });
-    } catch (error) {
-      console.error('Erreur lors du marquage livré:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -651,17 +638,11 @@ router.patch(
         };
 
         if (status === 'CONFIRMED' && existingOrder.status !== 'CONFIRMED') {
-          sendOrderConfirmationEmail(orderDataForEmail, customerEmail).catch((err) =>
-            console.error('Erreur email confirmation:', err)
-          );
+          sendOrderConfirmationEmail(orderDataForEmail, customerEmail).catch(() => {});
         } else if (status === 'SHIPPED' && existingOrder.status !== 'SHIPPED') {
-          sendShippingNotificationEmail(orderDataForEmail, customerEmail).catch((err) =>
-            console.error('Erreur email expedition:', err)
-          );
+          sendShippingNotificationEmail(orderDataForEmail, customerEmail).catch(() => {});
         } else if (status === 'DELIVERED' && existingOrder.status !== 'DELIVERED') {
-          sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail).catch((err) =>
-            console.error('Erreur email livraison:', err)
-          );
+          sendDeliveryConfirmationEmail(orderDataForEmail, customerEmail).catch(() => {});
         }
       }
 
@@ -669,8 +650,7 @@ router.patch(
         message: 'Statut de la commande mis à jour',
         order: updatedOrder,
       });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du statut:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -724,8 +704,7 @@ router.get('/stats/orders', async (_req: Request, res: Response) => {
         totalRevenue: totalRevenue._sum.totalCents || 0,
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des statistiques:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -810,8 +789,7 @@ router.get('/dashboard', async (_req: Request, res: Response) => {
       recentOrders,
       topProducts: topProductsDetails,
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du dashboard:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -868,8 +846,7 @@ router.get('/products', async (req: Request, res: Response) => {
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des produits:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -949,7 +926,6 @@ router.post(
 
       res.status(201).json({ product });
     } catch (error: any) {
-      console.error('Erreur lors de la création du produit:', error);
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1079,8 +1055,7 @@ router.put(
       });
 
       res.json({ product });
-    } catch (error) {
-      console.error('Erreur lors de la modification du produit:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1133,8 +1108,7 @@ router.delete('/products/:productId', adminDeleteLimiter, async (req: Request, r
     audit.productDeleted(req, productId, productName);
 
     res.json({ message: 'Produit supprimé avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la suppression du produit:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1198,8 +1172,7 @@ router.get('/users', async (req: Request, res: Response) => {
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des utilisateurs:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1241,8 +1214,7 @@ router.get('/users/:userId', async (req: Request, res: Response) => {
     }
 
     res.json({ user });
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1283,8 +1255,7 @@ router.patch(
       });
 
       res.json({ user });
-    } catch (error) {
-      console.error("Erreur lors de la modification de l'utilisateur:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1341,8 +1312,7 @@ router.get('/inventory', async (req: Request, res: Response) => {
         outOfStock: allVariants.filter((v) => v.stock === 0).length,
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du stock:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1368,7 +1338,7 @@ router.patch(
       }
 
       const { variantId } = req.params;
-      const { stock, reason } = req.body;
+      const { stock } = req.body;
 
       const variant = await prisma.productVariant.update({
         where: { id: variantId },
@@ -1384,8 +1354,7 @@ router.patch(
       });
 
       res.json({ variant });
-    } catch (error) {
-      console.error("Erreur lors de l'ajustement du stock:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1425,8 +1394,7 @@ router.get('/promos', async (req: Request, res: Response) => {
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des codes promo:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1493,8 +1461,7 @@ router.post(
       });
 
       res.status(201).json({ promo });
-    } catch (error) {
-      console.error('Erreur lors de la création du code promo:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1538,8 +1505,7 @@ router.put(
       });
 
       res.json({ promo });
-    } catch (error) {
-      console.error('Erreur lors de la modification du code promo:', error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1558,8 +1524,7 @@ router.delete('/promos/:promoId', async (req: Request, res: Response) => {
     });
 
     res.json({ message: 'Code promo supprimé avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la suppression du code promo:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1616,8 +1581,7 @@ router.get('/reviews', async (req: Request, res: Response) => {
         pages: Math.ceil(total / Number(limit)),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des avis:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1663,8 +1627,7 @@ router.patch(
       });
 
       res.json({ review });
-    } catch (error) {
-      console.error("Erreur lors de la modération de l'avis:", error);
+    } catch {
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -1683,8 +1646,7 @@ router.delete('/reviews/:reviewId', async (req: Request, res: Response) => {
     });
 
     res.json({ message: 'Avis supprimé avec succès' });
-  } catch (error) {
-    console.error("Erreur lors de la suppression de l'avis:", error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -1756,8 +1718,7 @@ router.get('/reports/sales', async (req: Request, res: Response) => {
         items: orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0), 0),
       },
     });
-  } catch (error) {
-    console.error('Erreur lors de la génération du rapport:', error);
+  } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

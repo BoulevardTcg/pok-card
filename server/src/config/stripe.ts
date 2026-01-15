@@ -12,12 +12,6 @@ import Stripe from 'stripe';
  */
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
-if (!stripeSecretKey) {
-  console.warn(
-    "⚠️ STRIPE_SECRET_KEY n'est pas définie. Les fonctionnalités Stripe ne fonctionneront pas."
-  );
-}
-
 // Créer l'instance Stripe avec la version d'API spécifiée ou une version récente par défaut
 export const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {

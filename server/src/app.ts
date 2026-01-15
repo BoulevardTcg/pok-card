@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import fetch from 'node-fetch';
 import cors from 'cors';
 
 // Import des routes
@@ -20,7 +19,6 @@ import gdprRoutes from './routes/gdpr.js';
 // Import des middlewares de sécurité
 import {
   helmetConfig,
-  corsOptions,
   apiLimiter,
   validateInput,
   sanitizeInput,
@@ -51,24 +49,15 @@ export const createApp = () => {
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          console.warn(`🚫 CORS bloqué pour l'origine: ${origin}`);
           callback(new Error('Not allowed by CORS'));
         }
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'idempotency-key'],
       optionsSuccessStatus: 200,
     })
   );
-
-  // Middleware de debug CORS (uniquement en développement)
-  if (isDevelopment) {
-    app.use((req, res, next) => {
-      console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
-      next();
-    });
-  }
 
   // Middlewares de sécurité
   app.use(helmetConfig);
@@ -124,13 +113,14 @@ export const createApp = () => {
   app.use('/api/gdpr', gdprRoutes);
 
   // Gestion des erreurs globales
-  app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Erreur globale:', err);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_SERVER_ERROR',
-    });
-  });
+  app.use(
+    (err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  );
 
   // Gestion des routes non trouvées
   app.use('*', (req, res) => {

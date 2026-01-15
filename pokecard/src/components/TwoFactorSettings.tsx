@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Shield,
   ShieldCheck,
@@ -30,11 +30,7 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
   const [success, setSuccess] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    checkStatus();
-  }, [token]);
-
-  async function checkStatus() {
+  const checkStatus = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/2fa/status`, {
@@ -47,12 +43,16 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
         const data = await response.json();
         setIsEnabled(data.twoFactorEnabled);
       }
-    } catch (err) {
-      console.error('Erreur lors de la vérification 2FA:', err);
+    } catch {
+      // Ignorer les erreurs
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    checkStatus();
+  }, [token, checkStatus]);
 
   async function startSetup() {
     try {
