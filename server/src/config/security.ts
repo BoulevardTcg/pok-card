@@ -24,7 +24,10 @@ export const SECURITY_CONFIG = {
   VALIDATION: {
     MAX_PAYLOAD_SIZE: '1mb',
     MAX_STRING_LENGTH: 1000,
-    ALLOWED_ORIGINS: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
+    ALLOWED_ORIGINS: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:5173',
+      'http://localhost:5174',
+    ],
   },
 
   // Logging
@@ -54,12 +57,15 @@ export const SECURITY_CONFIG = {
 export const validateSecurityConfig = () => {
   const errors: string[] = [];
 
+  // RS256 : JWT_PRIVATE_KEY remplace JWT_SECRET pour la signature
+  const hasRs256 = !!process.env.JWT_PRIVATE_KEY;
   if (
-    !process.env.JWT_SECRET ||
-    process.env.JWT_SECRET.length < SECURITY_CONFIG.JWT.SECRET_MIN_LENGTH
+    !hasRs256 &&
+    (!process.env.JWT_SECRET ||
+      process.env.JWT_SECRET.length < SECURITY_CONFIG.JWT.SECRET_MIN_LENGTH)
   ) {
     errors.push(
-      `JWT_SECRET doit faire au moins ${SECURITY_CONFIG.JWT.SECRET_MIN_LENGTH} caractères`
+      `JWT_SECRET (ou JWT_PRIVATE_KEY pour RS256) doit être défini (min ${SECURITY_CONFIG.JWT.SECRET_MIN_LENGTH} caractères pour HS256)`
     );
   }
 

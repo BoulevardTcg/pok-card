@@ -24,8 +24,12 @@ const requireEnv = (checks: EnvCheck[]) => {
 };
 
 export function validateEnvOrThrow() {
+  // RS256 : JWT_PRIVATE_KEY remplace JWT_SECRET pour la signature
+  const hasRs256 = !!process.env.JWT_PRIVATE_KEY;
+
   const checks: EnvCheck[] = [
-    { key: 'JWT_SECRET', requiredInProd: true, minLength: 64 },
+    // JWT_SECRET n'est requis que si JWT_PRIVATE_KEY n'est pas défini (fallback HS256)
+    ...(hasRs256 ? [] : [{ key: 'JWT_SECRET', requiredInProd: true, minLength: 64 } as EnvCheck]),
     { key: 'JWT_REFRESH_SECRET', requiredInProd: true, minLength: 64 },
 
     { key: 'STRIPE_SECRET_KEY', requiredInProd: true, pattern: /^sk_(test|live)_/ },

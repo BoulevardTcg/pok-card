@@ -1,0 +1,26 @@
+# Reverse proxy — une seule origine pour Boutique + Marketplace + front
+# Dev : http://localhost:3000
+# Prod : remplacer :3000 par le domaine (ex. app.boulevardtcg.com)
+#
+# Notes:
+# - Dans un container, "localhost" = le container. On utilise donc host.docker.internal
+#   pour atteindre les services qui tournent sur l'hôte.
+# - Sur Linux, host.docker.internal nécessite l'entrée extra_hosts: host-gateway (voir compose).
+#
+:3000 {
+    # Boutique API — garde le préfixe /api (la Boutique attend /api/...)
+    handle /api/* {
+        reverse_proxy host.docker.internal:8080
+    }
+
+    # Marketplace API — strip /market, le backend attend /me, /trade/..., pas /market/me
+    handle_path /market/* {
+        reverse_proxy host.docker.internal:8081
+    }
+
+    # Front Marketplace (Vite dev server)
+    # Important: ce bloc doit rester en dernier, sinon il capture /api et /market
+    handle {
+        reverse_proxy host.docker.internal:5174
+    }
+}

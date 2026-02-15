@@ -85,6 +85,10 @@ coverage/
 *.lcov
 .nyc_output
 
+# ==== CLÉS JWT (RS256) ====
+server/keys/
+*.pem
+
 # ==== AUTRES ====
 *.tgz
 *.tar.gz

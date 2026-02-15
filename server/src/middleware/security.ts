@@ -122,6 +122,20 @@ export const checkoutLimiter = rateLimit({
   keyGenerator,
 });
 
+/** 60 req/min par IP pour la recherche de cartes (TCGdex) */
+export const cardSearchLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: process.env.NODE_ENV === 'development' ? 120 : 60,
+  message: {
+    error: 'Trop de recherches. Réessayez dans 1 minute.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => req.ip || req.socket.remoteAddress || 'unknown',
+});
+
 export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const key = keyGenerator(req);
@@ -251,7 +265,7 @@ export const injectionProtection = (req: Request, res: Response, next: NextFunct
 };
 
 export const corsOptions = {
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'idempotency-key'],

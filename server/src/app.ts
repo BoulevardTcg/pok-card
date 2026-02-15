@@ -29,10 +29,13 @@ import {
 export const createApp = () => {
   const app = express();
 
-  // Configuration CORS sécurisée
-  const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()) || [
-    'http://localhost:5173',
-  ];
+  // Configuration CORS (Boutique 5173 + Marketplace 5174 toujours inclus)
+  const fromEnv =
+    process.env.CORS_ORIGIN?.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean) ?? [];
+  const defaultLocal = ['http://localhost:5173', 'http://localhost:5174'];
+  const allowedOrigins = [...new Set([...defaultLocal, ...fromEnv])];
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   app.use(

@@ -20,7 +20,7 @@ function createUrlValidator(allowedOrigins: string[]) {
     }
 
     if (
-      process.env.NODE_ENV === 'development' &&
+      (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') &&
       (url.includes('localhost') || url.includes('127.0.0.1'))
     ) {
       return url;

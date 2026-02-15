@@ -16,6 +16,7 @@ export async function cleanupDatabase() {
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.refreshToken.deleteMany();
+  await prisma.userCollection.deleteMany();
   await prisma.userProfile.deleteMany();
   await prisma.user.deleteMany();
   await prisma.productReview.deleteMany();

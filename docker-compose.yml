@@ -27,8 +27,10 @@ services:
     env_file:
       - ./server/.env
     environment:
-      - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
-      - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+      # RS256 : JWT_PRIVATE_KEY et JWT_PUBLIC_KEY sont lus depuis server/.env via env_file ci‑dessus.
+      # Si vous repassez en HS256, décommentez les lignes suivantes :
+      # - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+      # - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
       - ORDER_TRACKING_SECRET=test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
       - STRIPE_SECRET_KEY=sk_test_mock_key
       # URL publique du frontend (emails, redirects, liens utilisateurs)
@@ -66,6 +68,6 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data

@@ -90,7 +90,7 @@ describe('Auth Routes', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('accessToken');
-      expect(response.body).toHaveProperty('refreshToken');
+      // refreshToken est envoyé en cookie httpOnly uniquement (plus dans le body)
       expect(response.body).toHaveProperty('user');
       expect(response.body.user.id).toBe(user.id);
       expect(response.body.user.email).toBe('login@example.com');
@@ -160,7 +160,8 @@ describe('Auth Routes', () => {
       const response = await request(app).post('/api/auth/logout').send({ refreshToken });
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message');
+      expect(response.body).toHaveProperty('ok');
+      expect(response.body.ok).toBe(true);
     });
   });
 });

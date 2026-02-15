@@ -16,6 +16,22 @@ import { sendPasswordResetEmail } from '../services/email.js';
 const router = Router();
 const prisma = new PrismaClient();
 
+// Cookie refresh token — httpOnly, pas accessible au JS (anti-XSS)
+const REFRESH_COOKIE_NAME = 'refreshToken';
+function refreshCookieOptions(req: Request, maxAgeMs: number) {
+  const hostname = (req.hostname || req.headers.host || '').split(':')[0];
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/api/auth',
+    maxAge: maxAgeMs,
+    // Quand on est appelé via localhost (Boutique 5173, Marketplace 5174, proxy 3000), partager le cookie
+    ...(isLocalhost && { domain: 'localhost' }),
+  };
+}
+
 // Configuration du reset de mot de passe
 const PASSWORD_RESET_EXPIRY_HOURS = 1; // Token valide 1 heure
 
@@ -199,12 +215,14 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       }
     }
 
-    // Générer les tokens
+    // Générer les tokens (roles + firstName pour Marketplace /me)
     const accessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
       username: user.username,
       isAdmin: user.isAdmin,
+      firstName: user.firstName ?? undefined,
+      roles: user.isAdmin ? ['ADMIN'] : [],
     });
 
     const refreshToken = await generateRefreshToken(user.id);
@@ -214,10 +232,14 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       where: { userId: user.id },
     });
 
+    // Refresh token en cookie httpOnly (Phase 3 — jamais exposé au JS)
+    const refreshMaxAge = 1000 * 60 * 60 * 24 * 7; // 7 jours
+    res.cookie(REFRESH_COOKIE_NAME, refreshToken, refreshCookieOptions(req, refreshMaxAge));
+
     res.json({
       message: 'Connexion réussie',
       accessToken,
-      refreshToken,
+      // refreshToken n'est plus renvoyé dans le JSON (cookie httpOnly uniquement)
       user: {
         id: user.id,
         email: user.email,
@@ -238,10 +260,10 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
   }
 });
 
-// Rafraîchir le token d'accès
+// Rafraîchir le token d'accès (Phase 3 : lit le cookie httpOnly, fallback body pour rétrocompat)
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
 
     if (!refreshToken) {
       return res.status(400).json({
@@ -266,12 +288,14 @@ router.post('/refresh', async (req: Request, res: Response) => {
       });
     }
 
-    // Générer un nouveau token d'accès
+    // Générer un nouveau token d'accès (roles + firstName pour Marketplace)
     const newAccessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
       username: user.username,
       isAdmin: user.isAdmin,
+      firstName: user.firstName ?? undefined,
+      roles: user.isAdmin ? ['ADMIN'] : [],
     });
 
     res.json({
@@ -285,18 +309,27 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 });
 
-// Déconnexion
+// Déconnexion (Phase 3 : révoque le refresh + clear cookie)
 router.post('/logout', async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
 
     if (refreshToken) {
       await revokeRefreshToken(refreshToken);
     }
 
-    res.json({
-      message: 'Déconnexion réussie',
+    // Clear du cookie refresh (même options que à la pose pour bien cibler le cookie)
+    const hostname = (req.hostname || req.headers.host || '').split(':')[0];
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    res.clearCookie(REFRESH_COOKIE_NAME, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/api/auth',
+      ...(isLocalhost && { domain: 'localhost' }),
     });
+
+    return res.status(200).json({ ok: true });
   } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',
