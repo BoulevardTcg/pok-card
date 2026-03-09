@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import {
   hashPassword,
@@ -12,9 +11,10 @@ import {
 } from '../utils/auth.js';
 import { authLimiter, strictAuthLimiter } from '../middleware/security.js';
 import { sendPasswordResetEmail } from '../services/email.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Cookie refresh token — httpOnly, pas accessible au JS (anti-XSS)
 const REFRESH_COOKIE_NAME = 'refreshToken';
@@ -263,7 +263,15 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
 // Rafraîchir le token d'accès (Phase 3 : lit le cookie httpOnly, fallback body pour rétrocompat)
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    const tokenFromCookie = req.cookies?.[REFRESH_COOKIE_NAME];
+    const tokenFromBody = req.body?.refreshToken;
+    if (!tokenFromCookie && tokenFromBody) {
+      logger.warn('Refresh token reçu via body (fallback marketplace)', {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
+    const refreshToken = tokenFromCookie || tokenFromBody;
 
     if (!refreshToken) {
       return res.status(400).json({
@@ -312,7 +320,15 @@ router.post('/refresh', async (req: Request, res: Response) => {
 // Déconnexion (Phase 3 : révoque le refresh + clear cookie)
 router.post('/logout', async (req: Request, res: Response) => {
   try {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    const tokenFromCookie = req.cookies?.[REFRESH_COOKIE_NAME];
+    const tokenFromBody = req.body?.refreshToken;
+    if (!tokenFromCookie && tokenFromBody) {
+      logger.warn('Logout avec refresh token via body (fallback marketplace)', {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
+    const refreshToken = tokenFromCookie || tokenFromBody;
 
     if (refreshToken) {
       await revokeRefreshToken(refreshToken);

@@ -53,6 +53,19 @@ services:
       postgres:
         condition: service_healthy
 
+  # Stripe CLI — forward webhooks vers le backend (dev uniquement)
+  # Usage : docker compose --profile stripe up
+  # Copier le "webhook signing secret" affiché au démarrage dans server/.env -> STRIPE_WEBHOOK_SECRET
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    entrypoint: sh -c 'STRIPE_API_KEY=$$STRIPE_SECRET_KEY stripe listen --forward-to http://pokecard-backend:8080/api/checkout/webhook'
+    env_file:
+      - ./server/.env
+    depends_on:
+      - pokecard-backend
+    profiles:
+      - stripe
+
   postgres:
     image: postgres:17-alpine
     container_name: pokecard-postgres

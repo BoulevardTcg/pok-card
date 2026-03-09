@@ -169,6 +169,15 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
     return;
   }
 
+  // Idempotence : si Stripe rejoue le webhook, ne pas créer une 2ème commande
+  const existingOrder = await prisma.order.findFirst({
+    where: { paymentMethod: session.id },
+    select: { id: true },
+  });
+  if (existingOrder) {
+    return;
+  }
+
   const variantIds = items.map((item) => item.variantId);
   const userId =
     session.metadata?.userId && session.metadata.userId.trim() !== ''
