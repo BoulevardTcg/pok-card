@@ -202,11 +202,7 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
 
     const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (key === 'description' || key === 'imageUrl' || key === 'url' || key === 'images') {
-        sanitized[key] = value;
-      } else {
-        sanitized[key] = sanitize(value);
-      }
+      sanitized[key] = sanitize(value);
     }
     return sanitized;
   };

@@ -903,11 +903,7 @@ router.post(
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
-        ...(isDevelopment && {
-          details: error.message,
-          stack: error.stack,
-          code: error.code,
-        }),
+        ...(isDevelopment && { details: error.message }),
       });
     }
   }
