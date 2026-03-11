@@ -2,7 +2,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { createApp } from '../app.js';
 import { cleanupDatabase, createTestUser, prisma } from './setup.js';
-import { generateRefreshToken } from '../utils/auth.js';
+import { generateRefreshToken, hashPassword } from '../utils/auth.js';
 
 const app = createApp();
 
@@ -162,6 +162,66 @@ describe('Auth Routes', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('ok');
       expect(response.body.ok).toBe(true);
+    });
+  });
+
+  describe('POST /api/auth/login - 2FA', () => {
+    // Note: des tests plus détaillés sur le rate limiting 2FA sont dans security.test.ts.
+    // Ce describe couvre le comportement nominal de l'étape 2FA.
+
+    it('devrait retourner requiresTwoFactor si 2FA activé sans code fourni', async () => {
+      await prisma.user.create({
+        data: {
+          email: 'twofa-auth@example.com',
+          username: 'twofaAuth',
+          password: await hashPassword('TestPassword123!'),
+          twoFactorEnabled: true,
+          twoFactorSecret: 'JBSWY3DPEHPK3PXP',
+        },
+      });
+      await prisma.userProfile.create({
+        data: {
+          userId: (await prisma.user.findUnique({ where: { email: 'twofa-auth@example.com' } }))!
+            .id,
+        },
+      });
+
+      const response = await request(app).post('/api/auth/login').send({
+        email: 'twofa-auth@example.com',
+        password: 'TestPassword123!',
+        // pas de twoFactorCode
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.requiresTwoFactor).toBe(true);
+      expect(response.body).toHaveProperty('email');
+    });
+
+    it('devrait rejeter un code 2FA invalide avec 401 INVALID_2FA_CODE', async () => {
+      await prisma.user.create({
+        data: {
+          email: 'twofa-bad@example.com',
+          username: 'twofaBad',
+          password: await hashPassword('TestPassword123!'),
+          twoFactorEnabled: true,
+          twoFactorSecret: 'JBSWY3DPEHPK3PXP',
+        },
+      });
+      await prisma.userProfile.create({
+        data: {
+          userId: (await prisma.user.findUnique({ where: { email: 'twofa-bad@example.com' } }))!.id,
+        },
+      });
+
+      const response = await request(app).post('/api/auth/login').send({
+        email: 'twofa-bad@example.com',
+        password: 'TestPassword123!',
+        twoFactorCode: '000000', // mauvais code intentionnel
+      });
+
+      expect(response.status).toBe(401);
+      expect(response.body.code).toBe('INVALID_2FA_CODE');
+      expect(response.body.requiresTwoFactor).toBe(true);
     });
   });
 });
