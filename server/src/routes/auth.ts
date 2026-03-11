@@ -16,6 +16,21 @@ import logger from '../utils/logger.js';
 
 const router = Router();
 
+// Rate limiting dédié pour les tentatives 2FA (par email)
+const twoFaAttempts = new Map<string, { count: number; resetAt: number }>();
+const TWO_FA_MAX = 5;
+const TWO_FA_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const cleanupTwoFa = setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, val] of twoFaAttempts.entries()) {
+      if (val.resetAt < now) twoFaAttempts.delete(key);
+    }
+  },
+  5 * 60 * 1000
+);
+(cleanupTwoFa as any).unref?.();
+
 // Cookie refresh token — httpOnly, pas accessible au JS (anti-XSS)
 const REFRESH_COOKIE_NAME = 'refreshToken';
 function refreshCookieOptions(req: Request, maxAgeMs: number) {
@@ -193,12 +208,23 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
         });
       }
 
+      // Rate limiting dédié 2FA : max 5 tentatives / 15 min par email
+      const twoFaKey = `2fa:${user.email}`;
+      const twoFaRecord = twoFaAttempts.get(twoFaKey);
+      if (twoFaRecord && Date.now() < twoFaRecord.resetAt && twoFaRecord.count >= TWO_FA_MAX) {
+        return res.status(429).json({
+          error: 'Trop de tentatives 2FA. Réessayez dans 15 minutes.',
+          code: 'RATE_LIMIT_EXCEEDED',
+          requiresTwoFactor: true,
+        });
+      }
+
       // Vérifier le code 2FA
       const OTPAuth = await import('otpauth');
       const totp = new OTPAuth.TOTP({
         issuer: 'BoulevardTCG',
         label: user.email,
-        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
+        algorithm: 'SHA256',
         digits: 6,
         period: 30,
         secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret),
@@ -207,12 +233,22 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       const isValid2FA = totp.validate({ token: twoFactorCode, window: 1 }) !== null;
 
       if (!isValid2FA) {
+        // Incrémenter le compteur d'échecs
+        const current = twoFaAttempts.get(twoFaKey);
+        if (current && Date.now() < current.resetAt) {
+          twoFaAttempts.set(twoFaKey, { count: current.count + 1, resetAt: current.resetAt });
+        } else {
+          twoFaAttempts.set(twoFaKey, { count: 1, resetAt: Date.now() + TWO_FA_WINDOW_MS });
+        }
         return res.status(401).json({
           error: 'Code 2FA invalide',
           code: 'INVALID_2FA_CODE',
           requiresTwoFactor: true,
         });
       }
+
+      // Succès 2FA : réinitialiser le compteur
+      twoFaAttempts.delete(twoFaKey);
     }
 
     // Générer les tokens (roles + firstName pour Marketplace /me)

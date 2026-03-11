@@ -97,6 +97,7 @@ model Order {
   id                String            @id @default(cuid())
   userId            String?
   orderNumber       String            @unique
+  stripeSessionId   String?           @unique // Identifiant de session Stripe (idempotence webhook)
   status            OrderStatus       @default(PENDING)
   fulfillmentStatus FulfillmentStatus @default(PAID)
   carrier           Carrier?
