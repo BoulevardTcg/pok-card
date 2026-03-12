@@ -42,6 +42,7 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   keyGenerator,
+  skip: () => process.env.NODE_ENV === 'test',
 });
 
 export const strictAuthLimiter = rateLimit({
