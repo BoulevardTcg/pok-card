@@ -41,6 +41,7 @@ import { AdminPromoFormPage } from './pages/admin/AdminPromoFormPage';
 import { CGVPage } from './pages/legal/CGVPage';
 import { MentionsLegalesPage } from './pages/legal/MentionsLegalesPage';
 import { ConfidentialitePage } from './pages/legal/ConfidentialitePage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Composant principal de l'application
 function AppContent() {
@@ -230,7 +231,9 @@ export default function App() {
   return (
     <DarkModeProvider>
       <AuthProvider>
-        <AppContent />
+        <ErrorBoundary>
+          <AppContent />
+        </ErrorBoundary>
       </AuthProvider>
     </DarkModeProvider>
   );

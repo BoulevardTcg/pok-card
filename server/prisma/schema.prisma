@@ -97,6 +97,7 @@ model Order {
   id                String            @id @default(cuid())
   userId            String?
   orderNumber       String            @unique
+  stripeSessionId   String?           @unique // Identifiant de session Stripe (idempotence webhook)
   status            OrderStatus       @default(PENDING)
   fulfillmentStatus FulfillmentStatus @default(PAID)
   carrier           Carrier?
@@ -400,4 +401,55 @@ enum TradeStatus {
 enum PromoType {
   PERCENTAGE
   FIXED
+}
+
+// --- TCGdex price snapshots (historique courbes) ---
+enum PriceMarket {
+  CARDMARKET
+  TCGPLAYER
+}
+
+model CardPriceSnapshot {
+  id              String      @id @default(uuid())
+  tcgdexCardId    String
+  lang            String
+  market          PriceMarket
+  variant         String      // normal | holo | reverseHolofoil | holofoil | etc.
+  currency        String
+  low             Float?
+  avg             Float?
+  trend           Float?
+  avg1            Float?
+  avg7            Float?
+  avg30           Float?
+  mid             Float?
+  high            Float?
+  marketPrice     Float?
+  directLowPrice  Float?
+  sourceUpdatedAt DateTime?
+  capturedAt      DateTime   @default(now())
+  capturedDay     String     // YYYY-MM-DD pour unique index
+
+  @@unique([tcgdexCardId, lang, market, variant, capturedDay])
+  @@index([tcgdexCardId, lang, market, capturedAt])
+  @@map("card_price_snapshots")
+}
+
+// --- Boulevard: ventes internes (courbes par langue) ---
+model SaleTransaction {
+  id           String   @id @default(uuid())
+  tcgdexCardId String
+  lang         String   // "fr" | "en" | "ja" | autres
+  condition    String?  // "NM", "EX", "GD"... (optionnel MVP)
+  finish       String?  // "normal", "holo", "reverse"... (optionnel MVP)
+  qty          Int      @default(1)
+
+  price    Float    // montant (ex: 12.50)
+  currency String   // "EUR" par défaut
+  soldAt   DateTime // date de vente réelle
+
+  createdAt DateTime @default(now())
+
+  @@index([tcgdexCardId, lang, soldAt])
+  @@map("sale_transactions")
 }

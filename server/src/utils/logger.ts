@@ -26,10 +26,54 @@ const colors = {
 
 winston.addColors(colors);
 
+// Masque les secrets sensibles dans les métadonnées de log
+const SENSITIVE_KEYS = [
+  'password',
+  'token',
+  'secret',
+  'authorization',
+  'stripe_key',
+  'sk_',
+  'whsec_',
+  'rk_',
+];
+const maskSecrets = winston.format((info) => {
+  const maskValue = (val: unknown): unknown => {
+    if (typeof val === 'string') {
+      const lc = val.toLowerCase();
+      if (
+        lc.startsWith('sk_') ||
+        lc.startsWith('rk_') ||
+        lc.startsWith('whsec_') ||
+        lc.startsWith('eyj') // JWT
+      ) {
+        return `${val.substring(0, 8)}***`;
+      }
+      return val;
+    }
+    if (val && typeof val === 'object') {
+      return Object.fromEntries(
+        Object.entries(val as Record<string, unknown>).map(([k, v]) => {
+          const kl = k.toLowerCase();
+          if (SENSITIVE_KEYS.some((s) => kl.includes(s))) {
+            return [k, typeof v === 'string' ? `${String(v).substring(0, 4)}***` : '***'];
+          }
+          return [k, maskValue(v)];
+        })
+      );
+    }
+    return val;
+  };
+
+  const masked = maskValue(Object.assign({}, info)) as Record<string, unknown>;
+  return Object.assign(info, masked);
+});
+
 // Format pour les logs
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
+  maskSecrets(),
   winston.format.json()
 );
 
