@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
+import twoFactorRoutes from './routes/twoFactor.js';
 
 // Import des middlewares de sécurité
 import {
@@ -114,6 +115,7 @@ export const createApp = () => {
 
   // Routes RGPD (protection des données)
   app.use('/api/gdpr', gdprRoutes);
+  app.use('/api/2fa', twoFactorRoutes);
 
   // Gestion des erreurs globales
   app.use(

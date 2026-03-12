@@ -10,6 +10,25 @@ const prisma = new PrismaClient();
 // Toutes les routes 2FA nécessitent une authentification
 router.use(authenticateToken);
 
+// Vérifier le statut 2FA de l'utilisateur connecté
+router.get('/status', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { twoFactorEnabled: true },
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: { code: 'USER_NOT_FOUND', message: 'Utilisateur non trouvé' } });
+    }
+    return res.json({ twoFactorEnabled: user.twoFactorEnabled });
+  } catch {
+    return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' } });
+  }
+});
+
 // Générer un secret 2FA et le QR code
 router.post('/setup', async (req: Request, res: Response) => {
   try {
