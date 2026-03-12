@@ -4,11 +4,22 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/** Normalise une clé PEM : remplace les littéraux \\n par de vrais retours à la ligne
+ *  (nécessaire quand Docker env_file ne convertit pas les \\n). */
+function normalizePem(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  return raw.includes('\\n') ? raw.replace(/\\n/g, '\n') : raw;
+}
+
 export interface JWTPayload {
   userId: string;
   email: string;
   username: string;
   isAdmin: boolean;
+  /** Pour affichage navbar (Marketplace, etc.) */
+  firstName?: string;
+  /** Pour requireRole() côté Marketplace */
+  roles?: string[];
 }
 
 export interface RefreshTokenPayload {
@@ -30,14 +41,22 @@ export const verifyPassword = async (
   return bcrypt.compare(password, hashedPassword);
 };
 
-// Génération du token JWT d'accès
+// Génération du token JWT d'accès (RS256 si JWT_PRIVATE_KEY, sinon HS256 avec JWT_SECRET)
 export const generateAccessToken = (payload: JWTPayload): string => {
+  const privateKey = normalizePem(process.env.JWT_PRIVATE_KEY);
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
-  }
+  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
 
-  return (jwt as any).sign(payload, secret, { expiresIn: process.env.JWT_EXPIRES_IN || '15m' });
+  if (privateKey) {
+    return (jwt as any).sign(payload, privateKey, {
+      algorithm: 'RS256',
+      expiresIn,
+    });
+  }
+  if (secret) {
+    return (jwt as any).sign(payload, secret, { expiresIn });
+  }
+  throw new Error('JWT_PRIVATE_KEY or JWT_SECRET is required');
 };
 
 // Génération du token JWT de rafraîchissement
@@ -71,15 +90,19 @@ export const generateRefreshToken = async (userId: string): Promise<string> => {
   return refreshToken;
 };
 
-// Vérification du token JWT d'accès
+// Vérification du token JWT d'accès. Si JWT_PUBLIC_KEY présent → UNIQUEMENT RS256 (pas de fallback HS256).
 export const verifyAccessToken = (token: string): JWTPayload => {
+  const publicKey = normalizePem(process.env.JWT_PUBLIC_KEY);
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
-  }
 
   try {
-    return jwt.verify(token, secret) as JWTPayload;
+    if (publicKey) {
+      return jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JWTPayload;
+    }
+    if (secret) {
+      return jwt.verify(token, secret, { algorithms: ['HS256'] }) as JWTPayload;
+    }
+    throw new Error('JWT_PUBLIC_KEY or JWT_SECRET is required');
   } catch {
     throw new Error('Invalid access token');
   }

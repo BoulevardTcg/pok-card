@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import {
   hashPassword,
@@ -12,9 +11,41 @@ import {
 } from '../utils/auth.js';
 import { authLimiter, strictAuthLimiter } from '../middleware/security.js';
 import { sendPasswordResetEmail } from '../services/email.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
+
+// Rate limiting dédié pour les tentatives 2FA (par email)
+const twoFaAttempts = new Map<string, { count: number; resetAt: number }>();
+const TWO_FA_MAX = 5;
+const TWO_FA_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const cleanupTwoFa = setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, val] of twoFaAttempts.entries()) {
+      if (val.resetAt < now) twoFaAttempts.delete(key);
+    }
+  },
+  5 * 60 * 1000
+);
+(cleanupTwoFa as any).unref?.();
+
+// Cookie refresh token — httpOnly, pas accessible au JS (anti-XSS)
+const REFRESH_COOKIE_NAME = 'refreshToken';
+function refreshCookieOptions(req: Request, maxAgeMs: number) {
+  const hostname = (req.hostname || req.headers.host || '').split(':')[0];
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/api/auth',
+    maxAge: maxAgeMs,
+    // Quand on est appelé via localhost (Boutique 5173, Marketplace 5174, proxy 3000), partager le cookie
+    ...(isLocalhost && { domain: 'localhost' }),
+  };
+}
 
 // Configuration du reset de mot de passe
 const PASSWORD_RESET_EXPIRY_HOURS = 1; // Token valide 1 heure
@@ -177,12 +208,23 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
         });
       }
 
+      // Rate limiting dédié 2FA : max 5 tentatives / 15 min par email
+      const twoFaKey = `2fa:${user.email}`;
+      const twoFaRecord = twoFaAttempts.get(twoFaKey);
+      if (twoFaRecord && Date.now() < twoFaRecord.resetAt && twoFaRecord.count >= TWO_FA_MAX) {
+        return res.status(429).json({
+          error: 'Trop de tentatives 2FA. Réessayez dans 15 minutes.',
+          code: 'RATE_LIMIT_EXCEEDED',
+          requiresTwoFactor: true,
+        });
+      }
+
       // Vérifier le code 2FA
       const OTPAuth = await import('otpauth');
       const totp = new OTPAuth.TOTP({
         issuer: 'BoulevardTCG',
         label: user.email,
-        algorithm: 'SHA256', // Utilisation de SHA256 au lieu de SHA1 (plus sécurisé)
+        algorithm: 'SHA256',
         digits: 6,
         period: 30,
         secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret),
@@ -191,20 +233,32 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       const isValid2FA = totp.validate({ token: twoFactorCode, window: 1 }) !== null;
 
       if (!isValid2FA) {
+        // Incrémenter le compteur d'échecs
+        const current = twoFaAttempts.get(twoFaKey);
+        if (current && Date.now() < current.resetAt) {
+          twoFaAttempts.set(twoFaKey, { count: current.count + 1, resetAt: current.resetAt });
+        } else {
+          twoFaAttempts.set(twoFaKey, { count: 1, resetAt: Date.now() + TWO_FA_WINDOW_MS });
+        }
         return res.status(401).json({
           error: 'Code 2FA invalide',
           code: 'INVALID_2FA_CODE',
           requiresTwoFactor: true,
         });
       }
+
+      // Succès 2FA : réinitialiser le compteur
+      twoFaAttempts.delete(twoFaKey);
     }
 
-    // Générer les tokens
+    // Générer les tokens (roles + firstName pour Marketplace /me)
     const accessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
       username: user.username,
       isAdmin: user.isAdmin,
+      firstName: user.firstName ?? undefined,
+      roles: user.isAdmin ? ['ADMIN'] : [],
     });
 
     const refreshToken = await generateRefreshToken(user.id);
@@ -214,10 +268,14 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
       where: { userId: user.id },
     });
 
+    // Refresh token en cookie httpOnly (Phase 3 — jamais exposé au JS)
+    const refreshMaxAge = 1000 * 60 * 60 * 24 * 7; // 7 jours
+    res.cookie(REFRESH_COOKIE_NAME, refreshToken, refreshCookieOptions(req, refreshMaxAge));
+
     res.json({
       message: 'Connexion réussie',
       accessToken,
-      refreshToken,
+      // refreshToken n'est plus renvoyé dans le JSON (cookie httpOnly uniquement)
       user: {
         id: user.id,
         email: user.email,
@@ -238,10 +296,18 @@ router.post('/login', authLimiter, loginValidation, async (req: Request, res: Re
   }
 });
 
-// Rafraîchir le token d'accès
+// Rafraîchir le token d'accès (Phase 3 : lit le cookie httpOnly, fallback body pour rétrocompat)
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
+    const tokenFromCookie = req.cookies?.[REFRESH_COOKIE_NAME];
+    const tokenFromBody = req.body?.refreshToken;
+    if (!tokenFromCookie && tokenFromBody) {
+      logger.warn('Refresh token reçu via body (fallback marketplace)', {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
+    const refreshToken = tokenFromCookie || tokenFromBody;
 
     if (!refreshToken) {
       return res.status(400).json({
@@ -266,12 +332,14 @@ router.post('/refresh', async (req: Request, res: Response) => {
       });
     }
 
-    // Générer un nouveau token d'accès
+    // Générer un nouveau token d'accès (roles + firstName pour Marketplace)
     const newAccessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
       username: user.username,
       isAdmin: user.isAdmin,
+      firstName: user.firstName ?? undefined,
+      roles: user.isAdmin ? ['ADMIN'] : [],
     });
 
     res.json({
@@ -285,18 +353,35 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 });
 
-// Déconnexion
+// Déconnexion (Phase 3 : révoque le refresh + clear cookie)
 router.post('/logout', async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
+    const tokenFromCookie = req.cookies?.[REFRESH_COOKIE_NAME];
+    const tokenFromBody = req.body?.refreshToken;
+    if (!tokenFromCookie && tokenFromBody) {
+      logger.warn('Logout avec refresh token via body (fallback marketplace)', {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+    }
+    const refreshToken = tokenFromCookie || tokenFromBody;
 
     if (refreshToken) {
       await revokeRefreshToken(refreshToken);
     }
 
-    res.json({
-      message: 'Déconnexion réussie',
+    // Clear du cookie refresh (même options que à la pose pour bien cibler le cookie)
+    const hostname = (req.hostname || req.headers.host || '').split(':')[0];
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    res.clearCookie(REFRESH_COOKIE_NAME, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/api/auth',
+      ...(isLocalhost && { domain: 'localhost' }),
     });
+
+    return res.status(200).json({ ok: true });
   } catch {
     res.status(500).json({
       error: 'Erreur interne du serveur',

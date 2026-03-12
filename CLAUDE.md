@@ -119,8 +119,11 @@ Key models: User, Order, Product, ProductVariant, TradeOffer, UserCollection, Pr
 
 ### API Response Format
 ```typescript
-// Success
+// Success (routes standard)
 { data: T, meta?: { page, total, ... } }
+
+// Exceptions : auth (accessToken, user, message) et certaines routes legacy peuvent renvoyer un corps direct.
+// Les routes GET /api/trade/cards/search et GET /api/trade/cards/:id renvoient { data: T } depuis la normalisation.
 
 // Error
 { error: { code: string, message: string, details?: any } }
@@ -147,6 +150,10 @@ Backend requires `server/.env` (see `server/env.example`). Critical variables:
 - `SMTP_*` - Email configuration
 
 Frontend uses `VITE_API_URL` for backend connection (build-time injection).
+
+### Marketplace (`marketplace/`)
+- **marketplace/server/.env** : `JWT_SECRET` doit être **identique** à `server/.env` (Boutique). Les tokens sont émis par la Boutique et vérifiés par le Marketplace → 401 si différent.
+- **marketplace/client/.env** : `VITE_API_URL` (API Marketplace), `VITE_BOUTIQUE_API_URL` (API Boutique pour login).
 
 ## URLs in Development
 

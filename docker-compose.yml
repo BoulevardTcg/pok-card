@@ -27,8 +27,10 @@ services:
     env_file:
       - ./server/.env
     environment:
-      - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
-      - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
+      # RS256 : JWT_PRIVATE_KEY et JWT_PUBLIC_KEY sont lus depuis server/.env via env_file ci‑dessus.
+      # Si vous repassez en HS256, décommentez les lignes suivantes :
+      # - JWT_SECRET=test_jwt_secret_key_at_least_64_characters_long_for_security_config_validation
+      # - JWT_REFRESH_SECRET=test_jwt_refresh_secret_key_at_least_64_characters_long_for_security_config_validation
       - ORDER_TRACKING_SECRET=test_order_tracking_secret_key_at_least_64_characters_long_for_security_config_validation
       - STRIPE_SECRET_KEY=sk_test_mock_key
       # URL publique du frontend (emails, redirects, liens utilisateurs)
@@ -51,6 +53,19 @@ services:
       postgres:
         condition: service_healthy
 
+  # Stripe CLI — forward webhooks vers le backend (dev uniquement)
+  # Usage : docker compose --profile stripe up
+  # Copier le "webhook signing secret" affiché au démarrage dans server/.env -> STRIPE_WEBHOOK_SECRET
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    entrypoint: sh -c 'STRIPE_API_KEY=$$STRIPE_SECRET_KEY stripe listen --forward-to http://pokecard-backend:8080/api/checkout/webhook'
+    env_file:
+      - ./server/.env
+    depends_on:
+      - pokecard-backend
+    profiles:
+      - stripe
+
   postgres:
     image: postgres:17-alpine
     container_name: pokecard-postgres
@@ -66,6 +81,6 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data

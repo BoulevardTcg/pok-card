@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import { sendContactEmail, sendContactAutoReply } from '../services/email.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { optionalAuth } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -61,7 +61,7 @@ const contactValidation = [
 
 router.post(
   '/',
-  authenticateToken,
+  optionalAuth,
   contactLimiter,
   contactValidation,
   async (req: Request, res: Response) => {

@@ -20,7 +20,7 @@ function createUrlValidator(allowedOrigins: string[]) {
     }
 
     if (
-      process.env.NODE_ENV === 'development' &&
+      (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') &&
       (url.includes('localhost') || url.includes('127.0.0.1'))
     ) {
       return url;
@@ -124,6 +124,7 @@ async function createOrderFromSession(
     data: {
       userId,
       orderNumber,
+      stripeSessionId: sessionId,
       status: OrderStatus.CONFIRMED,
       fulfillmentStatus: FulfillmentStatus.PAID,
       totalCents,
@@ -176,6 +177,15 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
       : null;
 
   await prisma.$transaction(async (tx) => {
+    // Idempotence à l'intérieur de la transaction (protège contre les webhooks simultanés)
+    const existingOrder = await tx.order.findFirst({
+      where: { stripeSessionId: session.id },
+      select: { id: true },
+    });
+    if (existingOrder) {
+      return;
+    }
+
     const variants = await tx.productVariant.findMany({
       where: { id: { in: variantIds } },
       include: {
@@ -195,7 +205,7 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
     const currency = (session.currency ?? 'eur').toUpperCase();
     const paymentMethod = session.payment_method_types?.[0] ?? 'card';
     const shippingPriceCents = session.metadata?.shippingPriceCents
-      ? parseInt(session.metadata.shippingPriceCents) || 0
+      ? Math.max(0, parseInt(session.metadata.shippingPriceCents) || 0)
       : 0;
     const shippingMethodCode = session.metadata?.shippingMethodCode ?? null;
     const shippingCarrier = Object.values(Carrier).includes(
@@ -258,6 +268,7 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
       data: {
         userId,
         orderNumber,
+        stripeSessionId: session.id,
         status: OrderStatus.CONFIRMED,
         fulfillmentStatus: FulfillmentStatus.PAID,
         shippingMethod: shippingMethodCode ?? undefined,
@@ -268,7 +279,6 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
         paymentMethod,
         billingAddress: (() => {
           const billing = buildBillingAddress(session.customer_details) as any;
-          // Forcer l'email du formulaire si disponible dans les métadonnées
           if (customerEmailFromForm && billing) {
             billing.email = customerEmailFromForm;
           }
@@ -322,6 +332,7 @@ async function validateAndApplyPromoCode(
     return { promoDiscount, appliedPromoCode };
   }
 
+  // Fast-path : vérification préliminaire (peut être dépassée par race condition, traité ci-dessous)
   if (promoCodeRecord.usageLimit && promoCodeRecord.usedCount >= promoCodeRecord.usageLimit) {
     return { promoDiscount, appliedPromoCode };
   }
@@ -336,10 +347,22 @@ async function validateAndApplyPromoCode(
   }
   appliedPromoCode = promoCodeRecord.code;
 
-  await prisma.promoCode.update({
-    where: { code: promoCodeRecord.code },
+  // Incrément atomique : vérifie ET incrémente en une seule opération (protection TOCTOU)
+  const atomicUpdate = await prisma.promoCode.updateMany({
+    where: {
+      code: promoCodeRecord.code,
+      isActive: true,
+      ...(promoCodeRecord.usageLimit !== null && promoCodeRecord.usageLimit !== undefined
+        ? { usedCount: { lt: promoCodeRecord.usageLimit } }
+        : {}),
+    },
     data: { usedCount: { increment: 1 } },
   });
+
+  if (atomicUpdate.count === 0) {
+    // Limite atteinte par race condition ou code désactivé entre-temps
+    return { promoDiscount: 0, appliedPromoCode: null };
+  }
 
   return { promoDiscount, appliedPromoCode };
 }
@@ -880,11 +903,7 @@ router.post(
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
-        ...(isDevelopment && {
-          details: error.message,
-          stack: error.stack,
-          code: error.code,
-        }),
+        ...(isDevelopment && { details: error.message }),
       });
     }
   }
@@ -929,11 +948,9 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
       });
     }
 
-    // Vérifier si une commande existe déjà pour cette session
+    // Vérifier si une commande existe déjà pour cette session (via champ dédié)
     const existingOrder = await prisma.order.findFirst({
-      where: {
-        paymentMethod: sessionId, // On utilise paymentMethod pour stocker le sessionId
-      },
+      where: { stripeSessionId: sessionId },
     });
 
     if (existingOrder) {
@@ -1067,7 +1084,11 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
   if (event.type === 'checkout.session.completed') {
     try {
       await processCompletedCheckoutSession(event.data.object as Stripe.Checkout.Session);
-    } catch {
+    } catch (err: any) {
+      // P2002 = violation de contrainte unique (stripeSessionId) → commande déjà créée, idempotent
+      if (err?.code === 'P2002' || err?.message?.includes('stripeSessionId')) {
+        return res.status(200).json({ received: true });
+      }
       return res.status(500).json({
         received: false,
         error: 'Erreur lors du traitement du webhook',
