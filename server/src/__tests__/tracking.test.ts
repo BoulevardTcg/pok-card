@@ -11,7 +11,7 @@ describe('Tracking Utils', () => {
 
   beforeEach(() => {
     process.env = { ...originalEnv };
-    process.env.JWT_SECRET = 'test-secret-key-for-tracking-tests';
+    process.env.ORDER_TRACKING_SECRET = 'test-order-tracking-secret-for-tests';
   });
 
   afterEach(() => {

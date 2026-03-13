@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient, TradeStatus } from '@prisma/client';
+import { TradeStatus } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Créer une offre d'échange
 router.post(
@@ -84,7 +85,8 @@ router.post(
         message: "Offre d'échange créée avec succès",
         offer,
       });
-    } catch {
+    } catch (error) {
+      logger.error('Erreur trade-offers:', error);
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -133,7 +135,8 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
     });
 
     res.json({ offers });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur trade-offers:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -184,7 +187,8 @@ router.get('/:offerId', authenticateToken, async (req: Request, res: Response) =
     }
 
     res.json({ offer });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur trade-offers:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -252,7 +256,8 @@ router.post('/:offerId/accept', authenticateToken, async (req: Request, res: Res
       message: 'Offre acceptée avec succès',
       offer: updated,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur trade-offers:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -320,7 +325,8 @@ router.post('/:offerId/reject', authenticateToken, async (req: Request, res: Res
       message: 'Offre refusée',
       offer: updated,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur trade-offers:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -388,7 +394,8 @@ router.post('/:offerId/cancel', authenticateToken, async (req: Request, res: Res
       message: 'Offre annulée',
       offer: updated,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur trade-offers:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

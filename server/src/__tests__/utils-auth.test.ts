@@ -24,6 +24,12 @@ vi.mock('@prisma/client', async (importOriginal) => {
   };
 });
 
+vi.mock('../lib/prisma.js', () => ({
+  default: {
+    refreshToken: mockRefreshToken,
+  },
+}));
+
 import {
   hashPassword,
   verifyPassword,

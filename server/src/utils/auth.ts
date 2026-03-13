@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma.js';
 
 /** Normalise une clé PEM : remplace les littéraux \\n par de vrais retours à la ligne
  *  (nécessaire quand Docker env_file ne convertit pas les \\n). */

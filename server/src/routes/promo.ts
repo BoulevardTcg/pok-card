@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
 import { promoLimiter } from '../middleware/security.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Valider un code promo
 router.post(
@@ -84,7 +84,8 @@ router.post(
         discountCents,
         finalAmountCents: totalCents - discountCents,
       });
-    } catch {
+    } catch (error) {
+      logger.error('Erreur promo:', error);
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
@@ -168,7 +169,8 @@ router.post(
       res.json({
         message: 'Code promo appliqué avec succès',
       });
-    } catch {
+    } catch (error) {
+      logger.error('Erreur promo:', error);
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',
