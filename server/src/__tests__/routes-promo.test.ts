@@ -6,6 +6,7 @@ const { mockPromoCode } = vi.hoisted(() => ({
   mockPromoCode: {
     findUnique: vi.fn(),
     update: vi.fn(),
+    updateMany: vi.fn(),
   },
 }));
 
@@ -173,17 +174,26 @@ describe('POST /api/promo/apply', () => {
 
   it('increments usedCount and returns 200 for valid promo', async () => {
     mockPromoCode.findUnique.mockResolvedValue(makeValidPromo());
-    mockPromoCode.update.mockResolvedValue({ ...makeValidPromo(), usedCount: 1 });
+    mockPromoCode.updateMany.mockResolvedValue({ count: 1 });
 
     const res = await request(app).post('/api/promo/apply').send({ code: 'SAVE10' });
     expect(res.status).toBe(200);
     expect(res.body.message).toBeDefined();
-    expect(mockPromoCode.update).toHaveBeenCalledWith(
+    expect(mockPromoCode.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { code: 'SAVE10' },
+        where: expect.objectContaining({ code: 'SAVE10' }),
         data: expect.objectContaining({ usedCount: expect.objectContaining({ increment: 1 }) }),
       })
     );
+  });
+
+  it('returns 400 when atomic update fails (race condition hit usageLimit)', async () => {
+    mockPromoCode.findUnique.mockResolvedValue(makeValidPromo({ usageLimit: 5, usedCount: 4 }));
+    mockPromoCode.updateMany.mockResolvedValue({ count: 0 });
+
+    const res = await request(app).post('/api/promo/apply').send({ code: 'SAVE10' });
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('PROMO_LIMIT_REACHED');
   });
 
   it('returns 404 when promo code is not found', async () => {

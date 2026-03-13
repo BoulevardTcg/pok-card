@@ -22,6 +22,7 @@ const RATE_LIMITS = {
   admin: { windowMs: 15 * 60 * 1000, max: 200 }, // Admin: 200 req / 15 min
   upload: { windowMs: 60 * 60 * 1000, max: 50 }, // Upload: 50 req / 1h
   checkout: { windowMs: 60 * 60 * 1000, max: 10 }, // Checkout: 10 req / 1h
+  promo: { windowMs: 15 * 60 * 1000, max: 10 }, // Promo: 10 req / 15 min
 };
 
 const keyGenerator = (req: Request): string => {
@@ -121,6 +122,20 @@ export const checkoutLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
+});
+
+export const promoLimiter = rateLimit({
+  windowMs: RATE_LIMITS.promo.windowMs,
+  max: RATE_LIMITS.promo.max,
+  message: {
+    error: 'Trop de tentatives. Réessayez dans 15 minutes.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: Math.ceil(RATE_LIMITS.promo.windowMs / 1000),
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator,
+  skip: () => process.env.NODE_ENV === 'test',
 });
 
 /** 60 req/min par IP pour la recherche de cartes (TCGdex) */
