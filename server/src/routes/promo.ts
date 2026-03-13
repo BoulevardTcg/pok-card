@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import { promoLimiter } from '../middleware/security.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -8,6 +9,7 @@ const prisma = new PrismaClient();
 // Valider un code promo
 router.post(
   '/validate',
+  promoLimiter,
   [
     body('code').isString().notEmpty().withMessage('Le code promo est obligatoire'),
     body('totalCents').isInt({ min: 0 }).withMessage('Le montant total est obligatoire'),
@@ -94,6 +96,7 @@ router.post(
 // Appliquer un code promo (incrémente le compteur)
 router.post(
   '/apply',
+  promoLimiter,
   [body('code').isString().notEmpty().withMessage('Le code promo est obligatoire')],
   async (req: Request, res: Response) => {
     try {
@@ -106,6 +109,7 @@ router.post(
       }
 
       const { code } = req.body;
+      const now = new Date();
 
       const promoCode = await prisma.promoCode.findUnique({
         where: { code: code.toUpperCase() },
@@ -118,15 +122,48 @@ router.post(
         });
       }
 
-      // Incrémenter le compteur d'utilisation
-      await prisma.promoCode.update({
-        where: { code: promoCode.code },
-        data: {
-          usedCount: {
-            increment: 1,
-          },
+      // Q5: vérifier isActive (manquait avant)
+      if (!promoCode.isActive) {
+        return res.status(400).json({
+          error: "Ce code promo n'est plus actif",
+          code: 'PROMO_INACTIVE',
+        });
+      }
+
+      // Vérifier la validité temporelle
+      if (now < promoCode.validFrom || now > promoCode.validUntil) {
+        return res.status(400).json({
+          error: "Ce code promo n'est pas valide actuellement",
+          code: 'PROMO_EXPIRED',
+        });
+      }
+
+      // Fast-path : vérification préliminaire (protégée par l'incrément atomique ci-dessous)
+      if (promoCode.usageLimit && promoCode.usedCount >= promoCode.usageLimit) {
+        return res.status(400).json({
+          error: "Ce code promo a atteint sa limite d'utilisation",
+          code: 'PROMO_LIMIT_REACHED',
+        });
+      }
+
+      // S1: Incrément atomique — vérifie ET incrémente en une seule opération (protection TOCTOU)
+      const atomicUpdate = await prisma.promoCode.updateMany({
+        where: {
+          code: promoCode.code,
+          isActive: true,
+          ...(promoCode.usageLimit !== null && promoCode.usageLimit !== undefined
+            ? { usedCount: { lt: promoCode.usageLimit } }
+            : {}),
         },
+        data: { usedCount: { increment: 1 } },
       });
+
+      if (atomicUpdate.count === 0) {
+        return res.status(400).json({
+          error: "Ce code promo a atteint sa limite d'utilisation",
+          code: 'PROMO_LIMIT_REACHED',
+        });
+      }
 
       res.json({
         message: 'Code promo appliqué avec succès',
