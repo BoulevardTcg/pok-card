@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 
-// promo.ts uses new PrismaClient() directly — mock @prisma/client
+// promo.ts uses lib/prisma.js singleton — mock both for safety
 const { mockPromoCode } = vi.hoisted(() => ({
   mockPromoCode: {
     findUnique: vi.fn(),

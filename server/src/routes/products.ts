@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient, type Product, type ProductImage, type ProductVariant } from '@prisma/client';
+import { type Product, type ProductImage, type ProductVariant } from '@prisma/client';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 type ProductWithRelations = Product & {
   images: ProductImage[];
@@ -110,7 +111,8 @@ router.get('/', async (req, res) => {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur products:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { optionalAuth } from '../middleware/auth.js';
 import { verifyOrderTrackingToken } from '../utils/tracking.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const toPublicTrackingOrderDto = (order: any) => ({
   id: order.id,
@@ -82,7 +82,8 @@ router.get('/:orderId', optionalAuth, async (req: Request, res: Response) => {
       order: canUseToken ? toPublicTrackingOrderDto(order) : order,
       access: canUseToken ? 'token' : 'owner',
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur orders:', error);
     res.status(500).json({ error: 'Erreur interne du serveur', code: 'INTERNAL_SERVER_ERROR' });
   }
 });

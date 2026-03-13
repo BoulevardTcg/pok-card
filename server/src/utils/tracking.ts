@@ -34,9 +34,9 @@ export function buildTrackingUrl(
 }
 
 const getTrackingSecret = () => {
-  const secret = process.env.ORDER_TRACKING_SECRET || process.env.JWT_SECRET;
+  const secret = process.env.ORDER_TRACKING_SECRET;
   if (!secret) {
-    throw new Error('ORDER_TRACKING_SECRET or JWT_SECRET is required');
+    throw new Error('ORDER_TRACKING_SECRET is required');
   }
   return secret;
 };

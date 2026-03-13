@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Récupérer la collection de l'utilisateur
 router.get('/', authenticateToken, async (req: Request, res: Response) => {
@@ -50,7 +50,8 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
         uniqueCards: stats._count.id || 0,
       },
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur collection:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -249,7 +250,8 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
     res.json({
       message: 'Carte supprimée de la collection',
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur collection:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

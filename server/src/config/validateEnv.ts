@@ -44,6 +44,7 @@ export function validateEnvOrThrow() {
     // FRONTEND_PUBLIC_URL est l'URL publique pour les emails/redirects (prioritaire)
     // FRONTEND_URL est conservé pour rétrocompatibilité
     { key: 'FRONTEND_PUBLIC_URL', requiredInProd: true },
+    { key: 'ORDER_TRACKING_SECRET', requiredInProd: true, minLength: 32 },
   ];
 
   const errors = requireEnv(checks);
