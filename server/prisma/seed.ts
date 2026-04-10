@@ -506,7 +506,7 @@ const seedProducts = async () => {
           name: 'Display One Piece OP13',
           language: 'Français',
           edition: 'OP13',
-          priceCents: 15900,
+          priceCents: 27900,
           stock: 10,
           sku: 'DIS-OP13-FR',
         },

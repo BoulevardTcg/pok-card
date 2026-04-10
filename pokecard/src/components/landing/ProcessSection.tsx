@@ -29,8 +29,10 @@ const PROCESS_STEPS = [
 export default function ProcessSection() {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [dotPositions, setDotPositions] = useState<number[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
 
   const calculateProgress = useCallback(() => {
@@ -75,6 +77,28 @@ export default function ProcessSection() {
     setProgress(Math.min(100, Math.max(0, totalProgress)));
   }, []);
 
+  // Mesure la position verticale de chaque icône pour aligner les dots
+  useEffect(() => {
+    const measureDotPositions = () => {
+      if (!stepsRef.current || !timelineRef.current) return;
+      const timelineRect = timelineRef.current.getBoundingClientRect();
+      const stepElements = stepsRef.current.querySelectorAll('[data-step]');
+      const positions: number[] = [];
+      stepElements.forEach((step) => {
+        const icon = step.querySelector('[data-icon]');
+        if (icon) {
+          const iconRect = icon.getBoundingClientRect();
+          positions.push(iconRect.top + iconRect.height / 2 - timelineRect.top);
+        }
+      });
+      setDotPositions(positions);
+    };
+
+    measureDotPositions();
+    window.addEventListener('resize', measureDotPositions);
+    return () => window.removeEventListener('resize', measureDotPositions);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       // Annuler le frame précédent pour éviter les accumulations
@@ -115,7 +139,7 @@ export default function ProcessSection() {
         {/* Process Steps */}
         <div className={styles.processGrid}>
           {/* Timeline */}
-          <div className={styles.timeline}>
+          <div ref={timelineRef} className={styles.timeline}>
             <div className={styles.timelineLine}>
               <div className={styles.timelineProgress} style={{ height: `${progress}%` }} />
             </div>
@@ -123,6 +147,17 @@ export default function ProcessSection() {
               <div
                 key={step.number}
                 className={`${styles.timelineDot} ${index <= activeStep ? styles.active : ''}`}
+                style={
+                  dotPositions[index] !== undefined
+                    ? {
+                        position: 'absolute',
+                        top: dotPositions[index],
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        margin: 0,
+                      }
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -139,7 +174,7 @@ export default function ProcessSection() {
                   data-step={index}
                   className={`${styles.step} ${isActive ? styles.active : ''} ${isCurrent ? styles.current : ''}`}
                 >
-                  <div className={styles.stepIcon}>
+                  <div className={styles.stepIcon} data-icon>
                     <Icon size={24} strokeWidth={1.5} />
                   </div>
                   <div className={styles.stepContent}>

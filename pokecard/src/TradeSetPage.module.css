@@ -101,10 +101,19 @@
 }
 
 .divider {
-  width: 96px;
+  width: 80px;
   height: 2px;
-  background: #d7b56d;
-  margin: 1.5rem auto;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-secondary, #8b7355),
+    transparent
+  );
+  margin: var(--space-6, 1.5rem) auto;
+}
+
+html[data-theme='light'] .divider {
+  background: linear-gradient(90deg, transparent, #3f7ef3, transparent);
 }
 
 .description {

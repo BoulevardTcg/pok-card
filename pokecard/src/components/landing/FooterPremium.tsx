@@ -104,6 +104,10 @@ export default function FooterPremium() {
           <span className={styles.copyright}>
             © {currentYear} BoulevardTCG. Tous droits réservés.
           </span>
+          <span className={styles.copyright}>N° SIRET : 99409379700011</span>
+          <span className={styles.copyright}>
+            Contact - Téléphone : 06 95 81 97 88 / 06 86 30 75 36
+          </span>
         </div>
       </div>
     </footer>

@@ -94,9 +94,9 @@ html[data-theme='light'] {
 
   /* Accents CTA - Bleu cyan pour light mode */
   --color-accent-primary: #3f7ef3;
-  --color-accent-secondary: #4a8a58;
-  --color-accent-gold: #5a9c68;
-  --color-accent-hover: #2d5a38;
+  --color-accent-secondary: #617eb2;
+  --color-accent-gold: #7a9fd4;
+  --color-accent-hover: #4a6699;
 
   /* Bordures */
   --color-border-subtle: rgba(0, 0, 0, 0.06);
