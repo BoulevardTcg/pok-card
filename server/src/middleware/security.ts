@@ -22,6 +22,7 @@ const RATE_LIMITS = {
   admin: { windowMs: 15 * 60 * 1000, max: 200 }, // Admin: 200 req / 15 min
   upload: { windowMs: 60 * 60 * 1000, max: 50 }, // Upload: 50 req / 1h
   checkout: { windowMs: 60 * 60 * 1000, max: 10 }, // Checkout: 10 req / 1h
+  promo: { windowMs: 15 * 60 * 1000, max: 10 }, // Promo: 10 req / 15 min
 };
 
 const keyGenerator = (req: Request): string => {
@@ -42,6 +43,7 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   keyGenerator,
+  skip: () => process.env.NODE_ENV === 'test',
 });
 
 export const strictAuthLimiter = rateLimit({
@@ -122,6 +124,34 @@ export const checkoutLimiter = rateLimit({
   keyGenerator,
 });
 
+export const promoLimiter = rateLimit({
+  windowMs: RATE_LIMITS.promo.windowMs,
+  max: RATE_LIMITS.promo.max,
+  message: {
+    error: 'Trop de tentatives. Réessayez dans 15 minutes.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: Math.ceil(RATE_LIMITS.promo.windowMs / 1000),
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator,
+  skip: () => process.env.NODE_ENV === 'test',
+});
+
+/** 60 req/min par IP pour la recherche de cartes (TCGdex) */
+export const cardSearchLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: process.env.NODE_ENV === 'development' ? 120 : 60,
+  message: {
+    error: 'Trop de recherches. Réessayez dans 1 minute.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => req.ip || req.socket.remoteAddress || 'unknown',
+});
+
 export const dynamicUserRateLimit = (maxRequests: number, windowMs: number) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const key = keyGenerator(req);
@@ -188,11 +218,7 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
 
     const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (key === 'description' || key === 'imageUrl' || key === 'url' || key === 'images') {
-        sanitized[key] = value;
-      } else {
-        sanitized[key] = sanitize(value);
-      }
+      sanitized[key] = sanitize(value);
     }
     return sanitized;
   };
@@ -251,7 +277,7 @@ export const injectionProtection = (req: Request, res: Response, next: NextFunct
 };
 
 export const corsOptions = {
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'idempotency-key'],

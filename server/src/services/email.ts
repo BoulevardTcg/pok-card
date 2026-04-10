@@ -11,6 +11,16 @@ const EMAIL_PROVIDER = process.env.RESEND_API_KEY ? 'resend' : 'smtp';
 const sanitizeHeaderValue = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
 const sanitizeEmailAddress = (value: string) => sanitizeHeaderValue(value);
 
+function escapeHtml(str: string | null | undefined): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 // Initialiser Resend si la clé API est présente
 function getResendClient(): Resend {
   if (!resendClient) {
@@ -187,11 +197,11 @@ function generateItemsTable(items: OrderItemForEmail[]): string {
       (item) => `
     <tr>
       <td>
-        ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.productName}">` : ''}
+        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.productName)}">` : ''}
       </td>
       <td>
-        <strong>${item.productName}</strong>
-        ${item.variantName && item.variantName !== 'Standard' ? `<br><small style="color: #6b7280;">${item.variantName}</small>` : ''}
+        <strong>${escapeHtml(item.productName)}</strong>
+        ${item.variantName && item.variantName !== 'Standard' ? `<br><small style="color: #6b7280;">${escapeHtml(item.variantName)}</small>` : ''}
       </td>
       <td style="text-align: center;">${item.quantity}</td>
       <td style="text-align: right;">${formatPrice(item.unitPriceCents)}</td>
@@ -239,7 +249,7 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
     </div>
     
     <div class="content">
-      <p>Bonjour${order.billingAddress?.name ? ` ${order.billingAddress.name}` : ''},</p>
+      <p>Bonjour${order.billingAddress?.name ? ` ${escapeHtml(order.billingAddress.name)}` : ''},</p>
       
       <p>Nous avons bien recu votre commande et nous vous en remercions ! Votre paiement a ete confirme.</p>
       
@@ -282,11 +292,11 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
           ? `
       <h3 style="color: #1f2937; margin-top: 30px;">Adresse de livraison</h3>
       <div class="address-box">
-        ${order.shippingAddress.name ? `<strong>${order.shippingAddress.name}</strong><br>` : ''}
-        ${order.shippingAddress.address?.line1 || ''}<br>
-        ${order.shippingAddress.address?.line2 ? `${order.shippingAddress.address.line2}<br>` : ''}
-        ${order.shippingAddress.address?.postal_code || ''} ${order.shippingAddress.address?.city || ''}<br>
-        ${order.shippingAddress.address?.country || ''}
+        ${order.shippingAddress.name ? `<strong>${escapeHtml(order.shippingAddress.name)}</strong><br>` : ''}
+        ${escapeHtml(order.shippingAddress.address?.line1)}<br>
+        ${order.shippingAddress.address?.line2 ? `${escapeHtml(order.shippingAddress.address.line2)}<br>` : ''}
+        ${escapeHtml(order.shippingAddress.address?.postal_code)} ${escapeHtml(order.shippingAddress.address?.city)}<br>
+        ${escapeHtml(order.shippingAddress.address?.country)}
       </div>
       `
           : ''
@@ -305,7 +315,7 @@ function orderConfirmationTemplate(order: OrderDataForEmail, customerEmail: stri
       <p><strong>${SHOP_NAME}</strong></p>
       <p>Des questions ? Contactez-nous : <a href="mailto:${SHOP_EMAIL}">${SHOP_EMAIL}</a></p>
       <p style="margin-top: 20px; font-size: 12px;">
-        Cet email a ete envoye a ${customerEmail}<br>
+        Cet email a ete envoye a ${escapeHtml(customerEmail)}<br>
         <a href="${SHOP_URL}">Visiter notre boutique</a>
       </p>
     </div>
@@ -350,7 +360,7 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
     </div>
     
     <div class="content">
-      <p style="font-size: 16px; line-height: 1.6;">Bonjour${order.billingAddress?.name ? ` ${order.billingAddress.name}` : ''},</p>
+      <p style="font-size: 16px; line-height: 1.6;">Bonjour${order.billingAddress?.name ? ` ${escapeHtml(order.billingAddress.name)}` : ''},</p>
       
       <p style="font-size: 16px; line-height: 1.6;">Nous avons le plaisir de vous informer que votre commande <strong style="color: #1f2937;">${order.orderNumber}</strong> a été expédiée et est en route vers vous.</p>
       
@@ -403,11 +413,11 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
       <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
         <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">📍 Adresse de livraison</h3>
         <div class="address-box" style="background: #f9fafb; padding: 15px; border-radius: 8px;">
-          ${order.shippingAddress.name ? `<strong style="font-size: 16px;">${order.shippingAddress.name}</strong><br>` : ''}
-          ${order.shippingAddress.address?.line1 || ''}<br>
-          ${order.shippingAddress.address?.line2 ? `${order.shippingAddress.address.line2}<br>` : ''}
-          ${order.shippingAddress.address?.postal_code || ''} ${order.shippingAddress.address?.city || ''}<br>
-          ${order.shippingAddress.address?.country || ''}
+          ${order.shippingAddress.name ? `<strong style="font-size: 16px;">${escapeHtml(order.shippingAddress.name)}</strong><br>` : ''}
+          ${escapeHtml(order.shippingAddress.address?.line1)}<br>
+          ${order.shippingAddress.address?.line2 ? `${escapeHtml(order.shippingAddress.address.line2)}<br>` : ''}
+          ${escapeHtml(order.shippingAddress.address?.postal_code)} ${escapeHtml(order.shippingAddress.address?.city)}<br>
+          ${escapeHtml(order.shippingAddress.address?.country)}
         </div>
       </div>
       `
@@ -438,7 +448,7 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
       <p><strong>${SHOP_NAME}</strong></p>
       <p>Des questions sur votre livraison ? <a href="mailto:${SHOP_EMAIL}">${SHOP_EMAIL}</a></p>
       <p style="margin-top: 20px; font-size: 12px;">
-        Cet email a ete envoye a ${customerEmail}<br>
+        Cet email a ete envoye a ${escapeHtml(customerEmail)}<br>
         <a href="${SHOP_URL}">Visiter notre boutique</a>
       </p>
     </div>
@@ -466,7 +476,7 @@ function deliveryConfirmationTemplate(order: OrderDataForEmail, _customerEmail: 
     </div>
     
     <div class="content">
-      <p>Bonjour${order.billingAddress?.name ? ` ${order.billingAddress.name}` : ''},</p>
+      <p>Bonjour${order.billingAddress?.name ? ` ${escapeHtml(order.billingAddress.name)}` : ''},</p>
       
       <p>Votre commande <strong>${order.orderNumber}</strong> a ete livree avec succes !</p>
       

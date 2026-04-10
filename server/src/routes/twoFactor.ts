@@ -1,14 +1,34 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 import * as OTPAuth from 'otpauth';
 import QRCode from 'qrcode';
+import prisma from '../lib/prisma.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Toutes les routes 2FA nécessitent une authentification
 router.use(authenticateToken);
+
+// Vérifier le statut 2FA de l'utilisateur connecté
+router.get('/status', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { twoFactorEnabled: true },
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: { code: 'USER_NOT_FOUND', message: 'Utilisateur non trouvé' } });
+    }
+    return res.json({ twoFactorEnabled: user.twoFactorEnabled });
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
+    return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' } });
+  }
+});
 
 // Générer un secret 2FA et le QR code
 router.post('/setup', async (req: Request, res: Response) => {
@@ -61,7 +81,8 @@ router.post('/setup', async (req: Request, res: Response) => {
       message:
         "Scannez le QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)",
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -129,7 +150,8 @@ router.post('/enable', async (req: Request, res: Response) => {
       message: '2FA activé avec succès',
       twoFactorEnabled: true,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -204,7 +226,8 @@ router.post('/disable', async (req: Request, res: Response) => {
       message: '2FA désactivé avec succès',
       twoFactorEnabled: false,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -257,7 +280,8 @@ router.post('/verify', async (req: Request, res: Response) => {
       valid: true,
       message: 'Code vérifié avec succès',
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',
@@ -285,7 +309,8 @@ router.get('/status', async (req: Request, res: Response) => {
     res.json({
       twoFactorEnabled: user.twoFactorEnabled,
     });
-  } catch {
+  } catch (error) {
+    logger.error('Erreur twoFactor:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_SERVER_ERROR',

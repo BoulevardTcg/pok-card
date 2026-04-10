@@ -109,15 +109,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Fonction pour rafraîchir le token
-  const refreshAccessToken = useCallback(async (refreshToken: string): Promise<string | null> => {
+  // Fonction pour rafraîchir le token (via cookie httpOnly — jamais le localStorage)
+  const refreshAccessToken = useCallback(async (): Promise<string | null> => {
     try {
       const response = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken }),
+        credentials: 'include', // envoie le cookie httpOnly refreshToken
       });
 
       if (response.ok) {
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Fonction utilitaire pour gérer le cas où on a un token d'accès
   const handleAccessTokenCase = useCallback(
-    async (storedToken: string, refreshToken: string | null) => {
+    async (storedToken: string) => {
       // Pré-remplir avec le payload décodé
       const decoded = decodeAccessToken(storedToken);
       if (decoded) {
@@ -164,46 +164,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // Si le token est expiré, essayer de le rafraîchir
-      if (refreshToken) {
-        const newAccessToken = await refreshAccessToken(refreshToken);
-        if (newAccessToken) {
-          const decodedNew = decodeAccessToken(newAccessToken);
-          if (decodedNew) {
-            setUser(decodedNew as User);
-          }
-          await loadProfile(newAccessToken);
-          return;
-        }
-      }
-
-      // Refresh échoué ou pas de refresh token, déconnecter
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      setToken(null);
-      setUser(null);
-    },
-    [decodeAccessToken, isTokenExpired, loadProfile, refreshAccessToken]
-  );
-
-  // Fonction utilitaire pour gérer le cas où on a seulement un refresh token
-  const handleRefreshTokenCase = useCallback(
-    async (refreshToken: string) => {
-      const newAccessToken = await refreshAccessToken(refreshToken);
+      // Si le token est expiré, rafraîchir via cookie httpOnly
+      const newAccessToken = await refreshAccessToken();
       if (newAccessToken) {
         const decodedNew = decodeAccessToken(newAccessToken);
         if (decodedNew) {
           setUser(decodedNew as User);
         }
         await loadProfile(newAccessToken);
-      } else {
-        // Refresh token invalide
-        localStorage.removeItem('refreshToken');
-        setToken(null);
-        setUser(null);
+        return;
       }
+
+      // Refresh échoué, déconnecter
+      localStorage.removeItem('accessToken');
+      setToken(null);
+      setUser(null);
     },
-    [decodeAccessToken, loadProfile, refreshAccessToken]
+    [decodeAccessToken, isTokenExpired, loadProfile, refreshAccessToken]
   );
 
   // Vérifier si l'utilisateur est déjà connecté au chargement
@@ -211,15 +188,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         const storedToken = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
 
-        // Cas 1: On a un token d'accès
+        // Cas 1: On a un token d'accès en mémoire locale
         if (storedToken && storedToken.length > 0) {
-          await handleAccessTokenCase(storedToken, refreshToken);
-        }
-        // Cas 2: Pas de token d'accès mais on a un refresh token
-        else if (refreshToken) {
-          await handleRefreshTokenCase(refreshToken);
+          await handleAccessTokenCase(storedToken);
+        } else {
+          // Cas 2: Pas de token local → tenter un refresh via le cookie httpOnly
+          const newAccessToken = await refreshAccessToken();
+          if (newAccessToken) {
+            const decoded = decodeAccessToken(newAccessToken);
+            if (decoded) setUser(decoded as User);
+            await loadProfile(newAccessToken);
+          }
         }
       } catch {
         // Ignorer les erreurs
@@ -229,7 +209,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuthStatus();
-  }, [handleAccessTokenCase, handleRefreshTokenCase]);
+  }, [handleAccessTokenCase, refreshAccessToken, decodeAccessToken, loadProfile]);
 
   const login = async (
     email: string,
@@ -267,9 +247,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (response.ok && data.accessToken) {
-        // Sauvegarder les tokens
+        // Sauvegarder uniquement l'accessToken (le refreshToken est en cookie httpOnly côté serveur)
         localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
         setToken(data.accessToken);
 
         // Récupérer le profil complet de l'utilisateur
@@ -335,27 +314,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    // Récupérer le refreshToken avant de le supprimer
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    // Supprimer les tokens
+    // Supprimer l'accessToken du localStorage
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
     setToken(null);
 
     // Réinitialiser l'état utilisateur
     setUser(null);
 
-    // Appeler l'API de déconnexion (optionnel)
-    if (refreshToken) {
-      fetch(`${API_BASE}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      }).catch(() => {});
-    }
+    // Révoquer le cookie httpOnly refreshToken côté serveur
+    fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // envoie le cookie httpOnly pour révocation serveur
+    }).catch(() => {});
   };
 
   const refreshUser = async () => {
@@ -375,7 +348,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else if (response.status === 401 || response.status === 403) {
         // Token invalide ou expiré, déconnecter l'utilisateur
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
         setToken(null);
         setUser(null);
       } else {
