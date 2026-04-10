@@ -123,6 +123,10 @@ const Footer: React.FC = () => {
           <p className={styles.copyrightText}>
             © {new Date().getFullYear()} BoulevardTCG. Tous droits réservés.
           </p>
+          <p className={styles.copyrightText}>N° SIRET : 99409379700011</p>
+          <p className={styles.copyrightText}>
+            Contact - Téléphone : 06 95 81 97 88 / 06 86 30 75 36
+          </p>
         </div>
       </div>
     </footer>

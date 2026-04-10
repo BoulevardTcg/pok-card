@@ -9,51 +9,44 @@ import styles from './HeroSection.module.css';
 const HERO_PRODUCTS = [
   {
     id: 1,
-    name: 'Display One Piece OP13',
-    subtitle: 'Display 24 boosters',
-    set: 'OP13',
+    name: 'Roronoa Zoro',
+    subtitle: 'OP06-118-TR (Treasure Rare OP11)',
+    set: 'OP11',
     universe: 'One Piece',
     image: '/carte_accueil/card02.png',
   },
   {
     id: 2,
-    name: 'UPC Flammes Fantasmagoriques',
-    subtitle: 'Ultra Premium Collection',
-    set: 'ME02',
-    universe: 'Pokémon',
+    name: 'Aang, Maitre des éléments',
+    subtitle: "Magic : Le dernier maître de l'air",
+    set: 'MTG',
+    universe: 'Magic',
     image: '/carte_accueil/card03.png',
   },
   {
     id: 3,
-    name: 'Dracaufeu',
-    subtitle: 'Carte Pokémon',
-    set: 'ME02',
+    name: 'Dracaufeu V',
+    subtitle: 'EB Stars Étincelantes',
+    set: 'EB09',
     universe: 'Pokémon',
     image: '/carte_accueil/dracaufeu.png',
   },
   {
     id: 4,
-    name: 'Yasuo',
-    subtitle: 'Champion League of Legends',
+    name: 'Yasuo, Unforgiven',
+    subtitle: 'Riftbound - Origins',
     set: 'LoR',
     universe: 'League of Legends',
     image: '/carte_accueil/yasuo.png',
   },
   {
-    id: 5,
-    name: 'Yone',
-    subtitle: 'Champion League of Legends',
-    set: 'LoR',
-    universe: 'League of Legends',
-    image: '/carte_accueil/yone.png',
-  },
-  {
     id: 6,
-    name: 'Yu-Gi-Oh!',
-    subtitle: 'Carte de collection',
-    set: 'YG',
+    name: 'Alba-Lenatus le Dragon des Abysses',
+    subtitle: 'Les Déchus et les Vertueux',
+    set: 'YGO',
     universe: 'Yu-Gi-Oh!',
     image: '/carte_accueil/yugiho.png',
+    objectPosition: 'center top',
   },
 ];
 
@@ -300,6 +293,11 @@ export default function HeroSection() {
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
                 loading="eager"
+                style={
+                  'objectPosition' in currentProduct
+                    ? { objectPosition: currentProduct.objectPosition }
+                    : undefined
+                }
               />
               {/* Effet shimmer */}
               <div className={styles.cardShimmer} />

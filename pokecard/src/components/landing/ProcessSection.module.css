@@ -127,20 +127,17 @@ html[data-theme='light'] .timelineProgress {
 }
 
 .timelineDot {
-  position: relative;
   z-index: 1;
   width: 12px;
   height: 12px;
   border-radius: var(--radius-full, 9999px);
   background: var(--color-bg-elevated, #141416);
   border: 2px solid var(--color-border-default, rgba(255, 255, 255, 0.1));
-  /* Transition plus douce pour les dots */
   transition:
     background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: calc(33.33% - 12px);
   will-change: transform, background-color, border-color;
 }
 
