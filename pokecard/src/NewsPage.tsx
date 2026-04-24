@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { handleImageError } from './utils/imageFallback';
 import styles from './NewsPage.module.css';
 
 type TCGCategory =
@@ -577,7 +578,14 @@ export function NewsPage() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className={styles.cardImageWrapper}>
-                    <img src={news.image} alt={news.title} className={styles.cardImage} />
+                    <img
+                      src={news.image}
+                      alt={news.title}
+                      className={styles.cardImage}
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                    />
                     <div className={styles.cardImageOverlay}></div>
                     <div className={styles.cardBadges}>
                       <span

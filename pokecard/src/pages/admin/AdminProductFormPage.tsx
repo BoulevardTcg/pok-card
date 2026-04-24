@@ -4,6 +4,7 @@ import { useAuth } from '../../authContext';
 import { API_BASE, API_URL } from '../../api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { ArrowLeft, Plus, X, Save, Upload, Link } from 'lucide-react';
+import { handleImageError } from '../../utils/imageFallback';
 import styles from './AdminProductFormPage.module.css';
 
 interface Variant {
@@ -508,7 +509,14 @@ export function AdminProductFormPage() {
                       />
                     </div>
                     {image.url && (
-                      <img src={image.url} alt="Aperçu" className={styles.urlPreview} />
+                      <img
+                        src={image.url}
+                        alt="Aperçu"
+                        className={styles.urlPreview}
+                        loading="lazy"
+                        decoding="async"
+                        onError={handleImageError}
+                      />
                     )}
                     <button
                       type="button"

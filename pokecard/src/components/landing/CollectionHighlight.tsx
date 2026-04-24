@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightIcon } from '../icons/Icons';
+import { handleImageError } from '../../utils/imageFallback';
 import styles from './CollectionHighlight.module.css';
 
 type Universe = 'pokemon' | 'onepiece';
@@ -206,7 +207,14 @@ export default function CollectionHighlight() {
                 onClick={() => navigate(`/trade/set/${set.id}`)}
               >
                 <div className={styles.setCardInner}>
-                  <img src={set.image} alt={set.name} className={styles.setImage} />
+                  <img
+                    src={set.image}
+                    alt={set.name}
+                    className={styles.setImage}
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                  />
                   <div className={styles.setOverlay}>
                     <span className={styles.setCardsCount}>{set.cardsCount} cartes</span>
                     <span className={styles.setName}>{set.name}</span>

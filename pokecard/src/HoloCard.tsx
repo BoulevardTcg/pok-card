@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
+import { handleImageError } from './utils/imageFallback';
 import './pokeholo.css';
 
 export type TradeCard = {
@@ -454,7 +455,14 @@ export function HoloCard({ card, foilMap }: Props & { foilMap?: Map<string, stri
             }}
           >
             {/* Only front image is necessary for effect; back is optional */}
-            <img className="card__front" src={imageUrl} alt={card.name} loading="lazy" />
+            <img
+              className="card__front"
+              src={imageUrl}
+              alt={card.name}
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
+            />
             <div className="card__shine" />
             <div className="card__glare" />
           </button>
