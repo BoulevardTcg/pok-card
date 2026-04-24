@@ -13,6 +13,7 @@ import {
 } from './api';
 import { ArrowRightIcon } from './components/icons/Icons';
 import { NotifyModal } from './components/NotifyModal';
+import { handleImageError, PLACEHOLDER_IMAGE } from './utils/imageFallback';
 
 interface Review {
   id: string;
@@ -513,7 +514,7 @@ export function ProductDetail() {
                 <div className={styles.similarGrid} role="list">
                   {similarProducts.map((similarProduct) => {
                     const imageUrl = getImageUrl(
-                      similarProduct.images?.[0]?.url || '/img/products/placeholder.png'
+                      similarProduct.images?.[0]?.url || PLACEHOLDER_IMAGE
                     );
                     const price = similarProduct.minPriceCents || 0;
 
@@ -543,9 +544,7 @@ export function ProductDetail() {
                             className={styles.similarImage}
                             loading="lazy"
                             decoding="async"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
-                            }}
+                            onError={handleImageError}
                           />
                         </div>
 
@@ -1113,9 +1112,7 @@ export function ProductDetail() {
           </h2>
           <div className={styles.similarGrid} role="list">
             {similarProducts.map((similarProduct) => {
-              const imageUrl = getImageUrl(
-                similarProduct.images?.[0]?.url || '/img/products/placeholder.png'
-              );
+              const imageUrl = getImageUrl(similarProduct.images?.[0]?.url || PLACEHOLDER_IMAGE);
               const price = similarProduct.minPriceCents || 0;
 
               return (
@@ -1144,9 +1141,7 @@ export function ProductDetail() {
                       className={styles.similarImage}
                       loading="lazy"
                       decoding="async"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
-                      }}
+                      onError={handleImageError}
                     />
                   </div>
 

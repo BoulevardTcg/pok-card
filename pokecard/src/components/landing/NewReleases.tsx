@@ -4,6 +4,7 @@ import { ArrowRightIcon } from '../icons/Icons';
 import { API_BASE, getImageUrl } from '../../api';
 import { CartContext, type Product } from '../../cartContext';
 import { NotifyModal } from '../NotifyModal';
+import { handleImageError, PLACEHOLDER_IMAGE } from '../../utils/imageFallback';
 import styles from './NewReleases.module.css';
 
 type Universe = 'all' | 'pokemon' | 'onepiece' | 'yugioh';
@@ -216,9 +217,7 @@ export default function NewReleases() {
               const price = getLowestPrice(product);
               const productType = getProductType(product);
               const stockStatus = getStockStatus(product);
-              const imageUrl = getImageUrl(
-                product.images?.[0]?.url || '/img/products/placeholder.png'
-              );
+              const imageUrl = getImageUrl(product.images?.[0]?.url || PLACEHOLDER_IMAGE);
 
               return (
                 <article
@@ -234,9 +233,7 @@ export default function NewReleases() {
                       src={imageUrl}
                       alt={product.name}
                       className={styles.releaseImage}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
-                      }}
+                      onError={handleImageError}
                     />
 
                     {/* Status badges */}

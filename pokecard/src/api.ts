@@ -1,3 +1,5 @@
+import { PLACEHOLDER_IMAGE } from './utils/imageFallback';
+
 // URL de base de l'API (avec /api)
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api';
 
@@ -29,7 +31,7 @@ export function safeParse<T>(json: string | null | undefined, fallback: T): T {
  * @returns URL absolue de l'image
  */
 export function getImageUrl(imageUrl: string | null | undefined): string {
-  if (!imageUrl) return '/img/products/placeholder.png';
+  if (!imageUrl) return PLACEHOLDER_IMAGE;
 
   // Si l'URL est déjà absolue, la retourner telle quelle
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
