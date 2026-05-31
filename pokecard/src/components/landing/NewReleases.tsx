@@ -233,6 +233,8 @@ export default function NewReleases() {
                       src={imageUrl}
                       alt={product.name}
                       className={styles.releaseImage}
+                      loading="lazy"
+                      decoding="async"
                       onError={handleImageError}
                     />
 
