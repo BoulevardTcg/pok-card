@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Seo } from './components/Seo';
 import { motion } from 'framer-motion';
 import { API_BASE } from './api';
+import { handleImageError } from './utils/imageFallback';
 import styles from './TradePage.module.css';
 
 type Set = {
@@ -199,9 +200,23 @@ export function TradePage() {
               >
                 <div className={styles.setImageContainer}>
                   {set.imagesLogo ? (
-                    <img src={set.imagesLogo} alt={set.name} className={styles.setImage} />
+                    <img
+                      src={set.imagesLogo}
+                      alt={set.name}
+                      className={styles.setImage}
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                    />
                   ) : set.imagesSymbol ? (
-                    <img src={set.imagesSymbol} alt={set.name} className={styles.setSymbol} />
+                    <img
+                      src={set.imagesSymbol}
+                      alt={set.name}
+                      className={styles.setSymbol}
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                    />
                   ) : (
                     <div className={styles.placeholderImage}>🎴</div>
                   )}

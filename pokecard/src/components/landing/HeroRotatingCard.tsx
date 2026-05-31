@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { handleImageError } from '../../utils/imageFallback';
 import styles from './HeroRotatingCard.module.css';
 
 const cards = [
@@ -97,7 +98,14 @@ export default function HeroRotatingCard() {
           transform: `perspective(1200px) rotateY(${autoRotation.x}deg) rotateX(${-autoRotation.y}deg)`,
         }}
       >
-        <img src={card.image} alt={card.name} className={styles.cardImage} />
+        <img
+          src={card.image}
+          alt={card.name}
+          className={styles.cardImage}
+          loading="lazy"
+          decoding="async"
+          onError={handleImageError}
+        />
       </div>
     </div>
   );

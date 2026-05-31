@@ -5,6 +5,7 @@ import styles from './CategorySpecificPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
 import { navigateToProduct } from './utils/productMatching';
+import { handleImageError } from './utils/imageFallback';
 
 interface Product {
   id: number;
@@ -540,7 +541,13 @@ export function CategorySpecificPage() {
                 return (
                   <div key={`static-${product.id}`} className={styles.productCard}>
                     <div className={styles.productImage}>
-                      <img src={product.image} alt={product.name} />
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        onError={handleImageError}
+                      />
                       {product.isNew && <span className={styles.newBadge}>Nouveau</span>}
                       {product.isSale && <span className={styles.saleBadge}>Promo</span>}
                       {product.isPopular && <span className={styles.popularBadge}>Populaire</span>}

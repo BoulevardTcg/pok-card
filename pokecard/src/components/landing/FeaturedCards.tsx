@@ -5,6 +5,7 @@ import { API_BASE, getImageUrl } from '../../api';
 import { CartContext, type Product } from '../../cartContext';
 import { NotifyModal } from '../NotifyModal';
 import { getProductType as getProductTypeFromUtils, productTypeLabels } from '../../utils/filters';
+import { handleImageError, PLACEHOLDER_IMAGE } from '../../utils/imageFallback';
 import styles from './FeaturedCards.module.css';
 
 // Fonction pour obtenir le statut du stock
@@ -279,9 +280,7 @@ export default function FeaturedCards() {
                 const productType = getProductTypeFromUtils(product);
                 const language = getProductLanguage(product);
                 const stockStatus = getStockStatus(product);
-                const imageUrl = getImageUrl(
-                  product.images?.[0]?.url || '/img/products/placeholder.png'
-                );
+                const imageUrl = getImageUrl(product.images?.[0]?.url || PLACEHOLDER_IMAGE);
 
                 return (
                   <article
@@ -298,9 +297,7 @@ export default function FeaturedCards() {
                         src={imageUrl}
                         alt={product.name}
                         className={styles.cardImage}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/img/products/placeholder.png';
-                        }}
+                        onError={handleImageError}
                       />
 
                       {/* Badge */}

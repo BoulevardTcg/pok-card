@@ -11,6 +11,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { API_BASE } from '../api';
+import { handleImageError } from '../utils/imageFallback';
 import styles from './TwoFactorSettings.module.css';
 
 interface TwoFactorSettingsProps {
@@ -283,7 +284,12 @@ export function TwoFactorSettings({ token }: TwoFactorSettingsProps) {
               <div className={styles.stepContent}>
                 <h4>Scannez le QR code</h4>
                 <div className={styles.qrContainer}>
-                  <img src={qrCode} alt="QR Code 2FA" className={styles.qrCode} />
+                  <img
+                    src={qrCode}
+                    alt="QR Code 2FA"
+                    className={styles.qrCode}
+                    onError={handleImageError}
+                  />
                 </div>
                 <div className={styles.secretKey}>
                   <p>Ou entrez manuellement cette clé :</p>

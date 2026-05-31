@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Seo } from './components/Seo';
 import styles from './ProductsPage.module.css';
 import { listProducts } from './api';
+import { PLACEHOLDER_IMAGE } from './utils/imageFallback';
 import type { Product as ProductType } from './cartContext';
 import FilterBar from './components/catalogue/FilterBar';
 import ProductGrid from './components/catalogue/ProductGrid';
@@ -47,11 +48,10 @@ function isInStock(product: ProductType): boolean {
 
 // Fonction pour vérifier si un produit a une vraie image (pas placeholder)
 function hasRealImage(product: ProductType): boolean {
-  const placeholderUrl = '/img/products/placeholder.png';
   const imageUrl = product.images?.[0]?.url || product.image?.url;
   if (!imageUrl) return false;
   // Vérifier que ce n'est pas le placeholder
-  return !imageUrl.includes('placeholder.png') && imageUrl !== placeholderUrl;
+  return !imageUrl.includes('placeholder.png') && imageUrl !== PLACEHOLDER_IMAGE;
 }
 
 export function ProductsPage() {

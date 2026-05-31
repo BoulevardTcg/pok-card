@@ -5,6 +5,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { handleImageError } from '../../utils/imageFallback';
 import styles from './NewsSection.module.css';
 
 type TCGCategory =
@@ -96,7 +97,14 @@ export default function NewsSection() {
                 onClick={() => navigate('/actualites')}
               >
                 <div className={styles.newsImageContainer}>
-                  <img src={news.image} alt={news.title} className={styles.newsImage} />
+                  <img
+                    src={news.image}
+                    alt={news.title}
+                    className={styles.newsImage}
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                  />
                   <div className={styles.imageOverlay}></div>
                   <div className={styles.newsBadge}>
                     <span

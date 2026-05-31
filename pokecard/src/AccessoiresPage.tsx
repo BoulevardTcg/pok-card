@@ -6,6 +6,7 @@ import { listProducts, getImageUrl } from './api';
 import { NotifyModal } from './components/NotifyModal';
 import type { Product as ProductType } from './cartContext';
 import { navigateToProduct } from './utils/productMatching.ts';
+import { handleImageError } from './utils/imageFallback';
 
 interface Accessoire {
   id: number;
@@ -450,7 +451,13 @@ export function AccessoiresPage() {
                   return (
                     <div key={`static-${accessoire.id}`} className={styles.accessoireCard}>
                       <div className={styles.accessoireImage}>
-                        <img src={accessoire.image} alt={accessoire.name} />
+                        <img
+                          src={accessoire.image}
+                          alt={accessoire.name}
+                          loading="lazy"
+                          decoding="async"
+                          onError={handleImageError}
+                        />
                         {accessoire.isNew && <span className={styles.newBadge}>Nouveau</span>}
                         {accessoire.isSale && <span className={styles.saleBadge}>Promo</span>}
                         {accessoire.isPopular && (

@@ -7,6 +7,7 @@ import { useAuth } from '../../authContext';
 import { useDarkMode } from '../../contexts/useDarkMode';
 import { listProducts, getImageUrl } from '../../api';
 import { sanitizeInput } from '../../utils/security';
+import { handleImageError } from '../../utils/imageFallback';
 import {
   CartIcon,
   UserIcon,
@@ -343,7 +344,12 @@ export default function NavbarGlass() {
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
             transition={shouldReduceMotion ? { duration: 0.15 } : SPRING_CONFIG}
           >
-            <img src="/img/phoenix-logo.png.png" alt="BoulevardTCG" className={styles.logoImage} />
+            <img
+              src="/img/phoenix-logo.png.png"
+              alt="BoulevardTCG"
+              className={styles.logoImage}
+              onError={handleImageError}
+            />
           </motion.button>
 
           {/* Navigation Centrale */}

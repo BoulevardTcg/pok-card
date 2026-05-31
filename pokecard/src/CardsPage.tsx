@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Seo } from './components/Seo';
+import { handleImageError } from './utils/imageFallback';
 import styles from './CardsPage.module.css';
 
 interface Card {
@@ -352,7 +353,13 @@ export function CardsPage() {
         {sortedCards.map((card) => (
           <div key={card.id} className={styles.cardItem}>
             <div className={styles.cardImage}>
-              <img src={card.image} alt={card.name} />
+              <img
+                src={card.image}
+                alt={card.name}
+                loading="lazy"
+                decoding="async"
+                onError={handleImageError}
+              />
               {card.isNew && <span className={styles.newBadge}>Nouveau</span>}
               {card.isSale && <span className={styles.saleBadge}>Promo</span>}
               {card.isFoil && <span className={styles.foilBadge}>Foil</span>}
