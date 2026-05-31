@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { handleImageError } from './utils/imageFallback';
 import styles from './CardsPage.module.css';
 
@@ -261,6 +262,11 @@ export function CardsPage() {
 
   return (
     <div className={styles.container}>
+      <Seo
+        title="Cartes à l'unité"
+        description="Cartes à collectionner à l'unité chez BoulevardTCG : Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Section bientôt disponible."
+        canonical="/cartes"
+      />
       {/* Panneau d'avertissement - En construction */}
       <div className={styles.constructionBanner}>
         <div className={styles.constructionContent}>

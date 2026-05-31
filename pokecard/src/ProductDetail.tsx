@@ -13,6 +13,8 @@ import {
 } from './api';
 import { ArrowRightIcon } from './components/icons/Icons';
 import { NotifyModal } from './components/NotifyModal';
+import { Seo } from './components/Seo';
+import { SITE_NAME, absoluteUrl } from './lib/site';
 import { handleImageError, PLACEHOLDER_IMAGE } from './utils/imageFallback';
 
 interface Review {
@@ -346,8 +348,83 @@ export function ProductDetail() {
     );
   }
 
+  const productImageUrl =
+    product.images && product.images.length > 0
+      ? getImageUrl(product.images[selectedImage]?.url ?? product.images[0].url)
+      : product.image
+        ? getImageUrl(product.image.url)
+        : undefined;
+
+  const priceEuros =
+    product.minPriceCents != null ? (product.minPriceCents / 100).toFixed(2) : undefined;
+  const inStock = !product.outOfStock && product.variants.some((v) => v.stock > 0);
+  const ratingStats = reviewsData?.stats;
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description:
+      product.description ?? `${product.name} — ${product.category} disponible sur ${SITE_NAME}.`,
+    image: productImageUrl ? [productImageUrl] : undefined,
+    category: product.category,
+    brand: { '@type': 'Brand', name: SITE_NAME },
+    sku: product.id,
+    ...(priceEuros
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: priceEuros,
+            priceCurrency: 'EUR',
+            availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: absoluteUrl(`/produit/${product.slug}`),
+          },
+        }
+      : {}),
+    ...(ratingStats && ratingStats.totalReviews > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: ratingStats.averageRating.toFixed(1),
+            reviewCount: ratingStats.totalReviews,
+          },
+        }
+      : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: absoluteUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Produits', item: absoluteUrl('/produits') },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.name,
+        item: absoluteUrl(`/produit/${product.slug}`),
+      },
+    ],
+  };
+
+  const metaDescription = (
+    product.description ??
+    `${product.name} — ${product.category}. Produit scellé authentique, paiement sécurisé et livraison soignée sur ${SITE_NAME}.`
+  )
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 160);
+
   return (
     <div className={styles.page}>
+      <Seo
+        title={product.name}
+        description={metaDescription}
+        canonical={`/produit/${product.slug}`}
+        image={productImageUrl}
+        type="product"
+        jsonLd={[productJsonLd, breadcrumbJsonLd]}
+      />
       {/* Navigation retour discrète */}
       <nav className={styles.breadcrumb} aria-label="Navigation">
         <button

@@ -1,0 +1,17 @@
+# BoulevardTCG — robots.txt
+User-agent: *
+Allow: /
+
+# Pages privées / transactionnelles : pas d'intérêt SEO, ne pas indexer
+Disallow: /admin
+Disallow: /panier
+Disallow: /checkout
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /profile
+Disallow: /orders
+Disallow: /order-tracking
+
+Sitemap: https://boulevardtcg.com/sitemap.xml

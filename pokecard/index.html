@@ -2,9 +2,32 @@
 <html lang="fr" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BoulevardTCG - Le Boulevard Prestige du TCG</title>
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>BoulevardTCG — Le Boulevard Prestige du TCG</title>
+
+    <!-- Méta par défaut (fallback pour les crawlers lisant le HTML brut ;
+         surchargées par page via le composant <Seo /> côté React) -->
+    <meta
+      name="description"
+      content="BoulevardTCG — boutique de cartes à collectionner : produits scellés Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Authenticité garantie, paiement sécurisé."
+    />
+    <link rel="canonical" href="https://boulevardtcg.com/" />
+    <meta property="og:site_name" content="BoulevardTCG" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BoulevardTCG — Le Boulevard Prestige du TCG" />
+    <meta
+      property="og:description"
+      content="Produits scellés Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Authenticité garantie, paiement sécurisé."
+    />
+    <meta property="og:url" content="https://boulevardtcg.com/" />
+    <meta property="og:image" content="https://boulevardtcg.com/carte_accueil/dracaufeu.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     
     <!-- Script anti-flash : applique le thème AVANT le rendu -->
     <script>

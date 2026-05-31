@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import styles from './ProductsPage.module.css';
 import { listProducts } from './api';
 import { PLACEHOLDER_IMAGE } from './utils/imageFallback';
@@ -379,6 +380,11 @@ export function ProductsPage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Boutique — Produits scellés TCG"
+        description="Toute la boutique BoulevardTCG : displays, ETB, coffrets et boosters scellés Pokémon, One Piece, Magic et plus. Authenticité garantie, paiement sécurisé."
+        canonical="/produits"
+      />
       <div className={styles.container}>
         {/* En-tête */}
         <div className={styles.header}>

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noUnusedLocals false --noUnusedParameters false && vite build",
+    "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,scss,json}\"",

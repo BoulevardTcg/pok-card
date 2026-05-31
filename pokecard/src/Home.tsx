@@ -11,10 +11,39 @@ import NewReleases from './components/landing/NewReleases';
 import ProcessSection from './components/landing/ProcessSection';
 import FinalCTA from './components/landing/FinalCTA';
 import FooterPremium from './components/landing/FooterPremium';
+import { Seo } from './components/Seo';
+import { SITE_URL, SITE_NAME, absoluteUrl } from './lib/site';
+
+const homeJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: absoluteUrl('/favicon.png'),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}/produits?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
 
 export function Home() {
   return (
     <>
+      <Seo
+        title="Cartes à collectionner & produits scellés"
+        description="BoulevardTCG : boutique premium de cartes à collectionner. Produits scellés Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Authenticité garantie, paiement sécurisé, livraison soignée."
+        canonical="/"
+        jsonLd={homeJsonLd}
+      />
       <NavbarGlass />
       <main>
         {/* Hero — Accroche émotionnelle + rotation de cartes */}

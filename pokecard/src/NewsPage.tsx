@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { handleImageError } from './utils/imageFallback';
 import styles from './NewsPage.module.css';
+import { Seo } from './components/Seo';
 
 type TCGCategory =
   | 'Pokémon'
@@ -489,6 +490,11 @@ export function NewsPage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Actualités TCG"
+        description="L'actualité des cartes à collectionner : sorties Pokémon, One Piece, Magic, Yu-Gi-Oh!, Lorcana et plus, suivie par BoulevardTCG."
+        canonical="/actualites"
+      />
       <div className={styles.backgroundEffects}>
         <div className={styles.gradientOrb}></div>
         <div className={styles.noiseOverlay}></div>

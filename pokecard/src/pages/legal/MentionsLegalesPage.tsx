@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LegalPage.module.css';
 import FooterPremium from '../../components/landing/FooterPremium';
+import { Seo } from '../../components/Seo';
 
 export function MentionsLegalesPage() {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ export function MentionsLegalesPage() {
 
   return (
     <div className={styles.legalPage}>
+      <Seo
+        title="Mentions légales"
+        description="Mentions légales de BoulevardTCG : éditeur du site, hébergement et informations légales."
+        canonical="/mentions-legales"
+      />
       <div className={styles.container}>
         <button onClick={() => navigate(-1)} className={styles.backButton}>
           ← Retour

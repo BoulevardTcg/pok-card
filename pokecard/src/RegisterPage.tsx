@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { useAuth } from './authContext';
 import './RegisterPage.css';
 
@@ -95,6 +96,7 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="register-container">
+      <Seo title="Créer un compte" noindex />
       <div className="register-card">
         <div className="register-header">
           <h1>Créer un compte</h1>

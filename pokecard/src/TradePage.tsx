@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { motion } from 'framer-motion';
 import { API_BASE } from './api';
 import { handleImageError } from './utils/imageFallback';
@@ -92,6 +93,11 @@ export function TradePage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Échange de cartes"
+        description="Échangez vos cartes à collectionner entre passionnés sur BoulevardTCG. Fonctionnalité en cours de développement."
+        canonical="/trade"
+      />
       <div className={styles.container}>
         {/* Panneau d'avertissement - En construction */}
         <div className={styles.constructionBanner}>

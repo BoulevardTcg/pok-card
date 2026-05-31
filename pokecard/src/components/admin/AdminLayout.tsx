@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import styles from './AdminLayout.module.css';
+import { Seo } from '../Seo';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -236,6 +237,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className={styles.adminLayout}>
+      <Seo title="Administration" noindex />
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.open : ''}`}>
         <div className={styles.sidebarHeader}>

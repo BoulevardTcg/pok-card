@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import styles from './AccessoiresPage.module.css';
 import { listProducts, getImageUrl } from './api';
 import { NotifyModal } from './components/NotifyModal';
@@ -340,6 +341,11 @@ export function AccessoiresPage() {
 
   return (
     <div className={styles.container}>
+      <Seo
+        title="Accessoires TCG"
+        description="Accessoires pour cartes à collectionner : sleeves, classeurs, deck boxes, playmats et plus. Protégez, organisez et jouez avec BoulevardTCG."
+        canonical="/accessoires"
+      />
       <div className={styles.header}>
         <h1 className={styles.title}>Accessoires TCG</h1>
         <p className={styles.subtitle}>
