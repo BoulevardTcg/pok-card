@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import styles from './ProductsPage.module.css';
 import { listProducts, getImageUrl } from './api';
 import { NotifyModal } from './components/NotifyModal';
@@ -55,6 +56,11 @@ export function ProtectionsPage() {
 
   return (
     <div className={styles.container}>
+      <Seo
+        title="Protections pour cartes"
+        description="Sleeves, étuis, classeurs et toploaders pour protéger vos cartes à collectionner. Sélection premium BoulevardTCG."
+        canonical="/protections"
+      />
       <div className={styles.header}>
         <h1 className={styles.title}>Protections</h1>
         <p className={styles.subtitle}>

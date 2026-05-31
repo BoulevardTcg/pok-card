@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { CartContext } from '../../cartContext';
 import { getImageUrl } from '../../api';
@@ -103,11 +103,10 @@ export default function ProductCard({
     }
   };
 
-  const handleCardClick = () => {
-    if (product.slug) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      navigate(`/produit/${product.slug}`);
-    }
+  const productUrl = product.slug ? `/produit/${product.slug}` : '#';
+
+  const handleProductNavigate = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -129,29 +128,39 @@ export default function ProductCard({
       : product.image?.url || null;
 
   return (
-    <div
+    <article
       className={`${styles.card} ${stockStatus.status === 'out-of-stock' ? styles.outOfStock : ''}`}
-      onClick={handleCardClick}
     >
       {/* Image Container */}
       <div className={styles.imageContainer}>
         {productImage ? (
-          <img
-            src={getImageUrl(productImage)}
-            alt={product.image?.altText || product.name}
-            className={styles.productImage}
-            onError={(e) => {
-              // En cas d'erreur de chargement, afficher le placeholder
-              e.currentTarget.style.display = 'none';
-              const container = e.currentTarget.parentElement;
-              if (container) {
-                const placeholder = container.querySelector(`.${styles.placeholderImage}`);
-                if (placeholder) {
-                  (placeholder as HTMLElement).style.display = 'flex';
+          <Link
+            to={productUrl}
+            onClick={handleProductNavigate}
+            aria-label={product.name}
+            tabIndex={-1}
+          >
+            <img
+              src={getImageUrl(productImage)}
+              alt={product.image?.altText || product.name}
+              className={styles.productImage}
+              loading="lazy"
+              decoding="async"
+              width={400}
+              height={400}
+              onError={(e) => {
+                // En cas d'erreur de chargement, afficher le placeholder
+                e.currentTarget.style.display = 'none';
+                const container = e.currentTarget.closest(`.${styles.imageContainer}`);
+                if (container) {
+                  const placeholder = container.querySelector(`.${styles.placeholderImage}`);
+                  if (placeholder) {
+                    (placeholder as HTMLElement).style.display = 'flex';
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          </Link>
         ) : null}
 
         {/* Placeholder si pas d'image */}
@@ -186,7 +195,11 @@ export default function ProductCard({
       {/* Product Info */}
       <div className={styles.productInfo}>
         <div className={styles.categoryLabel}>{product.category}</div>
-        <h3 className={styles.productTitle}>{product.name}</h3>
+        <h3 className={styles.productTitle}>
+          <Link to={productUrl} onClick={handleProductNavigate} className={styles.productTitleLink}>
+            {product.name}
+          </Link>
+        </h3>
         <div className={styles.productMeta}>
           <span className={styles.metaItem}>{productTypeLabels[productType]}</span>
           <span className={styles.metaItem}>{language}</span>
@@ -229,6 +242,6 @@ export default function ProductCard({
           <span>Paiement sécurisé</span>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

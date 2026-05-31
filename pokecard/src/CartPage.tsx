@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { CartContext } from './cartContext';
 import { useAuth } from './authContext';
 import { CartIcon } from './components/icons/Icons';
@@ -449,6 +450,7 @@ export function CartPage() {
 
   return (
     <div className={styles.page}>
+      <Seo title="Panier" noindex />
       <div className={styles.container}>
         <h1 className={styles.title}>Panier</h1>
 

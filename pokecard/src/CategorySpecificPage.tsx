@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import styles from './CategorySpecificPage.module.css';
 import { listProducts } from './api';
 import type { Product as ProductType } from './cartContext';
@@ -465,6 +466,7 @@ export function CategorySpecificPage() {
 
   return (
     <div className={styles.container}>
+      <Seo title={categoryData.title} description={categoryData.description} />
       <div className={styles.header} style={{ borderColor: categoryData.color }}>
         <div className={styles.categoryIcon} style={{ color: categoryData.color }}>
           {categoryData.icon}

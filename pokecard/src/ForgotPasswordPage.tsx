@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { Mail, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { API_BASE } from './api';
 import styles from './ForgotPasswordPage.module.css';
@@ -77,6 +78,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className={styles.page}>
+      <Seo title="Mot de passe oublié" noindex />
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>

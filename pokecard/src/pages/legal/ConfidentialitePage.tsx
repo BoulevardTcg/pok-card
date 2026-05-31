@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LegalPage.module.css';
 import FooterPremium from '../../components/landing/FooterPremium';
+import { Seo } from '../../components/Seo';
 
 export function ConfidentialitePage() {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ export function ConfidentialitePage() {
 
   return (
     <div className={styles.legalPage}>
+      <Seo
+        title="Politique de confidentialité"
+        description="Politique de confidentialité de BoulevardTCG : données personnelles, cookies et droits RGPD."
+        canonical="/confidentialite"
+      />
       <div className={styles.container}>
         <button onClick={() => navigate(-1)} className={styles.backButton}>
           ← Retour

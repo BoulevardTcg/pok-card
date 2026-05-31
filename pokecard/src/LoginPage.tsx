@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Seo } from './components/Seo';
 import { useAuth } from './authContext';
 import { CartContext } from './cartContext';
 import { Shield, Key, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
@@ -228,6 +229,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className={styles.page}>
+      <Seo title="Connexion" noindex />
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>

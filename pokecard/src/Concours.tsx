@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Seo } from './components/Seo';
 import { AnimatedSection } from './components/AnimatedSection';
 import { AnimatedGrid } from './components/AnimatedGrid';
 
@@ -158,6 +159,11 @@ export function Concours() {
         padding: '24px',
       }}
     >
+      <Seo
+        title="Concours"
+        description="Participez aux concours BoulevardTCG et tentez de remporter des produits scellés et cartes rares à collectionner."
+        canonical="/concours"
+      />
       {/* Header principal */}
       <AnimatedSection animation="fadeUp" delay={0.1}>
         <div style={{ textAlign: 'center', marginBottom: '48px', padding: '32px 0' }}>

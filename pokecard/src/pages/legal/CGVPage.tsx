@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LegalPage.module.css';
 import FooterPremium from '../../components/landing/FooterPremium';
+import { Seo } from '../../components/Seo';
 
 export function CGVPage() {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ export function CGVPage() {
 
   return (
     <div className={styles.legalPage}>
+      <Seo
+        title="Conditions générales de vente"
+        description="Conditions générales de vente de BoulevardTCG : commandes, paiement, livraison, rétractation et garanties."
+        canonical="/cgv"
+      />
       <div className={styles.container}>
         <button onClick={() => navigate(-1)} className={styles.backButton}>
           ← Retour

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { Seo } from './components/Seo';
 import { useNavigate } from 'react-router-dom';
 import { MailIcon, GlobeIcon, SendIcon, CheckIcon } from './components/icons/Icons';
 import styles from './ContactPage.module.css';
@@ -187,6 +188,11 @@ export function ContactPage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Contact"
+        description="Une question sur une commande, un produit ou un échange ? Contactez l'équipe BoulevardTCG, nous vous répondons rapidement."
+        canonical="/contact"
+      />
       <div className={styles.container}>
         <header className={styles.header}>
           <span className={styles.overline}>Contact</span>
