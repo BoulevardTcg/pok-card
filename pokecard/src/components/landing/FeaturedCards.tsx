@@ -297,6 +297,8 @@ export default function FeaturedCards() {
                         src={imageUrl}
                         alt={product.name}
                         className={styles.cardImage}
+                        loading="lazy"
+                        decoding="async"
                         onError={handleImageError}
                       />
 

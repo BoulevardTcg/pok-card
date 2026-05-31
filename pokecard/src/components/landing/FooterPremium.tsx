@@ -45,6 +45,8 @@ export default function FooterPremium() {
                 src="/img/phoenix-logo.png.png"
                 alt="BoulevardTCG"
                 className={styles.logoImage}
+                loading="lazy"
+                decoding="async"
               />
             </button>
             <p className={styles.tagline}>Play your cards.</p>

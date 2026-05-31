@@ -57,21 +57,24 @@ export default function HeroSection() {
   const productRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef(0);
   const animationPausedRef = useRef(false);
+  const offscreenRef = useRef(false);
   const shouldReduceMotion = useReducedMotion();
 
   const currentProduct = HERO_PRODUCTS[currentProductIndex];
 
-  // Particules mémorisées pour éviter le recalcul à chaque re-render
-  const particles = useMemo(
-    () =>
-      [...Array(50)].map((_, i) => ({
-        id: i,
-        left: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${8 + Math.random() * 12}s`,
-      })),
-    []
-  );
+  // Particules mémorisées pour éviter le recalcul à chaque re-render.
+  // Désactivées en reduced-motion, et nombre réduit sur mobile (perf/INP).
+  const particles = useMemo(() => {
+    if (shouldReduceMotion) return [];
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const count = isMobile ? 16 : 28;
+    return [...Array(count)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 5}s`,
+      animationDuration: `${8 + Math.random() * 12}s`,
+    }));
+  }, [shouldReduceMotion]);
 
   // Configuration spring pour animations hero
   const SPRING_HERO = {
@@ -156,7 +159,7 @@ export default function HeroSection() {
     productRef.current.style.willChange = 'transform';
 
     const animate = () => {
-      if (!isActive || !productRef.current || animationPausedRef.current) {
+      if (!isActive || !productRef.current || animationPausedRef.current || offscreenRef.current) {
         if (isActive) {
           rafId = requestAnimationFrame(animate);
         }
@@ -182,11 +185,22 @@ export default function HeroSection() {
     // Capture the ref value for cleanup
     const productElement = productRef.current;
 
+    // Met l'animation en pause lorsque le hero n'est plus visible à l'écran
+    // (économie CPU/batterie : rAF continue sinon de tourner pendant tout le scroll).
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        offscreenRef.current = !entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    observer.observe(productElement);
+
     return () => {
       isActive = false;
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
+      observer.disconnect();
       if (productElement) {
         productElement.style.willChange = 'auto';
       }
@@ -293,6 +307,7 @@ export default function HeroSection() {
                 alt={`${currentProduct.name} - ${currentProduct.subtitle}`}
                 className={styles.cardImage}
                 loading="eager"
+                fetchPriority="high"
                 style={
                   'objectPosition' in currentProduct
                     ? { objectPosition: currentProduct.objectPosition }
