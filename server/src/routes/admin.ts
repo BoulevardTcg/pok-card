@@ -13,7 +13,7 @@ import {
   sendOrderConfirmationEmail,
 } from '../services/email.js';
 import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js';
-import { audit } from '../utils/audit.js';
+import { audit, auditLog } from '../utils/audit.js';
 
 const router = Router();
 
@@ -1163,6 +1163,14 @@ router.get('/users', async (req: Request, res: Response) => {
       prisma.user.count({ where }),
     ]);
 
+    // RGPD : tracer la consultation admin de données personnelles (emails clients)
+    auditLog(req, 'USER_DATA_ACCESS', 'user', 'list', {
+      action: 'ADMIN_LIST_USERS',
+      count: users.length,
+      search: search ? String(search) : undefined,
+      role: role ? String(role) : undefined,
+    });
+
     res.json({
       users,
       pagination: {
@@ -1212,6 +1220,9 @@ router.get('/users/:userId', async (req: Request, res: Response) => {
         code: 'USER_NOT_FOUND',
       });
     }
+
+    // RGPD : tracer la consultation admin de la fiche détaillée d'un utilisateur
+    auditLog(req, 'USER_DATA_ACCESS', 'user', userId, { action: 'ADMIN_VIEW_USER' });
 
     res.json({ user });
   } catch {

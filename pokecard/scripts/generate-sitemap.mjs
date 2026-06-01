@@ -47,22 +47,39 @@ function urlEntry({ path, changefreq, priority, lastmod }) {
 
 async function fetchProductRoutes() {
   if (!API_URL) return [];
+  const base = API_URL.replace(/\/$/, '');
+  // L'API plafonne `limit` à 48 → on pagine jusqu'à épuisement.
+  const limit = 48;
+  const collected = [];
+
+  const pushProduct = (p) => {
+    if (!p?.slug) return;
+    collected.push({
+      path: `/produit/${p.slug}`,
+      changefreq: 'weekly',
+      priority: '0.8',
+      lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : undefined,
+    });
+  };
+
   try {
-    const res = await fetch(`${API_URL.replace(/\/$/, '')}/products?limit=1000`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    const products = Array.isArray(json) ? json : (json.data ?? []);
-    return products
-      .filter((p) => p?.slug)
-      .map((p) => ({
-        path: `/produit/${p.slug}`,
-        changefreq: 'weekly',
-        priority: '0.8',
-        lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : undefined,
-      }));
+    let page = 1;
+    let pages = 1;
+    do {
+      const res = await fetch(`${base}/products?limit=${limit}&page=${page}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      // L'API renvoie { products, pagination }. Fallbacks au cas où.
+      const products = json.products ?? json.data ?? (Array.isArray(json) ? json : []);
+      products.forEach(pushProduct);
+      pages = json.pagination?.pages ?? 1;
+      page += 1;
+    } while (page <= pages);
+    return collected;
   } catch (err) {
     console.warn(`[sitemap] Produits ignorés (API injoignable) : ${err.message}`);
-    return [];
+    // On garde ce qui a déjà été collecté avant l'erreur éventuelle.
+    return collected;
   }
 }
 

@@ -13,6 +13,7 @@ export type AuditAction =
   | 'ORDER_DELIVER'
   | 'USER_UPDATE'
   | 'USER_ROLE_CHANGE'
+  | 'USER_DATA_ACCESS'
   | 'PROMO_CREATE'
   | 'PROMO_UPDATE'
   | 'PROMO_DELETE'
