@@ -9,7 +9,7 @@ export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? 'https://boulevardtcg.
 export const SITE_NAME = 'BoulevardTCG';
 
 export const SITE_DESCRIPTION =
-  'BoulevardTCG — boutique de cartes à collectionner : produits scellés Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Authenticité garantie, paiement sécurisé, livraison soignée.';
+  'BoulevardTCG, votre boutique TCG par des passionnés : produits scellés et cartes à collectionner Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana.';
 
 // Image de partage par défaut (Open Graph / Twitter). 1200x630 recommandé.
 export const SITE_OG_IMAGE = '/carte_accueil/dracaufeu.png';

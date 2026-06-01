@@ -40,7 +40,7 @@ export function Home() {
     <>
       <Seo
         title="Cartes à collectionner & produits scellés"
-        description="BoulevardTCG : boutique premium de cartes à collectionner. Produits scellés Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana. Authenticité garantie, paiement sécurisé, livraison soignée."
+        description="BoulevardTCG, votre boutique TCG par des passionnés : produits scellés et cartes à collectionner Pokémon, One Piece, Magic, Yu-Gi-Oh! et Lorcana."
         canonical="/"
         jsonLd={homeJsonLd}
       />
