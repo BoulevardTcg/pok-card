@@ -6,15 +6,26 @@
  *   SITE_URL=https://boulevardtcg.com API_URL=https://api.boulevardtcg.com/api \
  *     node scripts/generate-sitemap.mjs
  *
- * Sans API_URL ou si l'API est injoignable, seules les pages statiques sont écrites
- * (le build ne casse pas).
+ * En l'absence de SITE_URL / API_URL, le script réutilise VITE_SITE_URL /
+ * VITE_API_URL (déjà définis dans le build front, ex. sur Vercel) — donc rien
+ * à configurer en plus en pratique.
+ *
+ * Sans aucune URL d'API ou si l'API est injoignable, seules les pages statiques
+ * sont écrites (le build ne casse pas).
  */
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-const SITE_URL = (process.env.SITE_URL ?? 'https://boulevardtcg.com').replace(/\/$/, '');
-const API_URL = process.env.API_URL ?? '';
+// Réutilise les variables déjà présentes dans l'environnement de build du
+// frontend (Vercel : VITE_API_URL est déjà défini pour que le site appelle
+// l'API). On accepte aussi SITE_URL / API_URL si on veut surcharger.
+const SITE_URL = (
+  process.env.SITE_URL ??
+  process.env.VITE_SITE_URL ??
+  'https://boulevardtcg.com'
+).replace(/\/$/, '');
+const API_URL = process.env.API_URL ?? process.env.VITE_API_URL ?? '';
 
 const STATIC_ROUTES = [
   { path: '/', changefreq: 'daily', priority: '1.0' },
