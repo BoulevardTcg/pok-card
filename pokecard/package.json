@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-sitemap.mjs",
     "build": "tsc --noUnusedLocals false --noUnusedParameters false && vite build",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "optimize:images": "node scripts/optimize-images.mjs",

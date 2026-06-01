@@ -40,6 +40,17 @@ const UsersIcon = () => (
   </svg>
 );
 
+/**
+ * Masque partiellement un email (RGPD : minimisation de l'affichage).
+ * "jean.dupont@gmail.com" -> "je***@gmail.com"
+ */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!domain) return '***';
+  const visible = local.slice(0, 2);
+  return `${visible}${'*'.repeat(Math.max(3, local.length - 2))}@${domain}`;
+}
+
 interface User {
   id: string;
   email: string;
@@ -56,6 +67,15 @@ export function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [revealedEmails, setRevealedEmails] = useState<Set<string>>(new Set());
+
+  const toggleEmail = (id: string) =>
+    setRevealedEmails((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -167,7 +187,18 @@ export function AdminUsersPage() {
                     </div>
                   </td>
                   <td>
-                    <span className={styles.email}>{u.email}</span>
+                    <button
+                      type="button"
+                      className={styles.emailButton}
+                      onClick={() => toggleEmail(u.id)}
+                      title={
+                        revealedEmails.has(u.id)
+                          ? "Masquer l'email"
+                          : "Cliquer pour révéler l'email"
+                      }
+                    >
+                      {revealedEmails.has(u.id) ? u.email : maskEmail(u.email)}
+                    </button>
                   </td>
                   <td>
                     <span className={styles.orderCount}>{u._count.orders}</span>

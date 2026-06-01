@@ -6,15 +6,26 @@
  *   SITE_URL=https://boulevardtcg.com API_URL=https://api.boulevardtcg.com/api \
  *     node scripts/generate-sitemap.mjs
  *
- * Sans API_URL ou si l'API est injoignable, seules les pages statiques sont écrites
- * (le build ne casse pas).
+ * En l'absence de SITE_URL / API_URL, le script réutilise VITE_SITE_URL /
+ * VITE_API_URL (déjà définis dans le build front, ex. sur Vercel) — donc rien
+ * à configurer en plus en pratique.
+ *
+ * Sans aucune URL d'API ou si l'API est injoignable, seules les pages statiques
+ * sont écrites (le build ne casse pas).
  */
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-const SITE_URL = (process.env.SITE_URL ?? 'https://boulevardtcg.com').replace(/\/$/, '');
-const API_URL = process.env.API_URL ?? '';
+// Réutilise les variables déjà présentes dans l'environnement de build du
+// frontend (Vercel : VITE_API_URL est déjà défini pour que le site appelle
+// l'API). On accepte aussi SITE_URL / API_URL si on veut surcharger.
+const SITE_URL = (
+  process.env.SITE_URL ??
+  process.env.VITE_SITE_URL ??
+  'https://boulevardtcg.com'
+).replace(/\/$/, '');
+const API_URL = process.env.API_URL ?? process.env.VITE_API_URL ?? '';
 
 const STATIC_ROUTES = [
   { path: '/', changefreq: 'daily', priority: '1.0' },
@@ -47,22 +58,39 @@ function urlEntry({ path, changefreq, priority, lastmod }) {
 
 async function fetchProductRoutes() {
   if (!API_URL) return [];
+  const base = API_URL.replace(/\/$/, '');
+  // L'API plafonne `limit` à 48 → on pagine jusqu'à épuisement.
+  const limit = 48;
+  const collected = [];
+
+  const pushProduct = (p) => {
+    if (!p?.slug) return;
+    collected.push({
+      path: `/produit/${p.slug}`,
+      changefreq: 'weekly',
+      priority: '0.8',
+      lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : undefined,
+    });
+  };
+
   try {
-    const res = await fetch(`${API_URL.replace(/\/$/, '')}/products?limit=1000`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    const products = Array.isArray(json) ? json : (json.data ?? []);
-    return products
-      .filter((p) => p?.slug)
-      .map((p) => ({
-        path: `/produit/${p.slug}`,
-        changefreq: 'weekly',
-        priority: '0.8',
-        lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : undefined,
-      }));
+    let page = 1;
+    let pages = 1;
+    do {
+      const res = await fetch(`${base}/products?limit=${limit}&page=${page}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      // L'API renvoie { products, pagination }. Fallbacks au cas où.
+      const products = json.products ?? json.data ?? (Array.isArray(json) ? json : []);
+      products.forEach(pushProduct);
+      pages = json.pagination?.pages ?? 1;
+      page += 1;
+    } while (page <= pages);
+    return collected;
   } catch (err) {
     console.warn(`[sitemap] Produits ignorés (API injoignable) : ${err.message}`);
-    return [];
+    // On garde ce qui a déjà été collecté avant l'erreur éventuelle.
+    return collected;
   }
 }
 

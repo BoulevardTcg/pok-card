@@ -359,6 +359,11 @@ export function ProductDetail() {
     product.minPriceCents != null ? (product.minPriceCents / 100).toFixed(2) : undefined;
   const inStock = !product.outOfStock && product.variants.some((v) => v.stock > 0);
   const ratingStats = reviewsData?.stats;
+  // Validité du prix annoncée à Google (~1 an) pour éviter l'avertissement
+  // "priceValidUntil manquant" dans les rich results.
+  const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0];
 
   const productJsonLd = {
     '@context': 'https://schema.org',
@@ -377,6 +382,8 @@ export function ProductDetail() {
             price: priceEuros,
             priceCurrency: 'EUR',
             availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            priceValidUntil,
             url: absoluteUrl(`/produit/${product.slug}`),
           },
         }
