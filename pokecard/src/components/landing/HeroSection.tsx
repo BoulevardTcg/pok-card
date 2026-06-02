@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowRightIcon } from '../icons/Icons';
 import styles from './HeroSection.module.css';
 
@@ -231,35 +231,35 @@ export default function HeroSection() {
 
       <div className={styles.heroContainer}>
         {/* Contenu textuel avec animations stagger */}
-        <motion.div
+        <m.div
           className={styles.heroContent}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div className={styles.universeBadge} variants={itemVariants}>
+          <m.div className={styles.universeBadge} variants={itemVariants}>
             <span className={styles.universeDot} />
             <span>{currentProduct.universe}</span>
-          </motion.div>
+          </m.div>
 
           <h1 className={styles.title}>
-            <motion.span className={styles.titleMain} variants={itemVariants}>
+            <m.span className={styles.titleMain} variants={itemVariants}>
               Découvrez.
-            </motion.span>
-            <motion.span className={styles.titleMain} variants={itemVariants}>
+            </m.span>
+            <m.span className={styles.titleMain} variants={itemVariants}>
               Collectionnez.
-            </motion.span>
-            <motion.span className={styles.titleAccent} variants={itemVariants}>
+            </m.span>
+            <m.span className={styles.titleAccent} variants={itemVariants}>
               Play your cards.
-            </motion.span>
+            </m.span>
           </h1>
 
-          <motion.p className={styles.description} variants={itemVariants}>
+          <m.p className={styles.description} variants={itemVariants}>
             Boulevard propose des produits scellés pour les passionnés de cartes à collectionner.
-          </motion.p>
+          </m.p>
 
-          <motion.div className={styles.heroActions} variants={itemVariants}>
-            <motion.button
+          <m.div className={styles.heroActions} variants={itemVariants}>
+            <m.button
               onClick={() => navigate('/produits')}
               className={styles.primaryCta}
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.02, y: shouldReduceMotion ? 0 : -1 }}
@@ -268,11 +268,11 @@ export default function HeroSection() {
             >
               <span>Explorer la boutique</span>
               <ArrowRightIcon size={18} />
-            </motion.button>
-          </motion.div>
+            </m.button>
+          </m.div>
 
           {/* Product indicators */}
-          <motion.div className={styles.cardIndicators} variants={itemVariants}>
+          <m.div className={styles.cardIndicators} variants={itemVariants}>
             {HERO_PRODUCTS.map((product, index) => (
               <button
                 key={product.id}
@@ -283,11 +283,11 @@ export default function HeroSection() {
                 <span className={styles.indicatorProgress} />
               </button>
             ))}
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Produit en vedette */}
-        <motion.div
+        <m.div
           className={styles.heroVisual}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -325,7 +325,7 @@ export default function HeroSection() {
               <span className={styles.cardSubtitle}>{currentProduct.subtitle}</span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Indicateur scroll - centré en bas de la section */}

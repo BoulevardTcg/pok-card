@@ -1,4 +1,5 @@
 import { useEffect, useRef, lazy, Suspense } from 'react';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Home } from './Home';
 import styles from './App.module.css';
@@ -10,8 +11,8 @@ import { AuthProvider } from './authContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Routes chargées à la demande (code-splitting) pour alléger le bundle initial.
-// Les pages publiques secondaires, le compte, l'admin et les libs lourdes (Three.js
-// via ProductDetail/Trade) ne sont téléchargées que lorsqu'elles sont visitées.
+// Les pages publiques secondaires, le compte et l'admin ne sont téléchargés que
+// lorsqu'ils sont visités.
 const Concours = lazy(() => import('./Concours').then((m) => ({ default: m.Concours })));
 const ProductDetail = lazy(() =>
   import('./ProductDetail').then((m) => ({ default: m.ProductDetail }))
@@ -304,7 +305,12 @@ export default function App() {
     <DarkModeProvider>
       <AuthProvider>
         <ErrorBoundary>
-          <AppContent />
+          {/* LazyMotion + composant `m` : ne charge que le sous-ensemble
+              domAnimation (animations, variants, gestures) au lieu d'embarquer
+              tout framer-motion via le composant `motion`. */}
+          <LazyMotion features={domAnimation} strict>
+            <AppContent />
+          </LazyMotion>
         </ErrorBoundary>
       </AuthProvider>
     </DarkModeProvider>

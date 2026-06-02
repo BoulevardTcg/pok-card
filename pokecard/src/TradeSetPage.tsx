@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import HoloCard from './HoloCard';
 import { loadFoilMap } from './foilMap';
 import { API_BASE } from './api';
@@ -81,7 +81,7 @@ export function TradeSetPage() {
     <div className={styles.page}>
       <div className={styles.container}>
         {/* Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -94,10 +94,10 @@ export function TradeSetPage() {
           <h1 className={styles.title}>Série {id}</h1>
           <div className={styles.divider}></div>
           <p className={styles.description}>{cards.length} cartes disponibles</p>
-        </motion.div>
+        </m.div>
 
         {/* Barre de recherche et filtres */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -125,10 +125,10 @@ export function TradeSetPage() {
               </option>
             ))}
           </select>
-        </motion.div>
+        </m.div>
 
         {/* Statistiques */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -146,11 +146,11 @@ export function TradeSetPage() {
             <div className={styles.statValue}>{rarityOptions.length}</div>
             <div className={styles.statLabel}>Raretés</div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Grille des cartes */}
         {filteredCards.length === 0 ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -159,16 +159,16 @@ export function TradeSetPage() {
             <div className={styles.emptyIcon}>🔍</div>
             <h3 className={styles.emptyTitle}>Aucune carte trouvée</h3>
             <p className={styles.emptyText}>Essayez de modifier vos critères de recherche</p>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className={styles.cardsGrid}
           >
             {filteredCards.map((card) => (
-              <motion.div
+              <m.div
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -203,9 +203,9 @@ export function TradeSetPage() {
                     <button className={styles.tradeButton}>💰 Échanger</button>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         )}
       </div>
     </div>

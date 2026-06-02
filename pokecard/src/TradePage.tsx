@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Seo } from './components/Seo';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { API_BASE } from './api';
 import { handleImageError } from './utils/imageFallback';
 import styles from './TradePage.module.css';
@@ -114,7 +114,7 @@ export function TradePage() {
         </div>
 
         {/* Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -125,10 +125,10 @@ export function TradePage() {
           <p className={styles.description}>
             Découvrez et échangez des cartes de toutes les séries Pokémon et One Piece
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Barre de recherche et filtres */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -156,10 +156,10 @@ export function TradePage() {
               </option>
             ))}
           </select>
-        </motion.div>
+        </m.div>
 
         {/* Statistiques */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -173,11 +173,11 @@ export function TradePage() {
             <div className={styles.statValue}>{filteredSets.length}</div>
             <div className={styles.statLabel}>Résultats</div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Grille des extensions */}
         {filteredSets.length === 0 ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -186,11 +186,11 @@ export function TradePage() {
             <div className={styles.emptyIcon}>🔍</div>
             <h3 className={styles.emptyTitle}>Aucune extension trouvée</h3>
             <p className={styles.emptyText}>Essayez de modifier vos critères de recherche</p>
-          </motion.div>
+          </m.div>
         ) : (
           <div className={styles.setsGrid}>
             {filteredSets.map((set) => (
-              <motion.div
+              <m.div
                 key={set.id}
                 initial={false}
                 animate={{ opacity: 1 }}
@@ -235,7 +235,7 @@ export function TradePage() {
 
                   <div className={styles.setArrow}>→</div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         )}

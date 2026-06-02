@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { m, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { CartContext, type Product as ProductType } from '../../cartContext';
 import { useAuth } from '../../authContext';
 import { useDarkMode } from '../../contexts/useDarkMode';
@@ -325,7 +325,7 @@ export default function NavbarGlass() {
   };
 
   return (
-    <motion.nav
+    <m.nav
       className={styles.navbar}
       initial="initial"
       animate="animate"
@@ -336,7 +336,7 @@ export default function NavbarGlass() {
       <div className={styles.pill}>
         <div className={styles.container}>
           {/* Logo (Gauche) */}
-          <motion.button
+          <m.button
             className={styles.logo}
             onClick={() => navigate('/')}
             aria-label="Retour à l'accueil"
@@ -350,7 +350,7 @@ export default function NavbarGlass() {
               className={styles.logoImage}
               onError={handleImageError}
             />
-          </motion.button>
+          </m.button>
 
           {/* Navigation Centrale */}
           <ul className={styles.navLinks} role="list">
@@ -368,24 +368,24 @@ export default function NavbarGlass() {
                     onMouseLeave={() => setHoveredItem(null)}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <motion.span
+                    <m.span
                       variants={navLinkVariants}
                       initial="rest"
                       animate={isActive ? 'active' : isHovered ? 'hover' : 'rest'}
                       className={styles.navLinkText}
                     >
                       {item.label}
-                    </motion.span>
+                    </m.span>
 
-                    {/* Underline animé avec layoutId */}
+                    {/* Soulignement de l'item actif/survolé : fondu d'opacité
+                        (compatible LazyMotion domAnimation, sans feature layout). */}
                     {shouldShowUnderline && (
-                      <motion.div
+                      <m.div
                         className={styles.underline}
-                        layoutId="navbar-underline"
-                        initial={false}
-                        transition={
-                          shouldReduceMotion ? { duration: 0.2, ease: 'easeInOut' } : SPRING_CONFIG
-                        }
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2, ease: 'easeInOut' }}
                       />
                     )}
                   </Link>
@@ -399,7 +399,7 @@ export default function NavbarGlass() {
             {/* Recherche avec autocomplétion */}
             <div className={styles.searchWrapper} ref={searchResultsRef}>
               <form onSubmit={handleSearch} className={styles.searchForm}>
-                <motion.div
+                <m.div
                   className={`${styles.searchContainer} ${isSearchFocused ? styles.searchFocused : ''} ${showSearchResults ? styles.searchContainerOpen : ''}`}
                   whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
                   transition={shouldReduceMotion ? { duration: 0.15 } : SPRING_CONFIG}
@@ -428,13 +428,13 @@ export default function NavbarGlass() {
                     aria-autocomplete="list"
                   />
                   {isSearching && <div className={styles.searchSpinner} />}
-                </motion.div>
+                </m.div>
               </form>
 
               {/* Résultats de recherche */}
               <AnimatePresence>
                 {showSearchResults && searchResults.length > 0 && (
-                  <motion.div
+                  <m.div
                     className={styles.searchResults}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -483,7 +483,7 @@ export default function NavbarGlass() {
                         )
                       );
                     })()}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -499,7 +499,7 @@ export default function NavbarGlass() {
               className={styles.themeToggle}
             >
               <AnimatePresence mode="wait" initial={false}>
-                <motion.span
+                <m.span
                   key={isDark ? 'moon' : 'sun'}
                   initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -508,12 +508,12 @@ export default function NavbarGlass() {
                   className={styles.themeIconWrapper}
                 >
                   {isDark ? <MoonIcon size={16} /> : <SunIcon size={16} />}
-                </motion.span>
+                </m.span>
               </AnimatePresence>
             </LiquidMetalIconButton>
 
             {/* Panier (toujours visible) */}
-            <motion.button
+            <m.button
               onClick={() => navigate('/panier')}
               className={styles.iconButton}
               aria-label={`Panier${cartCount > 0 ? ` (${cartCount} articles)` : ''}`}
@@ -524,22 +524,22 @@ export default function NavbarGlass() {
             >
               <CartIcon size={18} />
               {cartCount > 0 && (
-                <motion.span
+                <m.span
                   className={styles.cartBadge}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={shouldReduceMotion ? { duration: 0.2 } : SPRING_CONFIG}
                 >
                   {cartCount > 9 ? '9+' : cartCount}
-                </motion.span>
+                </m.span>
               )}
-            </motion.button>
+            </m.button>
 
             {/* Utilisateur connecté ou non */}
             {isAuthenticated && user ? (
               <>
                 {user.isAdmin && (
-                  <motion.button
+                  <m.button
                     onClick={() => navigate('/admin/dashboard')}
                     className={styles.iconButton}
                     aria-label="Dashboard Admin"
@@ -549,10 +549,10 @@ export default function NavbarGlass() {
                     whileTap="tap"
                   >
                     <DashboardIcon size={16} />
-                  </motion.button>
+                  </m.button>
                 )}
 
-                <motion.button
+                <m.button
                   onClick={() => navigate('/profile')}
                   className={styles.userButton}
                   aria-label="Mon compte"
@@ -563,9 +563,9 @@ export default function NavbarGlass() {
                 >
                   <UserIcon size={16} />
                   <span className={styles.userName}>{user.firstName || user.username}</span>
-                </motion.button>
+                </m.button>
 
-                <motion.button
+                <m.button
                   onClick={logout}
                   className={styles.iconButton}
                   aria-label="Se déconnecter"
@@ -575,7 +575,7 @@ export default function NavbarGlass() {
                   whileTap="tap"
                 >
                   <LogOutIcon size={16} />
-                </motion.button>
+                </m.button>
               </>
             ) : (
               <Link to="/login" className={styles.signInLink} aria-label="Se connecter">
@@ -584,7 +584,7 @@ export default function NavbarGlass() {
             )}
 
             {/* Bouton menu mobile */}
-            <motion.button
+            <m.button
               className={styles.mobileMenuButton}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
@@ -595,7 +595,7 @@ export default function NavbarGlass() {
               whileTap="tap"
             >
               {isMobileMenuOpen ? <CloseIcon size={20} /> : <MenuIcon size={20} />}
-            </motion.button>
+            </m.button>
           </div>
         </div>
       </div>
@@ -607,7 +607,7 @@ export default function NavbarGlass() {
             {isMobileMenuOpen && (
               <div key="mobile-menu" className={styles.mobileMenuWrapper}>
                 {/* Overlay */}
-                <motion.div
+                <m.div
                   className={styles.mobileOverlay}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -618,7 +618,7 @@ export default function NavbarGlass() {
                 />
 
                 {/* Menu mobile slide depuis le bas */}
-                <motion.div
+                <m.div
                   className={styles.mobileMenu}
                   initial={{ y: '100%' }}
                   animate={{ y: 0 }}
@@ -695,7 +695,7 @@ export default function NavbarGlass() {
                     {/* Résultats de recherche mobile */}
                     <AnimatePresence>
                       {showSearchResults && searchResults.length > 0 && (
-                        <motion.div
+                        <m.div
                           className={styles.mobileSearchResults}
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -749,7 +749,7 @@ export default function NavbarGlass() {
                               )
                             );
                           })()}
-                        </motion.div>
+                        </m.div>
                       )}
                     </AnimatePresence>
                   </div>
@@ -779,7 +779,7 @@ export default function NavbarGlass() {
                   {/* Actions mobile */}
                   <div className={styles.mobileActions}>
                     {/* Toggle thème mobile */}
-                    <motion.button
+                    <m.button
                       onClick={toggleDarkMode}
                       className={styles.mobileActionButton}
                       aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
@@ -788,9 +788,9 @@ export default function NavbarGlass() {
                     >
                       {isDark ? <MoonIcon size={20} /> : <SunIcon size={20} />}
                       <span>{isDark ? 'Mode sombre' : 'Mode clair'}</span>
-                    </motion.button>
+                    </m.button>
 
-                    <motion.button
+                    <m.button
                       onClick={() => {
                         navigate('/panier');
                         closeMenu();
@@ -806,12 +806,12 @@ export default function NavbarGlass() {
                           {cartCount > 9 ? '9+' : cartCount}
                         </span>
                       )}
-                    </motion.button>
+                    </m.button>
 
                     {isAuthenticated && user ? (
                       <>
                         {user.isAdmin && (
-                          <motion.button
+                          <m.button
                             onClick={() => {
                               navigate('/admin/dashboard');
                               closeMenu();
@@ -822,10 +822,10 @@ export default function NavbarGlass() {
                           >
                             <DashboardIcon size={20} />
                             <span>Dashboard Admin</span>
-                          </motion.button>
+                          </m.button>
                         )}
 
-                        <motion.button
+                        <m.button
                           onClick={() => {
                             navigate('/profile');
                             closeMenu();
@@ -836,9 +836,9 @@ export default function NavbarGlass() {
                         >
                           <UserIcon size={20} />
                           <span>{user.firstName || user.username}</span>
-                        </motion.button>
+                        </m.button>
 
-                        <motion.button
+                        <m.button
                           onClick={() => {
                             logout();
                             closeMenu();
@@ -849,7 +849,7 @@ export default function NavbarGlass() {
                         >
                           <LogOutIcon size={20} />
                           <span>Déconnexion</span>
-                        </motion.button>
+                        </m.button>
                       </>
                     ) : (
                       <Link
@@ -863,12 +863,12 @@ export default function NavbarGlass() {
                       </Link>
                     )}
                   </div>
-                </motion.div>
+                </m.div>
               </div>
             )}
           </AnimatePresence>,
           document.body
         )}
-    </motion.nav>
+    </m.nav>
   );
 }

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
 import type { ReactNode } from 'react';
 
@@ -47,7 +47,7 @@ export function AnimatedSection({
   const [ref, isInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       initial="hidden"
@@ -60,6 +60,6 @@ export function AnimatedSection({
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

@@ -32,7 +32,7 @@ const cards = [
 export default function HeroRotatingCard() {
   const [index, setIndex] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
-  const [autoRotation, setAutoRotation] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef(0);
 
   useEffect(() => {
@@ -74,7 +74,12 @@ export default function HeroRotatingCard() {
       lastX = smoothX;
       lastY = smoothY;
 
-      setAutoRotation({ x: smoothX, y: smoothY });
+      // On écrit directement le transform sur le DOM plutôt que via un state :
+      // évite un re-render React à chaque frame (~60 fps) qui saturait le thread
+      // principal sur mobile.
+      if (cardRef.current) {
+        cardRef.current.style.transform = `perspective(1200px) rotateY(${smoothX}deg) rotateX(${-smoothY}deg)`;
+      }
 
       rafId = requestAnimationFrame(animate);
     };
@@ -92,17 +97,15 @@ export default function HeroRotatingCard() {
 
   return (
     <div className={styles.cardWrapper}>
-      <div
-        className={`${styles.card} ${isFlipping ? styles.flipping : ''}`}
-        style={{
-          transform: `perspective(1200px) rotateY(${autoRotation.x}deg) rotateX(${-autoRotation.y}deg)`,
-        }}
-      >
+      <div ref={cardRef} className={`${styles.card} ${isFlipping ? styles.flipping : ''}`}>
         <img
           src={card.image}
           alt={card.name}
           className={styles.cardImage}
-          loading="lazy"
+          width={280}
+          height={390}
+          loading="eager"
+          fetchPriority="high"
           decoding="async"
           onError={handleImageError}
         />

@@ -1,6 +1,12 @@
-import { type ReactNode, useState, useEffect, useMemo } from 'react';
-import { LiquidMetal } from '@paper-design/shaders-react';
+import { type ReactNode, useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import styles from './LiquidMetalIconButton.module.css';
+
+// Le shader WebGL (@paper-design/shaders-react) est purement décoratif : on le
+// charge à la demande pour le sortir du bundle initial servi sur chaque page.
+// Le fallbackRing s'affiche pendant le chargement.
+const LiquidMetal = lazy(() =>
+  import('./liquidMetalShader').then((m) => ({ default: m.LiquidMetal }))
+);
 
 interface LiquidMetalIconButtonProps {
   size?: number;
@@ -105,15 +111,17 @@ export function LiquidMetalIconButton({
         <span className={styles.fallbackRing} aria-hidden="true" />
       ) : (
         <span className={styles.shaderRing} aria-hidden="true">
-          <LiquidMetal
-            className={styles.shaderCanvas}
-            colorBack={shader.colorBack}
-            colorTint={shader.colorTint}
-            distortion={shader.distortion}
-            speed={shader.speed}
-            minPixelRatio={1}
-            maxPixelCount={120000}
-          />
+          <Suspense fallback={<span className={styles.fallbackRing} />}>
+            <LiquidMetal
+              className={styles.shaderCanvas}
+              colorBack={shader.colorBack}
+              colorTint={shader.colorTint}
+              distortion={shader.distortion}
+              speed={shader.speed}
+              minPixelRatio={1}
+              maxPixelCount={120000}
+            />
+          </Suspense>
         </span>
       )}
 

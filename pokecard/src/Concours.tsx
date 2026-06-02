@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Seo } from './components/Seo';
 import { AnimatedSection } from './components/AnimatedSection';
 import { AnimatedGrid } from './components/AnimatedGrid';
@@ -480,7 +480,7 @@ export function Concours() {
             }}
           >
             {pastContests.map((contest) => (
-              <motion.div
+              <m.div
                 key={contest.id}
                 whileHover={{
                   scale: 1.02,
@@ -574,7 +574,7 @@ export function Concours() {
                     <div style={{ fontSize: '1rem', fontWeight: '600' }}>{contest.winner}</div>
                   </div>
                 )}
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </AnimatedGrid>
@@ -597,7 +597,7 @@ export function Concours() {
             padding: '20px',
           }}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
@@ -749,7 +749,7 @@ export function Concours() {
                 )}
               </button>
             </form>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </div>

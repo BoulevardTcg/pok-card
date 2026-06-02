@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
 import { ReactNode } from 'react';
 
@@ -48,7 +48,7 @@ export function AnimatedGrid({
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       variants={containerVariants}
@@ -57,13 +57,13 @@ export function AnimatedGrid({
     >
       {Array.isArray(children) ? (
         children.map((child, index) => (
-          <motion.div key={index} variants={itemVariants}>
+          <m.div key={index} variants={itemVariants}>
             {child}
-          </motion.div>
+          </m.div>
         ))
       ) : (
-        <motion.div variants={itemVariants}>{children}</motion.div>
+        <m.div variants={itemVariants}>{children}</m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
