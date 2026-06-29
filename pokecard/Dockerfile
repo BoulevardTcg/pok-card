@@ -23,14 +23,24 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
+# VITE_API_URL est aussi nécessaire ici pour dériver l'origine de l'API
+# (scheme://host:port) injectée dans la directive connect-src de la CSP.
+ARG VITE_API_URL=http://localhost:8080/api
+
 # Copier le build depuis l'étape précédente
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copier les images et assets publics
 COPY --from=build /app/public /usr/share/nginx/html/public
 
-# Copier la configuration nginx personnalisée
-COPY nginx.conf /etc/nginx/nginx.conf
+# Générer la conf nginx finale : envsubst remplace ${API_ORIGIN} dans la CSP
+# (et uniquement cette variable, pour préserver les $uri/$host de nginx).
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+RUN API_ORIGIN="$(printf '%s' "$VITE_API_URL" | sed -E 's#^(https?://[^/]+).*#\1#')" \
+    && export API_ORIGIN \
+    && envsubst '${API_ORIGIN}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf \
+    && rm /etc/nginx/nginx.conf.template \
+    && nginx -t
 
 # Exposer le port 80
 EXPOSE 80

@@ -1,0 +1,81 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+
+    # Content-Security-Policy : 2e rempart anti-XSS (complète l'échappement côté
+    # code). ${API_ORIGIN} est injecté au build (envsubst, depuis VITE_API_URL).
+    # Définie une seule fois ici (DRY) puis réutilisée via $csp_header, car dans
+    # nginx un `add_header` posé dans un `location` annule ceux du `server`.
+    # - script-src 'self' : aucun script inline (le thème est dans theme-init.js) ;
+    #   + Stripe et googletagmanager (gtag.js / gtm.js, chargés après consentement).
+    # - style-src 'unsafe-inline' : requis par les styles inline runtime de React
+    #   et les effets holographiques (Three.js) ; + Google Fonts.
+    # - connect-src : API backend, GA4 (collect), GTM, Stripe.
+    # - frame-src : iframes Stripe (checkout / 3-D Secure).
+    map "" $csp_header {
+        default "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: ${API_ORIGIN}; worker-src 'self' blob:; connect-src 'self' ${API_ORIGIN} https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://api.stripe.com https://r.stripe.com; frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com";
+    }
+
+    server {
+        listen 80;
+        server_name localhost;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # En-têtes de sécurité (appliqués aux réponses qui n'ont pas leur propre
+        # bloc add_header — notamment les routes SPA servies via `location /`).
+        add_header Content-Security-Policy $csp_header always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Gestion des routes React Router (hérite des en-têtes de sécurité ci-dessus)
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        # Cache pour les assets statiques (réponses non-HTML : la CSP n'y est pas
+        # nécessaire, on ne re-déclare donc que le Cache-Control).
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # Gestion des assets publics
+        location /public/ {
+            alias /usr/share/nginx/html/public/;
+            try_files $uri =404;
+        }
+
+        # Gestion des images (depuis public/img)
+        location /img/ {
+            alias /usr/share/nginx/html/public/img/;
+            try_files $uri =404;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # Cache pour le HTML : un add_header ici annule ceux du server, on
+        # re-déclare donc les en-têtes de sécurité pour les réponses HTML directes.
+        location ~* \.html$ {
+            expires -1;
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Content-Security-Policy $csp_header always;
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-XSS-Protection "1; mode=block" always;
+            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        }
+    }
+}
