@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { InstagramIcon, MailIcon, VintedIcon } from '../icons/Icons';
+import { openCookieSettings } from '../../lib/analytics';
 import styles from './FooterPremium.module.css';
 
 const NAV_LINKS = [
@@ -97,6 +98,11 @@ export default function FooterPremium() {
                   </button>
                 </li>
               ))}
+              <li>
+                <button onClick={openCookieSettings} className={styles.navLink}>
+                  Gérer les cookies
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
