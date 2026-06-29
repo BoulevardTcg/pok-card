@@ -44,7 +44,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^7.0.11",
+    "nodemailer": "^9.0.1",
     "otpauth": "^9.4.1",
     "qrcode": "^1.5.4",
     "resend": "^6.7.0",
