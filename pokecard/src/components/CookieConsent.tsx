@@ -7,7 +7,20 @@ import {
   OPEN_COOKIE_SETTINGS_EVENT,
   storeConsent,
 } from '../lib/analytics';
+import { disableGtm, enableGtm } from '../lib/gtm';
 import styles from './CookieConsent.module.css';
+
+/** Active les traceurs soumis au consentement : GA4 (gtag.js) + GTM. */
+function enableTracking() {
+  enableAnalytics();
+  enableGtm();
+}
+
+/** Désactive les traceurs soumis au consentement. */
+function disableTracking() {
+  disableAnalytics();
+  disableGtm();
+}
 
 /**
  * Bandeau de consentement RGPD. Google Analytics n'est chargé qu'après
@@ -21,7 +34,7 @@ export function CookieConsent() {
   useEffect(() => {
     const consent = getStoredConsent();
     if (consent === 'granted') {
-      enableAnalytics();
+      enableTracking();
     } else if (consent === null) {
       setVisible(true);
     }
@@ -36,13 +49,13 @@ export function CookieConsent() {
 
   const accept = useCallback(() => {
     storeConsent('granted');
-    enableAnalytics();
+    enableTracking();
     setVisible(false);
   }, []);
 
   const refuse = useCallback(() => {
     storeConsent('denied');
-    disableAnalytics();
+    disableTracking();
     setVisible(false);
   }, []);
 
