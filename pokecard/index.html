@@ -28,24 +28,10 @@
     <meta property="og:image" content="https://boulevardtcg.com/carte_accueil/dracaufeu.png" />
     <meta name="twitter:card" content="summary_large_image" />
     
-    <!-- Script anti-flash : applique le thème AVANT le rendu -->
-    <script>
-      (function() {
-        var STORAGE_KEY = 'boulevard-theme';
-        var theme = 'dark'; // Thème par défaut
-        
-        try {
-          var stored = localStorage.getItem(STORAGE_KEY);
-          if (stored === 'dark' || stored === 'light') {
-            theme = stored;
-          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            theme = 'light';
-          }
-        } catch (e) {}
-        
-        document.documentElement.setAttribute('data-theme', theme);
-      })();
-    </script>
+    <!-- Script anti-flash : applique le thème AVANT le rendu.
+         Externalisé (et non inline) pour être compatible avec la
+         Content-Security-Policy (script-src 'self', sans 'unsafe-inline'). -->
+    <script src="/theme-init.js"></script>
     
     <!-- Préchargement de l'image LCP du hero (première carte affichée) -->
     <link rel="preload" as="image" href="/carte_accueil/card02.png" fetchpriority="high" />
