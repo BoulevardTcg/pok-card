@@ -19,6 +19,28 @@ interface SeoProps {
 }
 
 /**
+ * Sérialise un objet JSON-LD pour une insertion sûre dans un <script>.
+ * `JSON.stringify` n'échappe pas `<`, `>`, `&` ni les séparateurs de ligne
+ * Unicode (U+2028 / U+2029) : un `</script>` présent dans une donnée
+ * (nom/description produit…) pourrait sinon clôturer la balise et injecter
+ * du HTML arbitraire (XSS). On remplace ces caractères par leur échappement
+ * `\uXXXX`, qui reste du JSON valide.
+ */
+function serializeJsonLd(data: object | object[]): string {
+  const LS = String.fromCharCode(0x2028); // U+2028 LINE SEPARATOR
+  const PS = String.fromCharCode(0x2029); // U+2029 PARAGRAPH SEPARATOR
+  const ESCAPES: Record<string, string> = {
+    '<': '\\u003c',
+    '>': '\\u003e',
+    '&': '\\u0026',
+    [LS]: '\\u2028',
+    [PS]: '\\u2029',
+  };
+  const pattern = new RegExp(`[<>&${LS}${PS}]`, 'g');
+  return JSON.stringify(data).replace(pattern, (char) => ESCAPES[char]);
+}
+
+/**
  * Composant SEO centralisé.
  * S'appuie sur le hoisting natif des balises <title>/<meta>/<link> de React 19 :
  * ces balises sont automatiquement déplacées dans <head>.
@@ -69,7 +91,7 @@ export function Seo({
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       )}
     </>

@@ -1,0 +1,114 @@
+/* ===================================================================
+   COOKIE CONSENT — Bandeau de consentement RGPD
+   =================================================================== */
+
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-4, 1rem);
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: min(960px, calc(100% - 2rem));
+  background: var(--color-bg-elevated, var(--color-bg-primary));
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-lg, 0.75rem);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  animation: cookie-slide-up 0.35s ease both;
+}
+
+@keyframes cookie-slide-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6, 1.5rem);
+  padding: var(--space-5, 1.25rem) var(--space-6, 1.5rem);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1, 0.25rem);
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  line-height: var(--leading-normal, 1.5);
+  margin: 0;
+}
+
+.link {
+  color: var(--color-accent-secondary);
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3, 0.75rem);
+  flex-shrink: 0;
+}
+
+.accept,
+.refuse {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
+  padding: var(--space-2, 0.5rem) var(--space-5, 1.25rem);
+  border-radius: var(--radius-md, 0.5rem);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.accept {
+  background: var(--color-accent-secondary);
+  color: var(--color-bg-primary);
+  border: 1px solid var(--color-accent-secondary);
+}
+
+.accept:hover {
+  opacity: 0.9;
+}
+
+.refuse {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+}
+
+.refuse:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 640px) {
+  .content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4, 1rem);
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
+}

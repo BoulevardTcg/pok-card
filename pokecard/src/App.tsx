@@ -8,6 +8,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
 import { AuthProvider } from './authContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { CookieConsent } from './components/CookieConsent';
+import { trackPageView } from './lib/analytics';
 
 // Routes chargées à la demande (code-splitting) pour alléger le bundle initial.
 // Les pages publiques secondaires, le compte, l'admin et les libs lourdes (Three.js
@@ -118,6 +120,12 @@ function AppContent() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Suivi des vues de page (GA4) à chaque navigation. No-op tant que
+  // l'utilisateur n'a pas accepté les cookies analytiques.
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   // Ne pas afficher la navbar sur la page d'accueil (elle a déjà NavbarGlass dans Home.tsx)
   // Ne pas afficher la navbar sur les pages admin (elles ont leur propre AdminLayout)
@@ -294,6 +302,8 @@ function AppContent() {
           </Routes>
         </Suspense>
       </main>
+
+      <CookieConsent />
     </div>
   );
 }

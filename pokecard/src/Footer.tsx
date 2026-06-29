@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { openCookieSettings } from './lib/analytics';
 import styles from './Footer.module.css';
 
 const Footer: React.FC = () => {
@@ -109,6 +110,11 @@ const Footer: React.FC = () => {
               <li>
                 <button onClick={() => navigate('/cgv')} className={styles.footerLink}>
                   CGV
+                </button>
+              </li>
+              <li>
+                <button onClick={openCookieSettings} className={styles.footerLink}>
+                  Gérer les cookies
                 </button>
               </li>
             </ul>
