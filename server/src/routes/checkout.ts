@@ -43,6 +43,29 @@ function createUrlValidator(allowedOrigins: string[]) {
   };
 }
 
+// Mappe les lignes de commande (relues en DB) vers le format items GA4.
+// Partagé entre les deux chemins de création (verify-session et webhook) pour
+// garantir un payload identique.
+function toGa4Items(
+  orderItemsData: ReadonlyArray<{
+    productVariantId: string;
+    productName: string;
+    variantName: string;
+    quantity: number;
+    unitPriceCents: number;
+  }>
+): Ga4PurchaseItem[] {
+  return orderItemsData.map((item) => ({
+    item_id: item.productVariantId,
+    item_name:
+      item.variantName && item.variantName.toLowerCase() !== 'standard'
+        ? `${item.productName} – ${item.variantName}`
+        : item.productName,
+    quantity: item.quantity,
+    unitPriceCents: item.unitPriceCents,
+  }));
+}
+
 async function createOrderFromSession(
   tx: Prisma.TransactionClient,
   session: Stripe.Checkout.Session,
@@ -160,7 +183,17 @@ async function createOrderFromSession(
     },
   });
 
-  return createdOrder;
+  // Données GA4 portées par le chemin qui a réellement créé la commande
+  // (l'INSERT ci-dessus). Montants relus en DB, pas du payload client.
+  return {
+    order: createdOrder,
+    ga4: {
+      transactionId: orderNumber,
+      valueCents: totalCents,
+      currency,
+      items: toGa4Items(orderItemsData),
+    },
+  };
 }
 
 type CompletedSessionResult = {
@@ -325,15 +358,7 @@ async function processCompletedCheckoutSession(
         transactionId: orderNumber,
         valueCents: totalCents,
         currency,
-        items: orderItemsData.map((item) => ({
-          item_id: item.productVariantId,
-          item_name:
-            item.variantName && item.variantName.toLowerCase() !== 'standard'
-              ? `${item.productName} – ${item.variantName}`
-              : item.productName,
-          quantity: item.quantity,
-          unitPriceCents: item.unitPriceCents,
-        })),
+        items: toGa4Items(orderItemsData),
       },
     };
   });
@@ -1023,9 +1048,46 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
         ? session.metadata.userId
         : (req.user?.userId ?? null);
 
-    const order = await prisma.$transaction(async (tx) => {
-      return createOrderFromSession(tx, session, items, sessionId, userId);
-    });
+    let creation;
+    try {
+      creation = await prisma.$transaction(async (tx) => {
+        return createOrderFromSession(tx, session, items, sessionId, userId);
+      });
+    } catch (err: any) {
+      // Course avec le webhook : la commande a été créée entre-temps.
+      // La contrainte unique stripeSessionId garantit qu'un seul INSERT gagne ;
+      // ici on a perdu → on renvoie la commande existante, sans envoyer GA4
+      // (c'est le gagnant de l'INSERT qui l'enverra).
+      if (err?.code === 'P2002') {
+        const existing = await prisma.order.findFirst({
+          where: { stripeSessionId: sessionId },
+        });
+        if (existing) {
+          return res.json({
+            success: true,
+            alreadyCreated: true,
+            orderId: existing.id,
+            orderNumber: existing.orderNumber,
+          });
+        }
+      }
+      throw err;
+    }
+
+    const order = creation.order;
+
+    // Envoi GA4 (event purchase) : c'est ce chemin qui a créé la commande, donc
+    // exactly-once garanti par la contrainte unique. Fire-and-forget, uniquement
+    // si un client_id consenti est présent.
+    if (session.client_reference_id) {
+      void sendGa4Purchase({
+        clientId: session.client_reference_id,
+        transactionId: creation.ga4.transactionId,
+        valueCents: creation.ga4.valueCents,
+        currency: creation.ga4.currency,
+        items: creation.ga4.items,
+      }).catch(() => {});
+    }
 
     // Envoyer l'email de confirmation
     // Priorité : email du formulaire (métadonnées) > email Stripe > email utilisateur connecté
