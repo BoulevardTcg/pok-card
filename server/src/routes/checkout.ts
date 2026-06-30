@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 import { ensureStripeConfigured } from '../config/stripe.js';
 import { optionalAuth } from '../middleware/auth.js';
 import { sendOrderConfirmationEmail } from '../services/email.js';
+import { sendGa4Purchase, parseGaClientId, type Ga4PurchaseItem } from '../services/ga4.js';
 import { findShippingMethod } from '../config/shipping.js';
 
 const router = Router();
@@ -162,12 +163,27 @@ async function createOrderFromSession(
   return createdOrder;
 }
 
-async function processCompletedCheckoutSession(session: Stripe.Checkout.Session) {
+type CompletedSessionResult = {
+  // `true` uniquement quand la commande vient d'être créée par cet appel.
+  // Sert à n'envoyer l'évènement GA4 qu'une seule fois, même si Stripe rejoue
+  // le webhook (la création de commande étant idempotente).
+  created: boolean;
+  ga4: {
+    transactionId: string;
+    valueCents: number;
+    currency: string;
+    items: Ga4PurchaseItem[];
+  } | null;
+};
+
+async function processCompletedCheckoutSession(
+  session: Stripe.Checkout.Session
+): Promise<CompletedSessionResult> {
   const customerEmailFromForm = session.metadata?.customerEmail || session.customer_details?.email;
   const items = parseMetadataItems(session.metadata ?? null);
 
   if (items.length === 0) {
-    return;
+    return { created: false, ga4: null };
   }
 
   const variantIds = items.map((item) => item.variantId);
@@ -176,14 +192,14 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
       ? session.metadata.userId
       : null;
 
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx): Promise<CompletedSessionResult> => {
     // Idempotence à l'intérieur de la transaction (protège contre les webhooks simultanés)
     const existingOrder = await tx.order.findFirst({
       where: { stripeSessionId: session.id },
       select: { id: true },
     });
     if (existingOrder) {
-      return;
+      return { created: false, ga4: null };
     }
 
     const variants = await tx.productVariant.findMany({
@@ -301,6 +317,25 @@ async function processCompletedCheckoutSession(session: Stripe.Checkout.Session)
         },
       },
     });
+
+    // Données pour GA4 (montants relus depuis la DB, pas du payload client).
+    return {
+      created: true,
+      ga4: {
+        transactionId: orderNumber,
+        valueCents: totalCents,
+        currency,
+        items: orderItemsData.map((item) => ({
+          item_id: item.productVariantId,
+          item_name:
+            item.variantName && item.variantName.toLowerCase() !== 'standard'
+              ? `${item.productName} – ${item.variantName}`
+              : item.productName,
+          quantity: item.quantity,
+          unitPriceCents: item.unitPriceCents,
+        })),
+      },
+    };
   });
 }
 
@@ -454,6 +489,7 @@ router.post(
       .isInt({ min: 1, max: MAX_QUANTITY_PER_ITEM })
       .withMessage(`La quantité doit être entre 1 et ${MAX_QUANTITY_PER_ITEM}.`),
     body('customerEmail').optional().isEmail().normalizeEmail().withMessage('Email invalide'),
+    body('gaClientId').optional().isString().isLength({ max: 64 }),
     body('successUrl')
       .optional()
       .isString()
@@ -857,6 +893,14 @@ router.post(
         sessionConfig.discounts = [{ coupon: stripeCouponId }];
       }
 
+      // Rattacher le client_id GA (cookie `_ga`) pour relier l'achat au parcours
+      // dans GA4 via le webhook. Validé/normalisé : on ne stocke pas de valeur
+      // forgée sur la session Stripe.
+      const gaClientId = parseGaClientId(req.body.gaClientId);
+      if (gaClientId) {
+        sessionConfig.client_reference_id = gaClientId;
+      }
+
       const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
       // Stocker dans le cache d'idempotence si une clé était fournie
@@ -1082,8 +1126,10 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
   }
 
   if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
+    let result: CompletedSessionResult;
     try {
-      await processCompletedCheckoutSession(event.data.object as Stripe.Checkout.Session);
+      result = await processCompletedCheckoutSession(session);
     } catch (err: any) {
       // P2002 = violation de contrainte unique (stripeSessionId) → commande déjà créée, idempotent
       if (err?.code === 'P2002' || err?.message?.includes('stripeSessionId')) {
@@ -1093,6 +1139,18 @@ export const checkoutWebhookHandler = async (req: Request, res: Response) => {
         received: false,
         error: 'Erreur lors du traitement du webhook',
       });
+    }
+
+    // GA4 hors transaction : fire-and-forget, uniquement à la création (jamais
+    // sur un rejeu Stripe) et seulement si un client_id consenti est présent.
+    if (result.created && result.ga4 && session.client_reference_id) {
+      void sendGa4Purchase({
+        clientId: session.client_reference_id,
+        transactionId: result.ga4.transactionId,
+        valueCents: result.ga4.valueCents,
+        currency: result.ga4.currency,
+        items: result.ga4.items,
+      }).catch(() => {});
     }
   }
 
