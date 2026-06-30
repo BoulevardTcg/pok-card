@@ -1,4 +1,19 @@
 import { PLACEHOLDER_IMAGE } from './utils/imageFallback';
+import { getStoredConsent } from './lib/analytics';
+
+/**
+ * Lit l'identifiant client GA depuis le cookie `_ga`, uniquement si l'utilisateur
+ * a consenti aux cookies analytiques. Sans consentement, GA n'a pas été chargé,
+ * donc pas de cookie → on ne transmet rien (cohérent avec la gestion RGPD).
+ * Format du cookie : `GA1.1.<random>.<timestamp>` → on garde `<random>.<timestamp>`.
+ */
+function readGaClientId(): string | undefined {
+  if (typeof document === 'undefined' || getStoredConsent() !== 'granted') return undefined;
+  const match = document.cookie.match(/(?:^|;\s*)_ga=([^;]+)/);
+  if (!match) return undefined;
+  const clientId = decodeURIComponent(match[1]).replace(/^GA\d\.\d\./, '');
+  return /^\d+\.\d+$/.test(clientId) ? clientId : undefined;
+}
 
 // URL de base de l'API (avec /api)
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api';
@@ -132,6 +147,7 @@ export async function createCheckoutSession(
       cancelUrl,
       shipping,
       shippingMethodCode,
+      gaClientId: readGaClientId(),
     };
 
     const res = await fetch(`${API_BASE}/checkout/create-session`, {
