@@ -22,6 +22,7 @@ import adminRoutes from './routes/admin.js';
 import twoFactorRoutes from './routes/twoFactor.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
+import ebayRoutes from './routes/ebay.js';
 
 // Import des middlewares de sécurité
 import {
@@ -175,6 +176,9 @@ app.use('/api/gdpr', gdprRoutes);
 
 // Contact (formulaire)
 app.use('/api/contact', contactRoutes);
+
+// eBay - notifications de suppression/fermeture de compte (chemin exact enregistré côté eBay)
+app.use('/ebay-notifications', ebayRoutes);
 
 // Route de santé
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
