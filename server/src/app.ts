@@ -12,6 +12,7 @@ import promoRoutes from './routes/promo.js';
 import collectionRoutes from './routes/collection.js';
 import tradeOffersRoutes from './routes/trade-offers.js';
 import adminRoutes from './routes/admin.js';
+import shippingRoutes, { boxtalWebhookHandler } from './routes/shipping.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
@@ -65,6 +66,14 @@ export const createApp = () => {
 
   // Middlewares de sécurité
   app.use(helmetConfig);
+
+  // Webhook Boxtal - corps brut requis pour la signature HMAC (avant express.json)
+  app.post(
+    '/api/shipping/boxtal/webhook',
+    express.raw({ type: 'application/json' }),
+    boxtalWebhookHandler
+  );
+
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(validateInput);
@@ -106,6 +115,9 @@ export const createApp = () => {
 
   // Routes d'administration
   app.use('/api/admin', adminRoutes);
+
+  // Livraison (points relais Boxtal)
+  app.use('/api/shipping', shippingRoutes);
 
   // Routes de suivi commande
   app.use('/api/orders', orderRoutes);

@@ -105,6 +105,11 @@ model Order {
   trackingUrl       String?
   shippedAt         DateTime?
   deliveredAt       DateTime?
+  // Boxtal (agrégateur d'expédition)
+  boxtalShippingOrderId String? @unique // Identifiant de la commande d'expédition Boxtal
+  labelUrl              String? // URL signée de l'étiquette PDF (expire côté Boxtal après 7 jours)
+  pickupPointCode       String? // Code du point relais choisi par le client
+  pickupPoint           Json? // Détails du point relais (nom, adresse, réseau)
   totalCents        Int
   currency          String            @default("EUR")
   paymentMethod     String?

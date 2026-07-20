@@ -89,6 +89,10 @@ coverage/
 server/keys/
 *.pem
 
+# ==== OUTILLAGE LOCAL (Claude Code / BMAD) ====
+.claude/
+_bmad/
+
 # ==== AUTRES ====
 *.tgz
 *.tar.gz

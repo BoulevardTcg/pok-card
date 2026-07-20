@@ -8,6 +8,7 @@ import { optionalAuth } from '../middleware/auth.js';
 import { sendOrderConfirmationEmail } from '../services/email.js';
 import { sendGa4Purchase, parseGaClientId, type Ga4PurchaseItem } from '../services/ga4.js';
 import { findShippingMethod } from '../config/shipping.js';
+import { normalizePickupPointInput, type PickupPointInput } from '../validators/pickupPoint.js';
 
 const router = Router();
 
@@ -102,6 +103,7 @@ async function createOrderFromSession(
   )
     ? (session.metadata?.shippingCarrier as Carrier)
     : null;
+  const pickupPoint = parseMetadataPickupPoint(session.metadata ?? null);
 
   const orderItemsData = [];
 
@@ -157,6 +159,8 @@ async function createOrderFromSession(
       shippingMethod: shippingMethodCode ?? undefined,
       shippingCost: shippingPriceCents || undefined,
       carrier: shippingCarrier ?? undefined,
+      pickupPointCode: pickupPoint?.code ?? undefined,
+      pickupPoint: pickupPoint ?? undefined,
       billingAddress: (() => {
         const billing = buildBillingAddress(session.customer_details) as any;
         // Forcer l'email du formulaire si disponible dans les métadonnées
@@ -262,6 +266,7 @@ async function processCompletedCheckoutSession(
     )
       ? (session.metadata?.shippingCarrier as Carrier)
       : null;
+    const pickupPoint = parseMetadataPickupPoint(session.metadata ?? null);
 
     const orderItemsData = [];
 
@@ -323,6 +328,8 @@ async function processCompletedCheckoutSession(
         shippingMethod: shippingMethodCode ?? undefined,
         shippingCost: shippingPriceCents || undefined,
         carrier: shippingCarrier ?? undefined,
+        pickupPointCode: pickupPoint?.code ?? undefined,
+        pickupPoint: pickupPoint ?? undefined,
         totalCents,
         currency,
         paymentMethod,
@@ -610,6 +617,19 @@ router.post(
         });
       }
 
+      // Livraison en point relais : le client doit avoir choisi un point
+      let pickupPoint: PickupPointInput | null = null;
+      if (shippingMethod.requiresPickupPoint) {
+        const pickupValidation = normalizePickupPointInput(req.body.pickupPoint);
+        if (!pickupValidation.ok) {
+          return res.status(400).json({
+            error: pickupValidation.error,
+            code: 'INVALID_PICKUP_POINT',
+          });
+        }
+        pickupPoint = pickupValidation.pickupPoint;
+      }
+
       const totalQuantity = requestedItems.reduce((sum, item) => sum + item.quantity, 0);
       if (totalQuantity > MAX_TOTAL_QUANTITY) {
         return res.status(400).json({
@@ -840,6 +860,17 @@ router.post(
         shippingCity: shipping.city,
         shippingCountry: shipping.country,
         ...(shipping.phone ? { shippingPhone: shipping.phone } : {}),
+        ...(pickupPoint
+          ? {
+              pickupPointCode: pickupPoint.code,
+              pickupPointName: pickupPoint.name,
+              ...(pickupPoint.network ? { pickupPointNetwork: pickupPoint.network } : {}),
+              ...(pickupPoint.line1 ? { pickupPointLine1: pickupPoint.line1 } : {}),
+              pickupPointPostalCode: pickupPoint.postalCode,
+              pickupPointCity: pickupPoint.city,
+              pickupPointCountry: pickupPoint.country,
+            }
+          : {}),
         // Stocker l'email du formulaire pour l'utiliser dans l'email de confirmation
         ...(req.body.customerEmail ? { customerEmail: req.body.customerEmail } : {}),
       };
@@ -1143,6 +1174,22 @@ router.get('/verify-session/:sessionId', optionalAuth, async (req, res) => {
     });
   }
 });
+
+// Relit le point relais depuis les métadonnées Stripe (écrites par create-session)
+const parseMetadataPickupPoint = (
+  metadata: Stripe.Metadata | null | undefined
+): (PickupPointInput & { line1?: string }) | null => {
+  if (!metadata?.pickupPointCode) return null;
+  return {
+    code: metadata.pickupPointCode,
+    name: metadata.pickupPointName || metadata.pickupPointCode,
+    network: metadata.pickupPointNetwork || undefined,
+    line1: metadata.pickupPointLine1 || undefined,
+    postalCode: metadata.pickupPointPostalCode || '',
+    city: metadata.pickupPointCity || '',
+    country: metadata.pickupPointCountry || 'FR',
+  };
+};
 
 const parseMetadataItems = (metadata: Stripe.Metadata | null | undefined): CheckoutItemInput[] => {
   if (!metadata) return [];

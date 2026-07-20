@@ -106,13 +106,62 @@ export type ShippingInfo = {
   phone?: string;
 };
 
+// Point relais Boxtal retourné par GET /shipping/parcel-points
+export type ParcelPoint = {
+  code: string;
+  name: string;
+  networks?: string[];
+  address: {
+    number?: string;
+    street?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
+  };
+  distanceMeters?: number;
+  latitude?: number;
+  longitude?: number;
+  openingDays?: Record<string, { open: string; close: string }[]>;
+};
+
+// Payload point relais envoyé au checkout
+export type PickupPointPayload = {
+  code: string;
+  name: string;
+  network?: string;
+  address: {
+    line1?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
+  };
+};
+
+export async function searchParcelPoints(params: {
+  postalCode: string;
+  city?: string;
+  country?: string;
+  street?: string;
+}): Promise<ParcelPoint[]> {
+  const query = new URLSearchParams({ postalCode: params.postalCode });
+  if (params.city) query.set('city', params.city);
+  if (params.country) query.set('country', params.country);
+  if (params.street) query.set('street', params.street);
+
+  const res = await fetchJson<{ data: ParcelPoint[] }>(
+    `/shipping/parcel-points?${query.toString()}`
+  );
+  return res.data || [];
+}
+
 export async function createCheckoutSession(
   items: CheckoutItem[],
   email?: string,
   promoCode?: string,
   shipping?: ShippingInfo,
   shippingMethodCode?: string,
-  idempotencyKey?: string
+  idempotencyKey?: string,
+  pickupPoint?: PickupPointPayload
 ): Promise<{ url: string | null; sessionId?: string } | { url?: string; sessionId: string }> {
   // Construire les URLs de redirection basées sur l'origine actuelle
   const origin = window.location.origin;
@@ -147,6 +196,7 @@ export async function createCheckoutSession(
       cancelUrl,
       shipping,
       shippingMethodCode,
+      pickupPoint,
       gaClientId: readGaClientId(),
     };
 

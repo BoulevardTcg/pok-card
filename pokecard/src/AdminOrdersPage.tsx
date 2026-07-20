@@ -98,6 +98,15 @@ interface Order {
   deliveredAt?: string | null;
   shippingMethod?: string | null;
   shippingCost?: number | null;
+  boxtalShippingOrderId?: string | null;
+  labelUrl?: string | null;
+  pickupPointCode?: string | null;
+  pickupPoint?: {
+    name?: string | null;
+    line1?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+  } | null;
   shippingAddress?: {
     name?: string | null;
     address?: {
@@ -147,6 +156,7 @@ export function AdminOrdersPage() {
     note: string;
   }>({ orderId: null, carrier: 'COLISSIMO', trackingNumber: '', note: '' });
   const [shippingLoadingId, setShippingLoadingId] = useState<string | null>(null);
+  const [boxtalLoadingId, setBoxtalLoadingId] = useState<string | null>(null);
   const [deliveringId, setDeliveringId] = useState<string | null>(null);
   const { user, token, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -241,6 +251,31 @@ export function AdminOrdersPage() {
       alert(err.message || 'Erreur expédition');
     } finally {
       setShippingLoadingId(null);
+    }
+  }
+
+  async function shipViaBoxtal(orderId: string) {
+    if (!token) return;
+    setBoxtalLoadingId(orderId);
+    try {
+      const response = await fetch(`${API_BASE}/admin/orders/${orderId}/boxtal-shipment`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors de la création de l'expédition Boxtal");
+      }
+      const updated = data.order as Order;
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...updated } : o)));
+    } catch (err: Error) {
+      alert(err.message || 'Erreur expédition Boxtal');
+    } finally {
+      setBoxtalLoadingId(null);
     }
   }
 
@@ -436,6 +471,12 @@ export function AdminOrdersPage() {
                           <div className={styles.shippingLine}>
                             {order.shippingAddress.address?.country || ''}
                           </div>
+                          {order.pickupPoint && (
+                            <div className={styles.shippingLine}>
+                              <strong>Relais :</strong> {order.pickupPoint.name}
+                              {order.pickupPoint.city ? ` (${order.pickupPoint.city})` : ''}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <span className={styles.muted}>—</span>
@@ -445,9 +486,16 @@ export function AdminOrdersPage() {
                       <span className={styles.date}>{formatDate(order.createdAt)}</span>
                     </td>
                     <td>
-                      <span className={`${styles.statusBadge} ${styles[status.className]}`}>
-                        {status.label}
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span className={`${styles.statusBadge} ${styles[status.className]}`}>
+                          {status.label}
+                        </span>
+                        {order.fulfillmentStatus === 'PREPARING' && (
+                          <span className={`${styles.statusBadge} ${styles.warning}`}>
+                            En préparation
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td>
                       <div className={styles.actionsColumn}>
@@ -469,6 +517,22 @@ export function AdminOrdersPage() {
 
                         <div className={styles.actionsRow}>
                           <button
+                            className={styles.primaryButton}
+                            disabled={boxtalLoadingId === order.id}
+                            onClick={() => shipViaBoxtal(order.id)}
+                            title={
+                              order.boxtalShippingOrderId
+                                ? 'Resynchroniser le suivi et l’étiquette depuis Boxtal'
+                                : 'Créer l’étiquette Boxtal et notifier le client'
+                            }
+                          >
+                            {boxtalLoadingId === order.id
+                              ? 'Boxtal…'
+                              : order.boxtalShippingOrderId
+                                ? 'Resync Boxtal'
+                                : 'Expédier via Boxtal'}
+                          </button>
+                          <button
                             className={styles.secondaryButton}
                             onClick={() =>
                               setShippingDraft({
@@ -479,7 +543,7 @@ export function AdminOrdersPage() {
                               })
                             }
                           >
-                            Expédier
+                            Saisie manuelle
                           </button>
                           <button
                             className={styles.ghostButton}
@@ -561,6 +625,16 @@ export function AdminOrdersPage() {
                             rel="noreferrer"
                           >
                             Suivi transporteur
+                          </a>
+                        )}
+                        {order.labelUrl && (
+                          <a
+                            className={styles.trackingLink}
+                            href={order.labelUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Étiquette PDF
                           </a>
                         )}
                       </div>

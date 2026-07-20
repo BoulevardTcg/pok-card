@@ -14,6 +14,7 @@ const toPublicTrackingOrderDto = (order: any) => ({
   carrier: order.carrier ?? null,
   trackingNumber: order.trackingNumber ?? null,
   trackingUrl: order.trackingUrl ?? null,
+  pickupPoint: order.pickupPoint ?? null,
   shippedAt: order.shippedAt ?? null,
   deliveredAt: order.deliveredAt ?? null,
   items: (order.items || []).map((it: any) => ({

@@ -33,6 +33,23 @@ export function buildTrackingUrl(
   return `${baseUrl}${encodeURIComponent(trackingNumber)}`;
 }
 
+export const shopBaseUrl = () =>
+  (
+    process.env.SHOP_URL ||
+    process.env.FRONTEND_PUBLIC_URL ||
+    process.env.FRONT_BASE_URL ||
+    process.env.FRONTEND_URL ||
+    ''
+  ).replace(/\/$/, '');
+
+/** Lien « suivre ma commande » côté boutique (page order-tracking avec token signé). */
+export const buildOrderTrackingLink = (orderId: string, customerEmail?: string | null) => {
+  const base = shopBaseUrl();
+  if (!base) return null;
+  const token = generateOrderTrackingToken(orderId, customerEmail);
+  return `${base}/order-tracking/${orderId}?token=${token}`;
+};
+
 const getTrackingSecret = () => {
   const secret = process.env.ORDER_TRACKING_SECRET;
   if (!secret) {

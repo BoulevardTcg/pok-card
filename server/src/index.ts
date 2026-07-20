@@ -19,6 +19,7 @@ import promoRoutes from './routes/promo.js';
 import collectionRoutes from './routes/collection.js';
 import tradeOffersRoutes from './routes/trade-offers.js';
 import adminRoutes from './routes/admin.js';
+import shippingRoutes, { boxtalWebhookHandler } from './routes/shipping.js';
 import twoFactorRoutes from './routes/twoFactor.js';
 import contactRoutes from './routes/contact.js';
 import gdprRoutes from './routes/gdpr.js';
@@ -97,6 +98,13 @@ app.post(
   checkoutWebhookHandler
 );
 
+// Webhook Boxtal - corps brut requis pour vérifier la signature HMAC (x-bxt-signature)
+app.post(
+  '/api/shipping/boxtal/webhook',
+  express.raw({ type: 'application/json' }),
+  boxtalWebhookHandler
+);
+
 // Servir les fichiers uploadés (images produits)
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
@@ -110,10 +118,10 @@ app.use(validateInput);
 app.use(sanitizeInput);
 app.use(injectionProtection);
 
-// Rate limiting global (exclure le webhook Stripe)
+// Rate limiting global (exclure les webhooks Stripe et Boxtal)
 app.use('/api/', (req, res, next) => {
-  // Exempter le webhook Stripe du rate limiting
-  if (req.path === '/checkout/webhook') {
+  // Exempter les webhooks du rate limiting
+  if (req.path === '/checkout/webhook' || req.path === '/shipping/boxtal/webhook') {
     return next();
   }
   apiLimiter(req, res, next);
@@ -167,6 +175,9 @@ app.use('/api/trade-offers', tradeOffersRoutes);
 
 // Routes d'administration
 app.use('/api/admin', adminRoutes);
+
+// Livraison (points relais Boxtal)
+app.use('/api/shipping', shippingRoutes);
 
 // Routes 2FA (Two-Factor Authentication)
 app.use('/api/2fa', twoFactorRoutes);

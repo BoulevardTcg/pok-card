@@ -185,6 +185,12 @@ interface OrderDataForEmail {
   trackingUrl?: string;
   orderTrackingUrl?: string;
   carrier?: string;
+  pickupPoint?: {
+    name?: string;
+    line1?: string;
+    postalCode?: string;
+    city?: string;
+  } | null;
 }
 
 function formatPrice(cents: number): string {
@@ -407,6 +413,21 @@ function shippingNotificationTemplate(order: OrderDataForEmail, customerEmail: s
         ${generateItemsTable(order.items)}
       </div>
       
+      ${
+        order.pickupPoint
+          ? `
+      <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+        <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">🏪 Votre point relais</h3>
+        <div class="address-box" style="background: #f9fafb; padding: 15px; border-radius: 8px;">
+          ${order.pickupPoint.name ? `<strong style="font-size: 16px;">${escapeHtml(order.pickupPoint.name)}</strong><br>` : ''}
+          ${order.pickupPoint.line1 ? `${escapeHtml(order.pickupPoint.line1)}<br>` : ''}
+          ${escapeHtml(order.pickupPoint.postalCode)} ${escapeHtml(order.pickupPoint.city)}
+        </div>
+        <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">Pensez à vous munir d'une pièce d'identité pour retirer votre colis.</p>
+      </div>
+      `
+          : ''
+      }
       ${
         order.shippingAddress
           ? `
