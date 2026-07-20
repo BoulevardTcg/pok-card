@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "last_updated": "2026-03-15T00:00:00.000Z",
+  "current_step": "completed",
+  "completed_steps": ["0.5", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+  "total_steps": 12,
+  "project_classification": {
+    "type": "multi-part",
+    "structure": "monorepo",
+    "parts": [
+      {
+        "name": "frontend",
+        "directory": "pokecard/",
+        "project_type_id": "web"
+      },
+      {
+        "name": "backend",
+        "directory": "server/",
+        "project_type_id": "backend"
+      }
+    ]
+  },
+  "generated_files": [
+    "docs/index.md",
+    "docs/architecture.md",
+    "docs/frontend.md",
+    "docs/backend.md",
+    "docs/database.md",
+    "docs/api.md",
+    "docs/security.md",
+    "docs/deployment.md"
+  ]
+}
