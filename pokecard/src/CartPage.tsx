@@ -11,8 +11,11 @@ import {
   validatePromoCode,
   getImageUrl,
   safeParse,
+  type ParcelPoint,
+  type PickupPointPayload,
 } from './api';
 import { getEnabledShippingMethods, findShippingMethod } from './shippingMethods';
+import { ParcelPointSelector } from './components/ParcelPointSelector';
 import type { CartItem } from './cartContext';
 
 // Types pour le draft de checkout
@@ -29,6 +32,7 @@ type CheckoutDraft = {
     phone: string;
   };
   shippingMethodCode: string;
+  pickupPoint?: ParcelPoint | null;
   createdAt: number;
 };
 
@@ -65,6 +69,7 @@ export function CartPage() {
   const [shippingMethodCode, setShippingMethodCode] = useState(
     enabledShippingMethods[0]?.code ?? 'MONDIAL_RELAY'
   );
+  const [selectedPickupPoint, setSelectedPickupPoint] = useState<ParcelPoint | null>(null);
 
   // Refs pour l'auto-checkout (une seule exécution)
   const autoCheckoutRanRef = useRef(false);
@@ -120,6 +125,9 @@ export function CartPage() {
     }
     setShipping(draft.shipping);
     setShippingMethodCode(draft.shippingMethodCode);
+    if (draft.pickupPoint) {
+      setSelectedPickupPoint(draft.pickupPoint);
+    }
   }, []);
 
   // Rafraîchir le stock des articles du panier
@@ -212,6 +220,7 @@ export function CartPage() {
       country: string;
       phone?: string;
     };
+    pickupPointCode?: string;
   };
 
   function buildCheckoutSignature(args: CheckoutSignatureArgs) {
@@ -221,6 +230,7 @@ export function CartPage() {
       promoCode: args.promoCode || null,
       shippingMethodCode: args.shippingMethodCode || null,
       shipping: args.shipping || null,
+      pickupPointCode: args.pickupPointCode || null,
     });
   }
 
@@ -271,6 +281,11 @@ export function CartPage() {
       return;
     }
 
+    if (selectedShippingMethod.requiresPickupPoint && !selectedPickupPoint) {
+      setShippingError('Veuillez choisir un point relais pour la livraison.');
+      return;
+    }
+
     setEmailError('');
     setShippingError('');
     setLoading(true);
@@ -307,11 +322,31 @@ export function CartPage() {
       // Assurer que promoCode est undefined quand vide (pas '')
       const stablePromoCode = appliedPromo && appliedPromo.trim() ? appliedPromo : undefined;
 
+      // Point relais choisi (uniquement pour les modes de livraison en relais)
+      const pickupPointPayload: PickupPointPayload | undefined =
+        selectedShippingMethod.requiresPickupPoint && selectedPickupPoint
+          ? {
+              code: selectedPickupPoint.code,
+              name: selectedPickupPoint.name,
+              network: selectedPickupPoint.networks?.[0],
+              address: {
+                line1:
+                  [selectedPickupPoint.address.number, selectedPickupPoint.address.street]
+                    .filter(Boolean)
+                    .join(' ') || undefined,
+                postalCode: selectedPickupPoint.address.postalCode,
+                city: selectedPickupPoint.address.city,
+                country: selectedPickupPoint.address.country,
+              },
+            }
+          : undefined;
+
       const signature = buildCheckoutSignature({
         items,
         promoCode: stablePromoCode,
         shippingMethodCode: stableShippingMethodCode,
         shipping: shippingMapped,
+        pickupPointCode: pickupPointPayload?.code,
       });
       const idempotencyKey = getOrCreateIdempotencyKey(signature);
 
@@ -321,7 +356,8 @@ export function CartPage() {
         stablePromoCode,
         shippingMapped,
         stableShippingMethodCode,
-        idempotencyKey
+        idempotencyKey,
+        pickupPointPayload
       );
 
       if (url) {
@@ -360,6 +396,7 @@ export function CartPage() {
           promoCode: appliedPromo,
           shipping,
           shippingMethodCode,
+          pickupPoint: selectedPickupPoint,
           createdAt: Date.now(),
         };
 
@@ -411,6 +448,7 @@ export function CartPage() {
         promoCode: appliedPromo,
         shipping,
         shippingMethodCode,
+        pickupPoint: selectedPickupPoint,
         createdAt: Date.now(),
       };
       sessionStorage.setItem('checkoutIntent', JSON.stringify({ v: 1, createdAt: Date.now() }));
@@ -608,6 +646,15 @@ export function CartPage() {
                     </label>
                   ))}
                 </div>
+
+                {selectedShippingMethod?.requiresPickupPoint && (
+                  <ParcelPointSelector
+                    defaultPostalCode={shipping.postalCode}
+                    defaultCity={shipping.city}
+                    selected={selectedPickupPoint}
+                    onSelect={setSelectedPickupPoint}
+                  />
+                )}
               </div>
 
               <div className={styles.summaryDetails}>

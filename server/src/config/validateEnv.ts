@@ -48,6 +48,16 @@ export function validateEnvOrThrow() {
   ];
 
   const errors = requireEnv(checks);
+
+  // Boxtal (optionnel) : détecter une configuration partielle des clés API
+  const hasBoxtalAccess = !!process.env.BOXTAL_ACCESS_KEY?.trim();
+  const hasBoxtalSecret = !!process.env.BOXTAL_SECRET_KEY?.trim();
+  if (hasBoxtalAccess !== hasBoxtalSecret) {
+    errors.push(
+      'BOXTAL_ACCESS_KEY et BOXTAL_SECRET_KEY doivent être définis ensemble (configuration Boxtal partielle)'
+    );
+  }
+
   if (errors.length === 0) return;
 
   const message = `Configuration invalide (env):\n- ${errors.join('\n- ')}`;

@@ -5,6 +5,7 @@ import { API_BASE, getImageUrl } from './api';
 import styles from './OrderDetailPage.module.css';
 import {
   Package,
+  PackageOpen,
   Truck,
   CheckCircle,
   XCircle,
@@ -15,6 +16,7 @@ import {
   Calendar,
   Link as LinkIcon,
 } from 'lucide-react';
+import { getOrderDisplayStatus, ORDER_STATUS_TIMELINE } from './orderStatus';
 
 interface OrderItem {
   id: string;
@@ -34,6 +36,12 @@ interface Order {
   carrier?: string | null;
   trackingNumber?: string | null;
   trackingUrl?: string | null;
+  pickupPoint?: {
+    name?: string | null;
+    line1?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+  } | null;
   totalCents: number;
   currency: string;
   paymentMethod?: string;
@@ -77,6 +85,12 @@ const statusConfig = {
     color: '#3b82f6',
     bgColor: 'rgba(59, 130, 246, 0.1)',
   },
+  PREPARING: {
+    label: 'En préparation',
+    icon: PackageOpen,
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
+  },
   SHIPPED: { label: 'Expédiée', icon: Truck, color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
   DELIVERED: {
     label: 'Livrée',
@@ -98,7 +112,7 @@ const statusConfig = {
   },
 };
 
-const statusTimeline = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
+const statusTimeline = ORDER_STATUS_TIMELINE;
 
 export function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -161,7 +175,7 @@ export function OrderDetailPage() {
     });
   };
 
-  const getStatusIndex = (status: string) => {
+  const getStatusIndex = (status: (typeof statusTimeline)[number]) => {
     return statusTimeline.indexOf(status);
   };
 
@@ -194,8 +208,9 @@ export function OrderDetailPage() {
     );
   }
 
-  const StatusIcon = statusConfig[order.status].icon;
-  const currentStatusIndex = getStatusIndex(order.status);
+  const displayStatus = getOrderDisplayStatus(order.status, order.fulfillmentStatus);
+  const StatusIcon = statusConfig[displayStatus].icon;
+  const currentStatusIndex = getStatusIndex(displayStatus);
   const isCancelled = order.status === 'CANCELLED' || order.status === 'REFUNDED';
   const isShipped = order.fulfillmentStatus === 'SHIPPED';
 
@@ -219,12 +234,12 @@ export function OrderDetailPage() {
             <div
               className={styles.statusBadge}
               style={{
-                color: statusConfig[order.status].color,
-                backgroundColor: statusConfig[order.status].bgColor,
+                color: statusConfig[displayStatus].color,
+                backgroundColor: statusConfig[displayStatus].bgColor,
               }}
             >
               <StatusIcon size={18} />
-              {statusConfig[order.status].label}
+              {statusConfig[displayStatus].label}
             </div>
           </div>
         </div>
@@ -372,6 +387,27 @@ export function OrderDetailPage() {
                 <p className={styles.infoText}>{order.billingAddress.email}</p>
               )}
             </div>
+
+            {/* Point relais choisi */}
+            {order.pickupPoint && (
+              <div className={styles.infoCard}>
+                <h3 className={styles.cardTitle}>
+                  <MapPin size={18} />
+                  Point relais
+                </h3>
+                {order.pickupPoint.name && (
+                  <p className={styles.infoText}>
+                    <strong>{order.pickupPoint.name}</strong>
+                  </p>
+                )}
+                {order.pickupPoint.line1 && (
+                  <p className={styles.infoText}>{order.pickupPoint.line1}</p>
+                )}
+                <p className={styles.infoText}>
+                  {order.pickupPoint.postalCode} {order.pickupPoint.city}
+                </p>
+              </div>
+            )}
 
             {/* Adresse de livraison */}
             {order.shippingAddress && (

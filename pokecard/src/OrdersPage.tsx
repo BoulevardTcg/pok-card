@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './authContext';
 import { API_BASE, getImageUrl } from './api';
 import styles from './OrdersPage.module.css';
-import { Package, Truck, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
+import { Package, PackageOpen, Truck, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
+import { getOrderDisplayStatus } from './orderStatus';
 
 interface OrderItem {
   id: string;
@@ -19,6 +20,7 @@ interface Order {
   id: string;
   orderNumber: string;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  fulfillmentStatus?: string;
   totalCents: number;
   currency: string;
   items: OrderItem[];
@@ -30,6 +32,7 @@ interface Order {
 const statusConfig = {
   PENDING: { label: 'En attente', icon: Clock, color: '#f59e0b' },
   CONFIRMED: { label: 'Confirmée', icon: CheckCircle, color: '#3b82f6' },
+  PREPARING: { label: 'En préparation', icon: PackageOpen, color: '#f59e0b' },
   SHIPPED: { label: 'Expédiée', icon: Truck, color: '#8b5cf6' },
   DELIVERED: { label: 'Livrée', icon: Package, color: '#10b981' },
   CANCELLED: { label: 'Annulée', icon: XCircle, color: '#ef4444' },
@@ -151,8 +154,9 @@ export function OrdersPage() {
         ) : (
           <div className={styles.ordersList}>
             {orders.map((order) => {
-              const StatusIcon = statusConfig[order.status].icon;
-              const statusColor = statusConfig[order.status].color;
+              const displayStatus = getOrderDisplayStatus(order.status, order.fulfillmentStatus);
+              const StatusIcon = statusConfig[displayStatus].icon;
+              const statusColor = statusConfig[displayStatus].color;
 
               return (
                 <div key={order.id} className={styles.orderCard}>
@@ -163,7 +167,7 @@ export function OrdersPage() {
                     </div>
                     <div className={styles.orderStatus} style={{ color: statusColor }}>
                       <StatusIcon className={styles.statusIcon} />
-                      <span>{statusConfig[order.status].label}</span>
+                      <span>{statusConfig[displayStatus].label}</span>
                     </div>
                   </div>
 

@@ -30,6 +30,19 @@ vi.mock('../config/stripe.js', () => ({
   },
 }));
 
+// Point relais valide pour les modes de livraison en relais (Boxtal)
+const testPickupPoint = {
+  code: 'MONR-12345',
+  name: 'Tabac de la Gare',
+  network: 'MONR_NETWORK',
+  address: {
+    line1: '12 rue de la Gare',
+    postalCode: '75001',
+    city: 'Paris',
+    country: 'FR',
+  },
+};
+
 describe('Checkout Routes', () => {
   let testUser: any;
   let testUserToken: string;
@@ -82,6 +95,7 @@ describe('Checkout Routes', () => {
           successUrl: 'http://localhost:3000/checkout/success',
           cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -110,6 +124,7 @@ describe('Checkout Routes', () => {
           successUrl: 'http://localhost:3000/checkout/success',
           cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -146,6 +161,7 @@ describe('Checkout Routes', () => {
             },
           ],
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -171,6 +187,7 @@ describe('Checkout Routes', () => {
             },
           ],
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -198,6 +215,7 @@ describe('Checkout Routes', () => {
             },
           ],
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -247,6 +265,7 @@ describe('Checkout Routes', () => {
             },
           ],
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -258,6 +277,67 @@ describe('Checkout Routes', () => {
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('sessionId');
+    });
+
+    it('devrait rejeter une livraison en relais sans point relais', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [{ variantId: testVariant.id, quantity: 1 }],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('INVALID_PICKUP_POINT');
+    });
+
+    it('devrait accepter une livraison à domicile sans point relais', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [{ variantId: testVariant.id, quantity: 1 }],
+          shippingMethodCode: 'COLISSIMO_HOME',
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('sessionId');
+    });
+
+    it('devrait rejeter un point relais au format invalide', async () => {
+      const response = await request(app)
+        .post('/api/checkout/create-session')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          items: [{ variantId: testVariant.id, quantity: 1 }],
+          shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: { code: '<script>', name: 'X' },
+          shipping: {
+            fullName: 'Test User',
+            addressLine1: '123 Test St',
+            postalCode: '75001',
+            city: 'Paris',
+            country: 'France',
+          },
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('INVALID_PICKUP_POINT');
     });
 
     it('devrait exiger un mode de livraison', async () => {
@@ -326,6 +406,7 @@ describe('Checkout Routes', () => {
           successUrl: 'http://localhost:3000/checkout/success',
           cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',
@@ -364,6 +445,7 @@ describe('Checkout Routes', () => {
           successUrl: 'http://localhost:3000/checkout/success',
           cancelUrl: 'http://localhost:3000/panier',
           shippingMethodCode: 'MONDIAL_RELAY',
+          pickupPoint: testPickupPoint,
           shipping: {
             fullName: 'Test User',
             addressLine1: '123 Test St',

@@ -5,24 +5,28 @@ export type ShippingMethod = {
   carrier: string;
   enabled: boolean;
   description?: string;
+  // true si le client doit choisir un point relais au checkout (Boxtal)
+  requiresPickupPoint: boolean;
 };
 
 export const SHIPPING_METHODS: ShippingMethod[] = [
   {
     code: 'MONDIAL_RELAY',
-    label: 'Mondial Relay - Point relais',
+    label: 'Livraison en point relais',
     priceCents: 490,
     carrier: 'MONDIAL_RELAY',
     enabled: true,
     description: 'Livraison en point relais (3 à 5 jours)',
+    requiresPickupPoint: true,
   },
   {
     code: 'COLISSIMO_HOME',
-    label: 'Colissimo - Domicile',
+    label: 'Livraison à domicile',
     priceCents: 790,
     carrier: 'COLISSIMO',
     enabled: true,
     description: 'Livraison à domicile (3 à 5 jours ouvrés)',
+    requiresPickupPoint: false,
   },
 ];
 

@@ -12,8 +12,17 @@ import {
   sendDeliveryConfirmationEmail,
   sendOrderConfirmationEmail,
 } from '../services/email.js';
-import { buildTrackingUrl, generateOrderTrackingToken } from '../utils/tracking.js';
+import { buildTrackingUrl, buildOrderTrackingLink } from '../utils/tracking.js';
 import { audit, auditLog } from '../utils/audit.js';
+import { findShippingMethod } from '../config/shipping.js';
+import {
+  BoxtalApiError,
+  createShippingOrder,
+  getShippingOrderTracking,
+  getShippingLabelUrl,
+  carrierFromOfferCode,
+} from '../services/boxtal.js';
+import { applyBoxtalTrackingUpdate } from '../services/fulfillment.js';
 
 const router = Router();
 
@@ -79,22 +88,6 @@ const addOrderEvent = async (
       createdBy,
     },
   });
-};
-
-const shopBaseUrl = () =>
-  (
-    process.env.SHOP_URL ||
-    process.env.FRONTEND_PUBLIC_URL ||
-    process.env.FRONT_BASE_URL ||
-    process.env.FRONTEND_URL ||
-    ''
-  ).replace(/\/$/, '');
-
-const buildOrderTrackingLink = (orderId: string, customerEmail?: string | null) => {
-  const base = shopBaseUrl();
-  if (!base) return null;
-  const token = generateOrderTrackingToken(orderId, customerEmail);
-  return `${base}/order-tracking/${orderId}?token=${token}`;
 };
 
 const uploadDir = path.join(process.cwd(), 'public/uploads');
@@ -402,6 +395,229 @@ router.post(
         order: updatedOrder,
       });
     } catch {
+      res.status(500).json({
+        error: 'Erreur interne du serveur',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  }
+);
+
+/**
+ * Expédition via Boxtal : crée la commande d'expédition (étiquette) chez
+ * Boxtal, récupère suivi + étiquette, marque la commande expédiée et notifie
+ * le client. Rejouable : si l'expédition Boxtal existe déjà, resynchronise
+ * simplement le suivi et l'étiquette.
+ */
+router.post(
+  '/orders/:orderId/boxtal-shipment',
+  adminWriteLimiter,
+  async (req: Request, res: Response) => {
+    try {
+      const { orderId } = req.params;
+
+      const existingOrder = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: true,
+          user: {
+            select: { id: true, email: true, username: true, firstName: true, lastName: true },
+          },
+        },
+      });
+
+      if (!existingOrder) {
+        return res.status(404).json({ error: 'Commande non trouvée', code: 'ORDER_NOT_FOUND' });
+      }
+
+      // Resynchronisation : l'expédition Boxtal existe déjà pour cette commande.
+      // Récupère étiquette + suivi et applique les transitions d'état réelles
+      // (PREPARING → SHIPPED au premier scan transporteur, → DELIVERED ensuite).
+      if (existingOrder.boxtalShippingOrderId) {
+        const [tracking, labelUrl] = await Promise.all([
+          getShippingOrderTracking(existingOrder.boxtalShippingOrderId),
+          getShippingLabelUrl(existingOrder.boxtalShippingOrderId),
+        ]);
+
+        if (labelUrl && labelUrl !== existingOrder.labelUrl) {
+          await prisma.order.update({
+            where: { id: orderId },
+            data: { labelUrl },
+          });
+        }
+
+        await applyBoxtalTrackingUpdate(existingOrder, tracking);
+
+        const updatedOrder = await prisma.order.findUnique({
+          where: { id: orderId },
+          include: {
+            items: true,
+            user: {
+              select: { id: true, email: true, username: true, firstName: true, lastName: true },
+            },
+          },
+        });
+
+        return res.json({
+          message: 'Expédition Boxtal resynchronisée',
+          order: updatedOrder,
+        });
+      }
+
+      if (
+        existingOrder.fulfillmentStatus === FulfillmentStatus.SHIPPED ||
+        existingOrder.fulfillmentStatus === FulfillmentStatus.DELIVERED
+      ) {
+        return res.status(200).json({ message: 'Commande déjà expédiée', order: existingOrder });
+      }
+
+      const shippingAddress = existingOrder.shippingAddress as {
+        name?: string | null;
+        address?: {
+          line1?: string | null;
+          line2?: string | null;
+          city?: string | null;
+          postal_code?: string | null;
+          country?: string | null;
+        } | null;
+      } | null;
+
+      const billingAddress = existingOrder.billingAddress as {
+        name?: string | null;
+        email?: string | null;
+        phone?: string | null;
+      } | null;
+
+      const recipientName = shippingAddress?.name || billingAddress?.name || '';
+      const recipientEmail = billingAddress?.email || existingOrder.user?.email || '';
+      const line1 = shippingAddress?.address?.line1 || '';
+      const postalCode = shippingAddress?.address?.postal_code || '';
+      const city = shippingAddress?.address?.city || '';
+
+      if (!recipientName || !recipientEmail || !line1 || !postalCode || !city) {
+        return res.status(400).json({
+          error: 'Adresse de livraison incomplète sur la commande (nom, email, adresse requis)',
+          code: 'INCOMPLETE_SHIPPING_ADDRESS',
+        });
+      }
+
+      const shippingMethod = findShippingMethod(existingOrder.shippingMethod);
+      const offerType =
+        shippingMethod?.boxtalOfferType ?? (existingOrder.pickupPointCode ? 'RELAY' : 'HOME');
+
+      if (offerType === 'RELAY' && !existingOrder.pickupPointCode) {
+        return res.status(400).json({
+          error: 'Aucun point relais associé à cette commande',
+          code: 'PICKUP_POINT_MISSING',
+        });
+      }
+
+      const itemsCount = existingOrder.items.reduce((sum, item) => sum + item.quantity, 0);
+
+      const shipment = await createShippingOrder({
+        externalId: existingOrder.id,
+        offerType,
+        pickupPointCode: existingOrder.pickupPointCode,
+        recipient: {
+          name: recipientName,
+          email: recipientEmail,
+          phone: billingAddress?.phone,
+          line1,
+          line2: shippingAddress?.address?.line2,
+          postalCode,
+          city,
+          country: shippingAddress?.address?.country,
+        },
+        itemsCount,
+        valueCents: existingOrder.totalCents - (existingOrder.shippingCost ?? 0),
+      });
+
+      // L'id Boxtal est persisté immédiatement : si la suite échoue, le retry
+      // passera par le chemin de resynchronisation (pas de double étiquette).
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { boxtalShippingOrderId: shipment.boxtalShippingOrderId },
+      });
+
+      // Suivi et étiquette peuvent ne pas être immédiatement disponibles ;
+      // le webhook Boxtal complètera dès qu'ils le seront.
+      let tracking = null;
+      let labelUrl: string | null = null;
+      try {
+        [tracking, labelUrl] = await Promise.all([
+          getShippingOrderTracking(shipment.boxtalShippingOrderId),
+          getShippingLabelUrl(shipment.boxtalShippingOrderId),
+        ]);
+      } catch {
+        // Non bloquant : récupérés plus tard via webhook ou resynchronisation
+      }
+
+      const carrier = carrierFromOfferCode(shipment.offerCode);
+
+      // Étiquette créée ≠ colis expédié : la commande passe « en préparation ».
+      // Le passage à « expédiée » (+ email client) se fait au premier scan du
+      // transporteur, via le webhook Boxtal ou une resynchronisation.
+      const preparedOrder = await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          carrier,
+          trackingNumber: tracking?.trackingNumber ?? undefined,
+          trackingUrl: tracking?.trackingUrl ?? undefined,
+          labelUrl: labelUrl ?? undefined,
+          fulfillmentStatus: FulfillmentStatus.PREPARING,
+          events: {
+            create: {
+              type: OrderEventType.PREPARING,
+              message: `Étiquette créée via Boxtal (${shipment.boxtalShippingOrderId}) — colis en préparation`,
+              createdBy: req.user?.userId,
+            },
+          },
+        },
+        include: {
+          items: true,
+          user: {
+            select: { id: true, email: true, username: true, firstName: true, lastName: true },
+          },
+        },
+      });
+
+      auditLog(req, 'ORDER_SHIP', 'order', orderId, {
+        via: 'boxtal',
+        boxtalShippingOrderId: shipment.boxtalShippingOrderId,
+        offerCode: shipment.offerCode,
+      });
+
+      // Si Boxtal indique déjà une prise en charge (rare à la création),
+      // applique immédiatement la transition d'état correspondante.
+      await applyBoxtalTrackingUpdate(preparedOrder, tracking);
+
+      const updatedOrder = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: true,
+          user: {
+            select: { id: true, email: true, username: true, firstName: true, lastName: true },
+          },
+        },
+      });
+
+      res.json({
+        message: 'Étiquette Boxtal créée — commande en préparation',
+        order: updatedOrder,
+      });
+    } catch (err) {
+      if (err instanceof BoxtalApiError) {
+        auditLog(req, 'ORDER_SHIP', 'order', req.params.orderId, {
+          via: 'boxtal',
+          failed: true,
+          status: err.status,
+          code: err.code,
+        });
+        return res.status(err.status >= 500 ? 502 : err.status).json({
+          error: err.message,
+          code: err.code,
+        });
+      }
       res.status(500).json({
         error: 'Erreur interne du serveur',
         code: 'INTERNAL_SERVER_ERROR',

@@ -5,6 +5,7 @@ import { API_BASE, getImageUrl } from './api';
 import styles from './OrderDetailPage.module.css';
 import {
   Package,
+  PackageOpen,
   Truck,
   CheckCircle,
   XCircle,
@@ -13,6 +14,7 @@ import {
   Calendar,
   Link as LinkIcon,
 } from 'lucide-react';
+import { getOrderDisplayStatus, ORDER_STATUS_TIMELINE } from './orderStatus';
 
 interface OrderItem {
   id: string;
@@ -39,6 +41,12 @@ interface Order {
   carrier?: string | null;
   trackingNumber?: string | null;
   trackingUrl?: string | null;
+  pickupPoint?: {
+    name?: string | null;
+    line1?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+  } | null;
   shippedAt?: string | null;
   deliveredAt?: string | null;
   totalCents: number;
@@ -84,6 +92,12 @@ const statusConfig = {
     color: '#3b82f6',
     bgColor: 'rgba(59, 130, 246, 0.1)',
   },
+  PREPARING: {
+    label: 'En préparation',
+    icon: PackageOpen,
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
+  },
   SHIPPED: { label: 'Expédiée', icon: Truck, color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
   DELIVERED: {
     label: 'Livrée',
@@ -105,7 +119,7 @@ const statusConfig = {
   },
 };
 
-const statusTimeline = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
+const statusTimeline = ORDER_STATUS_TIMELINE;
 
 export function OrderTrackingPage() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -168,7 +182,8 @@ export function OrderTrackingPage() {
       minute: '2-digit',
     });
 
-  const getStatusIndex = (status: string) => statusTimeline.indexOf(status);
+  const getStatusIndex = (status: (typeof statusTimeline)[number]) =>
+    statusTimeline.indexOf(status);
 
   if (loading) {
     return (
@@ -199,8 +214,9 @@ export function OrderTrackingPage() {
     );
   }
 
-  const StatusIcon = statusConfig[order.status].icon;
-  const currentStatusIndex = getStatusIndex(order.status);
+  const displayStatus = getOrderDisplayStatus(order.status, order.fulfillmentStatus);
+  const StatusIcon = statusConfig[displayStatus].icon;
+  const currentStatusIndex = getStatusIndex(displayStatus);
   const isCancelled = order.status === 'CANCELLED' || order.status === 'REFUNDED';
 
   return (
@@ -222,12 +238,12 @@ export function OrderTrackingPage() {
             <div
               className={styles.statusBadge}
               style={{
-                color: statusConfig[order.status].color,
-                backgroundColor: statusConfig[order.status].bgColor,
+                color: statusConfig[displayStatus].color,
+                backgroundColor: statusConfig[displayStatus].bgColor,
               }}
             >
               <StatusIcon size={18} />
-              {statusConfig[order.status].label}
+              {statusConfig[displayStatus].label}
             </div>
           </div>
         </div>
@@ -281,6 +297,14 @@ export function OrderTrackingPage() {
                 <span>Numéro de suivi</span>
                 <span>{order.trackingNumber || '—'}</span>
               </div>
+              {order.pickupPoint && (
+                <div className={styles.summaryLine}>
+                  <span>Point relais</span>
+                  <span>
+                    {[order.pickupPoint.name, order.pickupPoint.city].filter(Boolean).join(' — ')}
+                  </span>
+                </div>
+              )}
               {order.trackingUrl && (
                 <a
                   className={styles.trackingButton}
